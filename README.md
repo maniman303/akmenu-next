@@ -47,7 +47,7 @@ Here is an example VS Code setup:
         {
             "name": "devkitARM-Internal",
             "includePath": [
-                "${workspaceFolder}/**",
+                "${workspaceFolder}/arm9/build",
                 "${workspaceFolder}/arm9/source",
                 "${workspaceFolder}/arm9/source/font",
                 "${workspaceFolder}/arm9/source/launcher",
@@ -72,8 +72,9 @@ Here is an example VS Code setup:
 }
 ```
 - Open repo in VS Code, choose **Reopen in container** in the popup.
+- In terminal run `make all` to generate all missing sources and headers.
 
-Now you should be able to call `make` etc. from the VS Code terminal, and all include paths should work.
+At this point you should be ready to go.
 
 ### Configuration
 
