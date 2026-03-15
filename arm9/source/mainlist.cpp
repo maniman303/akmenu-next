@@ -163,6 +163,18 @@ static bool hiddenEntryFilter(const std::vector<std::string>& entryNames, std::s
     return false;
 }
 
+static std::string replaceInString(const std::string& s, const std::string& oldValue, const std::string& newValue) {
+    std::string res = s;
+    size_t pos = 0;
+
+    while ((pos = res.find(oldValue, pos)) != std::string::npos) {
+        res.replace(pos, oldValue.length(), newValue);
+        pos += newValue.length();
+    }
+
+    return res;
+}
+
 bool cMainList::enterDir(const std::string& dirName) {
 
     std::string base = fsManager().resolveSystemPath("/_nds/akmenunext/icons/");
@@ -412,7 +424,13 @@ bool cMainList::enterDir(const std::string& dirName) {
 }
 
 std::string cMainList::processItemText(std::string text, int column) {
-    if (column != SHOWNAME_COLUMN || _showAllFiles) {
+    if (column != SHOWNAME_COLUMN) {
+        return text;
+    }
+
+    text = replaceInString(text, ".-", ":");
+
+    if (_showAllFiles) {
         return text;
     }
 
