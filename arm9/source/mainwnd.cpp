@@ -549,7 +549,7 @@ void cMainWnd::setParam(void) {
     _values.clear();
     _values.push_back(LANG("switches", "Disable"));
     _values.push_back(LANG("switches", "Enable"));
-    settingWnd.addSettingItem(LANG("file settings", "hide system items"), _values, gs().hideSystemItems);
+    settingWnd.addSettingItem(LANG("file settings", "hide system files"), _values, gs().hideSystemFiles);
     _values.clear();
     _values.push_back(".nds.sav");
     _values.push_back(".sav");
@@ -651,7 +651,7 @@ void cMainWnd::setParam(void) {
     // page 3: filesystem
     gs().showHiddenFiles = settingWnd.getItemSelection(2, 0);
     gs().showFileExtensions = settingWnd.getItemSelection(2, 1);
-    gs().hideSystemItems = settingWnd.getItemSelection(2, 2);
+    gs().hideSystemFiles = settingWnd.getItemSelection(2, 2);
     gs().saveExt = settingWnd.getItemSelection(2, 3);
     gs().saveDir = settingWnd.getItemSelection(2, 4);
 
@@ -714,13 +714,12 @@ void cMainWnd::showSettings(void) {
     u8 currentFileListType = gs().fileListType;
     bool currentShowHiddenFiles = gs().showHiddenFiles;
     bool currentShowFileExtensions = gs().showFileExtensions;
-    bool currentHideSystemItems = gs().hideSystemItems;
+    bool currentHideSystemFiles = gs().hideSystemFiles;
     setParam();
     if (gs().fileListType != currentFileListType ||
         gs().showHiddenFiles != currentShowHiddenFiles ||
         gs().showFileExtensions != currentShowFileExtensions ||
-        gs().hideSystemItems != currentHideSystemItems)
-    {
+        gs().hideSystemFiles != currentHideSystemFiles) {
         _mainList->enterDir(_mainList->getCurrentDir());
     }
 }

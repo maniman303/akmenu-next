@@ -242,7 +242,7 @@ show hidden files = Show hidden files
 save extension = Save extension
 use saves folder = Use 'saves' folder
 show file extensions = Show file extensions
-hide system items = Hide system items
+hide system files = Hide system files
 
 [interface settings]
 title = Interface settings

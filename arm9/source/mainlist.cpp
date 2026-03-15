@@ -38,9 +38,9 @@ cMainList::cMainList(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::str
       _topCount(5),
       _topuSD(0),
       _topuDSiSD(1),
-      _topFavorites(2),
-      _topSlot1(3),
-      _topSlot2(4) {
+      _topFavorites(4),
+      _topSlot1(2),
+      _topSlot2(3) {
     _viewMode = VM_LIST;
     _activeIconScale = 1;
     _activeIcon.hide();
@@ -51,8 +51,8 @@ cMainList::cMainList(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::str
     if (!isDSiMode()) {
         _topCount = 3;
         _topuSD = 0;
-        _topFavorites = 1;
-        _topSlot2 = 2;
+        _topSlot2 = 1;
+        _topFavorites = 2;
         _topuDSiSD = 3;
         _topSlot1 = 4;
     } else {
@@ -112,11 +112,13 @@ int cMainList::init() {
 static bool itemSortComp(const cListView::itemVector& item1, const cListView::itemVector& item2) {
     const std::string& fn1 = item1[cMainList::SHOWNAME_COLUMN].text();
     const std::string& fn2 = item2[cMainList::SHOWNAME_COLUMN].text();
-    if ("../" == fn1) return true;
-    if ("../" == fn2) return false;
-    if ('/' == fn1[fn1.size() - 1] && '/' == fn2[fn2.size() - 1]) return fn1 < fn2;
-    if ('/' == fn1[fn1.size() - 1]) return true;
-    if ('/' == fn2[fn2.size() - 1]) return false;
+    const std::string& realFn1 = item1[cMainList::REALNAME_COLUMN].text();
+    const std::string& realFn2 = item2[cMainList::REALNAME_COLUMN].text();
+    if (fn1 == "../" || fn1 == "..") return true;
+    if (fn2 == "../" || fn2 == "..") return false;
+    if (realFn1.back() == '/' && realFn2.back() == '/') return fn1 < fn2;
+    if (realFn1.back() == '/') return true;
+    if (realFn2.back() == '/') return false;
 
     return fn1 < fn2;
 }
@@ -131,6 +133,33 @@ static bool extnameFilter(const std::vector<std::string>& extNames, std::string 
             return true;
         }
     }
+    return false;
+}
+
+static bool hiddenEntryFilter(const std::vector<std::string>& entryNames, std::string entryName) {
+    if (entryName.length() == 0) {
+        return true;
+    }
+
+    for (size_t i = 0; i < entryName.size(); ++i) entryName[i] = tolower(entryName[i]);
+    if (gs().fileListType == 0 && entryName == "saves") {
+        return true;
+    }
+    
+    if (!gs().hideSystemFiles) {
+        return false;
+    }
+
+    if (entryName[0] == '_') {
+        return true;
+    }
+
+    for (size_t i = 0; i < entryNames.size(); ++i) {
+        if (entryName == entryNames[i]) {
+            return true;
+        }
+    }
+
     return false;
 }
 
@@ -244,6 +273,9 @@ bool cMainList::enterDir(const std::string& dirName) {
     std::vector<std::string> savNames;
     savNames.push_back(".sav");
 
+    std::vector<std::string> entryNames;
+    entryNames.push_back("boot.nds");
+
     // insert 一堆文件, 两列，一列作为显示，一列作为真实文件名
     std::string extName;
 
@@ -277,6 +309,11 @@ bool cMainList::enterDir(const std::string& dirName) {
         } else if (dir) {
             while ((entry = readdir(dir)) != NULL) {
                 std::string lfn(entry->d_name);
+
+                // Don't show system files and dirs
+                if (hiddenEntryFilter(entryNames, lfn)) {
+                    continue;
+                }
 
                 // Don't show MacOS dotfiles
                 if (!gs().showHiddenFiles && lfn[0] == '.') {
@@ -375,35 +412,34 @@ bool cMainList::enterDir(const std::string& dirName) {
 }
 
 std::string cMainList::processItemText(std::string text, int column) {
-    if (column != SHOWNAME_COLUMN || _showAllFiles)
-    {
+    if (column != SHOWNAME_COLUMN || _showAllFiles) {
         return text;
     }
 
-    if (gs().showFileExtensions)
-    {
+    if (gs().showFileExtensions) {
+        return text;
+    }
+
+    if (!text.empty() && text.back() == '/') {
+        text.pop_back();
         return text;
     }
 
     size_t lastdot = text.find_last_of(".");
-    if (lastdot == std::string::npos)
-    {
+    if (lastdot == std::string::npos) {
         return text;
     }
 
     std::string extName;
-    if (text.npos != lastdot)
-    {
+    if (text.npos != lastdot) {
         extName = text.substr(lastdot);
-    }
-    else
-    {
+    } else {
         extName = "";
     }
+
     for (size_t jj = 0; jj < extName.size(); ++jj) extName[jj] = tolower(extName[jj]);
 
-    if (extName != ".nds" && extName != ".sav" && extName != ".gba")
-    {
+    if (extName != ".nds" && extName != ".sav" && extName != ".gba") {
         return text;
     }
 
