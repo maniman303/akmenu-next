@@ -3,6 +3,7 @@ data/load.bin
 build
 staging
 .vscode
+.devcontainer
 *.elf
 *.nds
 *.dsi

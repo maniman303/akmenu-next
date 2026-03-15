@@ -22,6 +22,58 @@ A docker image is available with this version on [docker hub](https://hub.docker
 
 Build the repository with `make`, then run `package.cmd/sh` depending on your OS to package the build for Flashcarts, DSi and 3DS.
 
+### Local setup
+
+Here is an example VS Code setup:
+- In VS Code install extensions for `C++` and `Dev Containers`.
+- Pull the docker imager from [docker hub](https://hub.docker.com/layers/devkitpro/devkitarm/20241104).
+- Clone repo.
+- Inside repo create folders `.devcontainer` and `.vscode`.
+- Create file `.devcontainer/devcontainer.json` with content:
+```json
+{
+    "image": "devkitpro/devkitarm:20241104", 
+    "customizations": {
+        "vscode": {
+            "extensions": ["ms-vscode.cpptools"]
+        }
+    }
+}
+```
+- Create file `.vscode/c_cpp_properties.json` with content:
+```json
+{
+    "configurations": [
+        {
+            "name": "devkitARM-Internal",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/arm9/source",
+                "${workspaceFolder}/arm9/source/font",
+                "${workspaceFolder}/arm9/source/launcher",
+                "${workspaceFolder}/arm9/source/saves",
+                "${workspaceFolder}/arm9/source/ui",
+                "/opt/devkitpro/devkitARM/arm-none-eabi/include/**",
+                "/opt/devkitpro/libgba/include/**",
+                "/opt/devkitpro/libnds/include/**"
+            ],
+            "defines": [
+                "__arm__",
+                "ARM9",
+                "ARM11"
+            ],
+            "compilerPath": "/opt/devkitpro/devkitARM/bin/arm-none-eabi-g++",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-gcc-arm"
+        }
+    ],
+    "version": 4
+}
+```
+- Open repo in VS Code, choose **Reopen in container** in the popup.
+
+Now you should be able to call `make` etc. from the VS Code terminal, and all include paths should work.
 
 ### Configuration
 
