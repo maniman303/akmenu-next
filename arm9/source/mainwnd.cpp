@@ -650,8 +650,10 @@ void cMainWnd::setParam(void) {
 
     // page 3: filesystem
     gs().showHiddenFiles = settingWnd.getItemSelection(2, 0);
-    gs().saveExt = settingWnd.getItemSelection(2, 1);
-    gs().saveDir = settingWnd.getItemSelection(2, 2);
+    gs().showFileExtensions = settingWnd.getItemSelection(2, 1);
+    gs().hideSystemItems = settingWnd.getItemSelection(2, 2);
+    gs().saveExt = settingWnd.getItemSelection(2, 3);
+    gs().saveDir = settingWnd.getItemSelection(2, 4);
 
     // page 4: ndsbs
     gs().dsOnly = settingWnd.getItemSelection(3, 0);
@@ -709,10 +711,16 @@ void cMainWnd::setParam(void) {
 
 void cMainWnd::showSettings(void) {
     if (gs().safeMode) return;
-    u8 currentFileListType = gs().fileListType, currentShowHiddenFiles = gs().showHiddenFiles;
+    u8 currentFileListType = gs().fileListType;
+    bool currentShowHiddenFiles = gs().showHiddenFiles;
+    bool currentShowFileExtensions = gs().showFileExtensions;
+    bool currentHideSystemItems = gs().hideSystemItems;
     setParam();
     if (gs().fileListType != currentFileListType ||
-        gs().showHiddenFiles != currentShowHiddenFiles) {
+        gs().showHiddenFiles != currentShowHiddenFiles ||
+        gs().showFileExtensions != currentShowFileExtensions ||
+        gs().hideSystemItems != currentHideSystemItems)
+    {
         _mainList->enterDir(_mainList->getCurrentDir());
     }
 }
