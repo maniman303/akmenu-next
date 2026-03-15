@@ -374,8 +374,41 @@ bool cMainList::enterDir(const std::string& dirName) {
     return true;
 }
 
+std::string cMainList::processItemText(std::string text, int column) {
+    if (column != SHOWNAME_COLUMN || _showAllFiles)
+    {
+        return text;
+    }
+
+    // TODO: Add ini setting to hide extensions
+
+    size_t lastdot = text.find_last_of(".");
+    if (lastdot == std::string::npos)
+    {
+        return text;
+    }
+
+    std::string extName;
+    if (text.npos != lastdot)
+    {
+        extName = text.substr(lastdot);
+    }
+    else
+    {
+        extName = "";
+    }
+    for (size_t jj = 0; jj < extName.size(); ++jj) extName[jj] = tolower(extName[jj]);
+
+    if (extName != ".nds" && extName != ".sav" && extName != ".gba")
+    {
+        return text;
+    }
+
+    return text.substr(0, lastdot);
+}
+
 void cMainList::onSelectChanged(u32 index) {
-    dbg_printf("%s\n", _rows[index][3].text().c_str());
+    dbg_printf("%s\n", _rows[index][REALNAME_COLUMN].text().c_str());
 }
 
 void cMainList::onSelectedRowClicked(u32 index) {

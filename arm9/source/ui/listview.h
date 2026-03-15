@@ -142,6 +142,8 @@ class cListView : public cWindow {
 
     virtual void onScrolled(u32 index) {}
 
+    virtual std::string processItemText(std::string text, int column);
+
     bool processTouchMessage(const akui::cTouchMessage& msg);
 
   protected:

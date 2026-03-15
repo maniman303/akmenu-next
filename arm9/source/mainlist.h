@@ -94,6 +94,8 @@ class cMainList : public akui::cListView {
 
     void onScrolled(u32 index);
 
+    std::string processItemText(std::string text, int column);
+
   protected:
     VIEW_MODE _viewMode;
 
