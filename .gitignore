@@ -14,3 +14,13 @@ staging
 !redist/**/*.zip
 /package/_nds/akmenunext/language
 /package/title/00030004/4e455854/content/00000000.app
+/package/boot.dsi
+/package/boot.nds
+/package/akmenu-next-dsi.zip
+/package/akmenu-next-flashcart.zip
+/package/akmenu-next-pico.zip
+/package/3ds/*
+/package/dsi/*
+/package/flashcart/*
+/package/pico/*
+/.idea/*
