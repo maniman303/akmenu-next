@@ -60,7 +60,8 @@ Here is an example VS Code setup:
             "defines": [
                 "__arm__",
                 "ARM9",
-                "ARM11"
+                "ARM11",
+                "_GNU_SOURCE"
             ],
             "compilerPath": "/opt/devkitpro/devkitARM/bin/arm-none-eabi-g++",
             "cStandard": "c17",
