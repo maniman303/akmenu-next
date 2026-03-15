@@ -282,7 +282,7 @@ target slot = Ziel Speicher-Slot
 
 [mainlist]
 flash memory = Flash Memory
-microsd card = microSD Card
+microsd card = SD Card
 slot2 card = Slot2 Card
 slot1 card = Slot1 Card
 favorites = Favoriten

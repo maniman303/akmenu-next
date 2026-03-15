@@ -295,7 +295,7 @@ target slot = 目標存檔槽位
 
 [mainlist]
 flash memory = 內建記憶體
-microsd card = microSD卡
+microsd card = SD卡
 slot2 card = Slot2卡
 slot1 card = Slot1卡
 favorites = 喜愛的
