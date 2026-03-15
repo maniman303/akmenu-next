@@ -175,14 +175,22 @@ static std::string replaceInString(const std::string& s, const std::string& oldV
     return res;
 }
 
+static std::string getIconPath(std::string iconName) {
+    std::string basePath = fsManager().resolveSystemPath("/_nds/akmenunext/");
+    std::string uiIconPath = formatString("%sui/%s/icons/%s", basePath.c_str(), gs().uiName.c_str(), iconName.c_str());
+
+    if (fsManager().fileExists(uiIconPath)) {
+        return uiIconPath;
+    }
+
+    return formatString("%sicons/%s", basePath.c_str(), iconName.c_str());
+}
+
 bool cMainList::enterDir(const std::string& dirName) {
-
-    std::string base = fsManager().resolveSystemPath("/_nds/akmenunext/icons/");
-
-    std::string microsd = base + "microsd_banner.bin";
-    std::string nand = base + "nand_banner.bin";
-    std::string gba = base + "gba_banner.bin";
-    std::string folder = base + "folder_banner.bin";
+    std::string microsd = getIconPath("microsd_banner.bin");
+    std::string nand = getIconPath("nand_banner.bin");
+    std::string gba = getIconPath("gba_banner.bin");
+    std::string folder = getIconPath("folder_banner.bin");
 
     _saves.clear();
     if (memcmp(dirName.c_str(), "...", 3) == 0 || dirName.empty())  // select RPG or SD card

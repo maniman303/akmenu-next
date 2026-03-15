@@ -1,3 +1,4 @@
+#include <sys/stat.h>
 #include "fsmngr.h"
 #include "fifotool.h"
 
@@ -42,6 +43,15 @@ bool cFSManager::isFlashcart() const {
 
 bool cFSManager::isSDInserted() const {
     return _isSDInserted;
+}
+
+bool cFSManager::fileExists(const std::string& filePath) const {
+    struct stat buffer;
+    if (stat(filePath.c_str(), &buffer) != 0) {
+        return false;
+    }
+    
+    return S_ISREG(buffer.st_mode);
 }
 
 std::string cFSManager::resolveSystemPath(const char* path) const {

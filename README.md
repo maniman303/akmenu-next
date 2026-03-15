@@ -53,6 +53,7 @@ Here is an example VS Code setup:
                 "${workspaceFolder}/arm9/source/launcher",
                 "${workspaceFolder}/arm9/source/saves",
                 "${workspaceFolder}/arm9/source/ui",
+                "${workspaceFolder}/share",
                 "/opt/devkitpro/devkitARM/arm-none-eabi/include/**",
                 "/opt/devkitpro/libgba/include/**",
                 "/opt/devkitpro/libnds/include/**"

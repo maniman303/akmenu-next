@@ -13,6 +13,7 @@ public:
     void init(int argc, char* argv[]);
     bool isFlashcart() const;
     bool isSDInserted() const;
+    bool fileExists(const std::string& filePath) const;
     std::string resolveSystemPath(const char* path) const;
     std::string getFSRoot() const;
 
