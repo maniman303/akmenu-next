@@ -16,7 +16,7 @@ START = START
 [message box]
 yes = Yes
 no = No
-ok = OK
+ok = Ok
 cancel = Cancel
 
 [progress window]
@@ -149,9 +149,9 @@ item1 = NDS + SAV
 item2 = ALL
 
 [nds bootstrap]
-text = nds-bootstrap version
-release = release
-nightly = nightly
+text = Version of nds-bootstrap
+release = Release
+nightly = Nightly
 firsttimetitle = Initializing nds-bootstrap
 firsttime = Press OK to start first-time setup of nds-bootstrap. This may take a minute and is a one-time process.
 dsmode = DS-Only Mode
@@ -223,9 +223,9 @@ default = AKMenu-Next
 ndshb = nds-bootstrap
 
 [switches]
-Enable = on
-Disable = off
-Global = global(%s)
+Enable = On
+Disable = Off
+Global = Global(%s)
 
 [ram allocation]
 title = Error
@@ -241,6 +241,8 @@ title = File system settings
 show hidden files = Show hidden files
 save extension = Save extension
 use saves folder = Use 'saves' folder
+show file extensions = Show file extensions
+hide system items = Hide system items
 
 [interface settings]
 title = Interface settings
@@ -259,9 +261,9 @@ title = Other Settings
 sleephack = Universal sleep
 autosave = Backup save at startup
 mode = Slot-2 mode
-modegba = gba
-modends = nds
-modeask = ask
+modegba = GBA
+modends = NDS
+modeask = Ask
 modetext = Launch slot-2 in NDS mode?
 
 [sd save]
@@ -323,3 +325,4 @@ text = Language Override
 8 = Korean
 
 [end]
+

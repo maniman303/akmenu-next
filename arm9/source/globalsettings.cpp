@@ -24,6 +24,8 @@ cGlobalSettings::cGlobalSettings() {
     fileListType = 0;
     romTrim = 0;
     showHiddenFiles = false;
+    showFileExtensions = true;
+    hideSystemItems = false;
     enterLastDirWhenBoot = true;
     scrollSpeed = EScrollFast;
     showGbaRoms = true;
@@ -69,6 +71,8 @@ void cGlobalSettings::loadSettings() {
     fileListType = ini.GetInt("system", "fileListType", fileListType);
     romTrim = ini.GetInt("system", "romTrim", romTrim);
     showHiddenFiles = ini.GetInt("system", "showHiddenFiles", showHiddenFiles);
+    showFileExtensions = ini.GetInt("system", "showFileExtensions", showFileExtensions);
+    hideSystemItems = ini.GetInt("system", "hideSystemItems", hideSystemItems);
     enterLastDirWhenBoot = ini.GetInt("system", "enterLastDirWhenBoot", enterLastDirWhenBoot);
     gbaSleepHack = ini.GetInt("system", "gbaSleepHack", gbaSleepHack);
     gbaAutoSave = ini.GetInt("system", "gbaAutoSave", gbaAutoSave);
@@ -131,6 +135,8 @@ void cGlobalSettings::saveSettings() {
     ini.SetInt("system", "fileListType", fileListType);
     ini.SetInt("system", "romTrim", romTrim);
     ini.SetInt("system", "showHiddenFiles", showHiddenFiles);
+    ini.SetInt("system", "showFileExtensions", showFileExtensions);
+    ini.SetInt("system", "hideSystemItems", hideSystemItems);
     ini.SetInt("system", "gbaSleepHack", gbaSleepHack);
     ini.SetInt("system", "gbaAutoSave", gbaAutoSave);
     ini.SetInt("system", "Animation", Animation);

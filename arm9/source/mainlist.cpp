@@ -380,7 +380,10 @@ std::string cMainList::processItemText(std::string text, int column) {
         return text;
     }
 
-    // TODO: Add ini setting to hide extensions
+    if (gs().showFileExtensions)
+    {
+        return text;
+    }
 
     size_t lastdot = text.find_last_of(".");
     if (lastdot == std::string::npos)

@@ -543,6 +543,14 @@ void cMainWnd::setParam(void) {
     _values.push_back(LANG("switches", "Enable"));
     settingWnd.addSettingItem(LANG("file settings", "show hidden files"), _values, gs().showHiddenFiles);
     _values.clear();
+    _values.push_back(LANG("switches", "Disable"));
+    _values.push_back(LANG("switches", "Enable"));
+    settingWnd.addSettingItem(LANG("file settings", "show file extensions"), _values, gs().showFileExtensions);
+    _values.clear();
+    _values.push_back(LANG("switches", "Disable"));
+    _values.push_back(LANG("switches", "Enable"));
+    settingWnd.addSettingItem(LANG("file settings", "hide system items"), _values, gs().hideSystemItems);
+    _values.clear();
     _values.push_back(".nds.sav");
     _values.push_back(".sav");
     settingWnd.addSettingItem(LANG("file settings", "save extension"), _values, gs().saveExt);
