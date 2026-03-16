@@ -14,6 +14,7 @@
 #include <sys/dir.h>
 #include <unordered_set>
 #include <queue>
+#include <algorithm>
 #include "../../share/memtool.h"
 #include "dbgtool.h"
 #include "folder_banner_bin.h"
@@ -369,7 +370,7 @@ std::vector<std::vector<std::string>> cMainList::getGameRows(int rowsToLoad) {
         paths.push("sd:/");
     }
 
-    while (static_cast<int>(rows.size()) < rowsToLoad && !paths.empty()) {
+    while (static_cast<int>(rows.size()) <= rowsToLoad && !paths.empty()) {
         std::string path = paths.front();
         paths.pop();
 
@@ -444,17 +445,18 @@ bool cMainList::setupGameDir() {
         insertEntryRow(getRowCount(), favoriteRows[i], DSRomInfo());
     }
 
-    int rowsToLoad = 21 - favoriteRows.size();
+    int rowsToLoad = 20 - favoriteRows.size();
     if (rowsToLoad <= 0) {
         return false;
     }
 
     std::vector<std::vector<std::string>> rows = getGameRows(rowsToLoad);
-    for (size_t i = 0; i < rows.size(); i++) {
+    int rowsCount = static_cast<int>(rows.size());
+    for (int i = 0; i < std::min(rowsCount, rowsToLoad); i++) {
         insertEntryRow(getRowCount(), rows[i], DSRomInfo());
     }
 
-    return static_cast<int>(rows.size()) < rowsToLoad;
+    return rowsCount <= rowsToLoad;
 }
 
 bool cMainList::enterDir(const std::string& dirName) {
