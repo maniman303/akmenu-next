@@ -9,3 +9,5 @@
 #include <string>
 
 std::string formatString(const char* fmt, ...);
+
+bool startsWithString(const std::string& s, const std::string& prefix);

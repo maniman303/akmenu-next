@@ -199,8 +199,6 @@ static std::string getFriendlyFileSizeString(u64 size) {
 }
 
 void cRomInfoWnd::setFileInfo(const std::string& fullName, const std::string& showName) {
-    _fullName = fullName;
-
     if ("" == showName) {
         dbg_printf("show name %s\n", showName.c_str());
         return;
@@ -215,11 +213,19 @@ void cRomInfoWnd::setFileInfo(const std::string& fullName, const std::string& sh
         return;
     }
 
-    if (showName.size() > 0 && '/' == showName[showName.size() - 1])
-        _filenameText = showName.substr(0, showName.size() - 1);
-    else
-        _filenameText = showName;
+    _fullName = fullName;
+    if (_fullName.length() > 0 && '/' == _fullName.back()) {
+        _fullName = _fullName.substr(0, _fullName.length() - 1);
+    }
 
+    std::string realName = showName;
+    size_t pos = _fullName.find_last_of('/');
+    if (pos != std::string::npos && pos != (_fullName.length() - 1)) {
+        realName = _fullName.substr(pos + 1);
+    }
+
+    _filenameText = realName;
+        
     // dbg_printf("st.st_mtime %d\n", st.st_mtime );
     // struct tm * filetime = localtime(&st.st_mtime);
 

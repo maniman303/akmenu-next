@@ -193,7 +193,7 @@ bool cMainList::enterDir(const std::string& dirName) {
     std::string folder = getIconPath("folder_banner.bin");
 
     _saves.clear();
-    if (memcmp(dirName.c_str(), "...", 3) == 0 || dirName.empty())  // select RPG or SD card
+    if (startsWithString(dirName, "...") || dirName.empty())  // select RPG or SD card
     {
         removeAllRows();
         _romInfoList.clear();
@@ -436,7 +436,7 @@ std::string cMainList::processItemText(std::string text, int column) {
         return text;
     }
 
-    text = replaceInString(text, ".-", ":");
+    text = replaceInString(text, " ~ ", ": ");
 
     if (_showAllFiles) {
         return text;

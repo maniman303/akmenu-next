@@ -21,3 +21,8 @@ std::string formatString(const char* fmt, ...) {
     va_end(argList);
     return str;
 }
+
+bool startsWithString(const std::string& s, const std::string& prefix) {
+    return s.length() >= prefix.length() &&
+           s.compare(0, prefix.length(), prefix) == 0;
+}
