@@ -112,6 +112,8 @@ class cMainList : public akui::cListView {
     std::string processItemText(std::string text, int column);
 
   protected:
+    int _textOffset;
+
     VIEW_MODE _viewMode;
 
     std::string _currentDir;

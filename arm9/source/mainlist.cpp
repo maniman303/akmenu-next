@@ -44,6 +44,7 @@ cMainList::cMainList(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::str
       _topFavorites(4),
       _topSlot1(2),
       _topSlot2(3) {
+    _textOffset = 0;
     _viewMode = VM_LIST;
     _activeIconScale = 1;
     _activeIcon.hide();
@@ -90,6 +91,7 @@ cMainList::~cMainList() {}
 
 int cMainList::init() {
     CIniFile ini(SFN_UI_SETTINGS);
+    _textOffset = ini.GetInt("main list", "textOffset", 0);
     _textColor = ini.GetInt("main list", "textColor", RGB15(7, 7, 7));
     _textColorHilight = ini.GetInt("main list", "textColorHilight", RGB15(31, 0, 31));
     _selectionBarColor1 = ini.GetInt("main list", "selectionBarColor1", RGB15(16, 20, 24));
@@ -738,6 +740,9 @@ void cMainList::drawIcons()  // 直接画家算法画 icons
 void cMainList::setViewMode(VIEW_MODE mode) {
     if (!_columns.size()) return;
     _viewMode = mode;
+
+    // TODO: Load new ini setting and update column offset
+
     switch (_viewMode) {
         case VM_LIST:
             _columns[ICON_COLUMN].width = 0;
@@ -754,20 +759,21 @@ void cMainList::setViewMode(VIEW_MODE mode) {
             setRowHeight(18);
             break;
         case VM_ICON:
-            _columns[ICON_COLUMN].width = 36;
-            _columns[SHOWNAME_COLUMN].width = 214;
+            _columns[ICON_COLUMN].width = 36 + _textOffset;
+            _columns[SHOWNAME_COLUMN].width = 214 - _textOffset;
             _columns[INTERNALNAME_COLUMN].width = 0;
             arangeColumnsSize();
             setRowHeight(38);
             break;
         case VM_INTERNAL:
-            _columns[ICON_COLUMN].width = 36;
+            _columns[ICON_COLUMN].width = 36 + _textOffset;
             _columns[SHOWNAME_COLUMN].width = 0;
-            _columns[INTERNALNAME_COLUMN].width = 214;
+            _columns[INTERNALNAME_COLUMN].width = 214 - _textOffset;
             arangeColumnsSize();
             setRowHeight(38);
             break;
     }
+
     scrollTo(_selectedRowId - _visibleRowCount + 1);
 }
 
