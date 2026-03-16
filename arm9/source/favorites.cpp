@@ -7,6 +7,7 @@
 */
 
 #include "favorites.h"
+#include "fsmngr.h"
 #include "inifile.h"
 #include "systemfilenames.h"
 
@@ -63,4 +64,16 @@ bool cFavorites::IsInFavorites(const std::string& aFileName) {
         }
     }
     return false;
+}
+
+void cFavorites::RemoveInvalidFavorites() {
+    cFSManager fs = fsManager();
+    CIniFile ini(SFN_FAVORITES);
+    std::vector<std::string> items;
+    ini.GetStringVector("main", "list", items, '|');
+    for (size_t ii = 0; ii < items.size(); ++ii) {
+        if (!fs.fileExists(items[ii])) {
+            RemoveFromFavorites(items[ii]);
+        }
+    }
 }

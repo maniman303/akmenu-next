@@ -157,6 +157,8 @@ void cMainWnd::init() {
     dbg_printf("startMenu %08x\n", _startMenu);
 
     arrangeChildren();
+
+    cFavorites::RemoveInvalidFavorites();
 }
 
 void cMainWnd::draw() {
