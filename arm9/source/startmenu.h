@@ -30,4 +30,6 @@ class cStartMenu : public akui::cPopMenu {
     bool process(const akui::cMessage& msg);
 
     cWindow& loadAppearance(const std::string& aFileName);
+
+    cWindow& showForFile(const std::string& fileName);
 };

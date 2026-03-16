@@ -9,6 +9,7 @@
 
 #include "startmenu.h"
 #include "inifile.h"
+#include "favorites.h"
 #include "language.h"
 #include "mainlist.h"
 #include "systemfilenames.h"
@@ -19,8 +20,8 @@ using namespace akui;
 void cStartMenu::init() {
     addItem(START_MENU_ITEM_FAVORITES_ADD, LANG("start menu", "Set favorite"));
     addItem(START_MENU_ITEM_FAVORITES_DELETE, LANG("start menu", "Unset favorite"));
-    addItem(START_MENU_ITEM_SETTING, LANG("start menu", "Setting"));
     addItem(START_MENU_ITEM_INFO, LANG("start menu", "Info"));
+    addItem(START_MENU_ITEM_SETTING, LANG("start menu", "Setting"));
     addItem(START_MENU_ITEM_HELP, LANG("start menu", "Help"));
     //addItem(START_MENU_ITEM_TOOLS, LANG("start menu", "Tools"));
     loadAppearance(SFN_UI_SETTINGS);
@@ -55,4 +56,20 @@ cWindow& cStartMenu::loadAppearance(const std::string& aFileName) {
     _barLeft = ini.GetInt("start menu", "barLeft", 2);
     if (_itemWidth == 0 && _barLeft * 2 > _size.x) _barLeft = 0;
     return *this;
+}
+
+cWindow& cStartMenu::showForFile(const std::string& fileName) {
+    clearItem();
+
+    if (cFavorites::IsInFavorites(fileName)) {
+        addItem(START_MENU_ITEM_FAVORITES_DELETE, LANG("start menu", "Unset favorite"));
+    } else if (fileName != "") {
+        addItem(START_MENU_ITEM_FAVORITES_ADD, LANG("start menu", "Set favorite"));
+    }
+
+    addItem(START_MENU_ITEM_INFO, LANG("start menu", "Info"));
+    addItem(START_MENU_ITEM_SETTING, LANG("start menu", "Setting"));
+    addItem(START_MENU_ITEM_HELP, LANG("start menu", "Help"));
+
+    return show();
 }

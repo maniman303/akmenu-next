@@ -226,7 +226,7 @@ void cMainWnd::startButtonClicked() {
     if (_startMenu->isVisible()) {
         _startMenu->hide();
     } else {
-        if (!gs().safeMode) _startMenu->show();
+        if (!gs().safeMode) _startMenu->showForFile(_mainList->getSelectedFullPath());
     }
 }
 

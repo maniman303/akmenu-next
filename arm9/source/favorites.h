@@ -15,4 +15,5 @@ class cFavorites {
     static bool AddToFavorites(const std::string& aFileName);
     static bool UpdateFavorites(const std::string& aOldFileName, const std::string& aNewFileName);
     static bool RemoveFromFavorites(const std::string& aFileName);
+    static bool IsInFavorites(const std::string& aFileName);
 };

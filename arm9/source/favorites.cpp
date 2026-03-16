@@ -52,3 +52,15 @@ bool cFavorites::RemoveFromFavorites(const std::string& aFileName) {
     }
     return false;
 }
+
+bool cFavorites::IsInFavorites(const std::string& aFileName) {
+    CIniFile ini(SFN_FAVORITES);
+    std::vector<std::string> items;
+    ini.GetStringVector("main", "list", items, '|');
+    for (size_t ii = 0; ii < items.size(); ++ii) {
+        if (items[ii] == aFileName) {
+            return true;
+        }
+    }
+    return false;
+}
