@@ -386,11 +386,12 @@ void cMainWnd::onKeyAPressed() {
 void cMainWnd::launchSelected() {
     std::string fullPath = _mainList->getSelectedFullPath();
     std::string romName = _mainList->getSelectedShowName();
+    std::string fileName = _mainList->getSelectedFileName();
     size_t lastSlashPos = fullPath.find_last_of("/\\");
     std::string directory = fullPath.substr(0, lastSlashPos + 1);
     
     // Create the new path by appending "saves/"
-    std::string savesPath = directory + "saves/" + romName;
+    std::string savesPath = formatString("%ssaves/%s", directory.c_str(), fileName.c_str());
 
     if (fullPath[fullPath.size() - 1] == '/') {
         _mainList->enterDir(fullPath);
@@ -418,7 +419,7 @@ void cMainWnd::launchSelected() {
     progressWnd().show();
     progressWnd().setPercent(0);
     switch (launchRom(fullPath, rominfo,
-                      rominfo.isHomebrew() && "BOOT.NDS" == _mainList->getSelectedShowName(), savesPath)) {
+                      rominfo.isHomebrew() && "boot.nds" == toLowerString(fileName), savesPath)) {
         case ELaunchNoFreeSpace:
             title = LANG("no free space", "title");
             text = LANG("no free space", "text");

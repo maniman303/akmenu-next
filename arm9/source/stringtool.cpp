@@ -38,3 +38,11 @@ std::string replaceInString(const std::string& s, const std::string& oldValue, c
 
     return res;
 }
+
+std::string toLowerString(const std::string& value) {
+    std::string res(value);
+
+    for (size_t i = 0; i < res.size(); i++) res[i] = tolower(res[i]);
+
+    return res;
+}

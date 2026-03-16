@@ -30,7 +30,8 @@ class cMainList : public akui::cListView {
         INTERNALNAME_COLUMN = 2,
         REALNAME_COLUMN = 3,
         SAVETYPE_COLUMN = 4,
-        FILESIZE_COLUMN = 5
+        FILESIZE_COLUMN = 5,
+        IS_FAVORITE_COLUMN = 6
     };
 
   public:
@@ -59,6 +60,8 @@ class cMainList : public akui::cListView {
 
     std::string getSelectedShowName();
 
+    std::string getSelectedFileName();
+
     VIEW_MODE getViewMode() { return _viewMode; }
 
     void arrangeIcons();
@@ -86,6 +89,18 @@ class cMainList : public akui::cListView {
     void updateActiveIcon(bool updateContent);  // 更新活动图标的坐标等等
 
     void updateInternalNames(void);
+
+    bool insertEntryRow(size_t index, const std::vector<std::string>& texts, const DSRomInfo& romInfo);
+
+    void processDirIcons();
+
+    bool setupDefaultDir(bool skipCards, bool skipFavorites);
+
+    bool setupGameDir();
+
+    std::vector<std::vector<std::string>> getFavoriteRows(bool includeFolders);
+
+    std::vector<std::vector<std::string>> getGameRows(int rowsToLoad);
 
   protected:
     void onSelectedRowClicked(u32 index);
