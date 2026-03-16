@@ -15,6 +15,14 @@
 
 Frontend for [nds-bootstrap](https://github.com/DS-Homebrew/nds-bootstrap/) and [Pico-Loader](https://github.com/LNH-team/pico-loader) based upon [lifehansolhacker's akmenu4 port](https://github.com/lifehackerhansol/akmenu4).
 
+## Changes in this fork
+
+- New setting to hide file extensions.
+- Auto replace `;` from filenames with `:` when displaying text.
+- Added a new file presentation mode `Focused`, which will hide system folders and files.
+- Added a new file presentation mode `Minimal`, which will show all favorites and up to 20 games scanned from the sd card on the first page.
+- Added a `textOffset` theme setting under `[main list]`.
+
 ## Getting Started
 
 Requires the pre-calico version of devkitarm to be installed with the `nds-dev` package.
