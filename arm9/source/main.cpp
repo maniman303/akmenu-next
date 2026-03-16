@@ -144,6 +144,7 @@ int main(int argc, char* argv[]) {
             if ("" == lastFile) {
                 lastFile = "...";
             } else if (gs().enterLastDirWhenBoot) {
+                // TODO: Don't set lastDirectory when presentation mode set to minimal
                 size_t slashPos = lastFile.find_last_of('/');
                 if (lastFile.npos != slashPos) lastDirectory = lastFile.substr(0, slashPos + 1);
             }

@@ -163,18 +163,6 @@ static bool hiddenEntryFilter(const std::vector<std::string>& entryNames, std::s
     return false;
 }
 
-static std::string replaceInString(const std::string& s, const std::string& oldValue, const std::string& newValue) {
-    std::string res = s;
-    size_t pos = 0;
-
-    while ((pos = res.find(oldValue, pos)) != std::string::npos) {
-        res.replace(pos, oldValue.length(), newValue);
-        pos += newValue.length();
-    }
-
-    return res;
-}
-
 static std::string getIconPath(std::string iconName) {
     std::string basePath = fsManager().resolveSystemPath("/_nds/akmenunext/");
     std::string uiIconPath = formatString("%sui/%s/icons/%s", basePath.c_str(), gs().uiName.c_str(), iconName.c_str());
