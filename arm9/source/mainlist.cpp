@@ -146,7 +146,7 @@ static bool hiddenEntryFilter(const std::vector<std::string>& entryNames, std::s
         return true;
     }
     
-    if (!gs().hideSystemFiles) {
+    if (gs().filePresentationMode == 0) {
         return false;
     }
 

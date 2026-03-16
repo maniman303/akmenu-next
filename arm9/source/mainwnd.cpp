@@ -551,9 +551,10 @@ void cMainWnd::setParam(void) {
     _values.push_back(LANG("switches", "Enable"));
     settingWnd.addSettingItem(LANG("file settings", "show file extensions"), _values, gs().showFileExtensions);
     _values.clear();
-    _values.push_back(LANG("switches", "Disable"));
-    _values.push_back(LANG("switches", "Enable"));
-    settingWnd.addSettingItem(LANG("file settings", "hide system files"), _values, gs().hideSystemFiles);
+    _values.push_back(LANG("file settings", "presentation full"));
+    _values.push_back(LANG("file settings", "presentation user only"));
+    _values.push_back(LANG("file settings", "presentation games"));
+    settingWnd.addSettingItem(LANG("file settings", "file presentation mode"), _values, gs().filePresentationMode);
     _values.clear();
     _values.push_back(".nds.sav");
     _values.push_back(".sav");
@@ -655,7 +656,7 @@ void cMainWnd::setParam(void) {
     // page 3: filesystem
     gs().showHiddenFiles = settingWnd.getItemSelection(2, 0);
     gs().showFileExtensions = settingWnd.getItemSelection(2, 1);
-    gs().hideSystemFiles = settingWnd.getItemSelection(2, 2);
+    gs().filePresentationMode = settingWnd.getItemSelection(2, 2);
     gs().saveExt = settingWnd.getItemSelection(2, 3);
     gs().saveDir = settingWnd.getItemSelection(2, 4);
 
@@ -718,12 +719,15 @@ void cMainWnd::showSettings(void) {
     u8 currentFileListType = gs().fileListType;
     bool currentShowHiddenFiles = gs().showHiddenFiles;
     bool currentShowFileExtensions = gs().showFileExtensions;
-    bool currentHideSystemFiles = gs().hideSystemFiles;
+    int currentfilePresentationMode = gs().filePresentationMode;
+    
     setParam();
-    if (gs().fileListType != currentFileListType ||
+
+    if (gs().filePresentationMode != currentfilePresentationMode) {
+        _mainList->enterDir("...");
+    } else if (gs().fileListType != currentFileListType ||
         gs().showHiddenFiles != currentShowHiddenFiles ||
-        gs().showFileExtensions != currentShowFileExtensions ||
-        gs().hideSystemFiles != currentHideSystemFiles) {
+        gs().showFileExtensions != currentShowFileExtensions) {
         _mainList->enterDir(_mainList->getCurrentDir());
     }
 }

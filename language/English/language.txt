@@ -242,7 +242,10 @@ show hidden files = Show hidden files
 save extension = Save extension
 use saves folder = Use 'saves' folder
 show file extensions = Show file extensions
-hide system files = Hide system files
+file presentation mode = File presentation mode
+presentation full = Full
+presentation user only = Focused
+presentation games = Minimal
 
 [interface settings]
 title = Interface settings

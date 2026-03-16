@@ -143,8 +143,7 @@ int main(int argc, char* argv[]) {
             lastFile = f.GetString("Save Info", "lastLoaded", "");
             if ("" == lastFile) {
                 lastFile = "...";
-            } else if (gs().enterLastDirWhenBoot) {
-                // TODO: Don't set lastDirectory when presentation mode set to minimal
+            } else if (gs().enterLastDirWhenBoot && gs().filePresentationMode < 2) {
                 size_t slashPos = lastFile.find_last_of('/');
                 if (lastFile.npos != slashPos) lastDirectory = lastFile.substr(0, slashPos + 1);
             }
