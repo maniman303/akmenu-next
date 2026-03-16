@@ -229,11 +229,7 @@ void cMainList::processDirIcons() {
 
         extName = toLowerString(extName);
         if ('/' == filename.back()) {
-            if(gs().icon) {
-                rominfo.setBannerFromFile("folder", folder);
-            } else {
-                rominfo.setBanner("folder", folder_banner_bin);
-            }
+            rominfo.setBannerFromFile("folder", folder, folder_banner_bin);
         } else {
             bool allowExt = true, allowUnknown = false;
             if (".sav" == extName) {
@@ -279,11 +275,8 @@ bool cMainList::setupDefaultDir(bool skipCards, bool skipFavorites) {
             a_row.push_back(LANG("mainlist", "microsd card"));
             a_row.push_back("");
             a_row.push_back("fat:/");
-            if(gs().icon) {
-                rominfo.setBannerFromFile("folder", microsd);
-            } else {
-                rominfo.setBanner("folder", microsd_banner_bin);
-            }
+
+            rominfo.setBannerFromFile("folder", microsd, microsd_banner_bin);
         } else if (_topuDSiSD == i) {
             if (skipCards) {
                 continue;
@@ -292,29 +285,20 @@ bool cMainList::setupDefaultDir(bool skipCards, bool skipFavorites) {
             a_row.push_back("DSi SD");
             a_row.push_back("");
             a_row.push_back("sd:/");
-            if(gs().icon) {
-                rominfo.setBannerFromFile("folder", microsd);
-            } else {
-                rominfo.setBanner("folder", microsd_banner_bin);
-            }
+            
+            rominfo.setBannerFromFile("folder", microsd, microsd_banner_bin);
         } else if (_topSlot1 == i) {
             a_row.push_back(LANG("mainlist", "slot1 card"));
             a_row.push_back("");
             a_row.push_back("slot1:/");
-            if(gs().icon) {
-                rominfo.setBannerFromFile("folder", nand);
-            } else {
-                rominfo.setBanner("folder", nand_banner_bin);
-            }
+            
+            rominfo.setBannerFromFile("folder", nand, nand_banner_bin);
         } else if (_topSlot2 == i) {
             a_row.push_back(LANG("mainlist", "slot2 card"));
             a_row.push_back("");
             a_row.push_back("slot2:/");
-            if(gs().icon) {
-                rominfo.setBannerFromFile("folder", gba);
-            } else {
-                rominfo.setBanner("folder", gba_banner_bin);
-            }
+            
+            rominfo.setBannerFromFile("folder", gba, gba_banner_bin);
         } else if (_topFavorites == i) {
             if (skipFavorites) {
                 continue;
@@ -323,11 +307,8 @@ bool cMainList::setupDefaultDir(bool skipCards, bool skipFavorites) {
             a_row.push_back(LANG("mainlist", "favorites"));
             a_row.push_back("");
             a_row.push_back("favorites:/");
-            if(gs().icon) {
-                rominfo.setBannerFromFile("folder", folder);
-            } else {
-                rominfo.setBanner("folder", folder_banner_bin);
-            }
+            
+            rominfo.setBannerFromFile("folder", folder, folder_banner_bin);
         }
         
         insertEntryRow(getRowCount(), a_row, rominfo);
@@ -550,45 +531,43 @@ bool cMainList::enterDir(const std::string& dirName) {
         while ((entry = readdir(dir)) != NULL) {
             std::string lfn(entry->d_name);
 
-            // Don't show system files and dirs
+            // Don't show system or hidden files and dirs
             if (hiddenEntryFilter(entryNames, lfn)) {
                 continue;
             }
 
-            // entry->d_type == DT_DIR indicates a directory
             std::string extName = "";
             size_t lastDotPos = lfn.find_last_of('.');
             if (lfn.npos != lastDotPos) {
                 extName = lfn.substr(lastDotPos);
             }
 
-            dbg_printf("%s: %s %s\n", (entry->d_type == DT_DIR ? " DIR" : "FILE"),
-                        entry->d_name, extName.c_str());
-            bool showThis = (entry->d_type == DT_DIR) ? (strcmp(entry->d_name, ".") &&
-                                                            strcmp(entry->d_name, ".."))
-                                                        : extnameFilter(extNames, extName);
-            showThis = showThis && (_showAllFiles || gs().showHiddenFiles ||
-                                    !(FAT_getAttr((dirName + lfn).c_str()) & ATTR_HIDDEN));
-            // 如果有后缀名，或者是个目录，就push进去
-            if (showThis) {
-                u32 row_count = getRowCount();
-                std::vector<std::string> a_row;
-                a_row.push_back("");   // make a space for icon
-                a_row.push_back(lfn);  // show name
-                a_row.push_back("");   // make a space for internal name
-
-                a_row.push_back(dirName + lfn);  // real name
-                if (entry->d_type == DT_DIR) {
-                    a_row[SHOWNAME_COLUMN] += "/";
-                    a_row[REALNAME_COLUMN] += "/";
-                }
-                size_t insertPos(row_count);
-                insertEntryRow(insertPos, a_row, DSRomInfo());
-            }
+            std::string filePath = dirName + lfn;
 
             if (extnameFilter(savNames, extName)) {
-                _saves.push_back(dirName + lfn);
+                _saves.push_back(filePath);
             }
+
+            bool showThis = (entry->d_type == DT_DIR) ? (lfn != "." && lfn != "..") : extnameFilter(extNames, extName);
+            showThis = showThis && (_showAllFiles || gs().showHiddenFiles || !(FAT_getAttr(filePath.c_str()) & ATTR_HIDDEN));
+            if (!showThis) {
+                continue;
+            }
+
+            u32 row_count = getRowCount();
+            std::vector<std::string> a_row;
+            a_row.push_back("");   // make a space for icon
+            a_row.push_back(lfn);  // show name
+            a_row.push_back("");   // make a space for internal name
+            a_row.push_back(filePath);  // real name
+
+            if (entry->d_type == DT_DIR) {
+                a_row[SHOWNAME_COLUMN] += "/";
+                a_row[REALNAME_COLUMN] += "/";
+            }
+
+            size_t insertPos(row_count);
+            insertEntryRow(insertPos, a_row, DSRomInfo());
         }
 
         closedir(dir);

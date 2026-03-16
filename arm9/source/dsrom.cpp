@@ -326,14 +326,15 @@ void DSRomInfo::setExtIcon(const std::string& aValue) {
     _extIcon = fileIcons().Icon(aValue);
 };
 
-void DSRomInfo::setBanner(const std::string& anExtIcon, const u8* aBanner) {
-    setExtIcon(anExtIcon);
-    memcpy(&banner(), aBanner, sizeof(tNDSBanner));
-}
-
-bool DSRomInfo::setBannerFromFile(const std::string& anExtIcon,
-                                  const std::string& path)
+bool DSRomInfo::setBannerFromFile(const std::string& anExtIcon, const std::string& path, const u8* aBanner)
 {
+    if(!gs().icon) {
+        setExtIcon(anExtIcon);
+        memcpy(&banner(), aBanner, sizeof(tNDSBanner));
+        
+        return true;
+    }
+
     setExtIcon(anExtIcon);
     FILE* f = fopen(path.c_str(), "rb");
     if (!f) return false;
