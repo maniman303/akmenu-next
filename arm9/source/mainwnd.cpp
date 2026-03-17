@@ -97,7 +97,7 @@ void cMainWnd::init() {
     h = ini.GetInt("start button", "h", 10);
     color = ini.GetInt("start button", "textColor", 0x7fff);
     file = ini.GetString("start button", "file", "none");
-    text = ini.GetString("start button", "text", "START");
+    text = ini.GetString("start button", "text", "ini");
     if (file != "none") {
         file = SFN_UI_CURRENT_DIRECTORY + file;
     }
