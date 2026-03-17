@@ -46,6 +46,7 @@ class cCalendar : public akui::cWindow {
     cBMP15 _dayNumbers;  // index 10 means colon
     cBMP15 _dayNumbersSecond;
     cBMP15 _yearNumbers;
+    cBMP15 _dateSelection;
 
     bool _showYear;
     bool _showMonth;

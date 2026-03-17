@@ -35,15 +35,15 @@ void cCalendar::init() {
 }
 
 cWindow& cCalendar::loadAppearance(const std::string& aFileName) {
-    // load day number
     _dayNumbers = createBMP15FromFile(SFN_DAY_NUMBERS);
     _dayNumbersSecond = createBMP15FromFile(SFN_DAY_NUMBERS_SECOND);
     if (!_dayNumbersSecond.valid()) {
         _dayNumbersSecond = _dayNumbers;
     }
 
-    // load year number
     _yearNumbers = createBMP15FromFile(SFN_YEAR_NUMBERS);
+
+    _dateSelection = createBMP15FromFile(SFN_DATE_SELECTION);
 
     CIniFile ini(aFileName);
     _dayPosition.x = ini.GetInt("calendar day", "x", 134);
@@ -95,16 +95,24 @@ void cCalendar::drawDayNumber(u8 day) {
         x += _fixOnes;
     }
 
+    bool isToday = day == datetime().day();
+
     u16 dayColor = 0;
-    if (weekDayOfDay == 0) {
+    if (isToday) {
+        dayColor = 0;
+    } else if (weekDayOfDay == 0) {
         dayColor = _dayColorSunday;
     }
     else if (weekDayOfDay == 6) {
         dayColor = _dayColorSaturday;
     }
 
-    if (day == datetime().day()) {
-        gdi().fillRect(_dayHighlightColor, _dayHighlightColor, x - (_daySize.x / 2 - w), y - (_daySize.y - h) / 2, _daySize.x - 1, _daySize.y - 1, selectedEngine());
+    if (isToday) {
+        if (_dateSelection.valid()) {
+            gdi().maskBlt(_dateSelection.buffer(), x - (_daySize.x / 2 - w), y - (_daySize.y - h) / 2, _daySize.x - 1, _daySize.y - 1, selectedEngine());
+        } else {
+            gdi().fillRect(_dayHighlightColor, _dayHighlightColor, x - (_daySize.x / 2 - w), y - (_daySize.y - h) / 2, _daySize.x - 1, _daySize.y - 1, selectedEngine());
+        }
     }
 
     if (firstNumber == 0) {
