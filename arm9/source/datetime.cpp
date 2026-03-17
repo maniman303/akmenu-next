@@ -10,6 +10,8 @@
 #include "datetime.h"
 #include <string.h>  //memset
 
+#define IS_LEAP(n) ((!(((n) + 1900) % 400) || (!(((n) + 1900) % 4) && (((n) + 1900) % 100))) != 0)
+
 const char* cDateTime::weekdayStrings[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
 void cDateTime::FillTimeParts(void) {
@@ -54,6 +56,14 @@ u8 cDateTime::minutes() {
 u8 cDateTime::seconds() {
     FillTimeParts();
     return iTimeParts.tm_sec;
+}
+
+u8 cDateTime::daysOfMonth() {
+    return (28 | (((IS_LEAP(year()) ? 62648028 : 62648012) >> (month() * 2)) & 3));
+}
+
+u8 cDateTime::weekDayOfMonthFirstDay() {
+    return (weekday() + 7 - ((day() - 1) % 7)) % 7;
 }
 
 std::string cDateTime::getDateString() {

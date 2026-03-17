@@ -73,18 +73,13 @@ cWindow& cCalendar::loadAppearance(const std::string& aFileName) {
     return *this;
 }
 
-#define IS_LEAP(n) ((!(((n) + 1900) % 400) || (!(((n) + 1900) % 4) && (((n) + 1900) % 100))) != 0)
-static u8 daysOfMonth() {
-    return (28 |
-            (((IS_LEAP(datetime().year()) ? 62648028 : 62648012) >> (datetime().month() * 2)) & 3));
-}
-
 void cCalendar::drawDayNumber(u8 day) {
     if (day > 31) return;
 
-    u8 weekDayOfDay = (((day - 1) % 7) + weekDayOfFirstDay()) % 7;
+    u8 weekdDayOfMonthFirstDay = datetime().weekDayOfMonthFirstDay();
+    u8 weekDayOfDay = (((day - 1) % 7) + weekdDayOfMonthFirstDay) % 7;
     u8 x = weekDayOfDay * _daySize.x + _dayPosition.x;
-    u8 y = ((day - 1 + weekDayOfFirstDay()) / 7 * _daySize.y) + _dayPosition.y;
+    u8 y = ((day - 1 + weekdDayOfMonthFirstDay) / 7 * _daySize.y) + _dayPosition.y;
     u8 pitch = _dayNumbers.pitch() >> 1;
     u8 w = _dayNumbers.width();
     u8 h = _dayNumbers.height() / 10;
@@ -130,10 +125,6 @@ void cCalendar::drawDayNumber(u8 day) {
     }
 }
 
-u8 cCalendar::weekDayOfFirstDay() {
-    return (datetime().weekday() + 7 - ((datetime().day() - 1) % 7)) % 7;
-}
-
 void cCalendar::drawNumber(const akui::cPoint& position, u32 index, u32 value) {
     if (!_yearNumbers.valid()) return;
 
@@ -160,7 +151,7 @@ void cCalendar::drawText(const akui::cPoint& position, u32 value, u32 factor) {
 
 void cCalendar::draw() {
     if (_showDay) {
-        for (u8 i = 1; i <= daysOfMonth(); ++i) {
+        for (u8 i = 1; i <= datetime().daysOfMonth(); ++i) {
             drawDayNumber(i);
         }
     }

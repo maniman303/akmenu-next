@@ -7,13 +7,13 @@
     SPDX-License-Identifier: GPL-3.0-or-later
 */
 
-#include <ctime>
 #include "calendarwnd.h"
 #include "bmp15.h"
 #include "gdi.h"
 #include "globalsettings.h"
 #include "systemfilenames.h"
 #include "stringtool.h"
+#include "datetime.h"
 
 using namespace akui;
 
@@ -37,27 +37,10 @@ cWindow& cCalendarWnd::loadAppearance(const std::string& aFileName) {
 }
 
 static int weeksInCurrentMonth() {
-    std::time_t t = std::time(NULL);
-    std::tm* now = std::localtime(&t);
+    u8 daysOfMonth = datetime().daysOfMonth();
+    u8 weekdDayOfMonthFirstDay = datetime().weekDayOfMonthFirstDay();
 
-    std::tm firstDay = {};
-    firstDay.tm_year = now->tm_year;
-    firstDay.tm_mon = now->tm_mon;
-    firstDay.tm_mday = 1;
-
-    std::mktime(&firstDay);
-
-    int startWeekday = firstDay.tm_wday;
-
-    // days in month
-    std::tm nextMonth = firstDay;
-    nextMonth.tm_mon += 1;
-    nextMonth.tm_mday = 0;
-    std::mktime(&nextMonth);
-
-    int daysInMonth = nextMonth.tm_mday;
-
-    return (startWeekday + daysInMonth + 6) / 7;
+    return ((daysOfMonth + weekdDayOfMonthFirstDay - 1) / 7) + 1;
 }
 
 void cCalendarWnd::draw() {

@@ -24,6 +24,13 @@ Frontend for [nds-bootstrap](https://github.com/DS-Homebrew/nds-bootstrap/) and 
 - Added a new file presentation mode `Minimal`, which will show all favorites and up to 20 games scanned from the sd card on the first page.
 - Added a `textOffset` theme setting under `[main list]`.
 - Added new theme ability to specify `main_list_item_bg.bmp` bg for main list items.
+- Added new theme ability to specify `upper_screen_cal4.bmp` for upper screen bg when month has 4 rows.
+- Added new theme ability to specify `upper_screen_cal5.bmp` for upper screen bg when month has 5 rows.
+- Added new theme ability to specify `calendar/date_selection.bmp` for date selection bg.
+- Added new theme ability to specify `calendar/day_numbers_second.bmp` for custom second digits in calendar.
+- Added a `sundayColor` theme setting under `[calendar day]`.
+- Added a `saturdayColor` theme setting under `[calendar day]`.
+- Added a `fix ones` theme setting under `[calendar day]` to offset dates `21` and `31` on x axis by a specified value.
 
 ## Getting Started
 
