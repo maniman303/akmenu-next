@@ -419,105 +419,78 @@ void cGdi::bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH,
     }
 }
 
-// maskBlt 要destW是偶数，速度可以快一倍
-// 不是偶数也可以，但要求在内存中 src 的 pitch 凑成偶数
-void cGdi::maskBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH,
-                   GRAPHICS_ENGINE engine) {
-    u16* pSrc = (u16*)src;
-    u16* pDest = NULL;
-    bool destAligned = !(destX & 1);
+void cGdi::maskBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH, GRAPHICS_ENGINE engine) {
+    return maskBlt(src, destW, destH, destX, destY, destW, destH, engine, 0);
+}
 
-    if (GE_MAIN == engine)
-        pDest = _bufferMain2 + (destY)*256 + destX + _layerPitch;
-    else
-        pDest = _bufferSub2 + (destY)*256 + destX;
-
-    u16 pitch = (destW + (destW & 1));
-    u16 destInc = 256 - pitch;
-    u16 halfPitch = pitch >> 1;
-
-    if (destAligned)
-        for (u32 i = 0; i < destH; ++i) {
-            for (u32 j = 0; j < halfPitch; ++j) {
-                if (((*(u32*)pSrc) & 0x80008000) == 0x80008000) {
-                    *(u32*)pDest = *(u32*)pSrc;
-                    pSrc += 2;
-                    pDest += 2;
-                } else {
-                    if (*pSrc & 0x8000) *pDest = *pSrc;
-                    pSrc++;
-                    pDest++;
-                    if (*pSrc & 0x8000) *pDest = *pSrc;
-                    pSrc++;
-                    pDest++;
-                }
-            }
-            pDest += destInc;
-        }
-    else
-        for (u16 i = 0; i < destH; ++i) {
-            for (u16 j = 0; j < pitch; ++j) {
-                if (*pSrc & 0x8000) *pDest = *pSrc;
-                pDest++;
-                pSrc++;
-            }
-            pDest += destInc;
-        }
+void cGdi::maskBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH, GRAPHICS_ENGINE engine, u16 color) {
+    return maskBlt(src, destW, destH, destX, destY, destW, destH, engine, color);
 }
 
 void cGdi::maskBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH,
                    GRAPHICS_ENGINE engine) {
-    if (destW <= 0) return;
+    return maskBlt(src, srcW, srcH, destX, destY, destW, destH, engine, 0);
+ }
+
+void cGdi::maskBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH,
+                   GRAPHICS_ENGINE engine, u16 color) {
+    if (destW <= 0) {
+        return;
+    }
+
+    if (color != 0) {
+        color = BIT(15) | color;
+    }
 
     u16* pSrc = (u16*)src;
     u16* pDest = NULL;
-
-    if (GE_MAIN == engine)
+    
+    if (GE_MAIN == engine) {
         pDest = _bufferMain2 + (destY)*256 + destX + _layerPitch;
-    else
+    } else {
         pDest = _bufferSub2 + (destY)*256 + destX;
-
-    bool destAligned = !(destX & 1);
+    }
 
     if (destW > srcW) destW = srcW;
     if (destH > srcH) destH = srcH;
 
     u16 srcInc = srcW - destW;
-    u16 destInc = 256 - destW;
-    u16 destHalfWidth = destW >> 1;
     u16 pitch = (destW + (destW & 1));
-    u16 remain = destW & 1;
+    u16 destInc = 256 - pitch;
+    u16 halfPitch = pitch >> 1;
+    bool destAligned = !(destX & 1);
 
     if (destAligned) {
         for (u32 i = 0; i < destH; ++i) {
-            for (u32 j = 0; j < destHalfWidth; ++j) {
+            for (u32 j = 0; j < halfPitch; ++j) {
                 if (((*(u32*)pSrc) & 0x80008000) == 0x80008000) {
-                    *(u32*)pDest = *(u32*)pSrc;
+                    u32 newValue = (color == 0 ? *(u32*)pSrc : (((u32)color << 16) | color));
+                    *(u32*)pDest = newValue;
                     pSrc += 2;
                     pDest += 2;
                 } else {
-                    if (*pSrc & 0x8000) *pDest = *pSrc;
+                    if (*pSrc & 0x8000) *pDest = (color == 0 ? *pSrc : color);
                     pSrc++;
                     pDest++;
-                    if (*pSrc & 0x8000) *pDest = *pSrc;
+                    if (*pSrc & 0x8000) *pDest = (color == 0 ? *pSrc : color);
                     pSrc++;
                     pDest++;
                 }
             }
-            if (remain) *pDest++ = *pSrc++;
             pDest += destInc;
             pSrc += srcInc;
         }
-    } else
+    } else {
         for (u16 i = 0; i < destH; ++i) {
             for (u16 j = 0; j < pitch; ++j) {
-                if (*pSrc & 0x8000) *pDest = *pSrc;
+                if (*pSrc & 0x8000) *pDest = color == 0 ? *pSrc : color;
                 pDest++;
                 pSrc++;
             }
             pDest += destInc;
             pSrc += srcInc;
         }
+    }
 }
 
 void cGdi::textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine) {

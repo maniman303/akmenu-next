@@ -26,6 +26,8 @@ cCalendar::cCalendar() : cWindow(NULL, "calendar") {
     _showMonth = false;
     _showDayX = false;
     _showDay = false;
+
+    _fixOnes = 0;
 }
 
 void cCalendar::init() {
@@ -35,6 +37,10 @@ void cCalendar::init() {
 cWindow& cCalendar::loadAppearance(const std::string& aFileName) {
     // load day number
     _dayNumbers = createBMP15FromFile(SFN_DAY_NUMBERS);
+    _dayNumbersSecond = createBMP15FromFile(SFN_DAY_NUMBERS_SECOND);
+    if (!_dayNumbersSecond.valid()) {
+        _dayNumbersSecond = _dayNumbers;
+    }
 
     // load year number
     _yearNumbers = createBMP15FromFile(SFN_YEAR_NUMBERS);
@@ -44,8 +50,13 @@ cWindow& cCalendar::loadAppearance(const std::string& aFileName) {
     _dayPosition.y = ini.GetInt("calendar day", "y", 34);
     _daySize.x = ini.GetInt("calendar day", "dw", 16);
     _daySize.y = ini.GetInt("calendar day", "dh", 14);
+
     _dayHighlightColor = ini.GetInt("calendar day", "highlightColor", 0xfc00);
+    _dayColorSunday = ini.GetInt("calendar day", "sundayColor", 0x0000);
+    _dayColorSaturday = ini.GetInt("calendar day", "saturdayColor", 0x0000);
+
     _showDay = ini.GetInt("calendar day", "show", _showDay);
+    _fixOnes = ini.GetInt("calendar day", "fix ones", _fixOnes);
 
     _dayxPosition.x = ini.GetInt("calendar dayx", "x", 0);
     _dayxPosition.y = ini.GetInt("calendar dayx", "y", 28);
@@ -80,15 +91,34 @@ void cCalendar::drawDayNumber(u8 day) {
     u8 firstNumber = day / 10;
     u8 secondNumber = day % 10;
 
-    if (day == datetime().day())
-        gdi().fillRect(_dayHighlightColor, _dayHighlightColor, x - (_daySize.x / 2 - w),
-                       y - (_daySize.y - h) / 2, _daySize.x - 1, _daySize.y - 1, selectedEngine());
+    if (firstNumber != 0 && firstNumber != 1 && secondNumber == 1) {
+        x += _fixOnes;
+    }
+
+    u16 dayColor = 0;
+    if (weekDayOfDay == 0) {
+        dayColor = _dayColorSunday;
+    }
+    else if (weekDayOfDay == 6) {
+        dayColor = _dayColorSaturday;
+    }
+
+    if (day == datetime().day()) {
+        gdi().fillRect(_dayHighlightColor, _dayHighlightColor, x - (_daySize.x / 2 - w), y - (_daySize.y - h) / 2, _daySize.x - 1, _daySize.y - 1, selectedEngine());
+    }
+
+    if (firstNumber == 0) {
+        gdi().maskBlt(_dayNumbers.buffer() + secondNumber * pitch * h / 2, x + (w / 2), y, w, h, selectedEngine(), dayColor);
+
+        return;
+    }
 
     if (_dayNumbers.valid()) {
-        gdi().maskBlt(_dayNumbers.buffer() + firstNumber * pitch * h / 2, x, y, w, h,
-                      selectedEngine());
-        gdi().maskBlt(_dayNumbers.buffer() + secondNumber * pitch * h / 2, x + w, y, w, h,
-                      selectedEngine());
+        gdi().maskBlt(_dayNumbers.buffer() + firstNumber * pitch * h / 2, x, y, w, h, selectedEngine(), dayColor);
+    }
+
+    if (_dayNumbersSecond.valid()) {
+        gdi().maskBlt(_dayNumbersSecond.buffer() + secondNumber * pitch * h / 2, x + w, y, w, h, selectedEngine(), dayColor);
     }
 }
 

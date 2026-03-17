@@ -41,7 +41,10 @@ class cCalendar : public akui::cWindow {
     akui::cPoint _monthPosition;
     akui::cPoint _yearPosition;
     COLOR _dayHighlightColor;
+    COLOR _dayColorSunday;
+    COLOR _dayColorSaturday;
     cBMP15 _dayNumbers;  // index 10 means colon
+    cBMP15 _dayNumbersSecond;
     cBMP15 _yearNumbers;
 
     bool _showYear;
@@ -50,6 +53,8 @@ class cCalendar : public akui::cWindow {
     bool _showDay;
 
     bool _colonShow;
+
+    int _fixOnes;
 };
 
 typedef t_singleton<cCalendar> calendar_s;

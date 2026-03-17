@@ -28,6 +28,8 @@ class cCalendarWnd : public akui::cForm {
 
   protected:
     cBMP15 _background;
+    cBMP15 _background4;
+    cBMP15 _background5;
 };
 
 typedef t_singleton<cCalendarWnd> calendarWnd_s;

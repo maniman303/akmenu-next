@@ -58,8 +58,14 @@ class cGdi {
     void maskBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH,
                  GRAPHICS_ENGINE engine);
 
+    void maskBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH,
+                 GRAPHICS_ENGINE engine, u16 color);
+
     void maskBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH,
                  GRAPHICS_ENGINE engine);
+
+    void maskBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH,
+                 GRAPHICS_ENGINE engine, u16 color);
 
     void bitBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH,
                 GRAPHICS_ENGINE engine);
