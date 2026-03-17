@@ -408,3 +408,13 @@ bool CGbaLoader::LoadInternal(bool nor, bool force) {
     }
     return load;
 }
+
+u8 CGbaLoader::GetGbaHeader() {
+    u8 chk = 0;
+    for (u32 i = 0xA0; i < 0xBD; ++i) {
+        chk = chk - *(u8*)(0x8000000 + i);
+    }
+    chk = (chk - 0x19) & 0xff;
+
+    return chk;
+}

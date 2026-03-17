@@ -17,6 +17,7 @@
 #include <algorithm>
 #include "../../share/memtool.h"
 #include "dbgtool.h"
+#include "gbaloader.h"
 #include "folder_banner_bin.h"
 #include "gba_banner_bin.h"
 #include "inifile.h"
@@ -304,6 +305,11 @@ bool cMainList::setupDefaultDir(bool skipCards, bool skipFavorites) {
             
             rominfo.setBannerFromFile("folder", nand, nand_banner_bin);
         } else if (_topSlot2 == i) {
+            u8 chk = CGbaLoader::GetGbaHeader();
+            if (chk != GBA_HEADER.complement) {
+                continue;
+            }
+
             a_row.push_back(LANG("mainlist", "slot2 card"));
             a_row.push_back("");
             a_row.push_back("slot2:/");
@@ -454,7 +460,8 @@ bool cMainList::setupGameDir() {
         insertEntryRow(getRowCount(), favoriteRows[i], DSRomInfo());
     }
 
-    int rowsToLoad = 20 - favoriteRows.size();
+    int rowsToLoad = std::max(gs().minimalModeRomsCount, 0);
+    rowsToLoad = rowsToLoad - favoriteRows.size();
     if (rowsToLoad <= 0) {
         return false;
     }

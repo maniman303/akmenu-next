@@ -26,6 +26,7 @@ cGlobalSettings::cGlobalSettings() {
     showHiddenFiles = false;
     showFileExtensions = true;
     filePresentationMode = 0;
+    minimalModeRomsCount = 20;
     enterLastDirWhenBoot = true;
     scrollSpeed = EScrollFast;
     showGbaRoms = true;
@@ -73,6 +74,7 @@ void cGlobalSettings::loadSettings() {
     showHiddenFiles = ini.GetInt("system", "showHiddenFiles", showHiddenFiles);
     showFileExtensions = ini.GetInt("system", "showFileExtensions", showFileExtensions);
     filePresentationMode = ini.GetInt("system", "filePresentationMode", filePresentationMode);
+    minimalModeRomsCount = ini.GetInt("system", "minimalModeRomsCount", minimalModeRomsCount);
     enterLastDirWhenBoot = ini.GetInt("system", "enterLastDirWhenBoot", enterLastDirWhenBoot);
     gbaSleepHack = ini.GetInt("system", "gbaSleepHack", gbaSleepHack);
     gbaAutoSave = ini.GetInt("system", "gbaAutoSave", gbaAutoSave);

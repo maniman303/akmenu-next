@@ -33,4 +33,5 @@ class CGbaLoader {
     bool Load(bool aForce, bool aNotStart);
     static bool CheckPSRAM(u32 aSize);
     static void StartGBA(void);
+    static u8 GetGbaHeader();
 };

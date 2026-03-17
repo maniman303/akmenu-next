@@ -52,6 +52,7 @@ class cGlobalSettings {
     bool showHiddenFiles;
     bool showFileExtensions;
     int filePresentationMode;
+    int minimalModeRomsCount;
     bool enterLastDirWhenBoot;
     bool showGbaRoms;
     bool gbaSleepHack;

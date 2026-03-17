@@ -766,12 +766,14 @@ void cMainWnd::showFileInfo() {
 void cMainWnd::onFolderChanged() {
     resetInputIdle();
     std::string dirShowName = _mainList->getCurrentDir();
-    if (dirShowName != "favorites:/" && _mainList->getSelectedFullPath() == "slot2:/") {
-        u8 chk = 0;
-        for (u32 i = 0xA0; i < 0xBD; ++i) {
-            chk = chk - *(u8*)(0x8000000 + i);
-        }
-        chk = (chk - 0x19) & 0xff;
+    if (dirShowName == "favorites:/") {
+        _folderText->setText(dirShowName);
+
+        return;
+    }
+
+    if (_mainList->getSelectedFullPath() == "slot2:/") {
+        u8 chk = CGbaLoader::GetGbaHeader();
         if (chk != GBA_HEADER.complement) {
             dbg_printf("chk %02x header checksum %02x\n", chk, GBA_HEADER.complement);
             std::string title = LANG("no gba card", "title");
@@ -798,7 +800,7 @@ void cMainWnd::onFolderChanged() {
         }
     }
 
-    if (dirShowName != "favorites:/" && _mainList->getSelectedFullPath() == "slot1:/") {
+    if (_mainList->getSelectedFullPath() == "slot1:/") {
         Slot1Launcher().launchRom("slot1:/", "", 0, 0, 0, 0);
     }
 
