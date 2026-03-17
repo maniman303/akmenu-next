@@ -17,11 +17,13 @@ Frontend for [nds-bootstrap](https://github.com/DS-Homebrew/nds-bootstrap/) and 
 
 ## Changes in this fork
 
+- Small fixes to rendering and English typos.
 - New setting to hide file extensions.
 - Auto replace `;` from filenames with `:` when displaying text.
 - Added a new file presentation mode `Focused`, which will hide system folders and files.
 - Added a new file presentation mode `Minimal`, which will show all favorites and up to 20 games scanned from the sd card on the first page.
 - Added a `textOffset` theme setting under `[main list]`.
+- Added new theme ability to specify `main_list_item_bg.bmp` bg for main list items.
 
 ## Getting Started
 
