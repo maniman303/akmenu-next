@@ -348,7 +348,7 @@ void cGdi::fillRectBlend(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRA
     u32 destInc = 256 - w;
     for (u32 ii = 0; ii < h; ++ii) {
         for (u32 jj = 0; jj < w; ++jj) {
-            u32 buff = *pDest & 0x7fff;
+            u32 buff = *pDest & 0xffff;
             u32 original = (buff & 0x8000) == 0 ? *pSrc++ & 0x7fff : buff;
             u32 color = (jj & 1) ? color2 : color1;
             u32 rb = ((color & 0x7c1f) * alpha + (original & 0x7c1f) * (32 - alpha)) & 0xf83e0;
