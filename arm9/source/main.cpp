@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) {
 
     gdi().initBg(SFN_LOWER_SCREEN_BG);
 
-    cMainWnd* wnd = new cMainWnd(0, 0, 256, 192, NULL, "main window");
+    cMainWnd* wnd = new cMainWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, "main window");
     wnd->init();
 
     progressWnd().init();

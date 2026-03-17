@@ -17,7 +17,7 @@
 
 using namespace akui;
 
-cCalendarWnd::cCalendarWnd() : cForm(0, 0, 256, 192, NULL, "calendar window") {}
+cCalendarWnd::cCalendarWnd() : cForm(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, "calendar window") {}
 
 cCalendarWnd::~cCalendarWnd() {}
 
@@ -46,12 +46,12 @@ static int weeksInCurrentMonth() {
 void cCalendarWnd::draw() {
     int weeks = weeksInCurrentMonth();
     if (weeks == 4 && _background4.valid()) {
-        gdi().bitBlt(_background4.buffer(), 0, 0, 256, 192, selectedEngine());
+        gdi().bitBlt(_background4.buffer(), 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, selectedEngine());
         return;
     } else if (weeks == 5 && _background5.valid()) {
-        gdi().bitBlt(_background5.buffer(), 0, 0, 256, 192, selectedEngine());
+        gdi().bitBlt(_background5.buffer(), 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, selectedEngine());
         return;
     } else {
-        gdi().bitBlt(_background.buffer(), 0, 0, 256, 192, selectedEngine());
+        gdi().bitBlt(_background.buffer(), 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, selectedEngine());
     }
 }

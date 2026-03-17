@@ -300,7 +300,7 @@ void cRomInfoWnd::onShow() {
 void cRomInfoWnd::pressSaveType(void) {
     if (!_romInfo.isDSRom() || _romInfo.isHomebrew()) return;
 
-    cSettingWnd settingWnd(0, 0, 252, 188, this, LANG("save type", "tab1"));
+    cSettingWnd settingWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, this, LANG("save type", "tab1"));
     std::vector<std::string> _values;
     _values.push_back(LANG("save type", "Unknown"));
     _values.push_back(LANG("save type", "No Save"));
@@ -414,7 +414,7 @@ void cRomInfoWnd::pressCheats(void) {
 void cRomInfoWnd::showCheats(const std::string& aFileName) {
     u32 w = 256;
     u32 h = 179;
-    cCheatWnd cheatWnd((256 - w) / 2, (192 - h) / 2, w, h, NULL, LANG("cheats", "title"));
+    cCheatWnd cheatWnd((SCREEN_WIDTH - w) / 2, (SCREEN_HEIGHT - h) / 2, w, h, NULL, LANG("cheats", "title"));
     if (cheatWnd.parse(aFileName)) cheatWnd.doModal();
 }
 

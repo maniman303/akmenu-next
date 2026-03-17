@@ -201,7 +201,7 @@ void cSettingWnd::addSettingItem(const std::string& text, const std::vector<std:
     // recompute window size and position
     if (_maxTabSize < (items(lastTab).size() + 1)) {
         _maxTabSize = (items(lastTab).size() + 1);
-        setSize(cSize(_size.x, _maxTabSize * 20 + 41 + TOP_MARGIN));
+        //setSize(cSize(_size.x, _maxTabSize * 20 + 41 + TOP_MARGIN));
         _position.x = (SCREEN_WIDTH - _size.x) / 2;
         _position.y = (SCREEN_HEIGHT - _size.y) / 2;
     }

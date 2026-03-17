@@ -214,14 +214,14 @@ void cMainWnd::startMenuItemClicked(s16 i) {
         u32 h = 160;
         w = ini.GetInt("help window", "w", w);
         h = ini.GetInt("help window", "h", h);
-        cHelpWnd* helpWnd = new cHelpWnd((256 - w) / 2, (192 - h) / 2, w, h, this,
+        cHelpWnd* helpWnd = new cHelpWnd((SCREEN_WIDTH - w) / 2, (SCREEN_HEIGHT - h) / 2, w, h, this,
                                          LANG("help window", "title"));
         helpWnd->doModal();
         delete helpWnd;
     } else if (START_MENU_ITEM_TOOLS == i) {
         u32 w = 250;
         u32 h = 130;
-        cExpWnd expWnd((256 - w) / 2, (192 - h) / 2, w, h, NULL, LANG("exp window", "title"));
+        cExpWnd expWnd((SCREEN_WIDTH - w) / 2, (SCREEN_HEIGHT - h) / 2, w, h, NULL, LANG("exp window", "title"));
         expWnd.doModal();
     }
 }
@@ -439,7 +439,7 @@ void cMainWnd::onKeyBPressed() {
 }
 
 void cMainWnd::setParam(void) {
-    cSettingWnd settingWnd(0, 0, 252, 188, NULL, LANG("system setting", "title"));
+    cSettingWnd settingWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, LANG("system setting", "title"));
 
     // page 1: system
     std::string currentUIStyle = gs().uiName;
@@ -750,7 +750,7 @@ void cMainWnd::showFileInfo() {
     h = ini.GetInt("rom info window", "h", h);
 
     cRomInfoWnd* romInfoWnd =
-            new cRomInfoWnd((256 - w) / 2, (192 - h) / 2, w, h, this, LANG("rom info", "title"));
+            new cRomInfoWnd((SCREEN_WIDTH - w) / 2, (SCREEN_HEIGHT - h) / 2, w, h, this, LANG("rom info", "title"));
     std::string showName = _mainList->getSelectedShowName();
     std::string fullPath = _mainList->getSelectedFullPath();
     romInfoWnd->setFileInfo(fullPath, showName);

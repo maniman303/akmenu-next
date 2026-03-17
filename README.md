@@ -31,6 +31,7 @@ Frontend for [nds-bootstrap](https://github.com/DS-Homebrew/nds-bootstrap/) and 
 - Added a `sundayColor` theme setting under `[calendar day]`.
 - Added a `saturdayColor` theme setting under `[calendar day]`.
 - Added a `fix ones` theme setting under `[calendar day]` to offset dates `21` and `31` on x axis by a specified value.
+- Makes seetings window fullscreen.
 
 ## Getting Started
 
