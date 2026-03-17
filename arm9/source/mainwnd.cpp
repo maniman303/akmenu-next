@@ -313,6 +313,7 @@ bool cMainWnd::processKeyMessage(const cKeyMessage& msg) {
                     _processL = false;
                 } else {
                     _mainList->enterDir("favorites:/");
+                    _mainList->selectRow(0);
                 }
                 ret = true;
                 break;
@@ -726,6 +727,7 @@ void cMainWnd::showSettings(void) {
 
     if (gs().filePresentationMode != currentfilePresentationMode) {
         _mainList->enterDir("...");
+        _mainList->selectRow(0);
     } else if (gs().fileListType != currentFileListType ||
         gs().showHiddenFiles != currentShowHiddenFiles ||
         gs().showFileExtensions != currentShowFileExtensions) {
@@ -764,7 +766,7 @@ void cMainWnd::showFileInfo() {
 void cMainWnd::onFolderChanged() {
     resetInputIdle();
     std::string dirShowName = _mainList->getCurrentDir();
-    if ("favorites:/" != dirShowName && "slot2:/" == _mainList->getSelectedFullPath()) {
+    if (dirShowName != "favorites:/" && _mainList->getSelectedFullPath() == "slot2:/") {
         u8 chk = 0;
         for (u32 i = 0xA0; i < 0xBD; ++i) {
             chk = chk - *(u8*)(0x8000000 + i);
@@ -795,7 +797,8 @@ void cMainWnd::onFolderChanged() {
             CGbaLoader::StartGBA();
         }
     }
-    if ("favorites:/" != dirShowName && "slot1:/" == _mainList->getSelectedFullPath()) {
+
+    if (dirShowName != "favorites:/" && _mainList->getSelectedFullPath() == "slot1:/") {
         Slot1Launcher().launchRom("slot1:/", "", 0, 0, 0, 0);
     }
 

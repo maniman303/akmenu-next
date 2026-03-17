@@ -655,12 +655,16 @@ void cMainList::onScrolled(u32 index) {
 void cMainList::backParentDir() {
     if ("..." == _currentDir) return;
 
-    bool fat1 = (fsManager().getFSRoot() == _currentDir), favorites = ("favorites:/" == _currentDir);
-    if ("fat:/" == _currentDir || "sd:/" == _currentDir || fat1 || favorites ||
-        "/" == _currentDir) {
+    bool fat1 = (fsManager().getFSRoot() == _currentDir);
+    bool favorites = ("favorites:/" == _currentDir);
+    if (_currentDir == "fat:/" || _currentDir == "sd:/" || fat1 || favorites || _currentDir == "/") {
         enterDir("...");
-        if (fat1) selectRow(_topuSD);
-        if (favorites) selectRow(_topFavorites);
+        if (fat1) {
+            selectRow(SDCard());
+        } else if (favorites) {
+            selectRow(gs().filePresentationMode < 2 ? _topFavorites : 0);
+        }
+
         return;
     }
 
@@ -672,7 +676,7 @@ void cMainList::backParentDir() {
 
     if (enterDir(parentDir)) {  // select last entered director
         for (size_t i = 0; i < _rows.size(); ++i) {
-            if (parentDir + _rows[i][SHOWNAME_COLUMN].text() == oldCurrentDir) {
+            if (parentDir + _rows[i][REALNAME_COLUMN].text() == oldCurrentDir) {
                 selectRow(i);
             }
         }
@@ -750,10 +754,8 @@ void cMainList::drawIcons()  // 直接画家算法画 icons
     for (size_t i = 0; i < total; ++i) {
         // 这里图像呈现比真正的 MAIN buffer 翻转要早，所以会闪一下
         // 解决方法是在 gdi().present 里边统一呈现翻转
-        if (_firstVisibleRowId + i == _selectedRowId) {
-            if (_activeIcon.visible()) {
-                continue;
-            }
+        if (_firstVisibleRowId + i == _selectedRowId && _activeIcon.visible()) {
+            continue;
         }
         s32 itemX = _position.x + 1;
         s32 itemY = _position.y + i * _rowHeight + ((_rowHeight - icon_height) >> 1) - 1;
@@ -868,4 +870,37 @@ const std::vector<std::string>* cMainList::Saves(void) {
 void cMainList::SwitchShowAllFiles(void) {
     _showAllFiles = !_showAllFiles;
     enterDir(getCurrentDir());
+}
+
+u32 cMainList::Slot1() {
+    std::string slotName = LANG("mainlist", "slot1 card");
+    for (size_t i = 0; i < getRowCount(); i++) {
+        if (_rows[i][SHOWNAME_COLUMN].text() == slotName) {
+            return i;
+        }
+    }
+
+    return _topSlot1;
+}
+
+u32 cMainList::Slot2() {
+    std::string slotName = LANG("mainlist", "slot2 card");
+    for (size_t i = 0; i < getRowCount(); i++) {
+        if (_rows[i][SHOWNAME_COLUMN].text() == slotName) {
+            return i;
+        }
+    }
+
+    return _topSlot2;
+}
+
+u32 cMainList::SDCard() {
+    std::string slotName = LANG("mainlist", "microsd card");
+    for (size_t i = 0; i < getRowCount(); i++) {
+        if (_rows[i][SHOWNAME_COLUMN].text() == slotName) {
+            return i;
+        }
+    }
+
+    return _topuSD;
 }

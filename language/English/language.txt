@@ -140,7 +140,7 @@ text = Can not access sd card, save data of previous launched program will be wr
 
 [no gba card]
 title = Notify
-text = There is no device in SLOT-2
+text = There is no device in Slot 2.
 
 [filelist type]
 text = Set file list type

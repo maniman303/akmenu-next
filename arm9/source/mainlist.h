@@ -143,6 +143,7 @@ class cMainList : public akui::cListView {
     u32 _topSlot2;
 
   public:
-    u32 Slot1(void) { return _topSlot1; }
-    u32 Slot2(void) { return _topSlot2; }
+    u32 Slot1();
+    u32 Slot2();
+    u32 SDCard();
 };
