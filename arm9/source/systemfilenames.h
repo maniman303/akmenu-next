@@ -26,6 +26,7 @@
 #define SFN_UI_SETTINGS SFN_UI_DIRECTORY + gs().uiName + "/uisettings.ini"
 #define SFN_UPPER_SCREEN_BG SFN_UI_DIRECTORY + gs().uiName + "/upper_screen.bmp"
 #define SFN_LOWER_SCREEN_BG SFN_UI_DIRECTORY + gs().uiName + "/lower_screen.bmp"
+#define SFN_MAIN_LIST_ITEM_BG SFN_UI_DIRECTORY + gs().uiName + "/main_list_item_bg.bmp"
 #define SFN_FORM_TITLE_L SFN_UI_DIRECTORY + gs().uiName + "/title_left.bmp"
 #define SFN_FORM_TITLE_M SFN_UI_DIRECTORY + gs().uiName + "/title_bg.bmp"
 #define SFN_FORM_TITLE_R SFN_UI_DIRECTORY + gs().uiName + "/title_right.bmp"

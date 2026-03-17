@@ -127,6 +127,7 @@ int main(int argc, char* argv[]) {
     bigClock().draw();
 
     userWindow().draw();
+    // TODO: init and draw battery
 
     gdi().present(GE_MAIN);
     gdi().present(GE_SUB);
@@ -216,8 +217,6 @@ int main(int argc, char* argv[]) {
         windowManager().update();
 
         gdi().present(GE_MAIN);
-
-
     }
 
     return 0;

@@ -16,7 +16,7 @@
 #include "sigslot.h"
 #include "touchmessage.h"
 #include "zoomingicon.h"
-
+#include "image.h"
 
 // 显示游戏列表，文件列表等等
 class cMainList : public akui::cListView {
@@ -84,6 +84,8 @@ class cMainList : public akui::cListView {
 
     void drawIcons();  // 直接画家算法画 icons
 
+    void drawItemBackgrounds();
+
     enum { POSITION = 0, CONTENT = 1 };
 
     void updateActiveIcon(bool updateContent);  // 更新活动图标的坐标等等
@@ -113,6 +115,8 @@ class cMainList : public akui::cListView {
 
   protected:
     int _textOffset;
+
+    akui::cImage* _itemBg;
 
     VIEW_MODE _viewMode;
 

@@ -87,7 +87,11 @@ cMainList::cMainList(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::str
     }
 }
 
-cMainList::~cMainList() {}
+cMainList::~cMainList() {
+    if (_itemBg) {
+        delete _itemBg;
+    }
+}
 
 int cMainList::init() {
     CIniFile ini(SFN_UI_SETTINGS);
@@ -97,6 +101,9 @@ int cMainList::init() {
     _selectionBarColor1 = ini.GetInt("main list", "selectionBarColor1", RGB15(16, 20, 24));
     _selectionBarColor2 = ini.GetInt("main list", "selectionBarColor2", RGB15(20, 25, 0));
     _selectionBarOpacity = ini.GetInt("main list", "selectionBarOpacity", 100);
+
+    _itemBg = new akui::cImage(this);
+    _itemBg->loadAppearance(SFN_MAIN_LIST_ITEM_BG);
 
     // selectedRowClicked.connect(this,&cMainList::executeSelected);
 
@@ -708,32 +715,49 @@ void cMainList::setRomInfo(u32 rowIndex, const DSRomInfo& info) {
 
 void cMainList::draw() {
     updateInternalNames();
+    drawItemBackgrounds();
     cListView::draw();
     updateActiveIcon(POSITION);
     drawIcons();
 }
 
+void cMainList::drawItemBackgrounds() {
+    if (_viewMode == VM_LIST || _viewMode == VM_LIST_ICON) {
+        return;
+    }
+
+    size_t total = std::min(_visibleRowCount, _rows.size() - _firstVisibleRowId);
+
+    for (size_t i = 0; i < total; i++) {
+        s32 itemX = 0;
+        s32 itemY = _position.y + i * _rowHeight;
+
+        _itemBg->draw(itemX, itemY);
+    }
+}
+
 void cMainList::drawIcons()  // 直接画家算法画 icons
 {
-    if (VM_LIST != _viewMode){
-        size_t total = _visibleRowCount;
-        if (total > _rows.size() - _firstVisibleRowId) total = _rows.size() - _firstVisibleRowId;
+    if (_viewMode == VM_LIST) {
+        return;
+    }
 
-        int icon_height = (VM_LIST_ICON == _viewMode) ? 16 : 32;
-        bool small = (VM_LIST_ICON == _viewMode) ? true : false;
+    size_t total = std::min(_visibleRowCount, _rows.size() - _firstVisibleRowId);
 
-        for (size_t i = 0; i < total; ++i) {
-            // 这里图像呈现比真正的 MAIN buffer 翻转要早，所以会闪一下
-            // 解决方法是在 gdi().present 里边统一呈现翻转
-            if (_firstVisibleRowId + i == _selectedRowId) {
-                if (_activeIcon.visible()) {
-                    continue;
-                }
+    int icon_height = (VM_LIST_ICON == _viewMode) ? 16 : 32;
+    bool small = (VM_LIST_ICON == _viewMode) ? true : false;
+
+    for (size_t i = 0; i < total; ++i) {
+        // 这里图像呈现比真正的 MAIN buffer 翻转要早，所以会闪一下
+        // 解决方法是在 gdi().present 里边统一呈现翻转
+        if (_firstVisibleRowId + i == _selectedRowId) {
+            if (_activeIcon.visible()) {
+                continue;
             }
-            s32 itemX = _position.x + 1;
-            s32 itemY = _position.y + i * _rowHeight + ((_rowHeight - icon_height) >> 1) - 1;
-            _romInfoList[_firstVisibleRowId + i].drawDSRomIcon(itemX, itemY, _engine, small);
         }
+        s32 itemX = _position.x + 1;
+        s32 itemY = _position.y + i * _rowHeight + ((_rowHeight - icon_height) >> 1) - 1;
+        _romInfoList[_firstVisibleRowId + i].drawDSRomIcon(itemX, itemY, _engine, small);
     }
 }
 
