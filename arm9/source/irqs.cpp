@@ -12,6 +12,7 @@
 #include "bigclock.h"
 #include "calendar.h"
 #include "calendarwnd.h"
+#include "smalldate.h"
 #include "dbgtool.h"
 #include "diskicon.h"
 #include "timer.h"
@@ -55,6 +56,7 @@ void cIRQ::vBlank() {
         calendarWnd().draw();
         calendar().draw();
         bigClock().draw();
+        smallDate().draw();
         userWindow().draw();
 #if 0
         char fpsText[16];

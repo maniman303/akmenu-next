@@ -493,7 +493,19 @@ void cGdi::maskBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u1
     }
 }
 
+void cGdi::textOut(s16 x, s16 y, const char* text, GRAPHICS_ENGINE engine) {
+    textOutRect(x, y, 256, 192, text, engine, font());
+}
+
+void cGdi::textOut(s16 x, s16 y, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont) {
+    textOutRect(x, y, 256, 192, text, engine, textFont);
+}
+
 void cGdi::textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine) {
+    textOutRect(x, y, w, h, text, engine, font());
+}
+
+void cGdi::textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont) {
     const s16 originX = x, limitY = y + h - gs().fontHeight;
     while (*text) {
         if ('\r' == *text || '\n' == *text) {
@@ -503,9 +515,9 @@ void cGdi::textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_EN
             if (y > limitY) break;
         } else {
             u32 ww, add;
-            font().Info(text, &ww, &add);
+            textFont.Info(text, &ww, &add);
             if (x + (s16)ww < originX + w) {
-                font().Draw((GE_MAIN == engine) ? (_bufferMain2 + _layerPitch) : _bufferSub2, x, y,
+                textFont.Draw((GE_MAIN == engine) ? (_bufferMain2 + _layerPitch) : _bufferSub2, x, y,
                             (const u8*)text, (GE_MAIN == engine) ? _penColor : _penColorSub);
             }
             text += add;

@@ -2,6 +2,7 @@
 
 [font]
 main = liberation.pcf
+secondary = liberation_secondary.pcf
 language = 1
 
 [start menu]

@@ -16,11 +16,19 @@
 cFontFactory::cFontFactory() : _font(NULL) {}
 
 cFontFactory::~cFontFactory() {
-    if (NULL != _font) delete _font;
+    if (_font != NULL) delete _font;
+    if (_fontSecondary != NULL) delete _fontSecondary;
 }
 
 void cFontFactory::makeFont(void) {
     std::string filename(SFN_FONTS_DIRECTORY + lang().GetString("font", "main", SFN_DEFAULT_FONT));
     _font = new cFontPcf();
     _font->Load(filename.c_str());
+
+    std::string filenameSecondary(SFN_FONTS_DIRECTORY + lang().GetString("font", "secondary", ""));
+    _fontSecondary = new cFontPcf();
+    if (!_fontSecondary->Load(filenameSecondary.c_str())) {
+        delete _fontSecondary;
+        _fontSecondary = NULL;
+    }
 }

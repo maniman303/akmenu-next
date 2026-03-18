@@ -30,7 +30,7 @@ cFontPcf::~cFontPcf() {
     delete[] iData;
 }
 
-void cFontPcf::Info(const char* aString, u32* aWidth, u32* aSymbolCount) {
+void cFontPcf::Info(const char* aString, u32* aWidth, u32* aSymbolCount) const {
     u32 len;
     u32 code = utf8toucs2((const u8*)aString, &len);
     if (aSymbolCount) *aSymbolCount = len;
@@ -183,13 +183,13 @@ bool cFontPcf::Load(const char* aFileName) {
     return res;
 }
 
-s32 cFontPcf::Search(u16 aCode) {
+s32 cFontPcf::Search(u16 aCode) const {
     s32 result = SearchInternal(aCode);
     if (result < 0 && aCode > ' ') result = SearchInternal('?');
     return result;
 }
 
-s32 cFontPcf::SearchInternal(u16 aCode) {
+s32 cFontPcf::SearchInternal(u16 aCode) const {
     s32 low = 0, high = iCount - 1, curr;
     while (true) {
         curr = (low + high) / 2;
@@ -205,8 +205,7 @@ s32 cFontPcf::SearchInternal(u16 aCode) {
     }
 }
 
-void cFontPcf::DrawInternal(u16* mem, s16 x, s16 y, const u8* data, u16 color, u32 width,
-                            u32 height) {
+void cFontPcf::DrawInternal(u16* mem, s16 x, s16 y, const u8* data, u16 color, u32 width, u32 height) const {
     u32 byteW = width;
     byteW = byteW / 8 + (byteW & 7 ? 1 : 0);
     for (u32 ii = 0; ii < height; ii++) {
@@ -226,7 +225,7 @@ void cFontPcf::DrawInternal(u16* mem, s16 x, s16 y, const u8* data, u16 color, u
     }
 }
 
-void cFontPcf::Draw(u16* mem, s16 x, s16 y, const u8* aText, u16 color) {
+void cFontPcf::Draw(u16* mem, s16 x, s16 y, const u8* aText, u16 color) const {
     if (!(iData && iGlyphs)) return;
     u32 code = utf8toucs2(aText, NULL);
     s32 index = Search(code);

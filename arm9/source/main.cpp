@@ -31,6 +31,8 @@
 #include "calendarwnd.h"
 #include "datetime.h"
 
+#include "smalldate.h"
+
 #include "inifile.h"
 #include "irqs.h"
 
@@ -125,6 +127,9 @@ int main(int argc, char* argv[]) {
     calendar().draw();
     bigClock().init();
     bigClock().draw();
+
+    smallDate().init();
+    smallDate().draw();
 
     userWindow().draw();
     // TODO: init and draw battery

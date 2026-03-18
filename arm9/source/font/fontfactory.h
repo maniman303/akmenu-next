@@ -7,11 +7,12 @@
     SPDX-License-Identifier: GPL-3.0-or-later
 */
 
+#pragma once
+
 #include <nds.h>
-
 #include "singleton.h"
-
 #include "font.h"
+
 class cFontFactory {
   public:
     cFontFactory();
@@ -22,8 +23,11 @@ class cFontFactory {
 
     cFont& font() { return *_font; }
 
+    cFont& fontSecondary() { return _fontSecondary == NULL ? *_font : *_fontSecondary; }
+
   protected:
     cFont* _font;
+    cFont* _fontSecondary;
 };
 
 typedef t_singleton<cFontFactory> fontFactory_s;
@@ -32,4 +36,7 @@ inline cFontFactory& fontFactory() {
 }
 inline cFont& font() {
     return fontFactory_s::instance().font();
+}
+inline cFont& fontSecondary() {
+    return fontFactory_s::instance().fontSecondary();
 }

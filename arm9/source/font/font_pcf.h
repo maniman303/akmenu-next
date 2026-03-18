@@ -55,17 +55,17 @@ class cFontPcf : public cFont {
     bool ParseBitmaps(int aFont, u32 aSize, u32 aOffset);
     bool ParseMetrics(int aFont, u32 aSize, u32 aOffset);
     bool ParseEncodings(int aFont, u32 aSize, u32 aOffset);
-    s32 SearchInternal(u16 aCode);
-    s32 Search(u16 aCode);
+    s32 SearchInternal(u16 aCode) const;
+    s32 Search(u16 aCode) const;
     static u32 utf8toucs2(const u8* aSource, u32* aLength);
-    void DrawInternal(u16* mem, s16 x, s16 y, const u8* data, u16 color, u32 width, u32 height);
+    void DrawInternal(u16* mem, s16 x, s16 y, const u8* data, u16 color, u32 width, u32 height) const;
     static int Compare(const void* a, const void* b);
 
   public:
     cFontPcf();
     ~cFontPcf();
     bool Load(const char* aFileName);
-    void Draw(u16* mem, s16 x, s16 y, const u8* aText, u16 color);
-    void Info(const char* aString, u32* aWidth, u32* aSymbolCount);
+    void Draw(u16* mem, s16 x, s16 y, const u8* aText, u16 color) const;
+    void Info(const char* aString, u32* aWidth, u32* aSymbolCount) const;
     u32 FontRAM(void);
 };

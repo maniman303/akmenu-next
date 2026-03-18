@@ -12,8 +12,8 @@
 #include <nds.h>
 #include <vector>
 #include "bmp15.h"
-#include "gdi.h"
 #include "singleton.h"
+#include "font.h"
 
 #define SYSTEM_FONT_HEIGHT 12
 #define COLOR u16
@@ -89,11 +89,13 @@ class cGdi {
 
     void setTransColor(u16 color) { _transColor = color | BIT(15); }
 
+    void textOut(s16 x, s16 y, const char* text, GRAPHICS_ENGINE engine);
+
+    void textOut(s16 x, s16 y, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont);
+
     void textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine);
 
-    inline void textOut(s16 x, s16 y, const char* text, GRAPHICS_ENGINE engine) {
-        textOutRect(x, y, 256, 192, text, engine);
-    }
+    void textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont);
 
     void setMainEngineLayer(MAIN_ENGINE_LAYER layer) {
         _mainEngineLayer = layer;

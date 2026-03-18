@@ -12,6 +12,7 @@
 #include "../../share/memtool.h"
 #include "globalsettings.h"
 #include "inifile.h"
+#include "fontfactory.h"
 #include "stringtool.h"
 #include "systemfilenames.h"
 #include "unicode.h"
@@ -71,11 +72,11 @@ void cUserWindow::draw() {
 
     if (_showCustomText && _userText != "") {
         gdi().setPenColor(_userTextColor, _engine);
-        gdi().textOutRect(_tx, _ty, _tw, _th, _userText.c_str(), _engine);
+        gdi().textOutRect(_tx, _ty, _tw, _th, _userText.c_str(), _engine, fontSecondary());
     }
 
     if (_showUserName && _userName != "") {
         gdi().setPenColor(_userNameColor, _engine);
-        gdi().textOut(_ux, _uy, _userName.c_str(), _engine);
+        gdi().textOut(_ux, _uy, _userName.c_str(), _engine, fontSecondary());
     }
 }
