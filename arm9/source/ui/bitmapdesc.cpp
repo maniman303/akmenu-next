@@ -44,4 +44,8 @@ cSize cBitmapDesc::size() {
         return cSize(0, 0);
 }
 
+bool cBitmapDesc::valid() {
+    return _background.valid();
+}
+
 }  // namespace akui

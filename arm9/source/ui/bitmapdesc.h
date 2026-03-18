@@ -33,6 +33,8 @@ class cBitmapDesc : public cRenderDesc {
 
     cSize size();
 
+    bool valid();
+
   protected:
     cBMP15 _background;
 

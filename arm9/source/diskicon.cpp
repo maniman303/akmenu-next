@@ -25,7 +25,7 @@ cDiskIcon::cDiskIcon() : cWindow(NULL, "diskicon") {
     _icon.setPosition(226, 174);
     _icon.setPriority(3);
     _icon.setBufferOffset(16);
-    _icon.show();
+    _icon.hide();
 
     fillMemory(_icon.buffer(), 32 * 32 * 2, 0x00000000);
 }

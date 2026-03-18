@@ -12,6 +12,7 @@
 #include "bigclock.h"
 #include "calendar.h"
 #include "calendarwnd.h"
+#include "batterymeter.h"
 #include "smalldate.h"
 #include "smallclock.h"
 #include "dbgtool.h"
@@ -53,10 +54,11 @@ void cIRQ::vBlank() {
 
     if (vBlankCounter++ > 30) {
         vBlankCounter = 0;
-        bigClock().blinkColon();
         calendarWnd().draw();
         calendar().draw();
+        bigClock().blinkColon();
         bigClock().draw();
+        batteryMeter().draw();
         smallDate().draw();
         smallClock().flipColon();
         smallClock().draw();

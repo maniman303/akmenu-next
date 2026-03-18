@@ -25,11 +25,13 @@
 #include "startmenu.h"
 #include "systemfilenames.h"
 #include "timer.h"
+#include "systemdetails.h"
 
 #include "bigclock.h"
 #include "calendar.h"
 #include "calendarwnd.h"
 #include "datetime.h"
+#include "batterymeter.h"
 
 #include "smalldate.h"
 #include "smallclock.h"
@@ -37,7 +39,6 @@
 #include "inifile.h"
 #include "irqs.h"
 
-#include "diskicon.h"
 #include "fontfactory.h"
 #include "language.h"
 #include "progresswnd.h"
@@ -82,6 +83,8 @@ int main(int argc, char* argv[]) {
 #endif  // DEBUG
     dbg_printf("gdi ok\n");
 
+    sd().initArm7RegStatuses();
+
     // wait_press_b();
     //  init fat
     fsManager().init(argc, argv);
@@ -109,25 +112,14 @@ int main(int argc, char* argv[]) {
         dbg_printf("WARNING: savelist.bin missed\n");
     }
 
-    gdi().initBg(SFN_LOWER_SCREEN_BG);
-
-    cMainWnd* wnd = new cMainWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, "main window");
-    wnd->init();
-
-    progressWnd().init();
-
-    diskIcon().loadAppearance(SFN_CARD_ICON_BLUE);
-    diskIcon().show();
-
-    windowManager().update();
-    timer().updateFps();
-
     calendarWnd().init();
     calendarWnd().draw();
     calendar().init();
     calendar().draw();
     bigClock().init();
     bigClock().draw();
+    batteryMeter().init();
+    batteryMeter().draw();
 
     smallDate().init();
     smallDate().draw();
@@ -135,10 +127,21 @@ int main(int argc, char* argv[]) {
     smallClock().draw();
 
     userWindow().draw();
-    // TODO: init and draw battery
+
+    gdi().initBg(SFN_LOWER_SCREEN_BG);
+
+    gdi().present(GE_SUB);
+
+    cMainWnd* wnd = new cMainWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, "main window");
+    wnd->init();
+
+    timer().updateFps();
+
+    progressWnd().init();
+    
+    windowManager().update();
 
     gdi().present(GE_MAIN);
-    gdi().present(GE_SUB);
 
     dbg_printf("loop start\n");
 

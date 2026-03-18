@@ -17,7 +17,10 @@
 
 using namespace akui;
 
-cCalendarWnd::cCalendarWnd() : cForm(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, "calendar window") {}
+cCalendarWnd::cCalendarWnd() : cForm(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, "calendar window") {
+    _filename = "";
+    _weeks = 6;
+}
 
 cCalendarWnd::~cCalendarWnd() {}
 
@@ -27,11 +30,7 @@ void cCalendarWnd::init() {
 }
 
 cWindow& cCalendarWnd::loadAppearance(const std::string& aFileName) {
-    std::string aFileName4 = replaceInString(aFileName, ".bmp", "_cal4.bmp");
-    std::string aFileName5 = replaceInString(aFileName, ".bmp", "_cal5.bmp");
-    _background = createBMP15FromFile(aFileName);
-    _background4 = createBMP15FromFile(aFileName4);
-    _background5 = createBMP15FromFile(aFileName5);
+    _filename = aFileName;
 
     return *this;
 }
@@ -45,13 +44,24 @@ static int weeksInCurrentMonth() {
 
 void cCalendarWnd::draw() {
     int weeks = weeksInCurrentMonth();
-    if (weeks == 4 && _background4.valid()) {
-        gdi().bitBlt(_background4.buffer(), 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, selectedEngine());
-        return;
-    } else if (weeks == 5 && _background5.valid()) {
-        gdi().bitBlt(_background5.buffer(), 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, selectedEngine());
-        return;
-    } else {
+    if (weeks == _weeks && _background.valid()) {
         gdi().bitBlt(_background.buffer(), 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, selectedEngine());
+        return;
     }
+
+    std::string bgFile(_filename);
+    if (weeks == 4) {
+        bgFile = replaceInString(bgFile, ".bmp", "_cal4.bmp");
+    } else if (weeks == 5) {
+        bgFile = replaceInString(bgFile, ".bmp", "_cal5.bmp");
+    }
+
+    _background = createBMP15FromFile(bgFile);
+    if (!_background.valid()) {
+        _background = createBMP15FromFile(_filename);
+    }
+
+    _weeks = weeks;
+    gdi().bitBlt(_background.buffer(), 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, selectedEngine());
+
 }

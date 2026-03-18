@@ -15,6 +15,7 @@
 #include "timer.h"
 #include "timetool.h"
 #include "windowmanager.h"
+#include "diskicon.h"
 
 #include "datetime.h"
 
@@ -155,6 +156,9 @@ void cMainWnd::init() {
     addChildWindow(_startMenu);
     // windowManager().addWindow( _startMenu );
     dbg_printf("startMenu %08x\n", _startMenu);
+
+    diskIcon().loadAppearance(SFN_CARD_ICON_BLUE);
+    diskIcon().show();
 
     arrangeChildren();
 
