@@ -30,17 +30,17 @@ cFormDesc::~cFormDesc() {}
 
 void cFormDesc::draw(const cRect& area, GRAPHICS_ENGINE engine) const {
     if (_topleft.valid()) {
-        gdi().maskBlt(_topleft.buffer(), area.position().x, area.position().y, _topleft.width(),
-                      _topleft.height(), engine);
+        gdi().maskBlt(_topleft.buffer(), area.position().x, area.position().y, _topleft.width(), _topleft.height(), engine);
     }
 
     if (_middle.valid()) {
-        for (u32 i = 0; i < _middle.height(); ++i) {
-            COLOR lineColor = _middle.buffer()[i] & 0xFFFF;
-            gdi().setPenColor(lineColor, engine);
-            gdi().fillRect(lineColor, lineColor, area.position().x + _topleft.width(),
-                           area.position().y + i,
-                           area.size().x - _topleft.width() - _topright.width(), 1, engine);
+        u32 middleX = area.position().x + _topleft.width();
+        u32 middleY = area.position().y;
+        u32 middleWidth = area.size().x - _topleft.width() - _topright.width();
+        u32 repeats = (middleWidth / _middle.width()) + 1;
+
+        for (u32 i = 0; i < repeats; i++) {
+            gdi().maskBlt(_middle.buffer(), middleX + (i * _middle.width()), middleY, _middle.width(), _middle.height(), engine);
         }
     }
 

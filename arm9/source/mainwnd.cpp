@@ -105,7 +105,7 @@ void cMainWnd::init() {
     if (text == "ini") {
         text = LANG("start menu", "START");
     }
-    //_startButton = new cButton( 0, 172, 48, 18, this, " Start" );
+
     _startButton = new cButton(x, y, w, h, this, text);
     _startButton->setStyle(cButton::press);
     _startButton->setRelativePosition(cPoint(x, y));
