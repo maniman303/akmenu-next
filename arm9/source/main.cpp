@@ -32,6 +32,7 @@
 #include "datetime.h"
 
 #include "smalldate.h"
+#include "smallclock.h"
 
 #include "inifile.h"
 #include "irqs.h"
@@ -130,6 +131,8 @@ int main(int argc, char* argv[]) {
 
     smallDate().init();
     smallDate().draw();
+    smallClock().init();
+    smallClock().draw();
 
     userWindow().draw();
     // TODO: init and draw battery

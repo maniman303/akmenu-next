@@ -89,13 +89,13 @@ class cGdi {
 
     void setTransColor(u16 color) { _transColor = color | BIT(15); }
 
-    void textOut(s16 x, s16 y, const char* text, GRAPHICS_ENGINE engine);
+    s16  textOut(s16 x, s16 y, const char* text, GRAPHICS_ENGINE engine);
 
-    void textOut(s16 x, s16 y, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont);
+    s16  textOut(s16 x, s16 y, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont);
 
-    void textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine);
+    s16  textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine);
 
-    void textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont);
+    s16  textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont);
 
     void setMainEngineLayer(MAIN_ENGINE_LAYER layer) {
         _mainEngineLayer = layer;

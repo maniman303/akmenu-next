@@ -493,19 +493,19 @@ void cGdi::maskBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u1
     }
 }
 
-void cGdi::textOut(s16 x, s16 y, const char* text, GRAPHICS_ENGINE engine) {
-    textOutRect(x, y, 256, 192, text, engine, font());
+s16 cGdi::textOut(s16 x, s16 y, const char* text, GRAPHICS_ENGINE engine) {
+    return textOutRect(x, y, 256, 192, text, engine, font());
 }
 
-void cGdi::textOut(s16 x, s16 y, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont) {
-    textOutRect(x, y, 256, 192, text, engine, textFont);
+s16  cGdi::textOut(s16 x, s16 y, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont) {
+    return textOutRect(x, y, 256, 192, text, engine, textFont);
 }
 
-void cGdi::textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine) {
-    textOutRect(x, y, w, h, text, engine, font());
+s16  cGdi::textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine) {
+    return textOutRect(x, y, w, h, text, engine, font());
 }
 
-void cGdi::textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont) {
+s16 cGdi::textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont) {
     const s16 originX = x, limitY = y + h - gs().fontHeight;
     while (*text) {
         if ('\r' == *text || '\n' == *text) {
@@ -524,6 +524,8 @@ void cGdi::textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_EN
             x += ww;
         }
     }
+
+    return x;
 }
 
 void cGdi::present(GRAPHICS_ENGINE engine) {

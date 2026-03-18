@@ -40,6 +40,19 @@ void cFontPcf::Info(const char* aString, u32* aWidth, u32* aSymbolCount) const {
     }
 }
 
+u32 cFontPcf::TextLenght(const std::string& aString) const {
+    u32 res = 0;
+    u32 len = 0;
+
+    for (size_t i = 0; i < aString.length(); i++) {
+        u32 code = utf8toucs2(reinterpret_cast<const u8*>(aString.c_str() + i), &len);
+        s32 index = Search(code);
+        res += (index >= 0) ? iGlyphs[index].iWidth : ((code > 0 && code < 8) ? 10 : 0);
+    }
+
+    return res;
+}
+
 bool cFontPcf::ParseAccels(int aFont, u32 aSize, u32 aOffset) {
     bool res = false;
     if (lseek(aFont, aOffset, SEEK_SET) < 0) return false;

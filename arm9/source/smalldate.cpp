@@ -33,15 +33,14 @@ void cSmallDate::draw() {
 
     int day = datetime().day();
     int month = datetime().month();
-    int xOffset = 0;
-    if (day == 11) {
-        xOffset = 4;
-    } else if (day == 1 || day == 21 || day == 31 || (day >= 10 && day <= 19)) {
-        xOffset = 2;
-    }
+    
+    const cFont& textFont = fontSecondary();
+    u32 dayWidth = textFont.TextLenght(formatString("%02d", day));
+    u32 exampleWidth = textFont.TextLenght("22");
+    int xOffset = exampleWidth - dayWidth;
 
     std::string date = formatString("%02d / %02d", day, month);
 
     gdi().setPenColor(_textColor, _engine);
-    gdi().textOut(_dx + xOffset, _dy, date.c_str(), _engine, fontSecondary());
+    gdi().textOut(_dx + xOffset, _dy, date.c_str(), _engine, textFont);
 }

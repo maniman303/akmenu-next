@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include "bmp15.h"
 #include "datetime.h"
 #include "point.h"
@@ -8,16 +9,18 @@
 
 using namespace akui;
 
-class cSmallDate : public akui::cWindow {
+class cSmallClock : public akui::cWindow {
   public:
-    cSmallDate();
+    cSmallClock();
 
-    ~cSmallDate() {}
+    ~cSmallClock() {}
 
   public:
     void init();
 
     void draw();
+
+    void flipColon();
 
     akui::cWindow& loadAppearance(const std::string& aFileName) { return *this; }
 
@@ -26,9 +29,10 @@ class cSmallDate : public akui::cWindow {
     int _dy;
     u16 _textColor;
     bool _show;
+    bool _showColon;
 };
 
-typedef t_singleton<cSmallDate> SmallDate_s;
-inline cSmallDate& smallDate() {
-    return SmallDate_s::instance();
+typedef t_singleton<cSmallClock> SmallClock_s;
+inline cSmallClock& smallClock() {
+    return SmallClock_s::instance();
 }
