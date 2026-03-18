@@ -8,6 +8,7 @@
 */
 
 #include "formdesc.h"
+#include "fontfactory.h"
 #include "ui.h"
 
 //#include "globalsettings.h"
@@ -22,6 +23,7 @@ namespace akui {
 cFormDesc::cFormDesc() {
     _bodyColor = uiSettings().formBodyColor;    // RGB15(30,29,22);
     _frameColor = uiSettings().formFrameColor;  // RGB15(23,25,4);
+    _centerTitle = false;
 }
 
 cFormDesc::~cFormDesc() {}
@@ -49,9 +51,15 @@ void cFormDesc::draw(const cRect& area, GRAPHICS_ENGINE engine) const {
 
     if (_titleText != "") {
         gdi().setPenColor(uiSettings().formTitleTextColor, engine);
-        gdi().textOut(area.position().x + 8,
-                      area.position().y + (((_topleft.height() - gs().fontHeight)) >> 1) + 1,
-                      _titleText.c_str(), engine);
+
+        u32 textX = area.position().x + 8;
+        u32 textY = area.position().y + (((_topleft.height() - gs().fontHeight)) >> 1) + 1;
+        if (_centerTitle) {
+            u32 titleLength = font().TextLenght(_titleText);
+            textX = (area.size().x - titleLength) / 2;
+        }
+
+        gdi().textOut(textX, textY, _titleText.c_str(), engine);
     }
 
     gdi().setPenColor(_bodyColor, engine);
@@ -70,8 +78,21 @@ void cFormDesc::loadData(const std::string& topleftBmpFile, const std::string& t
     _middle = createBMP15FromFile(middleBmpFile);
 }
 
+cSize cFormDesc::size() {
+    if (_topleft.valid()) {
+        return cSize(_topleft.width(), _topleft.height());
+    }
+
+    return cSize(0, 0);
+}
+
 void cFormDesc::setTitleText(const std::string& text) {
+    setTitleText(text, false);
+}
+
+void cFormDesc::setTitleText(const std::string& text, bool centerTitle) {
     _titleText = text;
+    _centerTitle = centerTitle;
 }
 
 }  // namespace akui

@@ -27,7 +27,11 @@ class cFormDesc : public cRenderDesc {
     void loadData(const std::string& topleftBmpFile, const std::string& toprightBmpFile,
                   const std::string& middleBmpFile);
 
+    cSize size();
+
     void setTitleText(const std::string& text);
+
+    void setTitleText(const std::string& text, bool centerTitle);
 
   protected:
     cBMP15 _topleft;
@@ -38,6 +42,7 @@ class cFormDesc : public cRenderDesc {
     COLOR _frameColor;
 
     std::string _titleText;
+    bool _centerTitle;
 };
 
 }  // namespace akui

@@ -300,8 +300,11 @@ void cRomInfoWnd::onShow() {
 void cRomInfoWnd::pressSaveType(void) {
     if (!_romInfo.isDSRom() || _romInfo.isHomebrew()) return;
 
-    cSettingWnd settingWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, this, LANG("save type", "tab1"));
     std::vector<std::string> _values;
+    cSettingWnd settingWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, this, LANG("game settings", "title"));
+    
+    settingWnd.addSettingTab(LANG("save type", "tab1"));
+
     _values.push_back(LANG("save type", "Unknown"));
     _values.push_back(LANG("save type", "No Save"));
     _values.push_back(LANG("save type", "4K"));
@@ -327,9 +330,10 @@ void cRomInfoWnd::pressSaveType(void) {
                               _romInfo.saveInfo().getNdsBootstrap());
 #endif  // __KERNEL_LAUNCHER_SUPPORT__
 
+    _values.clear();
+
     settingWnd.addSettingTab(LANG("save type", "tab2"));
 
-    _values.clear();
     _values.push_back(LANG("switches", "Disable"));
     _values.push_back(LANG("switches", "Enable"));
     _values.push_back(formatString(LANG("switches", "Global").c_str(),

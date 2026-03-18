@@ -27,7 +27,6 @@ cSettingWnd::cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     _tabSwitcher.loadAppearance("");
     _tabSwitcher.changed.connect(this, &cSettingWnd::onItemChanged);
     addChildWindow(&_tabSwitcher);
-    _tabSwitcher.insertItem(_text, 0);
     _tabSwitcher.selectItem(0);
     _tabSwitcher.hide();
     _tabSwitcher.disableFocus();
@@ -68,18 +67,18 @@ cSettingWnd::cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     nextButtonX -= buttonPitch;
     _buttonY.setRelativePosition(cPoint(nextButtonX, buttonY));
 
-    loadAppearance("");
-    arrangeChildren();
-
-    _tabs.push_back(sSetingTab(new std::vector<sSetingItem>, text));
-    _currentTab = 0;
     _maxLabelLength = 0;
+    _titleOffset = 0;
+    _maxTabSize = 0;
+    _confirmMessage = LANG("setting window", "confirm text");
     CIniFile ini(SFN_UI_SETTINGS);
     _spinBoxWidth = ini.GetInt("setting window", "spinBoxWidth", 108);
     _simpleTabs = ini.GetInt("setting window", "simpleTabs", 0);
-    ;
-    _maxTabSize = 0;
-    _confirmMessage = LANG("setting window", "confirm text");
+
+    loadAppearance("");
+    arrangeChildren();
+
+    _currentTab = 0;
 }
 
 void cSettingWnd::setConfirmMessage(const std::string& text) {
@@ -176,16 +175,30 @@ bool cSettingWnd::processKeyMessage(const cKeyMessage& msg) {
 }
 
 cWindow& cSettingWnd::loadAppearance(const std::string& aFileName) {
+    if (_simpleTabs) {
+        _renderDesc.loadData("", "", "");
+        _renderDesc.setTitleText("");
+
+        return *this;
+    }
+
     _renderDesc.loadData(SFN_FORM_TITLE_L, SFN_FORM_TITLE_R, SFN_FORM_TITLE_M);
-    _renderDesc.setTitleText(_text);
+    _renderDesc.setTitleText(_text, true);
+
+    _titleOffset = _renderDesc.size().y;
+
+    _tabSwitcher.setRelativePosition(cPoint(0, _titleOffset));
+
     return *this;
 }
 
 void cSettingWnd::addSettingTab(const std::string& text) {
-    if (1 == _tabs.size()) {
-        if (_simpleTabs) _renderDesc.loadData("", "", "");
+    if (_tabs.size() == 0 && _simpleTabs) {
+        _renderDesc.loadData("", "", "");
         _renderDesc.setTitleText("");
+        _titleOffset = 0;
     }
+
     _tabSwitcher.insertItem(text, _tabs.size());
     _tabs.push_back(sSetingTab(new std::vector<sSetingItem>, text));
     _tabSwitcher.show();
@@ -207,7 +220,7 @@ void cSettingWnd::addSettingItem(const std::string& text, const std::vector<std:
     }
 
     // insert label, item and set their position
-    s32 itemY = items(lastTab).size() * 20 + 18 + TOP_MARGIN;
+    s32 itemY = (items(lastTab).size() * 20) + static_cast<s32>(_titleOffset) + 18 + TOP_MARGIN;
     s32 itemX = 8;
 
     cSpinBox* item = new cSpinBox(0, 0, 108, 18, this, "spin");

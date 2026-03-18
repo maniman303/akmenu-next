@@ -72,6 +72,7 @@ class cSettingWnd : public akui::cForm {
 
     std::vector<sSetingItem>& items(size_t index) { return *_tabs[index]._tab; };
 
+    u32 _titleOffset;
     u32 _maxLabelLength;
     u32 _spinBoxWidth;
     bool _simpleTabs;

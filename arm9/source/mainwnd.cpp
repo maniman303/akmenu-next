@@ -443,7 +443,8 @@ void cMainWnd::onKeyBPressed() {
 }
 
 void cMainWnd::setParam(void) {
-    cSettingWnd settingWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, LANG("system setting", "title"));
+    cSettingWnd settingWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, LANG("start menu", "Setting"));
+    settingWnd.addSettingTab(LANG("system setting", "title"));
 
     // page 1: system
     std::string currentUIStyle = gs().uiName;

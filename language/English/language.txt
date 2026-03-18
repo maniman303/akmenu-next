@@ -101,7 +101,7 @@ No Save = no save
 16M = 16M
 32M = 32M
 64M = 64M
-default = default
+default = Default
 save slot = Choose Save Slot
 tab1 = Compatibility
 tab2 = Features
@@ -109,6 +109,9 @@ tab2 = Features
 [system setting]
 title = System settings
 safe mode = Safe Mode
+
+[game settings]
+title = Game settings
 
 [rom info]
 title = File Information
@@ -276,9 +279,9 @@ text = This game cannot be launched from Acekard Internal Flash Memory, please c
 
 [icon]
 icon = Show icon
-transparent = transparent
-as is = as is
-firmware = firmware
+transparent = Transparent
+as is = As is
+firmware = Firmware
 
 [cheats]
 title = Cheats
