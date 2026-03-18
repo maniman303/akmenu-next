@@ -65,6 +65,7 @@ class cSettingWnd : public akui::cForm {
     void onItemChanged(akui::cSpinBox* item);
     ssize_t focusedItemId(void);
     akui::cSpinBox* focusedItem(void);
+    void colorLabels(void);
 
     void HideTab(size_t index);
     void ShowTab(size_t index);

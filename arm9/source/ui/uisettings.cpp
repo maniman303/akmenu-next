@@ -16,6 +16,7 @@ cUISettings::cUISettings() {
     formFrameColor = RGB15(23, 25, 4);
     formBodyColor = RGB15(30, 29, 22);
     formTextColor = RGB15(17, 12, 0);
+    formTextHighLightColor = RGB15(17, 12, 0);
     formTitleTextColor = RGB15(11, 11, 11);
     buttonTextColor = RGB15(17, 12, 0);
     spinBoxNormalColor = RGB15(0, 0, 31);
@@ -42,6 +43,7 @@ void cUISettings::loadSettings() {
     formFrameColor = ini.GetInt("global settings", "formFrameColor", formFrameColor);
     formBodyColor = ini.GetInt("global settings", "formBodyColor", formBodyColor);
     formTextColor = ini.GetInt("global settings", "formTextColor", formTextColor);
+    formTextHighLightColor = ini.GetInt("global settings", "formTextHighLightColor", formTextColor);
     formTitleTextColor = ini.GetInt("global settings", "formTitleTextColor", formTitleTextColor);
     buttonTextColor = ini.GetInt("global settings", "buttonTextColor", buttonTextColor);
     spinBoxNormalColor = ini.GetInt("global settings", "spinBoxNormalColor", spinBoxNormalColor);

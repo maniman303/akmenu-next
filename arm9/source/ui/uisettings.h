@@ -28,6 +28,7 @@ class cUISettings {
     COLOR formFrameColor;
     COLOR formBodyColor;
     COLOR formTextColor;
+    COLOR formTextHighLightColor;
     COLOR formTitleTextColor;
     COLOR buttonTextColor;
     COLOR spinBoxNormalColor;

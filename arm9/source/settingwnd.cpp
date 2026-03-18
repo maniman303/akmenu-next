@@ -97,6 +97,7 @@ cSettingWnd::~cSettingWnd() {
 
 void cSettingWnd::draw(void) {
     _renderDesc.draw(windowRectangle(), _engine);
+    colorLabels();
     cForm::draw();
 }
 
@@ -314,6 +315,18 @@ cSpinBox* cSettingWnd::focusedItem(void) {
     ssize_t focusItem = focusedItemId();
     if (focusItem >= 0) return items(_currentTab)[focusItem]._item;
     return NULL;
+}
+
+void cSettingWnd::colorLabels(void) {
+    ssize_t focusItem = focusedItemId();
+    ssize_t tabSize = (ssize_t)items(_currentTab).size();
+    if (focusItem >= tabSize || focusItem < 0) {
+        return;
+    }
+
+    for (ssize_t i = 0; i < tabSize; i++) {
+        items(_currentTab)[i]._label->setTextColor(i == focusItem ? uis().formTextHighLightColor : uis().formTextColor);
+    }
 }
 
 void cSettingWnd::HideTab(size_t index) {
