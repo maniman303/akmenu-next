@@ -42,20 +42,9 @@ std::string cBatteryMeter::getBatteryFileName() {
         return "";
     }
 
-    fifoSendValue32(FIFO_USER_01, MENU_MSG_BATTERY_STATE);
-
-    int iter = 0;
-    while(!fifoCheckValue32(FIFO_USER_04) && iter < 20000) {
-		iter++;
-	}
-
-    if (!fifoCheckValue32(FIFO_USER_04)) {
-        return "";
-    }
-
     _checkpoint = now;
 
-    u32 level = fifoGetValue32(FIFO_USER_04);
+    u32 level = sd().batteryStatus();
 
     if (level <= 1) {
         return base + "/battery1.bmp";

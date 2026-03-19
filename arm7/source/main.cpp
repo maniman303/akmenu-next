@@ -176,6 +176,10 @@ static void menuValue32Handler(u32 value, void* data) {
     }
 }
 
+static void probeBatteryStatus() {
+    fifoSendValue32(FIFO_USER_03, (readPowerManagement(PM_CONTROL_REG) & 0xff) | (MENU_MSG_BATTERY_STATE << 16));
+}
+
 int main() {
     // clear sound registers
 	dmaFillWords(0, (void*)0x04000400, 0x100);
@@ -200,7 +204,7 @@ int main() {
 
     fifoSetValue32Handler(FIFO_USER_01, menuValue32Handler, 0);
 
-    fifoSendValue32(FIFO_USER_03, FIFO_SOUND_READY);
+    fifoSendValue32(FIFO_USER_03, FIFO_SOUND_READY << 16);
 
     irqSet(IRQ_VBLANK, VblankHandler);
 
@@ -210,16 +214,32 @@ int main() {
 		i2cWriteRegister(0x4A, 0x12, 0x00);	// Press power-button for auto-reset
 		i2cWriteRegister(0x4A, 0x70, 0x01);	// Bootflag = Warmboot/SkipHealthSafety
 	}
+
+    u32 ticks = 0;
        
     while (true) {
         if (*(u32*)(0x2FFFD0C) == 0x454D4D43) {
             sdmmc_get_cid(true, (u32*)0x2FFD7BC);    // Get eMMC CID
             *(u32*)(0x2FFFD0C) = 0;
         }
+
+        if (ticks == 0) {
+            probeBatteryStatus();
+        }
+        
         swiWaitForVBlank();
-        if(reset_pico)
+
+        if (reset_pico) {
             resetDSPico();
+        }
+            
         swiWaitForVBlank();
+
+        if (ticks >= 29) {
+            ticks = 0;
+        } else {
+            ticks++;
+        }
     }
 }
 
