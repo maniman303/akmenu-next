@@ -12,6 +12,8 @@ namespace akui {
 
         cWindow& loadAppearance(const std::string& aFileName);
 
+        bool valid();
+
         void draw(s32 x, s32 y);
 
         void draw();

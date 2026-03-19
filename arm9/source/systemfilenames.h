@@ -35,6 +35,8 @@
 #define SFN_BUTTON4 SFN_UI_DIRECTORY + gs().uiName + "/btn4.bmp"
 #define SFN_SPINBUTTON_L SFN_UI_DIRECTORY + gs().uiName + "/spin_btn_left.bmp"
 #define SFN_SPINBUTTON_R SFN_UI_DIRECTORY + gs().uiName + "/spin_btn_right.bmp"
+#define SFN_SPINBUTTON_L_NAMED SFN_UI_DIRECTORY + gs().uiName + "/spin_btn_left_named.bmp"
+#define SFN_SPINBUTTON_R_NAMED SFN_UI_DIRECTORY + gs().uiName + "/spin_btn_right_named.bmp"
 #define SFN_BRIGHTNESS_BUTTON SFN_UI_DIRECTORY + gs().uiName + "/brightness.bmp"
 #define SFN_FOLDERUP_BUTTON SFN_UI_DIRECTORY + gs().uiName + "/folder_up.bmp"
 #define SFN_STARTMENU_BG SFN_UI_DIRECTORY + gs().uiName + "/menu_bg.bmp"

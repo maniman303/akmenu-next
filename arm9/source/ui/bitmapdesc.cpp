@@ -16,6 +16,7 @@ namespace akui {
 ///////////////////////////////// desc ////////////////
 cBitmapDesc::cBitmapDesc() {
     _bltmode = BM_BITBLT;
+    _background = cBMP15();
 }
 
 cBitmapDesc::~cBitmapDesc() {}
@@ -32,9 +33,7 @@ void cBitmapDesc::draw(const cRect& area, GRAPHICS_ENGINE engine) const {
 }
 
 void cBitmapDesc::loadData(const std::string& filename) {
-    if (!_background.valid()) {
-        _background = createBMP15FromFile(filename);
-    }
+    _background = createBMP15FromFile(filename);
 }
 
 cSize cBitmapDesc::size() {

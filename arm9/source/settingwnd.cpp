@@ -14,13 +14,14 @@
 #include "systemfilenames.h"
 #include "uisettings.h"
 #include "windowmanager.h"
+#include "fontfactory.h"
 #define TOP_MARGIN 4
 
 using namespace akui;
 
 cSettingWnd::cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
     : cForm(x, y, w, h, parent, text),
-      _tabSwitcher(0, 0, w, 18, this, "spin"),
+      _tabSwitcher(0, 0, w, 18, true, this, "spin"),
       _buttonOK(0, 0, 46, 18, this, "\x01 OK"),
       _buttonCancel(0, 0, 48, 18, this, "\x02 Cancel"),
       _buttonY(0, 0, 76, 18, this, "\x04 Common") {
@@ -237,7 +238,7 @@ void cSettingWnd::addSettingItem(const std::string& text, const std::vector<std:
     addChildWindow(item);
     item->selectItem(defaultValue);
 
-    cStaticText* label = new cStaticText(0, 0, _maxLabelLength * 6, gs().fontHeight, this, text);
+    cStaticText* label = new cStaticText(0, 0, _maxLabelLength * 6, font().GetHeight(), this, text);
     itemY += (item->windowRectangle().height() - label->windowRectangle().height()) / 2;
     label->setRelativePosition(cPoint(itemX, itemY));
     label->setTextColor(uis().formTextColor);

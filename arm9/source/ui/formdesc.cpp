@@ -54,7 +54,7 @@ void cFormDesc::draw(const cRect& area, GRAPHICS_ENGINE engine) const {
         gdi().setPenColor(uiSettings().formTitleTextColor, engine);
 
         u32 textX = area.position().x + 8;
-        u32 textY = area.position().y + (((_topleft.height() - gs().fontHeight)) >> 1) + 1;
+        u32 textY = area.position().y + (((_topleft.height() - font().GetHeight())) >> 1) + 1;
         if (_centerTitle) {
             u32 titleLength = font().TextLenght(_titleText);
             textX = (area.size().x - titleLength) / 2;

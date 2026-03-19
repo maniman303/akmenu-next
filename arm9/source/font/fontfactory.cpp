@@ -21,14 +21,25 @@ cFontFactory::~cFontFactory() {
 }
 
 void cFontFactory::makeFont(void) {
-    std::string filename(SFN_FONTS_DIRECTORY + lang().GetString("font", "main", SFN_DEFAULT_FONT));
+    std::string filename = lang().GetString("font", "main", SFN_DEFAULT_FONT);
+    std::string filepath(SFN_FONTS_DIRECTORY + filename);
     _font = new cFontPcf();
-    _font->Load(filename.c_str());
+    _font->Load(filepath.c_str());
 
-    std::string filenameSecondary(SFN_FONTS_DIRECTORY + lang().GetString("font", "secondary", ""));
+    if (filename == SFN_DEFAULT_FONT) {
+        _font->SetHeight(gs().fontHeight - 2);
+    }
+
+    std::string filenameSecondary = lang().GetString("font", "secondary", "");
+    std::string filepathSecondary(SFN_FONTS_DIRECTORY + lang().GetString("font", "secondary", ""));
     _fontSecondary = new cFontPcf();
-    if (!_fontSecondary->Load(filenameSecondary.c_str())) {
+    if (!_fontSecondary->Load(filepathSecondary.c_str())) {
         delete _fontSecondary;
         _fontSecondary = NULL;
+        return;
+    }
+
+    if (filenameSecondary == SFN_DEFAULT_FONT) {
+        _fontSecondary->SetHeight(gs().fontHeight - 2);
     }
 }

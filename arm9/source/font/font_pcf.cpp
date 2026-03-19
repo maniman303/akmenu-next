@@ -21,7 +21,8 @@ cFontPcf::cFontPcf()
       iHeight(0),
       iAscent(0),
       iDescent(0),
-      filename("") {
+      sFilename(""),
+      iFontHeight(gs().fontHeight) {
     // FIXME: test on nds
     // printf("%d\n",sizeof(cFontPcf::SGlyph));
 }
@@ -196,14 +197,22 @@ bool cFontPcf::Load(const char* aFileName) {
     }
 
     if (res) {
-        filename = std::string(aFileName);
+        sFilename = std::string(aFileName);
     }
 
     return res;
 }
 
 std::string cFontPcf::GetFilename() const {
-    return filename;
+    return sFilename;
+}
+
+void cFontPcf::SetHeight(u8 height) {
+    iFontHeight = height;
+}
+
+u8 cFontPcf::GetHeight() const {
+    return iFontHeight;
 }
 
 s32 cFontPcf::Search(u16 aCode) const {

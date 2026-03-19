@@ -16,11 +16,14 @@
 
 namespace akui {
 
-cSpinBox::cSpinBox(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
+cSpinBox::cSpinBox(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text) : cSpinBox(x, y, w, h, false, parent, text) {}
+
+cSpinBox::cSpinBox(s32 x, s32 y, u32 w, u32 h, bool namedAppearance, cWindow* parent, const std::string& text)
     : cForm(x, y, w, h, parent, text),
       _prevButton(0, 0, 0, 0, this, ""),
       _nextButton(0, 0, 0, 0, this, ""),
-      _itemText(0, 0, 0, 0, this, "spinbox") {
+      _itemText(0, 0, 0, 0, this, "spinbox"),
+      _namedAppearance(namedAppearance) {
     _normalColor = uiSettings().spinBoxNormalColor;  // RGB15( 0, 0, 31 );
     _focusedColor = uiSettings().spinBoxFocusColor;  // RGB15( 0, 31, 0 );
     _frameColor = uiSettings().spinBoxFrameColor;
@@ -67,6 +70,7 @@ void cSpinBox::selectItem(u32 id) {
     //);
 
     arrangeButton();
+    // TODO: Arrange header
     arrangeText();
     arrangeChildren();
     changed(this);
@@ -132,8 +136,18 @@ void cSpinBox::draw() {
 }
 
 cWindow& cSpinBox::loadAppearance(const std::string& aFileName) {
-    _prevButton.loadAppearance(SFN_SPINBUTTON_L);
-    _nextButton.loadAppearance(SFN_SPINBUTTON_R);
+    if (_namedAppearance) {
+        _prevButton.loadAppearance(SFN_SPINBUTTON_L_NAMED);
+        _nextButton.loadAppearance(SFN_SPINBUTTON_R_NAMED);
+    }
+
+    if (!_prevButton.valid()) {
+        _prevButton.loadAppearance(SFN_SPINBUTTON_L);
+    }
+
+    if (!_nextButton.valid()) {
+        _nextButton.loadAppearance(SFN_SPINBUTTON_R);
+    }
 
     setSize(cSize(size().x, std::max(_prevButton.size().y, _nextButton.size().y)));
 
@@ -145,24 +159,31 @@ void cSpinBox::onGainedFocus() {}
 void cSpinBox::onResize() {
     dbg_printf("spin box on resize\n");
     arrangeButton();
+    // TODO: Arrange header
     arrangeText();
     arrangeChildren();
 }
 
 void cSpinBox::onMove() {
     arrangeButton();
+    // TODO: Arrange header
     arrangeText();
     arrangeChildren();
 }
 
 void cSpinBox::arrangeText() {
-    s32 textWidth = _items.size() ? font().getStringScreenWidth(_items[_selectedItemId].c_str(),
-                                                                _items[_selectedItemId].length())
-                                  : 0;
-    s32 textHeight = gs().fontHeight;
+    s32 textWidth = _items.size() ? font().TextLenght(_items[_selectedItemId]) : 0;
     if (textWidth > _itemText.size().x) textWidth = _itemText.size().x;
 
-    _itemText.setRelativePosition(cPoint((_size.x - textWidth) >> 1, (_size.y - textHeight) >> 1));
+    if (_namedAppearance) {
+        int headerWidth = 0;
+        int positionX = _prevButton.size().x + headerWidth + 5;
+        _itemText.setRelativePosition(cPoint(positionX, (_size.y - font().GetHeight()) >> 1));
+        _itemText.setFont(true);
+    } else {
+        _itemText.setRelativePosition(cPoint((_size.x - textWidth) >> 1, (_size.y - fontSecondary().GetHeight()) >> 1));
+        _itemText.setFont(false);
+    }
 }
 
 void cSpinBox::arrangeButton() {
@@ -170,7 +191,8 @@ void cSpinBox::arrangeButton() {
     _prevButton.setRelativePosition(cPoint(x, (_size.y - _prevButton.size().y) / 2));
 
     x = _prevButton.size().x;
-    _itemText.setRelativePosition(cPoint(x, (_size.y - gs().fontHeight) / 2));
+    u8 fontHeight = _namedAppearance ? font().GetHeight() : fontSecondary().GetHeight();
+    _itemText.setRelativePosition(cPoint(x, (_size.y - fontHeight) / 2));
 
     x = size().x - _nextButton.size().x;
     _nextButton.setRelativePosition(cPoint(x, (_size.y - _nextButton.size().y)));

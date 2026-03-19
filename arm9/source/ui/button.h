@@ -35,6 +35,8 @@ class cButton : public cWindow {
 
     cWindow& loadAppearance(const std::string& aFileName);
 
+    bool valid() const;
+
     bool process(const cMessage& msg);
 
     State state() { return _state; }
@@ -91,6 +93,8 @@ class cButtonDesc : public cRenderDesc {
     }
 
     void draw(const cRect& area, GRAPHICS_ENGINE engine) const;
+
+    bool valid() const;
 
     void loadData(const std::string& filename);
 

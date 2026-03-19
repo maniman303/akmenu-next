@@ -26,7 +26,7 @@ cExpWnd::cExpWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string&
       _buttonRAM(0, 0, 46, 18, this, "\x03 RAM"),
       _buttonSRAM(0, 0, 46, 18, this, "\x04 SRAM"),
       _Rumble(0, 0, 108, 18, this, "spin"),
-      _Label(0, 0, 20 * 6, gs().fontHeight, this, "rumble strength") {
+      _Label(0, 0, 20 * 6, font().GetHeight(), this, "rumble strength") {
     s16 buttonY = size().y - _buttonCancel.size().y - 4;
 
     _buttonCancel.setStyle(cButton::press);

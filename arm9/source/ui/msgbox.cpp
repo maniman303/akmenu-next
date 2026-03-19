@@ -39,7 +39,7 @@ cMessageBox::cMessageBox(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     if (_size.x > 256) _size.x = 256;
     if (_size.y > 192) _size.y = 192;
     if (_size.x & 1) --_size.x;  // 4 byte align, for speed optimization
-    _size.y = lineCount * gs().fontHeight + 60;
+    _size.y = lineCount * font().GetHeight() + 60;
     _position.x = (SCREEN_WIDTH - _size.x) / 2;
     if (_position.x & 1) --_position.x;
     _position.y = (SCREEN_HEIGHT - _size.y) / 2;

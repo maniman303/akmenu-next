@@ -46,6 +46,14 @@ cWindow& cButton::loadAppearance(const std::string& aFileName) {
     return *this;
 }
 
+bool cButton::valid() const {
+    if (_renderDesc == NULL) {
+        return false;
+    }
+
+    return _renderDesc->valid();
+}
+
 bool cButton::process(const cMessage& msg) {
     // dbg_printf("cButton::process %s\n", _text.c_str() );
     bool ret = false;
@@ -178,6 +186,10 @@ void cButtonDesc::loadData(const std::string& filename) {
             _button->setSize(cSize(_background.width(), height));
         }
     }
+}
+
+bool cButtonDesc::valid() const {
+    return _background.valid();
 }
 
 }  // namespace akui

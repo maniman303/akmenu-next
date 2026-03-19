@@ -20,6 +20,7 @@ namespace akui {
 class cSpinBox : public cForm {
   public:
     cSpinBox(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text);
+    cSpinBox(s32 x, s32 y, u32 w, u32 h, bool namedAppearance, cWindow* parent, const std::string& text);
     ~cSpinBox();
 
   public:
@@ -63,6 +64,7 @@ class cSpinBox : public cForm {
     cButton _prevButton;
     cButton _nextButton;
     cStaticText _itemText;
+    bool _namedAppearance;
     u32 _selectedItemId;
     std::vector<std::string> _items;
 };
