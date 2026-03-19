@@ -509,10 +509,15 @@ s16  cGdi::textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_EN
 }
 
 s16 cGdi::textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont) {
-    const s16 originX = x, limitY = y + h - gs().fontHeight;
+    u8 fontHeight = gs().fontHeight;
+    if (textFont.GetFilename() != font().GetFilename()) {
+        fontHeight += 2;
+    }
+
+    const s16 originX = x, limitY = y + h - fontHeight;
     while (*text) {
         if ('\r' == *text || '\n' == *text) {
-            y += gs().fontHeight;  // FIXME
+            y += fontHeight;  // FIXME
             x = originX;
             ++text;
             if (y > limitY) break;

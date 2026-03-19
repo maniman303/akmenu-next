@@ -25,6 +25,7 @@ cSpinBox::cSpinBox(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::strin
     _focusedColor = uiSettings().spinBoxFocusColor;  // RGB15( 0, 31, 0 );
     _frameColor = uiSettings().spinBoxFrameColor;
     _itemText.setTextColor(uiSettings().spinBoxTextColor);
+    _itemText.setFont(false);
 
     _prevButton.pressed.connect(this, &cSpinBox::selectPrev);
     _prevButton.pressed.connect(this, &cSpinBox::onCmponentClicked);

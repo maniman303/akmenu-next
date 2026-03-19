@@ -45,10 +45,10 @@ void cSmallDate::draw() {
     const cFont& textFont = fontSecondary();
     u32 textWidth = textFont.TextLenght(formatString("%02d", first));
     u32 exampleWidth = textFont.TextLenght("22");
-    int xOffset = exampleWidth - textWidth;
-
-    std::string date = formatString("%02d / %02d", first, second);
+    int x = _dx + (exampleWidth - textWidth);
 
     gdi().setPenColor(_textColor, _engine);
-    gdi().textOut(_dx + xOffset, _dy, date.c_str(), _engine, textFont);
+    x = gdi().textOut(x, _dy, formatString("%02d", first).c_str(), _engine, textFont) + 1;
+    x = gdi().textOut(x, _dy, "/", _engine, textFont) + 1;
+    x = gdi().textOut(x, _dy, formatString("%02d", second).c_str(), _engine, textFont);
 }

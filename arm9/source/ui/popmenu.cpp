@@ -11,6 +11,7 @@
 
 #include "popmenu.h"
 #include "ui.h"
+#include "fontfactory.h"
 //#include "windowmanager.h"
 
 namespace akui {
@@ -81,7 +82,7 @@ void cPopMenu::drawItems() {
         } else {
             gdi().setPenColor(_textColor, _engine);
         }
-        gdi().textOut(itemX, itemY, _items[i].c_str(), _engine);
+        gdi().textOut(itemX, itemY, _items[i].c_str(), _engine, fontSecondary());
     }
 }
 

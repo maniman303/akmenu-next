@@ -49,6 +49,7 @@ class cFontPcf : public cFont {
     u32 iHeight;
     u32 iAscent;
     u32 iDescent;
+    std::string filename;
 
   private:
     bool ParseAccels(int aFont, u32 aSize, u32 aOffset);
@@ -67,6 +68,7 @@ class cFontPcf : public cFont {
     bool Load(const char* aFileName);
     void Draw(u16* mem, s16 x, s16 y, const u8* aText, u16 color) const;
     void Info(const char* aString, u32* aWidth, u32* aSymbolCount) const;
+    std::string GetFilename() const;
     u32 TextLenght(const std::string& aString) const;
     u32 FontRAM(void);
 };

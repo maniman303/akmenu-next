@@ -20,7 +20,8 @@ cFontPcf::cFontPcf()
       iDataSize(0),
       iHeight(0),
       iAscent(0),
-      iDescent(0) {
+      iDescent(0),
+      filename("") {
     // FIXME: test on nds
     // printf("%d\n",sizeof(cFontPcf::SGlyph));
 }
@@ -193,7 +194,16 @@ bool cFontPcf::Load(const char* aFileName) {
         } while (false);
         close(font);
     }
+
+    if (res) {
+        filename = std::string(aFileName);
+    }
+
     return res;
+}
+
+std::string cFontPcf::GetFilename() const {
+    return filename;
 }
 
 s32 cFontPcf::Search(u16 aCode) const {

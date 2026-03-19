@@ -44,12 +44,12 @@ void cSmallClock::draw() {
     std::string time = formatString("%02d : %02d", hours, minutes);
 
     gdi().setPenColor(_textColor, _engine);
-    x = gdi().textOut(x, _dy, formatString("%02d", hours).c_str(), _engine, fontSecondary());
+    x = gdi().textOut(x, _dy, formatString("%02d", hours).c_str(), _engine, fontSecondary()) + 1;
 
     if (_showColon) {
-        x = gdi().textOut(x, _dy, " : ", _engine, fontSecondary());
+        x = gdi().textOut(x, _dy, ":", _engine, fontSecondary()) + 1;
     } else {
-        x += textFont.TextLenght(" : ");
+        x += textFont.TextLenght(":") + 1;
     }
     
     x = gdi().textOut(x, _dy, formatString("%02d", minutes).c_str(), _engine, fontSecondary());

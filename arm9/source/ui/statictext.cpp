@@ -9,6 +9,7 @@
 
 #include "statictext.h"
 #include "ui.h"
+#include "fontfactory.h"
 //#include "gdi.h"
 
 namespace akui {
@@ -19,6 +20,7 @@ cStaticText::cStaticText(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     _position.y = y;
     _size.x = w;
     _size.y = h;
+    _primaryFont = true;
     _textColor = uiSettings().formTextColor;  //(RGB15(31,31,31))
 }
 
@@ -26,7 +28,7 @@ cStaticText::~cStaticText() {}
 
 void cStaticText::draw() {
     gdi().setPenColor(_textColor, _engine);
-    gdi().textOutRect(_position.x, _position.y, _size.x, _size.y, _text.c_str(), selectedEngine());
+    gdi().textOutRect(_position.x, _position.y, _size.x, _size.y, _text.c_str(), selectedEngine(), _primaryFont ? font() : fontSecondary());
 }
 
 cWindow& cStaticText::loadAppearance(const std::string& aFileName) {
@@ -35,6 +37,10 @@ cWindow& cStaticText::loadAppearance(const std::string& aFileName) {
 
 void cStaticText::setTextColor(COLOR color) {
     _textColor = color;
+}
+
+void cStaticText::setFont(bool primary) {
+    _primaryFont = primary;
 }
 
 }  // namespace akui

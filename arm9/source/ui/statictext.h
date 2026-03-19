@@ -27,7 +27,10 @@ class cStaticText : public cWindow {
 
     void setTextColor(COLOR color);
 
+    void setFont(bool primary);
+
   protected:
+    bool _primaryFont;
     COLOR _textColor;
 };
 
