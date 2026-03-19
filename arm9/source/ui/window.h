@@ -165,6 +165,7 @@ class cWindow : public SlotHolder {
     bool _isVisible;            //!< The visiblility flag
     bool _isSizeSetByUser;      //!< Whether the user has explicitly set the window's size
     bool _isFocusable;
+    bool _ignoreSizeEvent;
 
   protected:
     GRAPHICS_ENGINE _engine;

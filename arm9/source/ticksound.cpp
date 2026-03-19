@@ -161,6 +161,6 @@ void cTickSound::play() {
     _soundId = soundPlaySample(_pcmStart, (SoundFormat)_soundFormat, _dataSize, _sampleRate, 20, 64, false, 0);
 
     if (datetime().seconds() == 0 && _schedule == 0) {
-        _schedule = 12;
+        _schedule = 14;
     }
 }

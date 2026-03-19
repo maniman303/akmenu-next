@@ -22,6 +22,7 @@ cWindow::cWindow(cWindow* aParent, const std::string& aText)
       _isVisible(true),
       _isSizeSetByUser(false),
       _isFocusable(true),
+      _ignoreSizeEvent(false),
       _engine(GE_MAIN) {}
 
 cWindow::~cWindow() {
@@ -101,7 +102,11 @@ cWindow& cWindow::render() {
 
 cWindow& cWindow::setSize(const cSize& aSize) {
     _size = aSize;
-    onResize();
+    if (!_ignoreSizeEvent) {
+        _ignoreSizeEvent = true;
+        onResize();
+        _ignoreSizeEvent = false;
+    }
     _isSizeSetByUser = true;
     return *this;
 }

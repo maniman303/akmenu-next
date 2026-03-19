@@ -221,7 +221,8 @@ void cSettingWnd::addSettingItem(const std::string& text, const std::vector<std:
     }
 
     // insert label, item and set their position
-    s32 itemY = (items(lastTab).size() * 20) + static_cast<s32>(_titleOffset) + 18 + TOP_MARGIN;
+    s32 tabSwitcherHeight = _tabSwitcher.isVisible() ? _tabSwitcher.size().y : 0;
+    s32 itemY = (items(lastTab).size() * 20) + static_cast<s32>(_titleOffset) + tabSwitcherHeight + TOP_MARGIN;
     s32 itemX = 8;
 
     cSpinBox* item = new cSpinBox(0, 0, 108, 18, this, "spin");

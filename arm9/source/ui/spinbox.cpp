@@ -10,6 +10,7 @@
 #include "spinbox.h"
 #include "fontfactory.h"
 #include "ui.h"
+#include <math.h>
 
 //#include "windowmanager.h"
 
@@ -37,7 +38,6 @@ cSpinBox::cSpinBox(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::strin
     _itemText.setTextColor(RGB15(31, 31, 31));
 
     u8 cx = 0;
-    _prevButton.setSize(cSize(18, 18));
     _prevButton.setRelativePosition(cPoint(cx, 0));
 
     cx = 0 + _prevButton.windowRectangle().width();
@@ -45,7 +45,6 @@ cSpinBox::cSpinBox(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::strin
     _itemText.setSize(cSize(w - 18 * 2, 18));
 
     cx = windowRectangle().width() - _nextButton.windowRectangle().width();
-    _nextButton.setSize(cSize(18, 18));
     _nextButton.setRelativePosition(cPoint(cx, 0));
 
     selectItem(0);
@@ -135,6 +134,8 @@ cWindow& cSpinBox::loadAppearance(const std::string& aFileName) {
     _prevButton.loadAppearance(SFN_SPINBUTTON_L);
     _nextButton.loadAppearance(SFN_SPINBUTTON_R);
 
+    setSize(cSize(size().x, std::max(_prevButton.size().y, _nextButton.size().y)));
+
     return *this;
 }
 
@@ -165,14 +166,12 @@ void cSpinBox::arrangeText() {
 
 void cSpinBox::arrangeButton() {
     u8 x = 0;
-    _prevButton.setSize(cSize(_prevButton.size().x, _size.y));
     _prevButton.setRelativePosition(cPoint(x, (_size.y - _prevButton.size().y) / 2));
 
     x = _prevButton.size().x;
     _itemText.setRelativePosition(cPoint(x, (_size.y - gs().fontHeight) / 2));
 
     x = size().x - _nextButton.size().x;
-    _nextButton.setSize(cSize(_nextButton.size().x, _size.y));
     _nextButton.setRelativePosition(cPoint(x, (_size.y - _nextButton.size().y)));
 }
 
