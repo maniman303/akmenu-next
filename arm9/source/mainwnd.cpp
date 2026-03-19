@@ -342,7 +342,9 @@ bool cMainWnd::processKeyMessage(const cKeyMessage& msg) {
                 ret = true;
                 break;
             case cKeyMessage::UI_KEY_R:
-                // brightnessButtonClicked();
+                if (isL) {
+                    brightnessButtonClicked();
+                }
 #ifdef DEBUG
                 gdi().switchSubEngineMode();
                 gdi().present(GE_SUB);

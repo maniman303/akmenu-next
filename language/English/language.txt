@@ -316,7 +316,7 @@ info = Information
 load text = Please wait...
 
 [resethotkey]
-text = Menu Hotkey
+text = Menu hotkey
 0 = l-↓-select
 1 = l-r-start
 2 = l-r-select
