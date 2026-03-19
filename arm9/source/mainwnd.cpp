@@ -342,7 +342,7 @@ bool cMainWnd::processKeyMessage(const cKeyMessage& msg) {
                 ret = true;
                 break;
             case cKeyMessage::UI_KEY_R:
-                brightnessButtonClicked();
+                // brightnessButtonClicked();
 #ifdef DEBUG
                 gdi().switchSubEngineMode();
                 gdi().present(GE_SUB);
@@ -556,10 +556,6 @@ void cMainWnd::setParam(void) {
     _values.push_back(LANG("switches", "Enable"));
     settingWnd.addSettingItem(LANG("file settings", "show hidden files"), _values, gs().showHiddenFiles);
     _values.clear();
-    _values.push_back(LANG("switches", "Disable"));
-    _values.push_back(LANG("switches", "Enable"));
-    settingWnd.addSettingItem(LANG("file settings", "show file extensions"), _values, gs().showFileExtensions);
-    _values.clear();
     _values.push_back(LANG("file settings", "presentation full"));
     _values.push_back(LANG("file settings", "presentation user only"));
     _values.push_back(LANG("file settings", "presentation games"));
@@ -665,10 +661,9 @@ void cMainWnd::setParam(void) {
 
     // page 3: filesystem
     gs().showHiddenFiles = settingWnd.getItemSelection(2, 0);
-    gs().showFileExtensions = settingWnd.getItemSelection(2, 1);
-    gs().filePresentationMode = settingWnd.getItemSelection(2, 2);
-    gs().saveExt = settingWnd.getItemSelection(2, 3);
-    gs().saveDir = settingWnd.getItemSelection(2, 4);
+    gs().filePresentationMode = settingWnd.getItemSelection(2, 1);
+    gs().saveExt = settingWnd.getItemSelection(2, 2);
+    gs().saveDir = settingWnd.getItemSelection(2, 3);
 
     // page 4: ndsbs
     gs().dsOnly = settingWnd.getItemSelection(3, 0);
@@ -728,7 +723,6 @@ void cMainWnd::showSettings(void) {
     if (gs().safeMode) return;
     u8 currentFileListType = gs().fileListType;
     bool currentShowHiddenFiles = gs().showHiddenFiles;
-    bool currentShowFileExtensions = gs().showFileExtensions;
     int currentfilePresentationMode = gs().filePresentationMode;
     
     setParam();
@@ -737,8 +731,7 @@ void cMainWnd::showSettings(void) {
         _mainList->enterDir("...");
         _mainList->selectRow(0);
     } else if (gs().fileListType != currentFileListType ||
-        gs().showHiddenFiles != currentShowHiddenFiles ||
-        gs().showFileExtensions != currentShowFileExtensions) {
+        gs().showHiddenFiles != currentShowHiddenFiles) {
         _mainList->enterDir(_mainList->getCurrentDir());
     }
 }

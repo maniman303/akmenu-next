@@ -614,7 +614,7 @@ std::string cMainList::processItemText(std::string text, int column) {
         return text;
     }
 
-    if (gs().showFileExtensions) {
+    if (gs().filePresentationMode == 0) {
         return text;
     }
 
