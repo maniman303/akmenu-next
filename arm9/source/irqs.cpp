@@ -56,7 +56,7 @@ void cIRQ::vBlank() {
 
     static u32 vBlankCounter = 0;
 
-    if (vBlankCounter++ >= 30) {
+    if (vBlankCounter++ >= 29) {
         vBlankCounter = 0;
         calendarWnd().draw();
         calendar().draw();

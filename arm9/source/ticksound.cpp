@@ -141,5 +141,5 @@ void cTickSound::play() {
     _checkpoint = now;
 
     soundKill(_soundId);
-    _soundId = soundPlaySample(_pcmStart, (SoundFormat)_soundFormat, _dataSize, _sampleRate, 127, 64, false, 0);
+    _soundId = soundPlaySample(_pcmStart, (SoundFormat)_soundFormat, _dataSize, _sampleRate, 63, 64, false, 0);
 }
