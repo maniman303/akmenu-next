@@ -37,19 +37,19 @@ std::string cBatteryMeter::getBatteryFileName() {
         return base + "/battery1.bmp";
     }
 
+    u64 now = datetime().secondsInDay();
+    if ((now - _checkpoint) <= 0 && now >= _checkpoint) {
+        return "";
+    }
+
     fifoSendValue32(FIFO_USER_01, MENU_MSG_BATTERY_STATE);
 
     int iter = 0;
-    while(!fifoCheckValue32(FIFO_USER_04) && iter < 117133) {
+    while(!fifoCheckValue32(FIFO_USER_04) && iter < 20000) {
 		iter++;
 	}
 
     if (!fifoCheckValue32(FIFO_USER_04)) {
-        return "";
-    }
-
-    u64 now = datetime().secondsInDay();
-    if ((now - _checkpoint) <= 0 && now >= _checkpoint) {
         return "";
     }
 
