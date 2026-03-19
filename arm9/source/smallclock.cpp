@@ -13,7 +13,7 @@ cSmallClock::cSmallClock() : cWindow(NULL, "SmallClock") {
     _dy = 0;
     _textColor = 0;
     _show = false;
-    _showColon = false;
+    _showColon = true;
 
     _size = cSize(1, 1);
     _position = cPoint(0, 0);

@@ -21,7 +21,7 @@ cBigClock::cBigClock() : cWindow(NULL, "big clock") {
     _position = cPoint(8, 80);
     _engine = GE_SUB;
     _show = false;
-    _colonShow = false;
+    _colonShow = true;
     _ampmShow = false;
     _ampmColor = RGB15(17, 12, 0);
 }
