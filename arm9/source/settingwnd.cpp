@@ -186,7 +186,7 @@ cWindow& cSettingWnd::loadAppearance(const std::string& aFileName) {
     _renderDesc.loadData(SFN_FORM_TITLE_L, SFN_FORM_TITLE_R, SFN_FORM_TITLE_M);
     _renderDesc.setTitleText(_text, true);
 
-    _titleOffset = _renderDesc.size().y;
+    _titleOffset = _renderDesc.titleSize().y;
 
     _tabSwitcher.setRelativePosition(cPoint(0, _titleOffset));
 

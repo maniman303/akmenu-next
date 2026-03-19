@@ -15,6 +15,7 @@ cUISettings::cUISettings() {
     showCalendar = true;
     formFrameColor = RGB15(23, 25, 4);
     formBodyColor = RGB15(30, 29, 22);
+    formBodyColor2 = RGB15(30, 29, 22);
     formTextColor = RGB15(17, 12, 0);
     formTextHighLightColor = RGB15(17, 12, 0);
     formTitleTextColor = RGB15(11, 11, 11);
@@ -42,6 +43,7 @@ void cUISettings::loadSettings() {
     showCalendar = ini.GetInt("global settings", "showCalendar", showCalendar);
     formFrameColor = ini.GetInt("global settings", "formFrameColor", formFrameColor);
     formBodyColor = ini.GetInt("global settings", "formBodyColor", formBodyColor);
+    formBodyColor2 = ini.GetInt("global settings", "formBodyColor2", formBodyColor);
     formTextColor = ini.GetInt("global settings", "formTextColor", formTextColor);
     formTextHighLightColor = ini.GetInt("global settings", "formTextHighLightColor", formTextColor);
     formTitleTextColor = ini.GetInt("global settings", "formTitleTextColor", formTitleTextColor);

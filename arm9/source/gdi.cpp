@@ -305,7 +305,9 @@ void cGdi::frameRect(s16 x, s16 y, u16 w, u16 h, u16 thickness, GRAPHICS_ENGINE 
 
 void cGdi::fillRect(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine) {
     ALIGN(4) u16 color[2] = { (u16)(BIT(15) | color1), (u16)(BIT(15) | color2) };
+    ALIGN(4) u16 altColor[2] = { (u16)(BIT(15) | color2), (u16)(BIT(15) | color1) };
     u16* pSrc = (u16*)color;
+    u16* pAltSrc = (u16*)altColor;
     u16* pDest = NULL;
 
     if (GE_MAIN == engine)
@@ -321,15 +323,16 @@ void cGdi::fillRect(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS
 
     if (destAligned)
         for (u32 i = 0; i < h; ++i) {
-            swiFastCopy(pSrc, pDest, COPY_MODE_WORD | COPY_MODE_FILL | halfWidth);
+            u16* source = (i & 1) ? pSrc : pAltSrc;
+            swiFastCopy(source, pDest, COPY_MODE_WORD | COPY_MODE_FILL | halfWidth);
             pDest += halfWidth << 1;
-            if (remain) *pDest++ = *pSrc;
+            if (remain) *pDest++ = *source;
             pDest += destInc;
         }
     else
         for (u32 i = 0; i < h; ++i) {
             for (u32 j = 0; j < w; ++j) {
-                *pDest++ = pSrc[j & 1];
+                *pDest++ = pSrc[(j ^ i) & 1];
             }
             pDest += destInc;
         }

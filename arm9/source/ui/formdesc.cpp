@@ -22,6 +22,7 @@ namespace akui {
 
 cFormDesc::cFormDesc() {
     _bodyColor = uiSettings().formBodyColor;    // RGB15(30,29,22);
+    _bodyColor2 = uiSettings().formBodyColor2;
     _frameColor = uiSettings().formFrameColor;  // RGB15(23,25,4);
     _centerTitle = false;
 }
@@ -63,7 +64,7 @@ void cFormDesc::draw(const cRect& area, GRAPHICS_ENGINE engine) const {
     }
 
     gdi().setPenColor(_bodyColor, engine);
-    gdi().fillRect(_bodyColor, _bodyColor, area.topLeft().x, area.topLeft().y + _topleft.height(),
+    gdi().fillRect(_bodyColor, _bodyColor2, area.topLeft().x, area.topLeft().y + _topleft.height(),
                    area.width(), area.height() - _topleft.height(), engine);
 
     gdi().setPenColor(_frameColor, engine);
@@ -78,7 +79,7 @@ void cFormDesc::loadData(const std::string& topleftBmpFile, const std::string& t
     _middle = createBMP15FromFile(middleBmpFile);
 }
 
-cSize cFormDesc::size() {
+cSize cFormDesc::titleSize() {
     if (_topleft.valid()) {
         return cSize(_topleft.width(), _topleft.height());
     }

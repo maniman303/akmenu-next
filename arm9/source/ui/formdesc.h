@@ -27,7 +27,7 @@ class cFormDesc : public cRenderDesc {
     void loadData(const std::string& topleftBmpFile, const std::string& toprightBmpFile,
                   const std::string& middleBmpFile);
 
-    cSize size();
+    cSize titleSize();
 
     void setTitleText(const std::string& text);
 
@@ -39,6 +39,7 @@ class cFormDesc : public cRenderDesc {
     cBMP15 _topright;
 
     COLOR _bodyColor;
+    COLOR _bodyColor2;
     COLOR _frameColor;
 
     std::string _titleText;

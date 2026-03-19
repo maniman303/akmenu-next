@@ -27,6 +27,7 @@ class cUISettings {
 
     COLOR formFrameColor;
     COLOR formBodyColor;
+    COLOR formBodyColor2;
     COLOR formTextColor;
     COLOR formTextHighLightColor;
     COLOR formTitleTextColor;
