@@ -14,6 +14,7 @@ cTickSound::cTickSound() {
     _soundFormat = 0;
     _checkpoint = 0;
     _soundId = 0;
+    _scheduleSoundId = 0;
     _schedule = 0;
 }
 
@@ -138,17 +139,28 @@ void cTickSound::play() {
         _schedule--;
     }
 
+    if (_schedule == 1) {
+        soundKill(_scheduleSoundId);
+        _scheduleSoundId = soundPlaySample(_pcmStart, (SoundFormat)_soundFormat, _dataSize, _sampleRate, 20, 64, false, 0);
+        return;
+    }
+
     u64 now = datetime().secondsInDay();
-    if ((now - _checkpoint) <= 0 && now >= _checkpoint && _schedule != 1) {
+    if ((now - _checkpoint) <= 0 && now >= _checkpoint) {
+        return;
+    }
+
+    if ((now - _checkpoint) > 2) {
+        _checkpoint = now;
         return;
     }
 
     _checkpoint = now;
 
     soundKill(_soundId);
-    _soundId = soundPlaySample(_pcmStart, (SoundFormat)_soundFormat, _dataSize, _sampleRate, 42, 64, false, 0);
+    _soundId = soundPlaySample(_pcmStart, (SoundFormat)_soundFormat, _dataSize, _sampleRate, 20, 64, false, 0);
 
     if (datetime().seconds() == 0 && _schedule == 0) {
-        _schedule = 15;
+        _schedule = 12;
     }
 }

@@ -24,6 +24,7 @@ class cTickSound {
     int  _soundFormat;
     u64 _checkpoint;
     int _soundId;
+    int _scheduleSoundId;
     int _schedule;
 };
 
