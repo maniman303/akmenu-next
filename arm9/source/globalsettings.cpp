@@ -21,6 +21,7 @@ cGlobalSettings::cGlobalSettings() {
     langDirectory = "English";
     uiName = "blue skies";
     startupFolder = "...";
+    dateFormat = 0;
     fileListType = 0;
     romTrim = 0;
     showHiddenFiles = false;
@@ -69,6 +70,7 @@ void cGlobalSettings::loadSettings() {
     uiName = ini.GetString("system", "uiName", uiName);
     startupFolder = ini.GetString("system", "startupFolder", startupFolder);
     if ('/' != startupFolder[startupFolder.length() - 1]) startupFolder += '/';
+    dateFormat = ini.GetInt("system", "dateFormat", dateFormat);
     fileListType = ini.GetInt("system", "fileListType", fileListType);
     romTrim = ini.GetInt("system", "romTrim", romTrim);
     showHiddenFiles = ini.GetInt("system", "showHiddenFiles", showHiddenFiles);
@@ -134,6 +136,7 @@ void cGlobalSettings::saveSettings() {
     // ini.SetInt( "system", "fontHeight", fontHeight );
     ini.SetString("system", "uiName", uiName);
     ini.SetString("system", "langDirectory", langDirectory);
+    ini.SetInt("system", "dateFormat", dateFormat);
     ini.SetInt("system", "fileListType", fileListType);
     ini.SetInt("system", "romTrim", romTrim);
     ini.SetInt("system", "showHiddenFiles", showHiddenFiles);

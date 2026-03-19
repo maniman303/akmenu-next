@@ -493,6 +493,11 @@ void cMainWnd::setParam(void) {
     langNames = _values;
     settingWnd.addSettingItem(LANG("language", "text"), _values, langIndex);
 
+    _values.clear();
+    _values.push_back(LANG("date format", "dd-mm-yyyy"));
+    _values.push_back(LANG("date format", "mm-dd-yyyy"));
+    settingWnd.addSettingItem(LANG("date format", "title"), _values, gs().dateFormat);
+
     // file list type
     _values.clear();
     for (size_t ii = 0; ii < 3; ++ii) {
@@ -640,8 +645,9 @@ void cMainWnd::setParam(void) {
     // page 1: system
     u32 uiIndexAfter = settingWnd.getItemSelection(0, 0);
     u32 langIndexAfter = settingWnd.getItemSelection(0, 1);
-    gs().fileListType = settingWnd.getItemSelection(0, 2);
-    gs().resetHotKey = settingWnd.getItemSelection(0, 3);
+    gs().dateFormat = settingWnd.getItemSelection(0, 2);
+    gs().fileListType = settingWnd.getItemSelection(0, 3);
+    gs().resetHotKey = settingWnd.getItemSelection(0, 4);
 
     // page 2: interface
     switch (settingWnd.getItemSelection(1, 0)) {

@@ -33,13 +33,21 @@ void cSmallDate::draw() {
 
     int day = datetime().day();
     int month = datetime().month();
+
+    int first = day;
+    int second = month;
+
+    if (gs().dateFormat > 0) {
+        first = month;
+        second = day;
+    }
     
     const cFont& textFont = fontSecondary();
-    u32 dayWidth = textFont.TextLenght(formatString("%02d", day));
+    u32 textWidth = textFont.TextLenght(formatString("%02d", first));
     u32 exampleWidth = textFont.TextLenght("22");
-    int xOffset = exampleWidth - dayWidth;
+    int xOffset = exampleWidth - textWidth;
 
-    std::string date = formatString("%02d / %02d", day, month);
+    std::string date = formatString("%02d / %02d", first, second);
 
     gdi().setPenColor(_textColor, _engine);
     gdi().textOut(_dx + xOffset, _dy, date.c_str(), _engine, textFont);

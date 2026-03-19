@@ -179,6 +179,11 @@ zh = 繁體中文
 [ui style]
 text = User Interface style
 
+[date format]
+title = Date format
+dd-mm-yyyy = dd-mm-yyyy
+mm-dd-yyyy = mm-dd-yyyy
+
 [help window]
 title = Help information
 item0 = %c  Select Programs
