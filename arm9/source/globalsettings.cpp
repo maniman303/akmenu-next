@@ -15,7 +15,7 @@
 #include "systemfilenames.h"
 
 cGlobalSettings::cGlobalSettings() {
-    fontHeight = 12;
+    fontHeight = 10;
     brightness = 1;
     language = 1;
     langDirectory = "English";
