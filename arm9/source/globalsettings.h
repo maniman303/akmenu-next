@@ -52,6 +52,7 @@ class cGlobalSettings {
     int slot2mode;
     bool showHiddenFiles;
     bool showFileExtensions;
+    bool clockSound;
     int filePresentationMode;
     int minimalModeRomsCount;
     bool enterLastDirWhenBoot;

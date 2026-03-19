@@ -537,10 +537,6 @@ void cMainWnd::setParam(void) {
     _values.push_back(LANG("scrolling", "slow"));
     settingWnd.addSettingItem(LANG("interface settings", "scrolling speed"), _values, scrollSpeed);
     _values.clear();
-    _values.push_back(LANG("switches", "Disable"));
-    _values.push_back(LANG("switches", "Enable"));
-    settingWnd.addSettingItem(LANG("interface settings", "custom icons"), _values, gs().icon);
-    _values.clear();
     _values.push_back(LANG("interface settings", "oldschool"));
     _values.push_back(LANG("interface settings", "modern"));
     _values.push_back(LANG("interface settings", "internal"));
@@ -551,6 +547,7 @@ void cMainWnd::setParam(void) {
     _values.push_back(LANG("switches", "Enable"));
     settingWnd.addSettingItem(LANG("interface settings", "animation"), _values, gs().Animation);
     settingWnd.addSettingItem(LANG("interface settings", "12 hour"), _values, gs().show12hrClock);
+    settingWnd.addSettingItem(LANG("interface settings", "clock sound"), _values, gs().clockSound);
 
     // page 3: filesystem
     settingWnd.addSettingTab(LANG("file settings", "title"));
@@ -661,10 +658,10 @@ void cMainWnd::setParam(void) {
             gs().scrollSpeed = cGlobalSettings::EScrollSlow;
             break;
     }
-    gs().icon = settingWnd.getItemSelection(1, 1);
-    gs().viewMode = settingWnd.getItemSelection(1, 2);
-    gs().Animation = settingWnd.getItemSelection(1, 3);
-    gs().show12hrClock = settingWnd.getItemSelection(1, 4);
+    gs().viewMode = settingWnd.getItemSelection(1, 1);
+    gs().Animation = settingWnd.getItemSelection(1, 2);
+    gs().show12hrClock = settingWnd.getItemSelection(1, 3);
+    gs().clockSound = settingWnd.getItemSelection(1, 4);
 
     // page 3: filesystem
     gs().showHiddenFiles = settingWnd.getItemSelection(2, 0);

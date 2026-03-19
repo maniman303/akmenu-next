@@ -26,6 +26,7 @@ cGlobalSettings::cGlobalSettings() {
     romTrim = 0;
     showHiddenFiles = false;
     showFileExtensions = true;
+    clockSound = true;
     filePresentationMode = 0;
     minimalModeRomsCount = 20;
     enterLastDirWhenBoot = true;
@@ -72,6 +73,7 @@ void cGlobalSettings::loadSettings() {
     if ('/' != startupFolder[startupFolder.length() - 1]) startupFolder += '/';
     dateFormat = ini.GetInt("system", "dateFormat", dateFormat);
     fileListType = ini.GetInt("system", "fileListType", fileListType);
+    clockSound = ini.GetInt("system", "clockSound", clockSound);
     romTrim = ini.GetInt("system", "romTrim", romTrim);
     showHiddenFiles = ini.GetInt("system", "showHiddenFiles", showHiddenFiles);
     showFileExtensions = ini.GetInt("system", "showFileExtensions", showFileExtensions);
@@ -141,6 +143,7 @@ void cGlobalSettings::saveSettings() {
     ini.SetInt("system", "romTrim", romTrim);
     ini.SetInt("system", "showHiddenFiles", showHiddenFiles);
     ini.SetInt("system", "showFileExtensions", showFileExtensions);
+    ini.SetInt("system", "clockSound", clockSound);
     ini.SetInt("system", "filePresentationMode", filePresentationMode);
     ini.SetInt("system", "gbaSleepHack", gbaSleepHack);
     ini.SetInt("system", "gbaAutoSave", gbaAutoSave);

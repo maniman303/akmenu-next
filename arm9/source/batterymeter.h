@@ -30,6 +30,7 @@ class cBatteryMeter : public akui::cWindow {
     int _dx;
     int _dy;
     bool _show;
+    u64 _checkpoint;
     cBMP15 _battery;
 };
 

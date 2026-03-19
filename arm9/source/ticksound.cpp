@@ -4,6 +4,7 @@
 #include <malloc.h>
 #include "systemdetails.h"
 #include "datetime.h"
+#include "globalsettings.h"
 
 cTickSound::cTickSound() {
     _rawData = NULL;
@@ -125,6 +126,10 @@ void cTickSound::play() {
     }
 
     if (_pcmStart == NULL) {
+        return;
+    }
+
+    if (!gs().clockSound) {
         return;
     }
 

@@ -8,11 +8,13 @@
 #include "inifile.h"
 #include "systemfilenames.h"
 #include "systemdetails.h"
+#include "datetime.h"
 
 cBatteryMeter::cBatteryMeter() : cWindow(NULL, "BatteryMeter") {
     _dx = 0;
     _dy = 0;
     _show = false;
+    _checkpoint = 0;
 
     _size = cSize(1, 1);
     _position = cPoint(0, 0);
@@ -45,6 +47,13 @@ std::string cBatteryMeter::getBatteryFileName() {
     if (!fifoCheckValue32(FIFO_USER_04)) {
         return "";
     }
+
+    u64 now = datetime().secondsInDay();
+    if ((now - _checkpoint) <= 0 && now >= _checkpoint) {
+        return "";
+    }
+
+    _checkpoint = now;
 
     u32 level = fifoGetValue32(FIFO_USER_04);
 
