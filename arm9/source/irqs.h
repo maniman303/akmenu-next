@@ -25,6 +25,8 @@ class cIRQ {
 
     void vblankStop();
 
+    bool isVblankStarted();
+
     static void cardMC();
 
     static void vBlank();

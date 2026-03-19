@@ -33,6 +33,8 @@
 #include "datetime.h"
 #include "batterymeter.h"
 
+#include "ticksound.h"
+
 #include "smalldate.h"
 #include "smallclock.h"
 
@@ -76,6 +78,8 @@ int main(int argc, char* argv[]) {
     // turn led on
     ledBlink(PM_LED_ON);
 
+    // soundEnable();
+
     // init graphics
     gdi().init();
 #ifdef DEBUG
@@ -111,6 +115,8 @@ int main(int argc, char* argv[]) {
         //     LANG("no savelist", "text"), MB_OK );
         dbg_printf("WARNING: savelist.bin missed\n");
     }
+
+    tickSound().load(SFN_UI_TICK_SOUND);
 
     calendarWnd().init();
     calendarWnd().draw();
@@ -218,6 +224,7 @@ int main(int argc, char* argv[]) {
 
     while (true) {
         timer().updateFps();
+        tickSound().play();
 
         INPUT& inputs = updateInput();
 

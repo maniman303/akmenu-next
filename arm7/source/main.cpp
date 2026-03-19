@@ -31,6 +31,7 @@ void VblankHandler(void) {
 #define PM_NDSLITE_ISLITE BIT(6)
 #define PM_NDSLITE_BRIGHTNESS(x) ((x & 0x03) << 0)
 #define PM_NDSLITE_BRIGHTNESS_MASK (PM_NDSLITE_BRIGHTNESS(3))
+#define FIFO_SOUND_READY 0x1234
 
 static u32 getSystem(void) {
     static u32 dsGen = 0;
@@ -167,15 +168,23 @@ static void menuValue32Handler(u32 value, void* data) {
         case MENU_MSG_IS_SD_INSERTED:
             fifoSendValue32(FIFO_USER_01, checkSD());
             break;
+        case MENU_MSG_BATTERY_STATE:
+            fifoSendValue32(FIFO_USER_01, readPowerManagement(PM_CONTROL_REG) & 0xff);
+            break;
         default:
             break;
     }
 }
 
 int main() {
+    // clear sound registers
+	dmaFillWords(0, (void*)0x04000400, 0x100);
+
+	REG_SOUNDCNT |= SOUND_ENABLE;
     // switch on backlight on both screens
-    writePowerManagement(PM_CONTROL_REG, readPowerManagement(PM_CONTROL_REG) | PM_BACKLIGHT_BOTTOM |
-                                                 PM_BACKLIGHT_TOP);
+    writePowerManagement(PM_CONTROL_REG, (readPowerManagement(PM_CONTROL_REG) & ~PM_SOUND_MUTE) |
+        PM_BACKLIGHT_BOTTOM | PM_BACKLIGHT_TOP | PM_SOUND_AMP);
+    powerOn(POWER_SOUND);
 
     // read User Settings from firmware
     readUserSettings();
@@ -184,16 +193,18 @@ int main() {
     fifoInit();
 	touchInit();
 
-    // Start the RTC tracking IRQ
     initClockIRQ();
+
+    installSystemFIFO();
+    installSoundFIFO();
 
     fifoSetValue32Handler(FIFO_USER_01, menuValue32Handler, 0);
 
-    installSystemFIFO();
+    fifoSendValue32(FIFO_USER_03, FIFO_SOUND_READY);
 
     irqSet(IRQ_VBLANK, VblankHandler);
 
-    irqEnable(IRQ_VBLANK | IRQ_NETWORK);
+    irqEnable(IRQ_VBLANK | IRQ_NETWORK | IRQ_FIFO_NOT_EMPTY | IRQ_SPI);
 
 	if (isDSiMode() && REG_SNDEXTCNT != 0) {
 		i2cWriteRegister(0x4A, 0x12, 0x00);	// Press power-button for auto-reset

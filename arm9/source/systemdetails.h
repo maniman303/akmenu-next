@@ -6,8 +6,7 @@ class cSystemDetails {
   public:
     cSystemDetails();
     void initArm7RegStatuses();
-    int batteryStatus();
-    int volumeStatus();
+    bool fifoStatus();
 
   protected:
     bool _fifoInit;

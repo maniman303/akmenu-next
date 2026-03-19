@@ -2,23 +2,19 @@
 #include <nds.h>
 #include "systemdetails.h"
 
-#define BAT_MASK  0b00000000000011111111
-#define BAT_OFF 0
-
-#define VOL_MASK  0b00000001111100000000
-#define VOL_OFF 8
-
 extern "C" {
-	static volatile int _batteryLevel = 0;
-	static volatile int _volumeLevel = -1;
+	static volatile bool _fifoReady = false;
 
-	void volBatSdCallback(u32 status, void *userdata) {
-		_batteryLevel = (status & BAT_MASK) >> BAT_OFF;
-		_volumeLevel = (status & VOL_MASK) >> VOL_OFF;
+	void soundCallback(u32 value, void *userdata) {
+		if (value == 0x1234) {
+			soundEnable();
+
+			_fifoReady = true;
+		}
 	}
 
 	void registerFifoHandlers() {
-		fifoSetValue32Handler(FIFO_USER_03, volBatSdCallback, NULL);
+		fifoSetValue32Handler(FIFO_USER_03, soundCallback, NULL);
 	}
 }
 
@@ -34,10 +30,6 @@ void cSystemDetails::initArm7RegStatuses() {
 	_fifoInit = true;
 }
 
-int cSystemDetails::batteryStatus() {
-	return _batteryLevel;
-}
-
-int cSystemDetails::volumeStatus() {
-	return _volumeLevel;
+bool cSystemDetails::fifoStatus() {
+	return _fifoReady;
 }

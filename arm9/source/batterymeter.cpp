@@ -3,6 +3,8 @@
 #include <math.h>
 #include <chrono>
 #include "batterymeter.h"
+#include "irqs.h"
+#include "fifotool.h"
 #include "globalsettings.h"
 #include "inifile.h"
 #include "systemfilenames.h"
@@ -39,10 +41,18 @@ void cBatteryMeter::init() {
     _start = getMillisecondsSinceEpoch();
 }
 
-std::string cBatteryMeter::getBatteryFileName(int level) {
+std::string cBatteryMeter::getBatteryFileName() {
     std::string base = SFN_UI_DIRECTORY + gs().uiName + "/icons";
     
-    if (level & BIT(0)) {
+    if (!sd().fifoStatus()) {
+        return base + "/battery1.bmp";
+    }
+
+    fifoSendValue32(FIFO_USER_01, MENU_MSG_BATTERY_STATE);
+    fifoWaitValue32(FIFO_USER_01);
+    u32 level = fifoGetValue32(FIFO_USER_01);
+
+    if (level <= 1) {
         return base + "/battery1.bmp";
     }
 
@@ -51,7 +61,7 @@ std::string cBatteryMeter::getBatteryFileName(int level) {
 
 void cBatteryMeter::draw() {
     if (!_battery.valid()) {
-        _battery = createBMP15FromFile(getBatteryFileName(sd().batteryStatus()));
+        _battery = createBMP15FromFile(getBatteryFileName());
         gdi().maskBlt(_battery.buffer(), _dx, _dy, _battery.width(), _battery.height(), selectedEngine());
         return;
     }
@@ -63,7 +73,7 @@ void cBatteryMeter::draw() {
     }
 
     _start = now;
-    _battery = createBMP15FromFile(getBatteryFileName(sd().batteryStatus()));
+    _battery = createBMP15FromFile(getBatteryFileName());
     gdi().maskBlt(_battery.buffer(), _dx, _dy, _battery.width(), _battery.height(), selectedEngine());
     return;
 }

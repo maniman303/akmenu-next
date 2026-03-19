@@ -45,6 +45,10 @@ void cIRQ::vblankStop() {
     _vblankStarted = false;
 }
 
+bool cIRQ::isVblankStarted() {
+    return _vblankStarted;
+}
+
 void cIRQ::vBlank() {
     if (!_vblankStarted) return;
 
