@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
-#include <chrono>
 #include "systemdetails.h"
+#include "timer.h"
 
 cTickSound::cTickSound() {
     _rawData = NULL;
@@ -12,20 +12,12 @@ cTickSound::cTickSound() {
     _sampleRate = 0;
     _soundFormat = 0;
     _checkpoint = 0;
+    _isFresh = true;
+    _soundId = 0;
 }
 
 cTickSound::~cTickSound() {
     unload();
-}
-
-static s64 getMillisecondsSinceEpoch() {
-    auto tp = std::chrono::steady_clock::now();
-
-    s64 ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-        tp.time_since_epoch()
-    ).count();
-
-    return ms;
 }
 
 void cTickSound::unload() {
@@ -123,7 +115,8 @@ bool cTickSound::load(std::string filepath) {
 
     DC_FlushRange(_pcmStart, _dataSize);
 
-    _checkpoint = 1;
+    _checkpoint = timer().getTime();
+    _isFresh = true;
 
     return true;
 }
@@ -137,12 +130,21 @@ void cTickSound::play() {
         return;
     }
 
-    // s64 now = 1;
-    // if (now - _checkpoint < 999) {
-    //     return;
-    // }
+    double now = timer().getTime();
+    if ((now - _checkpoint) < 0.95) {
+        return;
+    }
 
-    // _checkpoint = now;
+    _checkpoint = now;
 
-    soundPlaySample(_pcmStart, (SoundFormat)_soundFormat, _dataSize, _sampleRate, 127, 64, false, 0);
+    soundKill(_soundId);
+    _soundId = soundPlaySample(_pcmStart, (SoundFormat)_soundFormat, _dataSize, _sampleRate, 127, 64, false, 0);
+
+    if (!_isFresh) {
+        // soundResume(_soundId);
+        return;
+    }
+
+    _isFresh = false;
+    // _soundId = soundPlaySample(_pcmStart, (SoundFormat)_soundFormat, _dataSize, _sampleRate, 127, 64, false, 0);
 }

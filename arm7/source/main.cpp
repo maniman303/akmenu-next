@@ -150,7 +150,7 @@ static void menuValue32Handler(u32 value, void* data) {
             fifoSendValue32(FIFO_USER_02, getSystem());
             break;
         case MENU_MSG_BRIGHTNESS_GET:
-            fifoSendValue32(FIFO_USER_01, brightnessGet());
+            fifoSendValue32(FIFO_USER_05, brightnessGet());
             break;
         case MENU_MSG_BRIGHTNESS_SET0:
         case MENU_MSG_BRIGHTNESS_SET1:
@@ -166,10 +166,10 @@ static void menuValue32Handler(u32 value, void* data) {
                 systemShutDown();
             break;
         case MENU_MSG_IS_SD_INSERTED:
-            fifoSendValue32(FIFO_USER_01, checkSD());
+            fifoSendValue32(FIFO_USER_06, checkSD());
             break;
         case MENU_MSG_BATTERY_STATE:
-            fifoSendValue32(FIFO_USER_01, readPowerManagement(PM_CONTROL_REG) & 0xff);
+            fifoSendValue32(FIFO_USER_04, readPowerManagement(PM_CONTROL_REG) & 0xff);
             break;
         default:
             break;

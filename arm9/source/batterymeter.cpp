@@ -1,7 +1,6 @@
 #include <nds.h>
 #include <nds/system.h>
 #include <math.h>
-#include <chrono>
 #include "batterymeter.h"
 #include "irqs.h"
 #include "fifotool.h"
@@ -14,7 +13,6 @@ cBatteryMeter::cBatteryMeter() : cWindow(NULL, "BatteryMeter") {
     _dx = 0;
     _dy = 0;
     _show = false;
-    _start = 0;
 
     _size = cSize(1, 1);
     _position = cPoint(0, 0);
@@ -23,22 +21,11 @@ cBatteryMeter::cBatteryMeter() : cWindow(NULL, "BatteryMeter") {
 
 cBatteryMeter::~cBatteryMeter() { }
 
-static s64 getMillisecondsSinceEpoch() {
-    auto tp = std::chrono::steady_clock::now();
-
-    s64 ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-        tp.time_since_epoch()
-    ).count();
-
-    return ms;
-}
-
 void cBatteryMeter::init() {
     CIniFile ini(SFN_UI_SETTINGS);
     _dx = ini.GetInt("battery icon", "x", 0);
     _dy = ini.GetInt("battery icon", "y", 0);
     _show = ini.GetInt("battery icon", "show", _show);
-    _start = getMillisecondsSinceEpoch();
 }
 
 std::string cBatteryMeter::getBatteryFileName() {
@@ -49,8 +36,17 @@ std::string cBatteryMeter::getBatteryFileName() {
     }
 
     fifoSendValue32(FIFO_USER_01, MENU_MSG_BATTERY_STATE);
-    fifoWaitValue32(FIFO_USER_01);
-    u32 level = fifoGetValue32(FIFO_USER_01);
+
+    int iter = 0;
+    while(!fifoCheckValue32(FIFO_USER_04) && iter < 117133) {
+		iter++;
+	}
+
+    if (!fifoCheckValue32(FIFO_USER_04)) {
+        return "";
+    }
+
+    u32 level = fifoGetValue32(FIFO_USER_04);
 
     if (level <= 1) {
         return base + "/battery1.bmp";
@@ -60,20 +56,11 @@ std::string cBatteryMeter::getBatteryFileName() {
 }
 
 void cBatteryMeter::draw() {
-    if (!_battery.valid()) {
-        _battery = createBMP15FromFile(getBatteryFileName());
-        gdi().maskBlt(_battery.buffer(), _dx, _dy, _battery.width(), _battery.height(), selectedEngine());
-        return;
+    std::string newFile = getBatteryFileName();
+    if (newFile != "") {
+        _battery = createBMP15FromFile(newFile);
     }
 
-    s64 now = getMillisecondsSinceEpoch();
-    if (now - _start < 500) {
-        gdi().maskBlt(_battery.buffer(), _dx, _dy, _battery.width(), _battery.height(), selectedEngine());
-        return;
-    }
-
-    _start = now;
-    _battery = createBMP15FromFile(getBatteryFileName());
     gdi().maskBlt(_battery.buffer(), _dx, _dy, _battery.width(), _battery.height(), selectedEngine());
     return;
 }

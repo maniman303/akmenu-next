@@ -209,9 +209,9 @@ u32 cGlobalSettings::CopyBufferSize(void) {
 
 void cGlobalSettings::nextBrightness(void) {
     fifoSendValue32(FIFO_USER_01, MENU_MSG_BRIGHTNESS_GET);
-    while (!fifoCheckValue32(FIFO_USER_01))
+    while (!fifoCheckValue32(FIFO_USER_05))
         ;
-    u32 currentLevel = fifoGetValue32(FIFO_USER_01);
+    u32 currentLevel = fifoGetValue32(FIFO_USER_05);
     brightness = (currentLevel + 1) & 3;
 
     setBrightness(brightness);

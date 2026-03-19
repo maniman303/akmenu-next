@@ -22,7 +22,9 @@ class cTickSound {
     u8* _pcmStart;
     u32  _sampleRate;
     int  _soundFormat;
-    s64 _checkpoint;
+    double _checkpoint;
+    bool _isFresh;
+    int _soundId;
 };
 
 typedef t_singleton<cTickSound> TickSound_s;

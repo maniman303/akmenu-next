@@ -7,7 +7,9 @@ extern "C" {
 
 	void soundCallback(u32 value, void *userdata) {
 		if (value == 0x1234) {
-			soundEnable();
+			if (!_fifoReady) {
+				soundEnable();
+			}
 
 			_fifoReady = true;
 		}

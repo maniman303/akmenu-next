@@ -224,6 +224,7 @@ int main(int argc, char* argv[]) {
 
     while (true) {
         timer().updateFps();
+        
         tickSound().play();
 
         INPUT& inputs = updateInput();

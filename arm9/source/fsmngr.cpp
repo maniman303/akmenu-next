@@ -65,9 +65,9 @@ std::string cFSManager::getFSRoot() const {
 bool cFSManager::checkSDInserted() const {
     fifoSendValue32(FIFO_USER_01, MENU_MSG_IS_SD_INSERTED);
 
-    fifoWaitValue32(FIFO_USER_01);
+    fifoWaitValue32(FIFO_USER_06);
 
-    int result = fifoGetValue32(FIFO_USER_01);
+    int result = fifoGetValue32(FIFO_USER_06);
 
     return result != 0;
 }
