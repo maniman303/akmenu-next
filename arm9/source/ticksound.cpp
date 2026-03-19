@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include "systemdetails.h"
-#include "timer.h"
+#include "datetime.h"
 
 cTickSound::cTickSound() {
     _rawData = NULL;
@@ -12,7 +12,6 @@ cTickSound::cTickSound() {
     _sampleRate = 0;
     _soundFormat = 0;
     _checkpoint = 0;
-    _isFresh = true;
     _soundId = 0;
 }
 
@@ -115,8 +114,7 @@ bool cTickSound::load(std::string filepath) {
 
     DC_FlushRange(_pcmStart, _dataSize);
 
-    _checkpoint = timer().getTime();
-    _isFresh = true;
+    _checkpoint = datetime().secondsInDay();
 
     return true;
 }
@@ -130,8 +128,8 @@ void cTickSound::play() {
         return;
     }
 
-    double now = timer().getTime();
-    if ((now - _checkpoint) < 0.95) {
+    u64 now = datetime().secondsInDay();
+    if ((now - _checkpoint) <= 0 && now >= _checkpoint) {
         return;
     }
 
@@ -139,12 +137,4 @@ void cTickSound::play() {
 
     soundKill(_soundId);
     _soundId = soundPlaySample(_pcmStart, (SoundFormat)_soundFormat, _dataSize, _sampleRate, 127, 64, false, 0);
-
-    if (!_isFresh) {
-        // soundResume(_soundId);
-        return;
-    }
-
-    _isFresh = false;
-    // _soundId = soundPlaySample(_pcmStart, (SoundFormat)_soundFormat, _dataSize, _sampleRate, 127, 64, false, 0);
 }

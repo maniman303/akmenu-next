@@ -39,6 +39,8 @@ class cDateTime {
     u8 daysOfMonth(void);
     u8 weekDayOfMonthFirstDay(void);
 
+    u64 secondsInDay(void);
+
     std::string getDateString(void);
     std::string getTimeString(void);
     std::string getTimeStampString(void);

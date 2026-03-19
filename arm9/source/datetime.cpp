@@ -66,6 +66,15 @@ u8 cDateTime::weekDayOfMonthFirstDay() {
     return (weekday() + 7 - ((day() - 1) % 7)) % 7;
 }
 
+u64 cDateTime::secondsInDay(void) {
+    FillTimeParts();
+    u8 hours = iTimeParts.tm_hour;
+    u16 minutes = hours * 60 + iTimeParts.tm_min;
+    u64 seconds = minutes * 60 + iTimeParts.tm_sec;
+
+    return seconds;
+}
+
 std::string cDateTime::getDateString() {
     // FillTimeParts();
     return formatString("%d/%d%/%d %s\n", year(), month(), day(), weekdayStrings[weekday()]);

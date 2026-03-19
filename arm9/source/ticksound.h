@@ -22,8 +22,7 @@ class cTickSound {
     u8* _pcmStart;
     u32  _sampleRate;
     int  _soundFormat;
-    double _checkpoint;
-    bool _isFresh;
+    u64 _checkpoint;
     int _soundId;
 };
 
