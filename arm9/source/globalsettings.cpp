@@ -25,7 +25,7 @@ cGlobalSettings::cGlobalSettings() {
     fileListType = 0;
     romTrim = 0;
     showHiddenFiles = false;
-    clockSound = true;
+    clockSound = false;
     filePresentationMode = 0;
     minimalModeRomsCount = 20;
     enterLastDirWhenBoot = true;

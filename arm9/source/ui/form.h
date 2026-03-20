@@ -25,8 +25,6 @@ class cForm : public cWindow {
   public:
     u32 doModal();
 
-    u32 doStatic();
-
     cForm& addChildWindow(cWindow* aWindow);
 
     cForm& removeChildWindow(cWindow* aWindow);

@@ -17,6 +17,8 @@ class cTickSound {
   protected:
     void unload();
 
+    int playTickFromWav(int soundId, u8 volume);
+
     u8* _rawData;
     u32  _dataSize;
     u8* _pcmStart;

@@ -220,12 +220,4 @@ u32 messageBox(cWindow* parent, const std::string& title, const std::string& msg
     return msgbox.doModal();
 }
 
-u32 messageBoxStatic(cWindow* parent, const std::string& title, const std::string& msg, u32 style) {
-    // check point 如果出现奇怪的对话框消失问题就检查这里
-    cMessageBox msgbox(12, 36, 232, 120, parent, title, msg, style);
-    // cMessageBox msgbox( 0, 0, 256, 192, parent, text, style );
-
-    return msgbox.doStatic();
-}
-
 }  // namespace akui

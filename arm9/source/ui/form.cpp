@@ -10,6 +10,7 @@
 #include "form.h"
 #include "timer.h"
 #include "ui.h"
+#include "ticksound.h"
 //#include "dbgtool.h"
 //#include "windowmanager.h"
 
@@ -167,8 +168,10 @@ u32 cForm::doModal() {
     windowManager().addWindow(this);
     show();
 
+    // TODO: Get rid of this hack
     do {  // manually update system loop
         timer().updateFps();
+        tickSound().play();
         INPUT& inputs = updateInput();
         processInput(inputs);
         windowManager().update();
@@ -177,19 +180,6 @@ u32 cForm::doModal() {
     } while (modalRet() == (u32)-1);
 
     windowManager().removeWindow(this);
-    return modalRet();
-}
-
-u32 cForm::doStatic() {
-    windowManager().addWindow(this);
-    show();
-
-    timer().updateFps();
-    INPUT& inputs = updateInput();
-    processInput(inputs);
-    windowManager().update();
-    gdi().present(GE_MAIN);
-
     return modalRet();
 }
 
