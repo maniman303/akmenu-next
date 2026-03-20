@@ -160,7 +160,7 @@ void cTickSound::play() {
 
     _soundId = playTickFromWav(_soundId, TICK_VOLUME);
     
-    if (datetime().seconds() == 1 && _schedule == -1) {
+    if (datetime().seconds() == 0 && _schedule == -1) {
         _schedule = 13;
     }
 }
