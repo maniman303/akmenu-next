@@ -117,20 +117,21 @@ cRomInfoWnd::~cRomInfoWnd() {}
 
 void cRomInfoWnd::draw() {
     _renderDesc.draw(windowRectangle(), _engine);
+    int titleOffset = _renderDesc.titleSize().y;
 
-    _romInfo.drawDSRomIcon(position().x + 8, position().y + 24, selectedEngine(), false);
+    _romInfo.drawDSRomIcon(position().x + 8, position().y + titleOffset + 8, selectedEngine(), false);
 
     gdi().setPenColor(uiSettings().formTextColor, selectedEngine());
-    gdi().textOutRect(position().x + 48, position().y + 22, size().x - 40, 40, _romInfoText.c_str(),
+    gdi().textOutRect(position().x + 48, position().y + titleOffset + 8, size().x - 40, 40, _romInfoText.c_str(),
                       selectedEngine());
 
-    gdi().textOutRect(position().x + 8, position().y + 64, size().x - 8, 40, _filenameText.c_str(),
+    gdi().textOutRect(position().x + 8, position().y + titleOffset + 48, size().x - 8, 40, _filenameText.c_str(),
                       selectedEngine());
-    gdi().textOutRect(position().x + 8, position().y + 64 + 14, size().x - 8, 40,
+    gdi().textOutRect(position().x + 8, position().y + titleOffset + 48 + 14, size().x - 8, 40,
                       _fileDateText.c_str(), selectedEngine());
-    gdi().textOutRect(position().x + 8, position().y + 64 + 14 + 14, size().x - 8, 40,
+    gdi().textOutRect(position().x + 8, position().y + titleOffset + 48 + 14 + 14, size().x - 8, 40,
                       _fileSizeText.c_str(), selectedEngine());
-    gdi().textOutRect(position().x + 8, position().y + 64 + 14 + 14 + 14, size().x - 8, 40,
+    gdi().textOutRect(position().x + 8, position().y + titleOffset + 48 + 14 + 14 + 14, size().x - 8, 40,
                       _saveTypeText.c_str(), selectedEngine());
 
     cForm::draw();
