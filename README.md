@@ -100,7 +100,7 @@ At this point you should be ready to go.
 
 ### Configuration
 
-* The system directory is `_nds/akmenunext` where the akmenu system files should be placed, along with a copy the nds-bootstrap files in the `_nds` folder.
+* The system directory is `_nds/akmenunext` where the akmenu system files should be placed, along with a copy of the nds-bootstrap files in the `_nds` folder.
 * The binary of akmenu-next additionally needs to be in the `_nds/akmenunext` folder as `launcher.nds` for theme & language reboots, this is automatically added if using the package script.
 * Cheats should be placed as `usrcheat.dat` into the `_nds/akmenunext/cheats` folder.
 * Themes go into `_nds/akmenunext/ui`. Acekard & Wood R4 themes are supported.

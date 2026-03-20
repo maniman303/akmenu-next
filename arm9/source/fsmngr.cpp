@@ -2,14 +2,13 @@
 #include <dirent.h>
 #include <fat.h>
 #include <algorithm>
+#include "stringtool.h"
 #include "fsmngr.h"
 #include "fifotool.h"
 #include "systemfilenames.h"
 #include "globalsettings.h"
 
-cFSManager::cFSManager() : _isSDInserted(false), _isFlashcart(false), _fsRoot() {
-
-}
+cFSManager::cFSManager() : _isSDInserted(false), _isFlashcart(false), _isRebooted(false), _fsRoot() {}
 
 void cFSManager::init(int argc, char* argv[]) {
     _isSDInserted = checkSDInserted();
@@ -21,8 +20,12 @@ void cFSManager::init(int argc, char* argv[]) {
     } else if (!isSDInserted()) {
         _isFlashcart = true;
     // If argv tells us we've launched from fat, we're on a flashcart
-    }else if (argc > 0 && strncmp(argv[0], "fat:/", 5) == 0) {
+    } else if (argc > 0 && strncmp(argv[0], "fat:/", 5) == 0) {
         _isFlashcart = true;
+    }
+
+    if (argc > 0 && containsString(toLowerString(std::string(argv[0])), "akmenunext")) {
+        _isRebooted = true;
     }
 
     // Mount devices
@@ -48,6 +51,10 @@ bool cFSManager::isFlashcart() const {
 
 bool cFSManager::isSDInserted() const {
     return _isSDInserted;
+}
+
+bool cFSManager::isRebooted() const {
+    return _isRebooted;
 }
 
 bool cFSManager::fileExists(const std::string& filePath) const {

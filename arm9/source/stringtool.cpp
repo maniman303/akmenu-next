@@ -27,6 +27,18 @@ bool startsWithString(const std::string& s, const std::string& prefix) {
            s.compare(0, prefix.length(), prefix) == 0;
 }
 
+bool endsWithString(const std::string& s, const std::string& suffix) {
+    if (s.length() < suffix.length()) {
+        return false;
+    }
+
+    return s.compare(s.length() - suffix.length(), suffix.length(), suffix) == 0;
+}
+
+bool containsString(const std::string& str, const std::string& substr) {
+    return str.find(substr) != std::string::npos;
+}
+
 std::string replaceInString(const std::string& s, const std::string& oldValue, const std::string& newValue) {
     std::string res = s;
     size_t pos = 0;

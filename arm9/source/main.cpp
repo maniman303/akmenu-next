@@ -205,7 +205,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if (gs().autorunWithLastRom && "..." != lastFile) {
+    if (!fsManager().isRebooted() && gs().autorunWithLastRom && "..." != lastFile) {
         INPUT& inputs = updateInput();
         if (!(inputs.keysHeld & KEY_B)) autoLaunchRom(lastFile);
     }

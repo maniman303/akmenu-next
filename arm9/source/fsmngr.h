@@ -13,6 +13,7 @@ public:
     void init(int argc, char* argv[]);
     bool isFlashcart() const;
     bool isSDInserted() const;
+    bool isRebooted() const;
     bool fileExists(const std::string& filePath) const;
     std::vector<std::string> getUiNames() const;
     std::vector<std::string> getLangNames() const;
@@ -23,6 +24,7 @@ private:
     bool checkSDInserted() const;
     bool _isSDInserted;
     bool _isFlashcart;
+    bool _isRebooted;
     std::string _fsRoot;
 };
 
