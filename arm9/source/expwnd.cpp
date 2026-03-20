@@ -120,7 +120,6 @@ cExpWnd::~cExpWnd() {}
 
 void cExpWnd::draw() {
     _renderDesc.draw(windowRectangle(), _engine);
-    gdi().setPenColor(uiSettings().formTextColor, _engine);
     int textY = _Rumble.position().y + _Rumble.size().y + 8,
         textHeight = _buttonOK.position().y - 8 - textY;
     gdi().textOutRect(position().x + 8, textY, size().x - 16, textHeight, _romName.c_str(),

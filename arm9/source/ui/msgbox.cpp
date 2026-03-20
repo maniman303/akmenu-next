@@ -65,7 +65,7 @@ namespace akui {
         if (_position.x & 1) --_position.x;
         _position.y = (SCREEN_HEIGHT - _size.y) / 2;
         _textPoision.x = _position.x + (_size.x - largestLineWidth) / 2;
-        _textPoision.y = _position.y + 24;
+        _textPoision.y = _position.y;
         dbg_printf("_size.x %d largestLineWidth %d\n", _size.x, largestLineWidth);
 
         _text = title;
@@ -222,8 +222,9 @@ namespace akui {
         cForm::draw();
 
         // draw message text
+        int titleOffset = _renderDesc.titleSize().y + 8;
         gdi().setPenColor(uiSettings().formTextColor, _engine);
-        gdi().textOut(_textPoision.x, _textPoision.y, _msg.c_str(), _engine);
+        gdi().textOut(_textPoision.x, _textPoision.y + titleOffset, _msg.c_str(), _engine);
     }
 
     cWindow& cMessageBox::loadAppearance(const std::string& aFileName) {

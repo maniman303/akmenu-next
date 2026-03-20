@@ -86,8 +86,10 @@ cHelpWnd::~cHelpWnd() {}
 
 void cHelpWnd::draw() {
     _renderDesc.draw(windowRectangle(), _engine);
+    int titleOffset = _renderDesc.titleSize().y;
+
     gdi().setPenColor(uiSettings().formTextColor, _engine);
-    gdi().textOutRect(position().x + 8, position().y + 17 + uiSettings().thickness, size().x - 8,
+    gdi().textOutRect(position().x + 8, position().y + titleOffset + 2 + uiSettings().thickness, size().x - 8,
                       size().y - 20 - 2 * uiSettings().thickness, _helpText.c_str(), _engine);
     cForm::draw();
 }
