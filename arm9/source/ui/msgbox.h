@@ -58,13 +58,9 @@ namespace akui {
       cWindow& loadAppearance(const std::string& aFileName);
 
     protected:
-      void onOK();
+      void onOK() override;
 
-      void onCANCEL();
-
-      void onYES() { onOK(); }
-
-      void onNO() { onCANCEL(); }
+      void onCancel() override;
 
       bool processKeyMessage(const cKeyMessage& msg);
 

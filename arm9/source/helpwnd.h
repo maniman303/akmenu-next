@@ -35,9 +35,9 @@ class cHelpWnd : public akui::cForm {
   protected:
     bool processKeyMessage(const akui::cKeyMessage& msg);
 
-    void onOK();
+    void onOK() override;
 
-    void onShow();
+    void onShow() override;
 
     akui::cButton _buttonOK;
 

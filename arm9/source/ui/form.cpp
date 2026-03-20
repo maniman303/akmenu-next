@@ -195,22 +195,24 @@ namespace akui {
     }
 
     void cForm::onOK() {
+        _modalRet = 1;
+        hide();
+
         if (onAccepted) {
             onAccepted();
         }
 
-        _modalRet = 1;
-        hide();
         windowManager().removeWindow(this);
     }
 
     void cForm::onCancel() {
+        _modalRet = 0;
+        hide();
+
         if (onRejected) {
             onRejected();
         }
 
-        _modalRet = 0;
-        hide();
         windowManager().removeWindow(this);
     }
 

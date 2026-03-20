@@ -99,6 +99,9 @@ std::string CIniFile::GetString(const std::string& Section, const std::string& I
         SetString(Section, Item, DefaultValue);
         temp = DefaultValue;
     }
+
+    temp = replaceInString(temp, "\\n", "\n");
+
     return temp;
 }
 

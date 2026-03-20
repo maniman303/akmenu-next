@@ -129,21 +129,18 @@ bool NdsBootstrapLauncher::prepareIni(bool hb) {
     }
 
     std::string externalHotkey;
-    {
-        CIniFile extIni;
-        if (extIni.LoadIniFile(custIniPath)) {
-            externalHotkey = extIni.GetString("ndsbs", "hotkey", "");
-            if (!externalHotkey.empty()) {
-                hotkeyCheck = true;
-            } else {
-                hotkeyCheck = false;
-            }
+    CIniFile extIni;
+    if (extIni.LoadIniFile(custIniPath)) {
+        externalHotkey = extIni.GetString("ndsbs", "hotkey", "");
+        if (!externalHotkey.empty()) {
+            hotkeyCheck = true;
         } else {
-            // TODO: Fix this
-            // akui::messageBox(NULL, LANG("nds bootstrap", "inimissingtitle"), LANG("nds bootstrap", "inimissing"), MB_OK);
+            hotkeyCheck = false;
         }
+    } else {
+        akui::cMessageBox::showModal(NULL, LANG("nds bootstrap", "inimissingtitle"), LANG("nds bootstrap", "inimissing"), MB_OK);
+        return false;
     }
-
 
     /*
     0 = l-↓-select : 200 80 4
@@ -243,12 +240,21 @@ bool launchHbStrap(std::string romPath){
     return false;
 }
 
+MessageEntry NdsBootstrapLauncher::prepareLaunchMessage() {
+    //has the user used nds-bootstrap before?
+    std::string ndsBootstrapCheck = fsManager().resolveSystemPath("/_nds/pagefile.sys");
+    if(access(ndsBootstrapCheck.c_str(), F_OK) != 0){
+        return MessageEntry{LANG("nds bootstrap", "firsttimetitle"), LANG("nds bootstrap", "firsttime")};
+    }
+
+    return MessageEntry{};
+}
+
 bool NdsBootstrapLauncher::launchRom(std::string romPath, std::string savePath, u32 flags,
                                      u32 cheatOffset, u32 cheatSize, bool hb) {
     std::string ndsBootstrapPath = fsManager().resolveSystemPath("/_nds/nds-bootstrap-release.nds");
     std::string ndsBootstrapPathNightly = fsManager().resolveSystemPath("/_nds/nds-bootstrap-nightly.nds");
     std::string ndsHbBootstrapPath = fsManager().resolveSystemPath("/_nds/nds-bootstrap-hb-release.nds");
-    std::string ndsBootstrapCheck = fsManager().resolveSystemPath("/_nds/pagefile.sys");
     bool useNightly = false;
     bool hbStrap = hb;
 
@@ -271,12 +277,6 @@ bool NdsBootstrapLauncher::launchRom(std::string romPath, std::string savePath, 
         if (!prepareIni(false)) return false;
         progressWnd().setPercent(25);
         launchHbStrap(romPath);
-    }
-
-    //has the user used nds-bootstrap before?
-    if(access(ndsBootstrapCheck.c_str(), F_OK) != 0){
-        // TODO: Fix this
-        // akui::messageBox(NULL, LANG("nds bootstrap", "firsttimetitle"), LANG("nds bootstrap", "firsttime"), MB_OK);
     }
 
     _romInfo.MayBeDSRom(romPath);

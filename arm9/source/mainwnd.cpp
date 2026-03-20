@@ -440,12 +440,15 @@ void cMainWnd::launchSelected() {
             show = false;
             break;
     }
+
     progressWnd().setPercent(100);
     progressWnd().hide();
 
-    if (show) {
-        cMessageBox::showModal(this, title, text, MB_OK);
+    if (!show) {
+        return;
     }
+
+    cMessageBox::showModal(this, title, text, MB_OK);
 }
 
 void cMainWnd::onKeyBPressed() {
@@ -711,7 +714,8 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
 
                 std::string launcherPath = fsManager().resolveSystemPath("/_nds/akmenunext/launcher.nds");
                 HomebrewLauncher().launchRom(launcherPath, "", 0, 0, 0, 0);
-            });
+            },
+            {});
     }else if (langIndex != langIndexAfter) {
         cMessageBox::showModal(this, LANG("language changed", "title"), LANG("language changed", "text"), MB_YES | MB_NO,
             [this, langNames, langIndexAfter]() {
@@ -720,7 +724,8 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
 
                 std::string launcherPath = fsManager().resolveSystemPath("/_nds/akmenunext/launcher.nds");
                 HomebrewLauncher().launchRom(launcherPath, "", 0, 0, 0, 0);
-            });
+            },
+            {});
     }
 
     gs().saveSettings();

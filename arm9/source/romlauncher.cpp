@@ -7,6 +7,7 @@
 
 #include <sys/stat.h>
 #include "romlauncher.h"
+#include "msgbox.h"
 #include "cheatwnd.h"
 #include "exptools.h"
 #include "flags.h"
@@ -273,12 +274,25 @@ TLaunchResult launchRom(const std::string& aFullPath, DSRomInfo& aRomInfo, bool 
             launcher = new HomebrewLauncher();
         }
     }
-    launcher->launchRom(aFullPath, saveName, flags, cheatOffset, cheatSize, hb);
+
+    MessageEntry message = launcher->prepareLaunchMessage();
+    if (message.empty()) {
+        launcher->launchRom(aFullPath, saveName, flags, cheatOffset, cheatSize, hb);
+        return ELaunchRomOk;
+    }
+
+    akui::cMessageBox::showModal(NULL, message.title, message.content, MB_OK,
+        [launcher, aFullPath, saveName, flags, cheatOffset, cheatSize, hb]() {
+            launcher->launchRom(aFullPath, saveName, flags, cheatOffset, cheatSize, hb);
+        });
+    
     return ELaunchRomOk;
 }
 
 void autoLaunchRom(const std::string& aFullPath) {
     DSRomInfo rominfo;
     rominfo.MayBeDSRom(aFullPath);
-    if (rominfo.isDSRom()) launchRom(aFullPath, rominfo, false, "");
+    if (rominfo.isDSRom()) {
+        launchRom(aFullPath, rominfo, false, "");
+    }
 }

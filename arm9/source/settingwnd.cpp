@@ -133,7 +133,8 @@ void cSettingWnd::onOK(void) {
         }
 
         cForm::onOK();
-    });
+    },
+    {});
 }
 
 void cSettingWnd::onCancel(void) {

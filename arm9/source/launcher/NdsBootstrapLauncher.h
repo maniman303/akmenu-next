@@ -13,8 +13,8 @@
 
 class NdsBootstrapLauncher : public ILauncher {
   public:
-    bool launchRom(std::string romPath, std::string savePath, u32 flags, u32 cheatOffset,
-                   u32 cheatSize, bool hb) override;
+    bool launchRom(std::string romPath, std::string savePath, u32 flags, u32 cheatOffset, u32 cheatSize, bool hb) override;
+    MessageEntry prepareLaunchMessage() override;
 
   private:
     bool prepareCheats(void);

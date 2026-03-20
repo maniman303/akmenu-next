@@ -30,11 +30,11 @@ class cExpWnd : public akui::cForm {
 
   protected:
     bool processKeyMessage(const akui::cKeyMessage& msg);
-    void onOK();
-    void onCancel();
+    void onOK() override;
+    void onCancel() override;
     void onRAM();
     void onSRAM();
-    void onShow();
+    void onShow() override;
     akui::cButton _buttonOK;
     akui::cButton _buttonCancel;
     akui::cButton _buttonRAM;

@@ -7,6 +7,7 @@
 #pragma once
 
 #include <nds/ndstypes.h>
+#include <string>
 #include "../language.h"
 #include "../ui/msgbox.h"
 
@@ -18,9 +19,18 @@ static inline void printError(std::string errorMsg) {
     akui::cMessageBox::showModal(NULL, LANG("loader", "error"), errorMsg, MB_OK);
 }
 
+struct MessageEntry {
+    std::string title = "";
+    std::string content = "";
+
+    bool empty() const {
+        return title.empty() || content.empty();
+    }
+};
+
 class ILauncher {
   public:
     virtual ~ILauncher() {}
-    virtual bool launchRom(std::string romPath, std::string savePath, u32 flags, u32 cheatOffset,
-                           u32 cheatSize, bool hb) = 0;
+    virtual bool launchRom(std::string romPath, std::string savePath, u32 flags, u32 cheatOffset, u32 cheatSize, bool hb) = 0;
+    virtual MessageEntry prepareLaunchMessage() { return MessageEntry{}; }
 };

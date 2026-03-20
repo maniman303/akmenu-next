@@ -17,8 +17,8 @@ namespace akui {
         showModal(parent, title, msg, {}, {});
     }
 
-    void cMessageBox::showModal(cWindow* parent, const std::string& title, const std::string& msg, u32 style, std::function<void()> onAccepted) {
-        showModal(parent, title, msg, style, onAccepted, {});
+    void cMessageBox::showModal(cWindow* parent, const std::string& title, const std::string& msg, u32 style, std::function<void()> onClosed) {
+        showModal(parent, title, msg, style, onClosed, onClosed);
     }
 
     void cMessageBox::showModal(cWindow* parent, const std::string& title, const std::string& msg, u32 style,
@@ -92,7 +92,7 @@ namespace akui {
         _buttonCANCEL->setStyle(cButton::press);
         _buttonCANCEL->hide();
         _buttonCANCEL->loadAppearance(SFN_BUTTON3);
-        _buttonCANCEL->clicked.connect(this, &cMessageBox::onCANCEL);
+        _buttonCANCEL->clicked.connect(this, &cMessageBox::onCancel);
         addChildWindow(_buttonCANCEL);
 
         _buttonYES = new cButton(0, 0, 46, 18, this, "\x01 Yes");
@@ -109,7 +109,7 @@ namespace akui {
         _buttonNO->hide();
         //_buttonNO->setTextColor( RGB15(20,14,0) );
         _buttonNO->loadAppearance(SFN_BUTTON3);
-        _buttonNO->clicked.connect(this, &cMessageBox::onCANCEL);
+        _buttonNO->clicked.connect(this, &cMessageBox::onCancel);
         addChildWindow(_buttonNO);
 
         s16 nextButtonX = size().x;
@@ -173,7 +173,7 @@ namespace akui {
         cForm::onOK();
     }
 
-    void cMessageBox::onCANCEL() {
+    void cMessageBox::onCancel() {
         cForm::onCancel();
     }
 
@@ -204,7 +204,7 @@ namespace akui {
                     return true;
                     break;
                 case cKeyMessage::UI_KEY_B:
-                    onCANCEL();
+                    onCancel();
                     ret = true;
                     return true;
                     break;

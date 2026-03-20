@@ -60,9 +60,9 @@ class cRomInfoWnd : public akui::cForm {
 
     bool processKeyMessage(const akui::cKeyMessage& msg);
 
-    void onOK();
+    void onOK() override;
 
-    void onShow();
+    void onShow() override;
 
     void addCode(void);
 

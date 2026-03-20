@@ -57,9 +57,9 @@ class cSettingWnd : public akui::cForm {
     };
 
   protected:
-    void onOK(void);
-    void onCancel(void);
-    void onShow(void);
+    void onOK(void) override;
+    void onCancel(void) override;
+    void onShow(void) override;
     void onUIKeyUP(void);
     void onUIKeyDOWN(void);
     void onUIKeyLEFT(void);
