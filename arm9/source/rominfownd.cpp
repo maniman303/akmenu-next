@@ -401,7 +401,8 @@ void cRomInfoWnd::saveSettings(cSettingWnd* settingWnd) {
     }
     _romInfo.saveInfo().setFlags(
             0, 0, 0, settingWnd->getItemSelection(ITEM_CHEATS),
-            settingWnd->getItemSelection(ITEM_SAVESLOT), 2, 0, 0, 2, 0, 0,
+            settingWnd->getItemSelection(ITEM_SAVESLOT), 2, 0, 0,
+            settingWnd->getItemSelection(ITEM_ICON), 0, 0,
             settingWnd->getItemSelection(ITEM_NDSBOOTSTRAP));
 
     saveManager().updateCustomSaveList(_romInfo.saveInfo());

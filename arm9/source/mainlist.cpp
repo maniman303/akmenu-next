@@ -755,12 +755,10 @@ void cMainList::drawIcons()  // 直接画家算法画 icons
 
     size_t total = std::min(_visibleRowCount, _rows.size() - _firstVisibleRowId);
 
-    int icon_height = (VM_LIST_ICON == _viewMode) ? 16 : 32;
-    bool small = (VM_LIST_ICON == _viewMode) ? true : false;
+    bool small = (_viewMode == VM_LIST_ICON) ? true : false;
+    int icon_height = small ? 16 : 32;
 
     for (size_t i = 0; i < total; ++i) {
-        // 这里图像呈现比真正的 MAIN buffer 翻转要早，所以会闪一下
-        // 解决方法是在 gdi().present 里边统一呈现翻转
         if (_firstVisibleRowId + i == _selectedRowId && _activeIcon.visible()) {
             continue;
         }
