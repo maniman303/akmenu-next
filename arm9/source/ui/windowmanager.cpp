@@ -28,7 +28,7 @@ void cWindowManager::setFocusedWindow(cWindow* aWindow) {
 }
 
 cWindowManager& cWindowManager::addWindow(cWindow* aWindow) {
-    if (_currentWindow()) {
+    if (_currentWindow.window() != NULL) {
         _currentWindow._focused = focusedWindow();
         _backgroundWindows.push_back(_currentWindow);
     }
@@ -39,7 +39,7 @@ cWindowManager& cWindowManager::addWindow(cWindow* aWindow) {
 }
 
 cWindowManager& cWindowManager::removeWindow(cWindow* aWindow) {
-    if (aWindow == _currentWindow()) {
+    if (aWindow == _currentWindow.window()) {
         if (_backgroundWindows.empty()) {
             _currentWindow = cWindowRec(NULL, NULL);
         } else {
@@ -50,17 +50,35 @@ cWindowManager& cWindowManager::removeWindow(cWindow* aWindow) {
     } else {
         for (cWindows::iterator it = _backgroundWindows.begin(); it != _backgroundWindows.end();
              ++it) {
-            if ((*it)() == aWindow) {
+            if ((*it).window() == aWindow) {
                 _backgroundWindows.erase(it);
                 break;
             }
         }
     }
     if (focusedWindow() && aWindow->doesHierarchyContain(focusedWindow())) {
-        _focusedWindow = _currentWindow();
+        _focusedWindow = _currentWindow.window();
     }
     updateBackground();
     return *this;
+}
+
+bool cWindowManager::containsWindow(cWindow* aWindow) {
+    if (aWindow == NULL) {
+        return false;
+    }
+
+    if (_currentWindow.window() == aWindow) {
+        return true;
+    }
+
+    for (cWindows::iterator it = _backgroundWindows.begin(); it != _backgroundWindows.end(); ++it) {
+        if ((*it).window() == aWindow) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 const cWindowManager& cWindowManager::update(void) {
@@ -71,9 +89,9 @@ const cWindowManager& cWindowManager::update(void) {
     }
     dbg_printf("currentWindow (%s)\n",_currentWindow()?_currentWindow()->text().c_str():"NULL");
 #endif
-    if (_currentWindow()) {
-        _currentWindow()->update();
-        _currentWindow()->render();
+    if (_currentWindow.window() != NULL) {
+        _currentWindow.window()->update();
+        _currentWindow.window()->render();
     }
     return *this;
 }
@@ -81,10 +99,10 @@ const cWindowManager& cWindowManager::update(void) {
 const cWindowManager& cWindowManager::updateBackground(void) {
     gdi().setMainEngineLayer(MEL_DOWN);
     for (cWindows::iterator it = _backgroundWindows.begin(); it != _backgroundWindows.end(); ++it) {
-        (*it)()->update();
+        (*it).window()->update();
     }
     for (cWindows::iterator it = _backgroundWindows.begin(); it != _backgroundWindows.end(); ++it) {
-        (*it)()->render();
+        (*it).window()->render();
     }
     gdi().setMainEngineLayer(MEL_UP);
     update();
@@ -93,13 +111,13 @@ const cWindowManager& cWindowManager::updateBackground(void) {
 }
 
 bool cWindowManager::process(cMessage& message) const {
-    return _currentWindow()->process(message);
+    return _currentWindow.window()->process(message);
 }
 
 cWindowManager& cWindowManager::checkForWindowBelowPen(const cPoint& touchPoint) {
     _windowBelowPen = NULL;
-    if (_currentWindow()->isVisible()) {
-        cWindow* wbp = _currentWindow()->windowBelow(touchPoint);
+    if (_currentWindow.window()->isVisible()) {
+        cWindow* wbp = _currentWindow.window()->windowBelow(touchPoint);
         if (wbp) _windowBelowPen = wbp;
     }
     return *this;

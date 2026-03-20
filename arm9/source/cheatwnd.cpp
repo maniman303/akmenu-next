@@ -28,6 +28,21 @@ static u32 crc32(const u8* p, size_t len) {
     return crc;
 }
 
+void cCheatWnd::showModal(const std::string& aFileName) {
+    u32 w = 256;
+    u32 h = 179;
+    cCheatWnd* modal = new cCheatWnd((SCREEN_WIDTH - w) / 2, (SCREEN_HEIGHT - h) / 2, w, h, NULL, LANG("cheats", "title"));
+    if (!modal->parse(aFileName)) {
+        delete modal;
+        return;
+    }
+
+    modal->setDynamic(true);
+    modal->doModal();
+
+    _modals.push_back(modal);
+}
+
 cCheatWnd::cCheatWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
     : cForm(x, y, w, h, parent, text),
       _buttonDeselect(0, 0, 46, 18, this, "\x05 Deselect"),
@@ -216,7 +231,7 @@ void cCheatWnd::onInfo(void) {
     std::string body(_data[index]._title);
     body += "\n\n";
     body += _data[index]._comment;
-    messageBox(this, LANG("cheats", "title"), body, MB_OK);
+    cMessageBox::showModal(this, LANG("cheats", "title"), body, MB_OK);
 }
 
 void cCheatWnd::onCancel(void) {

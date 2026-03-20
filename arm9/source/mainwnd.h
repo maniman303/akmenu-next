@@ -17,6 +17,7 @@
 #include "spinbox.h"
 #include "startmenu.h"
 #include "touchmessage.h"
+#include "rominfownd.h"
 
 class cMainWnd : public akui::cForm {
   public:
@@ -62,15 +63,17 @@ class cMainWnd : public akui::cForm {
 
     bool processTouchMessage(const akui::cTouchMessage& msg);
 
-    void setParam(void);
-
     void showSettings(void);
+
+    void saveSettings(cSettingWnd* settingWnd);
 
     void onFolderChanged();
 
     void onAnimation(bool& anAllow);
 
     void showFileInfo();
+
+    void saveFileInfo(cRomInfoWnd* romInfoWnd);
 
     void launchSelected();
 

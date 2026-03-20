@@ -19,6 +19,15 @@
 
 using namespace akui;
 
+cSettingWnd* cSettingWnd::createWindow(cWindow* parent, const std::string& text, std::function<void(cSettingWnd*)> onSaved) {
+    cSettingWnd* wnd = new cSettingWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, parent, text);
+    wnd->setDynamic(true);
+    wnd->onSaved = onSaved;
+    _modals.push_back(wnd);
+
+    return wnd;
+}
+
 cSettingWnd::cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
     : cForm(x, y, w, h, parent, text),
       _tabSwitcher(0, 0, w, 18, true, this, "spin"),
@@ -118,14 +127,17 @@ bool cSettingWnd::process(const akui::cMessage& msg) {
 }
 
 void cSettingWnd::onOK(void) {
-    u32 ret =
-            messageBox(this, LANG("setting window", "confirm"), _confirmMessage, MB_OK | MB_CANCEL);
-    if (ID_OK != ret) return;
-    _modalRet = 1;
+    cMessageBox::showModal(this, LANG("setting window", "confirm"), _confirmMessage, MB_OK | MB_CANCEL, [this]() {
+        if (onSaved) {
+            onSaved(this);
+        }
+
+        cForm::onOK();
+    });
 }
 
 void cSettingWnd::onCancel(void) {
-    _modalRet = 0;
+    cForm::onCancel();
 }
 
 bool cSettingWnd::processKeyMessage(const cKeyMessage& msg) {

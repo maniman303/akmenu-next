@@ -21,7 +21,7 @@ class cWindowManager {
         cWindow* _window;
         cWindow* _focused;
         cWindowRec(cWindow* window, cWindow* focused = NULL) : _window(window), _focused(focused) {}
-        cWindow* operator()(void) const { return _window; }
+        cWindow* window() const { return _window; }
     };
     typedef std::list<cWindowRec> cWindows;
 
@@ -46,7 +46,8 @@ class cWindowManager {
     void setFocusedWindow(cWindow* aWindow);
     cWindowManager& addWindow(cWindow* aWindow);
     cWindowManager& removeWindow(cWindow* aWindow);
-    cWindow* currentWindow(void) const { return _currentWindow(); }
+    cWindow* currentWindow(void) const { return _currentWindow.window(); }
+    bool containsWindow(cWindow* aWindow);
     const cWindowManager& update(void);
     bool onKeyDown(unsigned char keyCode, unsigned char shift);
     bool onKeyUp(unsigned char keyCode, unsigned char shift);

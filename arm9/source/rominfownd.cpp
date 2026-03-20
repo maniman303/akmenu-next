@@ -22,6 +22,21 @@
 
 using namespace akui;
 
+cRomInfoWnd* cRomInfoWnd::createWindow(cWindow* parent, const std::string& text, std::function<void(cRomInfoWnd*)> onSaved) {
+    CIniFile ini(SFN_UI_SETTINGS);
+    u32 w = 240;
+    u32 h = 144;
+    w = ini.GetInt("rom info window", "w", w);
+    h = ini.GetInt("rom info window", "h", h);
+
+    cRomInfoWnd* wnd = new cRomInfoWnd((SCREEN_WIDTH - w) / 2, (SCREEN_HEIGHT - h) / 2, w, h, parent, text);
+    wnd->setDynamic(true);
+    wnd->onSaved = onSaved;
+    _modals.push_back(wnd);
+
+    return wnd;
+}
+
 cRomInfoWnd::cRomInfoWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
     : cForm(x, y, w, h, parent, text),
       _buttonOK(0, 0, 46, 18, this, "\x01 OK"),
@@ -29,7 +44,6 @@ cRomInfoWnd::cRomInfoWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
       _buttonFlash(0, 0, 46, 18, this, "\x03 to NOR"),
       _buttonCopy(0, 0, 46, 18, this, "\x05 to RAM"),
       _buttonCheats(0, 0, 46, 18, this, "\x03 Cheats"),
-      _settingWnd(NULL),
       _saves(NULL) {
     s16 buttonY = size().y - _buttonOK.size().y - 4;
 
@@ -283,6 +297,10 @@ void cRomInfoWnd::setSaves(const std::vector<std::string>* saves) {
 }
 
 void cRomInfoWnd::onOK() {
+    if (onSaved) {
+        onSaved(this);
+    }
+
     cForm::onOK();
 }
 
@@ -300,11 +318,11 @@ void cRomInfoWnd::onShow() {
 void cRomInfoWnd::pressSaveType(void) {
     if (!_romInfo.isDSRom() || _romInfo.isHomebrew()) return;
 
-    std::vector<std::string> _values;
-    cSettingWnd settingWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, this, LANG("game settings", "title"));
+    cSettingWnd* settingWnd = cSettingWnd::createWindow(this, LANG("game settings", "title"), [this](cSettingWnd* wnd) { saveSettings(wnd); });
     
-    settingWnd.addSettingTab(LANG("save type", "tab1"));
+    settingWnd->addSettingTab(LANG("save type", "tab1"));
 
+    std::vector<std::string> _values;
     _values.push_back(LANG("save type", "Unknown"));
     _values.push_back(LANG("save type", "No Save"));
     _values.push_back(LANG("save type", "4K"));
@@ -317,7 +335,7 @@ void cRomInfoWnd::pressSaveType(void) {
     _values.push_back(LANG("save type", "16M"));
     _values.push_back(LANG("save type", "32M"));
     _values.push_back(LANG("save type", "64M"));
-    settingWnd.addSettingItem(
+    settingWnd->addSettingItem(
             LANG("save type", "text"), _values,
             cSaveManager::SaveTypeToDisplaySaveType((SAVE_TYPE)_romInfo.saveInfo().saveType));
 
@@ -326,20 +344,20 @@ void cRomInfoWnd::pressSaveType(void) {
     _values.push_back("kernel");
     _values.push_back("nds-bootstrap");
     _values.push_back(LANG("save type", "default"));
-    settingWnd.addSettingItem(LANG("loader", "text"), _values,
+    settingWnd->addSettingItem(LANG("loader", "text"), _values,
                               _romInfo.saveInfo().getNdsBootstrap());
 #endif  // __KERNEL_LAUNCHER_SUPPORT__
 
     _values.clear();
 
-    settingWnd.addSettingTab(LANG("save type", "tab2"));
+    settingWnd->addSettingTab(LANG("save type", "tab2"));
 
     _values.push_back(LANG("switches", "Disable"));
     _values.push_back(LANG("switches", "Enable"));
     _values.push_back(formatString(LANG("switches", "Global").c_str(),
                                    gs().cheats ? LANG("switches", "Enable").c_str()
                                                : LANG("switches", "Disable").c_str()));
-    settingWnd.addSettingItem(LANG("patches", "cheating system"), _values,
+    settingWnd->addSettingItem(LANG("patches", "cheating system"), _values,
                               _romInfo.saveInfo().getCheat());
 
     _values.clear();
@@ -353,34 +371,25 @@ void cRomInfoWnd::pressSaveType(void) {
         if (SlotExists(ii)) slotValue += "*";
         _values.push_back(slotValue);
     }
-    settingWnd.addSettingItem(LANG("save type", "save slot"), _values,
+    settingWnd->addSettingItem(LANG("save type", "save slot"), _values,
                               _romInfo.saveInfo().getSlot());
 
     _values.clear();
     _values.push_back(LANG("icon", "transparent"));
     _values.push_back(LANG("icon", "as is"));
     _values.push_back(LANG("icon", "firmware"));
-    settingWnd.addSettingItem(LANG("icon", "icon"), _values, _romInfo.saveInfo().getIcon());
+    settingWnd->addSettingItem(LANG("icon", "icon"), _values, _romInfo.saveInfo().getIcon());
 
-    // Refactor this to support nds-bs override in the future
-    //_values.clear();
-    //_values.push_back(LANG("save type", "default"));
-    //_values.push_back(LANG("language", "ja"));
-    //_values.push_back(LANG("language", "en"));
-    //_values.push_back(LANG("language", "fr"));
-    //_values.push_back(LANG("language", "de"));
-    //_values.push_back(LANG("language", "it"));
-    //_values.push_back(LANG("language", "es"));
-    //settingWnd.addSettingItem(LANG("language", "text"), _values, _romInfo.saveInfo().getLanguage());
+    settingWnd->doModal();
+}
 
-    _settingWnd = &settingWnd;
-
-    u32 ret = settingWnd.doModal();
-    _settingWnd = NULL;
-    if (ID_CANCEL == ret) return;
+void cRomInfoWnd::saveSettings(cSettingWnd* settingWnd) {
+    if (settingWnd == NULL) {
+        return;
+    }
 
     _romInfo.saveInfo().saveType = cSaveManager::DisplaySaveTypeToSaveType(
-            (DISPLAY_SAVE_TYPE)settingWnd.getItemSelection(ITEM_SAVETYPE));
+            (DISPLAY_SAVE_TYPE)settingWnd->getItemSelection(ITEM_SAVETYPE));
 
     const char* stLangStrings[] = {"Unknown", "No Save", "4K",      "64K", "512K", "2M",  "4M",
                                    "8M",      "Unknown", "Unknown", "1M",  "16M",  "32M", "64M"};
@@ -391,9 +400,9 @@ void cRomInfoWnd::pressSaveType(void) {
         addCode();
     }
     _romInfo.saveInfo().setFlags(
-            0, 0, 0, settingWnd.getItemSelection(ITEM_CHEATS),
-            settingWnd.getItemSelection(ITEM_SAVESLOT), 2, 0, 0, 2, 0, 0,
-            settingWnd.getItemSelection(ITEM_NDSBOOTSTRAP));
+            0, 0, 0, settingWnd->getItemSelection(ITEM_CHEATS),
+            settingWnd->getItemSelection(ITEM_SAVESLOT), 2, 0, 0, 2, 0, 0,
+            settingWnd->getItemSelection(ITEM_NDSBOOTSTRAP));
 
     saveManager().updateCustomSaveList(_romInfo.saveInfo());
 }
@@ -416,10 +425,7 @@ void cRomInfoWnd::pressCheats(void) {
 }
 
 void cRomInfoWnd::showCheats(const std::string& aFileName) {
-    u32 w = 256;
-    u32 h = 179;
-    cCheatWnd cheatWnd((SCREEN_WIDTH - w) / 2, (SCREEN_HEIGHT - h) / 2, w, h, NULL, LANG("cheats", "title"));
-    if (cheatWnd.parse(aFileName)) cheatWnd.doModal();
+    cCheatWnd::showModal(aFileName);
 }
 
 void cRomInfoWnd::addCode(void) {

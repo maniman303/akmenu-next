@@ -19,6 +19,17 @@
 
 using namespace akui;
 
+void cExpWnd::showModal(cWindow* parent) {
+    u32 w = 250;
+    u32 h = 130;
+    cExpWnd* modal = new cExpWnd((SCREEN_WIDTH - w) / 2, (SCREEN_HEIGHT - h) / 2, w, h, parent, LANG("exp window", "title"));
+    
+    modal->setDynamic(true);
+    modal->doModal();
+
+    _modals.push_back(modal);
+}
+
 cExpWnd::cExpWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
     : cForm(x, y, w, h, parent, text),
       _buttonOK(0, 0, 46, 18, this, "\x01 OK"),

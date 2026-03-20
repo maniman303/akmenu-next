@@ -24,6 +24,8 @@ class cHelpWnd : public akui::cForm {
     ~cHelpWnd();
 
   public:
+    static void showModal(cWindow* parent);
+
     void draw();
 
     bool process(const akui::cMessage& msg);

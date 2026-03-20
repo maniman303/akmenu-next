@@ -26,7 +26,6 @@
 #include "inifile.h"
 #include "language.h"
 #include "progresswnd.h"
-#include "rominfownd.h"
 #include "romlauncher.h"
 
 #include <dirent.h>
@@ -51,12 +50,30 @@ cMainWnd::cMainWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::strin
       _processL(false) {}
 
 cMainWnd::~cMainWnd() {
-    delete _folderText;
-    delete _folderUpButton;
-    delete _brightnessButton;
-    delete _startButton;
-    delete _startMenu;
-    delete _mainList;
+    if (_folderText != NULL) {
+        delete _folderText;
+    }
+    
+    if (_folderUpButton != NULL) {
+        delete _folderUpButton;
+    }
+
+    if (_brightnessButton != NULL) {
+        delete _brightnessButton;
+    }
+
+    if (_startButton != NULL) {
+        delete _startButton;
+    }
+
+    if (_startMenu != NULL) {
+        delete _startMenu;
+    }
+
+    if (_mainList != NULL) {
+        delete _mainList;
+    }
+
     windowManager().removeWindow(this);
 }
 
@@ -188,7 +205,6 @@ void cMainWnd::listSelChange(u32 i) {
 
 void cMainWnd::startMenuItemClicked(s16 i) {
     dbg_printf("start menu item %d\n", i);
-    // messageBox( this, "Power Off", "Are you sure you want to turn off ds?", MB_YES | MB_NO );
 
     if (START_MENU_ITEM_FAVORITES == i) {
         std::string selectedFullPath = _mainList->getSelectedFullPath();
@@ -213,28 +229,17 @@ void cMainWnd::startMenuItemClicked(s16 i) {
     }
 
     else if (START_MENU_ITEM_HELP == i) {
-        CIniFile ini(SFN_UI_SETTINGS);  //(256-)/2,(192-128)/2, 220, 128
-        u32 w = 200;
-        u32 h = 160;
-        w = ini.GetInt("help window", "w", w);
-        h = ini.GetInt("help window", "h", h);
-        cHelpWnd* helpWnd = new cHelpWnd((SCREEN_WIDTH - w) / 2, (SCREEN_HEIGHT - h) / 2, w, h, this,
-                                         LANG("help window", "title"));
-        helpWnd->doModal();
-        delete helpWnd;
+        cHelpWnd::showModal(this);
     } else if (START_MENU_ITEM_TOOLS == i) {
-        u32 w = 250;
-        u32 h = 130;
-        cExpWnd expWnd((SCREEN_WIDTH - w) / 2, (SCREEN_HEIGHT - h) / 2, w, h, NULL, LANG("exp window", "title"));
-        expWnd.doModal();
+        cExpWnd::showModal(this);
     }
 }
 
 void cMainWnd::startButtonClicked() {
     if (_startMenu->isVisible()) {
         _startMenu->hide();
-    } else {
-        if (!gs().safeMode) _startMenu->showForFile(_mainList->getSelectedFullPath());
+    } else if (!gs().safeMode) {
+        _startMenu->showForFile(_mainList->getSelectedFullPath());
     }
 }
 
@@ -436,69 +441,53 @@ void cMainWnd::launchSelected() {
             break;
     }
     progressWnd().setPercent(100);
-    if (show) messageBox(this, title, text, MB_OK);
     progressWnd().hide();
+
+    if (show) {
+        cMessageBox::showModal(this, title, text, MB_OK);
+    }
 }
 
 void cMainWnd::onKeyBPressed() {
     _mainList->backParentDir();
 }
 
-void cMainWnd::setParam(void) {
-    cSettingWnd settingWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, LANG("start menu", "Setting"));
-    settingWnd.addSettingTab(LANG("system setting", "title"));
+void cMainWnd::showSettings(void) {
+    if (gs().safeMode) {
+        return;
+    }
+
+    cSettingWnd* settingWnd = cSettingWnd::createWindow(this, LANG("start menu", "Setting"), [this](cSettingWnd* wnd) { saveSettings(wnd); });
+    settingWnd->addSettingTab(LANG("system setting", "title"));
 
     // page 1: system
-    std::string currentUIStyle = gs().uiName;
-    std::vector<std::string> _values;
-    u32 uiIndex = 0, langIndex = 0;
     // user interface style
-    _values.clear();
-    std::vector<std::string> uiNames;
-    DIR* dir = opendir((SFN_UI_DIRECTORY).c_str());
-    struct dirent* entry;
-    if (NULL != dir) {
-        while ((entry = readdir(dir)) != NULL) {
-            std::string lfn(entry->d_name);
-            if (lfn != ".." && lfn != ".") _values.push_back(lfn);
-        }
-        closedir(dir);
-        dir = NULL;
-    } else {
-        _values.push_back(gs().uiName);
-    }
-    std::sort(_values.begin(), _values.end());
+    std::string currentUIStyle = gs().uiName;
+    u32 uiIndex = 0;
+    u32 langIndex = 0;
+    std::vector<std::string> _values = fsManager().getUiNames();
+    
     for (size_t ii = 0; ii < _values.size(); ++ii) {
-        if (0 == strcasecmp(_values[ii].c_str(), gs().uiName.c_str())) uiIndex = ii;
+        if (_values[ii] == gs().uiName) uiIndex = ii;
     }
-    uiNames = _values;
-    settingWnd.addSettingItem(LANG("ui style", "text"), _values, uiIndex);
+
+    std::vector<std::string> uiNames = _values;
+    settingWnd->addSettingItem(LANG("ui style", "text"), _values, uiIndex);
 
     // language
-    _values.clear();
-    std::vector<std::string> langNames;
-    dir = opendir((SFN_LANGUAGE_DIRECTORY).c_str());
-    if (NULL != dir) {
-        while ((entry = readdir(dir)) != NULL) {
-            std::string lfn(entry->d_name);
-            if (lfn != ".." && lfn != ".") _values.push_back(lfn);
-        }
-        closedir(dir);
-        dir = NULL;
-    } else {
-        _values.push_back(gs().langDirectory);
-    }
-    std::sort(_values.begin(), _values.end());
+    _values = fsManager().getLangNames();
+    
     for (size_t ii = 0; ii < _values.size(); ++ii) {
-        if (0 == strcasecmp(_values[ii].c_str(), gs().langDirectory.c_str())) langIndex = ii;
+        if (_values[ii] == gs().langDirectory) langIndex = ii;
     }
-    langNames = _values;
-    settingWnd.addSettingItem(LANG("language", "text"), _values, langIndex);
+
+    std::vector<std::string> langNames = _values;
+    settingWnd->addSettingItem(LANG("language", "text"), _values, langIndex);
 
     _values.clear();
     _values.push_back(LANG("date format", "dd-mm-yyyy"));
     _values.push_back(LANG("date format", "mm-dd-yyyy"));
-    settingWnd.addSettingItem(LANG("date format", "title"), _values, gs().dateFormat);
+    settingWnd->addSettingItem(LANG("date format", "title"), _values, gs().dateFormat);
 
     // file list type
     _values.clear();
@@ -506,7 +495,7 @@ void cMainWnd::setParam(void) {
         std::string itemName = formatString("item%d", ii);
         _values.push_back(LANG("filelist type", itemName));
     }
-    settingWnd.addSettingItem(LANG("filelist type", "text"), _values, gs().fileListType);
+    settingWnd->addSettingItem(LANG("filelist type", "text"), _values, gs().fileListType);
 
     // reset hotkey
     _values.clear();
@@ -517,10 +506,10 @@ void cMainWnd::setParam(void) {
     _values.push_back(LANG("resethotkey", "4"));
     _values.push_back(LANG("resethotkey", "5"));
     _values.push_back(LANG("resethotkey", "6"));
-    settingWnd.addSettingItem(LANG("resethotkey", "text"), _values, gs().resetHotKey);
+    settingWnd->addSettingItem(LANG("resethotkey", "text"), _values, gs().resetHotKey);
 
     // page 2: interface
-    settingWnd.addSettingTab(LANG("interface settings", "title"));
+    settingWnd->addSettingTab(LANG("interface settings", "title"));
     size_t scrollSpeed = 0;
     switch (gs().scrollSpeed) {
         case cGlobalSettings::EScrollFast:
@@ -537,50 +526,50 @@ void cMainWnd::setParam(void) {
     _values.push_back(LANG("scrolling", "fast"));
     _values.push_back(LANG("scrolling", "medium"));
     _values.push_back(LANG("scrolling", "slow"));
-    settingWnd.addSettingItem(LANG("interface settings", "scrolling speed"), _values, scrollSpeed);
+    settingWnd->addSettingItem(LANG("interface settings", "scrolling speed"), _values, scrollSpeed);
     _values.clear();
     _values.push_back(LANG("interface settings", "oldschool"));
     _values.push_back(LANG("interface settings", "modern"));
     _values.push_back(LANG("interface settings", "internal"));
     _values.push_back(LANG("interface settings", "small"));
-    settingWnd.addSettingItem(LANG("interface settings", "filelist style"), _values, gs().viewMode);
+    settingWnd->addSettingItem(LANG("interface settings", "filelist style"), _values, gs().viewMode);
     _values.clear();
     _values.push_back(LANG("switches", "Disable"));
     _values.push_back(LANG("switches", "Enable"));
-    settingWnd.addSettingItem(LANG("interface settings", "animation"), _values, gs().Animation);
-    settingWnd.addSettingItem(LANG("interface settings", "12 hour"), _values, gs().show12hrClock);
-    settingWnd.addSettingItem(LANG("interface settings", "clock sound"), _values, gs().clockSound);
+    settingWnd->addSettingItem(LANG("interface settings", "animation"), _values, gs().Animation);
+    settingWnd->addSettingItem(LANG("interface settings", "12 hour"), _values, gs().show12hrClock);
+    settingWnd->addSettingItem(LANG("interface settings", "clock sound"), _values, gs().clockSound);
 
     // page 3: filesystem
-    settingWnd.addSettingTab(LANG("file settings", "title"));
+    settingWnd->addSettingTab(LANG("file settings", "title"));
     _values.clear();
     _values.push_back(LANG("switches", "Disable"));
     _values.push_back(LANG("switches", "Enable"));
-    settingWnd.addSettingItem(LANG("file settings", "show hidden files"), _values, gs().showHiddenFiles);
+    settingWnd->addSettingItem(LANG("file settings", "show hidden files"), _values, gs().showHiddenFiles);
     _values.clear();
     _values.push_back(LANG("file settings", "presentation full"));
     _values.push_back(LANG("file settings", "presentation user only"));
     _values.push_back(LANG("file settings", "presentation games"));
-    settingWnd.addSettingItem(LANG("file settings", "file presentation mode"), _values, gs().filePresentationMode);
+    settingWnd->addSettingItem(LANG("file settings", "file presentation mode"), _values, gs().filePresentationMode);
     _values.clear();
     _values.push_back(".nds.sav");
     _values.push_back(".sav");
-    settingWnd.addSettingItem(LANG("file settings", "save extension"), _values, gs().saveExt);
+    settingWnd->addSettingItem(LANG("file settings", "save extension"), _values, gs().saveExt);
     _values.clear();
     _values.push_back(LANG("message box", "no"));
     _values.push_back(LANG("message box", "yes"));
-    settingWnd.addSettingItem(LANG("file settings", "use saves folder"), _values, gs().saveDir);
+    settingWnd->addSettingItem(LANG("file settings", "use saves folder"), _values, gs().saveDir);
 
     // page 4: ndsbs
-    settingWnd.addSettingTab(LANG("setting window", "patches"));
+    settingWnd->addSettingTab(LANG("setting window", "patches"));
     _values.clear();
     _values.push_back(LANG("switches", "Disable"));
     _values.push_back(LANG("switches", "Enable"));
-    settingWnd.addSettingItem(LANG("nds bootstrap", "dsmode"), _values, gs().dsOnly);
+    settingWnd->addSettingItem(LANG("nds bootstrap", "dsmode"), _values, gs().dsOnly);
     _values.clear();
     _values.push_back(LANG("nds bootstrap", "release"));
     _values.push_back(LANG("nds bootstrap", "nightly"));
-    settingWnd.addSettingItem(LANG("nds bootstrap", "text"), _values, gs().nightly);
+    settingWnd->addSettingItem(LANG("nds bootstrap", "text"), _values, gs().nightly);
 
     _values.clear();
     _values.push_back(LANG("override", "0"));
@@ -592,20 +581,20 @@ void cMainWnd::setParam(void) {
     _values.push_back(LANG("override", "6"));
     _values.push_back(LANG("override", "7"));
     _values.push_back(LANG("override", "8"));
-    settingWnd.addSettingItem(LANG("override", "text"), _values, gs().languageOverride);
+    settingWnd->addSettingItem(LANG("override", "text"), _values, gs().languageOverride);
 
     if (isDSiMode()){
         _values.clear();
         _values.push_back(LANG("switches", "Disable"));
         _values.push_back(LANG("switches", "Enable"));
-        settingWnd.addSettingItem(LANG("nds bootstrap", "phatCol"), _values, gs().phatCol);
+        settingWnd->addSettingItem(LANG("nds bootstrap", "phatCol"), _values, gs().phatCol);
     }
 
     if (fsManager().isFlashcart()){
         _values.clear();
         _values.push_back("nds-bootstrap");
         _values.push_back("Pico-Loader");
-        settingWnd.addSettingItem(LANG("nds bootstrap", "loader"), _values, gs().pico);
+        settingWnd->addSettingItem(LANG("nds bootstrap", "loader"), _values, gs().pico);
     }
 
 #ifdef __KERNEL_LAUNCHER_SUPPORT__
@@ -616,36 +605,58 @@ void cMainWnd::setParam(void) {
 #endif
 
     // page 5: other
-    settingWnd.addSettingTab(LANG("gba settings", "title"));
+    settingWnd->addSettingTab(LANG("gba settings", "title"));
     _values.clear();
     _values.push_back(LANG("switches", "Disable"));
     _values.push_back(LANG("switches", "Enable"));
-    settingWnd.addSettingItem(LANG("patches", "cheating system"), _values, gs().cheats);
+    settingWnd->addSettingItem(LANG("patches", "cheating system"), _values, gs().cheats);
     _values.clear();
     _values.push_back(LANG("gba settings", "modeask"));
     _values.push_back(LANG("gba settings", "modegba"));
     _values.push_back(LANG("gba settings", "modends"));
-    settingWnd.addSettingItem(LANG("gba settings", "mode"), _values, gs().slot2mode);
+    settingWnd->addSettingItem(LANG("gba settings", "mode"), _values, gs().slot2mode);
 
     if (isDSiMode()) {
         _values.clear(); 
         _values.push_back(LANG("patches", "default"));
         _values.push_back(LANG("patches", "ndshb"));
-        settingWnd.addSettingItem(LANG("patches", "hbstrap"), _values, gs().hbStrap);
+        settingWnd->addSettingItem(LANG("patches", "hbstrap"), _values, gs().hbStrap);
     }
 
-    u32 ret = settingWnd.doModal();
-    if (ID_CANCEL == ret) return;
+    settingWnd->doModal();
+}
 
+void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
+    if (settingWnd == NULL) {
+        return;
+    }
+
+    u8 currentFileListType = gs().fileListType;
+    bool currentShowHiddenFiles = gs().showHiddenFiles;
+    int currentfilePresentationMode = gs().filePresentationMode;
+
+    u32 uiIndex = 0;
+    u32 langIndex = 0;
+    std::vector<std::string> uiNames = fsManager().getUiNames();
+    std::vector<std::string> langNames = fsManager().getLangNames();
+
+    for (size_t ii = 0; ii < uiNames.size(); ++ii) {
+        if (uiNames[ii] == gs().uiName) uiIndex = ii;
+    }
+
+    for (size_t ii = 0; ii < langNames.size(); ++ii) {
+        if (langNames[ii] == gs().langDirectory) langIndex = ii;
+    }
+    
     // page 1: system
-    u32 uiIndexAfter = settingWnd.getItemSelection(0, 0);
-    u32 langIndexAfter = settingWnd.getItemSelection(0, 1);
-    gs().dateFormat = settingWnd.getItemSelection(0, 2);
-    gs().fileListType = settingWnd.getItemSelection(0, 3);
-    gs().resetHotKey = settingWnd.getItemSelection(0, 4);
+    u32 uiIndexAfter = settingWnd->getItemSelection(0, 0);
+    u32 langIndexAfter = settingWnd->getItemSelection(0, 1);
+    gs().dateFormat = settingWnd->getItemSelection(0, 2);
+    gs().fileListType = settingWnd->getItemSelection(0, 3);
+    gs().resetHotKey = settingWnd->getItemSelection(0, 4);
 
     // page 2: interface
-    switch (settingWnd.getItemSelection(1, 0)) {
+    switch (settingWnd->getItemSelection(1, 0)) {
         case 0:
             gs().scrollSpeed = cGlobalSettings::EScrollFast;
             break;
@@ -656,78 +667,64 @@ void cMainWnd::setParam(void) {
             gs().scrollSpeed = cGlobalSettings::EScrollSlow;
             break;
     }
-    gs().viewMode = settingWnd.getItemSelection(1, 1);
-    gs().Animation = settingWnd.getItemSelection(1, 2);
-    gs().show12hrClock = settingWnd.getItemSelection(1, 3);
-    gs().clockSound = settingWnd.getItemSelection(1, 4);
+    gs().viewMode = settingWnd->getItemSelection(1, 1);
+    gs().Animation = settingWnd->getItemSelection(1, 2);
+    gs().show12hrClock = settingWnd->getItemSelection(1, 3);
+    gs().clockSound = settingWnd->getItemSelection(1, 4);
 
     // page 3: filesystem
-    gs().showHiddenFiles = settingWnd.getItemSelection(2, 0);
-    gs().filePresentationMode = settingWnd.getItemSelection(2, 1);
-    gs().saveExt = settingWnd.getItemSelection(2, 2);
-    gs().saveDir = settingWnd.getItemSelection(2, 3);
+    gs().showHiddenFiles = settingWnd->getItemSelection(2, 0);
+    gs().filePresentationMode = settingWnd->getItemSelection(2, 1);
+    gs().saveExt = settingWnd->getItemSelection(2, 2);
+    gs().saveDir = settingWnd->getItemSelection(2, 3);
 
     // page 4: ndsbs
-    gs().dsOnly = settingWnd.getItemSelection(3, 0);
-    gs().nightly = settingWnd.getItemSelection(3, 1);
-    gs().languageOverride = settingWnd.getItemSelection(3,2);
+    gs().dsOnly = settingWnd->getItemSelection(3, 0);
+    gs().nightly = settingWnd->getItemSelection(3, 1);
+    gs().languageOverride = settingWnd->getItemSelection(3,2);
 
     if (isDSiMode()) {
-        gs().phatCol = settingWnd.getItemSelection(3, 3);
+        gs().phatCol = settingWnd->getItemSelection(3, 3);
 
         if (fsManager().isFlashcart()){
-            gs().pico = settingWnd.getItemSelection(3, 4);
+            gs().pico = settingWnd->getItemSelection(3, 4);
         }
         
     }else if (fsManager().isFlashcart()) {
-        gs().pico = settingWnd.getItemSelection(3, 3);
+        gs().pico = settingWnd->getItemSelection(3, 3);
     }
 
     // page 5: other
-    gs().cheats = settingWnd.getItemSelection(4, 0);
-    gs().slot2mode = settingWnd.getItemSelection(4, 1);
+    gs().cheats = settingWnd->getItemSelection(4, 0);
+    gs().slot2mode = settingWnd->getItemSelection(4, 1);
 
     if (isDSiMode()){
-        gs().hbStrap = settingWnd.getItemSelection(4, 2);
+        gs().hbStrap = settingWnd->getItemSelection(4, 2);
     }
-
 
     if (uiIndex != uiIndexAfter) {
-        u32 ret = messageBox(this, LANG("ui style changed", "title"),
-                             LANG("ui style changed", "text"), MB_YES | MB_NO);
-        if (ID_YES == ret) {
-            gs().uiName = uiNames[uiIndexAfter];
-            gs().langDirectory = langNames[langIndexAfter];
-            gs().saveSettings();
+        cMessageBox::showModal(this, LANG("ui style changed", "title"), LANG("ui style changed", "text"), MB_YES | MB_NO,
+            [this, uiNames, uiIndexAfter, langNames, langIndexAfter]() {
+                gs().uiName = uiNames[uiIndexAfter];
+                gs().langDirectory = langNames[langIndexAfter];
+                gs().saveSettings();
 
-            std::string launcherPath = fsManager().resolveSystemPath("/_nds/akmenunext/launcher.nds");
-            HomebrewLauncher().launchRom(launcherPath, "", 0, 0, 0, 0);
-        }
-    }
+                std::string launcherPath = fsManager().resolveSystemPath("/_nds/akmenunext/launcher.nds");
+                HomebrewLauncher().launchRom(launcherPath, "", 0, 0, 0, 0);
+            });
+    }else if (langIndex != langIndexAfter) {
+        cMessageBox::showModal(this, LANG("language changed", "title"), LANG("language changed", "text"), MB_YES | MB_NO,
+            [this, langNames, langIndexAfter]() {
+                gs().langDirectory = langNames[langIndexAfter];
+                gs().saveSettings();
 
-    if (langIndex != langIndexAfter) {
-        u32 ret = messageBox(this, LANG("language changed", "title"),
-                             LANG("language changed", "text"), MB_YES | MB_NO);
-        if (ID_YES == ret) {
-            gs().langDirectory = langNames[langIndexAfter];
-            gs().saveSettings();
-
-            std::string launcherPath = fsManager().resolveSystemPath("/_nds/akmenunext/launcher.nds");
-            HomebrewLauncher().launchRom(launcherPath, "", 0, 0, 0, 0);
-        }
+                std::string launcherPath = fsManager().resolveSystemPath("/_nds/akmenunext/launcher.nds");
+                HomebrewLauncher().launchRom(launcherPath, "", 0, 0, 0, 0);
+            });
     }
 
     gs().saveSettings();
     _mainList->setViewMode((cMainList::VIEW_MODE)gs().viewMode);
-}
-
-void cMainWnd::showSettings(void) {
-    if (gs().safeMode) return;
-    u8 currentFileListType = gs().fileListType;
-    bool currentShowHiddenFiles = gs().showHiddenFiles;
-    int currentfilePresentationMode = gs().filePresentationMode;
-    
-    setParam();
 
     if (gs().filePresentationMode != currentfilePresentationMode) {
         _mainList->enterDir("...");
@@ -746,24 +743,22 @@ void cMainWnd::showFileInfo() {
 
     dbg_printf("show '%s' info\n", _mainList->getSelectedFullPath().c_str());
 
-    CIniFile ini(SFN_UI_SETTINGS);  //(256-)/2,(192-128)/2, 220, 128
-    u32 w = 240;
-    u32 h = 144;
-    w = ini.GetInt("rom info window", "w", w);
-    h = ini.GetInt("rom info window", "h", h);
-
-    cRomInfoWnd* romInfoWnd =
-            new cRomInfoWnd((SCREEN_WIDTH - w) / 2, (SCREEN_HEIGHT - h) / 2, w, h, this, LANG("rom info", "title"));
     std::string showName = _mainList->getSelectedShowName();
     std::string fullPath = _mainList->getSelectedFullPath();
+    cRomInfoWnd* romInfoWnd = cRomInfoWnd::createWindow(this, LANG("rom info", "title"), [this](cRomInfoWnd* wnd) { saveFileInfo(wnd); });
     romInfoWnd->setFileInfo(fullPath, showName);
     romInfoWnd->setRomInfo(rominfo);
     romInfoWnd->setSaves(_mainList->Saves());
     romInfoWnd->doModal();
-    rominfo = romInfoWnd->getRomInfo();
-    _mainList->setRomInfo(_mainList->selectedRowId(), rominfo);
+}
 
-    delete romInfoWnd;
+void cMainWnd::saveFileInfo(cRomInfoWnd* romInfoWnd) {
+    if (romInfoWnd == NULL) {
+        return;
+    }
+
+    DSRomInfo rominfo = romInfoWnd->getRomInfo();
+    _mainList->setRomInfo(_mainList->selectedRowId(), rominfo);
 }
 
 void cMainWnd::onFolderChanged() {
@@ -781,7 +776,7 @@ void cMainWnd::onFolderChanged() {
             dbg_printf("chk %02x header checksum %02x\n", chk, GBA_HEADER.complement);
             std::string title = LANG("no gba card", "title");
             std::string text = LANG("no gba card", "text");
-            messageBox(NULL, title, text, MB_OK);
+            cMessageBox::showModal(this, title, text, MB_OK);
             _mainList->enterDir("...");
             _mainList->selectRow(_mainList->Slot2());
             return;
@@ -789,14 +784,14 @@ void cMainWnd::onFolderChanged() {
 
         int mode = gs().slot2mode;
         if (mode == cGlobalSettings::ESlot2Ask) {
-            if (ID_YES == messageBox(NULL, LANG("gba settings", "mode"),
-                                     LANG("gba settings", "modetext"), MB_YES_NO)) {
-                mode = cGlobalSettings::ESlot2Nds;
-            } else {
-                mode = cGlobalSettings::ESlot2Gba;
-            }
-        }
-        if (mode == cGlobalSettings::ESlot2Nds) {
+            cMessageBox::showModal(this, LANG("gba settings", "mode"), LANG("gba settings", "modetext"), MB_YES_NO,
+                [this]() {
+                    PassMeLauncher().launchRom("slot2:/", "", 0, 0, 0, 0);
+                },
+                [this]() {
+                    CGbaLoader::StartGBA();
+                });
+        }else if (mode == cGlobalSettings::ESlot2Nds) {
             PassMeLauncher().launchRom("slot2:/", "", 0, 0, 0, 0);
         } else {
             CGbaLoader::StartGBA();

@@ -10,10 +10,13 @@
 #pragma once
 
 #include <string>
+#include <functional>
+#include <vector>
 #include "button.h"
 #include "form.h"
 #include "formdesc.h"
 #include "window.h"
+#include "windowmanager.h"
 
 namespace akui {
 
@@ -32,8 +35,7 @@ namespace akui {
 
   class cMessageBox : public cForm {
     public:
-      friend u32 messageBox(cWindow* parent, const std::string& title, const std::string& msg,
-                            u32 style);
+      cMessageBox(cWindow* parent, const std::string& title, const std::string& msg, u32 style);
 
       cMessageBox(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& title,
                   const std::string& msg, u32 style);
@@ -41,15 +43,19 @@ namespace akui {
       ~cMessageBox();
 
     public:
+      static void showModal(cWindow* parent, const std::string& title, const std::string& msg, u32 style);
+
+      static void showModal(cWindow* parent, const std::string& title, const std::string& msg, u32 style,
+        std::function<void()> onAccepted);
+
+      static void showModal(cWindow* parent, const std::string& title, const std::string& msg, u32 style,
+        std::function<void()> onAccepted, std::function<void()> onRejected);
+
       void draw();
 
       bool process(const cMessage& msg);
 
       cWindow& loadAppearance(const std::string& aFileName);
-
-      // u32 doModal();
-
-      // u32 msgRet() { return _msgRet; }
 
     protected:
       void onOK();
@@ -76,7 +82,4 @@ namespace akui {
       cButton* _buttonNO;
       cFormDesc _renderDesc;
   };
-
-  u32 messageBox(cWindow* parent, const std::string& title, const std::string& msg, u32 style);
-
 }

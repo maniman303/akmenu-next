@@ -20,6 +20,7 @@ class cCheatWnd : public akui::cForm {
   public:
     cCheatWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text);
     ~cCheatWnd();
+    static void showModal(const std::string& aFileName);
     bool parse(const std::string& aFileName);
     static bool searchCheatData(FILE* aDat, u32 gamecode, u32 crc32, long& aPos, size_t& aSize);
     static bool romData(const std::string& aFileName, u32& aGameCode, u32& aCrc32);

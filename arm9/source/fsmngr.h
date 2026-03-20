@@ -14,6 +14,8 @@ public:
     bool isFlashcart() const;
     bool isSDInserted() const;
     bool fileExists(const std::string& filePath) const;
+    std::vector<std::string> getUiNames() const;
+    std::vector<std::string> getLangNames() const;
     std::string resolveSystemPath(const char* path) const;
     std::string getFSRoot() const;
 

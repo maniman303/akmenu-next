@@ -10,6 +10,7 @@
 #pragma once
 
 #include <list>
+#include <functional>
 #include "bitmapdesc.h"
 #include "rectangle.h"
 #include "window.h"
@@ -23,7 +24,7 @@ class cForm : public cWindow {
     ~cForm();
 
   public:
-    u32 doModal();
+    void doModal();
 
     cForm& addChildWindow(cWindow* aWindow);
 
@@ -47,7 +48,18 @@ class cForm : public cWindow {
 
     cWindow& disableFocus(void);
 
+    bool isDynamic();
+
+    void setDynamic(bool isDynamic);
+
+    std::function<void()> onAccepted;
+    std::function<void()> onRejected;
+
   protected:
+    static std::vector<cForm*> _modals;
+
+    static void cleanModals(cForm* current);
+
     virtual void onOK();
 
     virtual void onCancel();
@@ -62,6 +74,7 @@ class cForm : public cWindow {
 
     // cFormDesc * _renderDesc;
     u32 _modalRet;
+    bool _isDynamic;
 };
 
 }  // namespace akui

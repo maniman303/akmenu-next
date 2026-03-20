@@ -24,7 +24,11 @@ class cRomInfoWnd : public akui::cForm {
 
     ~cRomInfoWnd();
 
+    static cRomInfoWnd* createWindow(cWindow* parent, const std::string& text, std::function<void(cRomInfoWnd*)> onSaved);
+
   public:
+    std::function<void(cRomInfoWnd*)> onSaved;
+
     void draw();
 
     bool process(const akui::cMessage& msg);
@@ -47,6 +51,8 @@ class cRomInfoWnd : public akui::cForm {
     void pressFlash(void);
 
     void pressSaveType(void);
+
+    void saveSettings(cSettingWnd* settingWnd);
 
     void pressCopy(void);
 
@@ -87,8 +93,6 @@ class cRomInfoWnd : public akui::cForm {
     std::string _fullName;
 
     u32 _size;
-
-    cSettingWnd* _settingWnd;
 
     const std::vector<std::string>* _saves;
 };

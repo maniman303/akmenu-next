@@ -524,7 +524,7 @@ bool cMainList::enterDir(const std::string& dirName) {
             if (fsManager().getFSRoot() == dirName) {
                 std::string title = LANG("sd card error", "title");
                 std::string sdError = LANG("sd card error", "text");
-                messageBox(NULL, title, sdError, MB_OK);
+                cMessageBox::showModal(this, title, sdError, MB_OK);
             }
             dbg_printf("Unable to open directory<%s>.\n", dirName.c_str());
             return false;

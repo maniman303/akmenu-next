@@ -123,10 +123,10 @@ bool NdsBootstrapLauncher::prepareIni(bool hb) {
 
     std::string custIniPath = fsManager().resolveSystemPath("/_nds/akmenunext/ndsbs.ini");
 
-    if(access(custIniPath.c_str(), F_OK) != 0){
-            akui::messageBox(NULL, LANG("nds bootstrap", "inimissingtitle"), LANG("nds bootstrap", "inimissing"), MB_OK);
-            return false;
-        }
+    if (access(custIniPath.c_str(), F_OK) != 0) {
+        akui::cMessageBox::showModal(NULL, LANG("nds bootstrap", "inimissingtitle"), LANG("nds bootstrap", "inimissing"), MB_OK);
+        return false;
+    }
 
     std::string externalHotkey;
     {
@@ -139,7 +139,8 @@ bool NdsBootstrapLauncher::prepareIni(bool hb) {
                 hotkeyCheck = false;
             }
         } else {
-            akui::messageBox(NULL, LANG("nds bootstrap", "inimissingtitle"), LANG("nds bootstrap", "inimissing"), MB_OK);
+            // TODO: Fix this
+            // akui::messageBox(NULL, LANG("nds bootstrap", "inimissingtitle"), LANG("nds bootstrap", "inimissing"), MB_OK);
         }
     }
 
@@ -181,6 +182,7 @@ bool NdsBootstrapLauncher::prepareIni(bool hb) {
         default:
             break;
     }
+
     switch(gs().languageOverride)
     {
         case 0:
@@ -212,11 +214,11 @@ bool NdsBootstrapLauncher::prepareIni(bool hb) {
             break;
     }
 
-    if(gs().dsOnly) {
+    if (gs().dsOnly) {
         ini.SetString("NDS-BOOTSTRAP", "DSI_MODE", "0");
     }
     
-    if(gs().phatCol && isDSiMode()) {
+    if (gs().phatCol && isDSiMode()) {
         ini.SetString("NDS-BOOTSTRAP", "PHAT_COLORS", "1");
     }
 
@@ -273,7 +275,8 @@ bool NdsBootstrapLauncher::launchRom(std::string romPath, std::string savePath, 
 
     //has the user used nds-bootstrap before?
     if(access(ndsBootstrapCheck.c_str(), F_OK) != 0){
-        akui::messageBox(NULL, LANG("nds bootstrap", "firsttimetitle"), LANG("nds bootstrap", "firsttime"), MB_OK);
+        // TODO: Fix this
+        // akui::messageBox(NULL, LANG("nds bootstrap", "firsttimetitle"), LANG("nds bootstrap", "firsttime"), MB_OK);
     }
 
     _romInfo.MayBeDSRom(romPath);

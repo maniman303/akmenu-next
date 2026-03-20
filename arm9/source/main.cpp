@@ -110,9 +110,6 @@ int main(int argc, char* argv[]) {
 
     bool saveListOK = saveManager().importSaveList(SFN_CUSTOM_SAVELIST, SFN_OFFICIAL_SAVELIST);
     if (!saveListOK) {
-        // messageBox( NULL,
-        //     LANG("no savelist","title"),
-        //     LANG("no savelist", "text"), MB_OK );
         dbg_printf("WARNING: savelist.bin missed\n");
     }
 

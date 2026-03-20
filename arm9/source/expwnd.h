@@ -23,6 +23,7 @@ class cExpWnd : public akui::cForm {
     ~cExpWnd();
 
   public:
+    static void showModal(cWindow* parent);
     void draw();
     bool process(const akui::cMessage& msg);
     cWindow& loadAppearance(const std::string& aFileName);

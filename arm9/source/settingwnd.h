@@ -10,6 +10,7 @@
 #pragma once
 
 #include <string>
+#include <functional>
 #include "form.h"
 #include "formdesc.h"
 #include "message.h"
@@ -22,6 +23,10 @@ class cSettingWnd : public akui::cForm {
     ~cSettingWnd();
 
   public:
+    static cSettingWnd* createWindow(cWindow* parent, const std::string& text, std::function<void(cSettingWnd*)> onSaved);
+
+    std::function<void(cSettingWnd*)> onSaved;
+
     void draw(void);
     bool process(const akui::cMessage& msg);
     cWindow& loadAppearance(const std::string& aFileName);

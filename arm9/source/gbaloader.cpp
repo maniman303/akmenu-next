@@ -153,7 +153,7 @@ bool CGbaLoader::Load(bool aForce, bool aNotStart) {
     if (iSize > MAX_PSRAM) {
         nor = true;
     } else if (iSize > MAX_NOR) {
-        akui::messageBox(NULL, LANG("gba warn", "title"), LANG("gba warn", "text"), MB_OK);
+        akui::cMessageBox::showModal(NULL, LANG("gba warn", "title"), LANG("gba warn", "text"), MB_OK);
         return false;
     }
 
