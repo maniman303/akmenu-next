@@ -12,6 +12,7 @@
 #include "exptools.h"
 #include "flags.h"
 #include "language.h"
+#include "globalsettings.h"
 
 #include "launcher/AcekardLauncher.h"
 #include "launcher/HomebrewLauncher.h"
@@ -179,24 +180,28 @@ TLaunchResult launchRom(const std::string& aFullPath, DSRomInfo& aRomInfo, bool 
             }
         }
 
-        std::string savesFolderPath = aFullPath;
-
         //if saveDir is set to true, use saves dir
         if (gs().saveDir) {
             useSavesPath = savesPath;
-            savesFolderPath.insert(aFullPath.find_last_of("/\\") + 1, "saves/");
-            size_t lastSlashPos = savesFolderPath.find_last_of("/\\");
-            std::string directory = savesFolderPath.substr(0, lastSlashPos + 1);
+            if (useSavesPath.empty()) {
+                useSavesPath = aFullPath;
+                useSavesPath.insert(aFullPath.find_last_of("/\\") + 1, "saves/");
+            }
+            
+            size_t lastSlashPos = useSavesPath.find_last_of("/\\");
+            std::string directory = useSavesPath.substr(0, lastSlashPos + 1);
+
             // Create the saves folder if it doesn't exist
             std::string cleanPath = (directory.find("fat:") == 0) ? directory.substr(4) : directory;
             cleanPath.pop_back();
             if (access(cleanPath.c_str(), F_OK) != 0) {
                 mkdir(cleanPath.c_str(), 0777);
-                }
             }
-        else useSavesPath = aFullPath;
+        } else {
+            useSavesPath = aFullPath;
+        }
 
-        saveName = cSaveManager::generateSaveName(savesFolderPath, aRomInfo.saveInfo().getSlot());
+        saveName = cSaveManager::generateSaveName(useSavesPath, aRomInfo.saveInfo().getSlot());
 
         if (isBigSave) {
             isBigSave = cSaveManager::initializeSaveFile(useSavesPath, aRomInfo.saveInfo().getSlot(),
@@ -216,6 +221,7 @@ TLaunchResult launchRom(const std::string& aFullPath, DSRomInfo& aRomInfo, bool 
                     saveManager().updateCustomSaveList(aRomInfo.saveInfo());
                 }
             }
+
             if(!isDsiWare){
                 if (cSaveManager::initializeSaveFile(useSavesPath, aRomInfo.saveInfo().getSlot(),
                 SaveSize(st))) {
@@ -225,8 +231,8 @@ TLaunchResult launchRom(const std::string& aFullPath, DSRomInfo& aRomInfo, bool 
                 return ELaunchNoFreeSpace;
                 }
             }
-
         }
+
         __NDSHeader->cardControl13 = 0x00406000 | speed;
 
         if (aRomInfo.saveInfo().isDownloadPlay()) flags |= PATCH_DOWNLOAD_PLAY;

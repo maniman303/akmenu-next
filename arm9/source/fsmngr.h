@@ -15,6 +15,7 @@ public:
     bool isSDInserted() const;
     bool isRebooted() const;
     bool fileExists(const std::string& filePath) const;
+    std::string getFilename(const std::string& path) const;
     std::vector<std::string> getUiNames() const;
     std::vector<std::string> getLangNames() const;
     std::string resolveSystemPath(const char* path) const;

@@ -24,7 +24,7 @@ void cFSManager::init(int argc, char* argv[]) {
         _isFlashcart = true;
     }
 
-    if (argc > 0 && containsString(toLowerString(std::string(argv[0])), "akmenunext")) {
+    if (argc == 0 || (argc > 0 && containsString(toLowerString(std::string(argv[0])), "akmenunext"))) {
         _isRebooted = true;
     }
 
@@ -64,6 +64,15 @@ bool cFSManager::fileExists(const std::string& filePath) const {
     }
     
     return S_ISREG(buffer.st_mode);
+}
+
+std::string cFSManager::getFilename(const std::string& path) const {
+    size_t pos = path.find_last_of("/\\");
+    if (pos == std::string::npos) {
+        return path;
+    }
+
+    return path.substr(pos + 1);
 }
 
 std::vector<std::string> cFSManager::getUiNames() const {
