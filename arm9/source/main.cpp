@@ -114,6 +114,7 @@ int main(int argc, char* argv[]) {
     }
 
     tickSound().load(SFN_UI_TICK_SOUND);
+    sd().update();
 
     calendarWnd().init();
     calendarWnd().draw();
@@ -219,14 +220,26 @@ int main(int argc, char* argv[]) {
         swiDelay(100);
     }
 
+    u16 ticks = 0;
+
     while (true) {
         timer().updateFps();
         tickSound().play();
+
+        if (ticks == 0) {
+            sd().update();
+        }
 
         INPUT& inputs = updateInput();
         processInput(inputs);
 
         // swiWaitForVBlank();
+
+        if (ticks >= 29) {
+            ticks = 0;
+        } else {
+            ticks++;
+        }
 
         windowManager().update();
         gdi().present(GE_MAIN);

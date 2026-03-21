@@ -7,9 +7,11 @@
 */
 
 #include <nds.h>
+#include <nds/system.h>
 #include <string.h>
 #include "../../share/fifotool.h"
 #include "../../share/memtool.h"
+#include "myi2c.h"
 #include "picoLoader7.h"
 
 #ifdef __cplusplus
@@ -21,10 +23,6 @@ void __libnds_exit(int rc) {}
 }
 #endif
 
-void VblankHandler(void) {
-    inputGetAndSend();
-}
-
 #define PM_NDSLITE_ADR (4)
 #define PM_CONTROL2_REG (16)
 #define PM_CONTROL2_RESET (1)
@@ -32,6 +30,10 @@ void VblankHandler(void) {
 #define PM_NDSLITE_BRIGHTNESS(x) ((x & 0x03) << 0)
 #define PM_NDSLITE_BRIGHTNESS_MASK (PM_NDSLITE_BRIGHTNESS(3))
 #define FIFO_SOUND_READY 0x1234
+
+void VblankHandler(void) {
+    inputGetAndSend();
+}
 
 static u32 getSystem(void) {
     static u32 dsGen = 0;
@@ -168,16 +170,20 @@ static void menuValue32Handler(u32 value, void* data) {
         case MENU_MSG_IS_SD_INSERTED:
             fifoSendValue32(FIFO_USER_06, checkSD());
             break;
-        case MENU_MSG_BATTERY_STATE:
-            fifoSendValue32(FIFO_USER_04, readPowerManagement(PM_CONTROL_REG) & 0xff);
-            break;
         default:
             break;
     }
 }
 
 static void probeBatteryStatus() {
-    fifoSendValue32(FIFO_USER_03, (readPowerManagement(PM_CONTROL_REG) & 0xff) | (MENU_MSG_BATTERY_STATE << 16));
+    u32 ime = REG_IME;
+    REG_IME = 0;
+
+    u32 batteryStatus = readPowerManagement(PM_BATTERY_REG) & 0x1;
+
+    REG_IME = ime;
+
+    fifoSendValue32(FIFO_USER_03, batteryStatus | (MENU_MSG_BATTERY_STATE << 16));
 }
 
 int main() {
@@ -208,7 +214,7 @@ int main() {
 
     irqSet(IRQ_VBLANK, VblankHandler);
 
-    irqEnable(IRQ_VBLANK | IRQ_NETWORK | IRQ_FIFO_NOT_EMPTY | IRQ_SPI);
+    irqEnable(IRQ_VBLANK);
 
 	if (isDSiMode() && REG_SNDEXTCNT != 0) {
 		i2cWriteRegister(0x4A, 0x12, 0x00);	// Press power-button for auto-reset
@@ -226,20 +232,16 @@ int main() {
         if (ticks == 0) {
             probeBatteryStatus();
         }
-        
+
         swiWaitForVBlank();
 
         if (reset_pico) {
             resetDSPico();
         }
-            
+
         swiWaitForVBlank();
 
-        if (ticks >= 29) {
-            ticks = 0;
-        } else {
-            ticks++;
-        }
+        ticks = (ticks + 1) % 40;
     }
 }
 

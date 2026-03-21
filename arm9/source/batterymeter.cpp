@@ -14,7 +14,7 @@ cBatteryMeter::cBatteryMeter() : cWindow(NULL, "BatteryMeter") {
     _dx = 0;
     _dy = 0;
     _show = false;
-    _checkpoint = 0;
+    _flip = false;
 
     _size = cSize(1, 1);
     _position = cPoint(0, 0);
@@ -30,35 +30,41 @@ void cBatteryMeter::init() {
     _show = ini.GetInt("battery icon", "show", _show);
 }
 
-std::string cBatteryMeter::getBatteryFileName() {
-    std::string base = SFN_UI_DIRECTORY + gs().uiName + "/icons";
-    
+int cBatteryMeter::getBatteryType() {
     if (!sd().fifoStatus()) {
-        return base + "/battery1.bmp";
+        return -1;
     }
 
-    u64 now = datetime().secondsInDay();
-    if ((now - _checkpoint) <= 0 && now >= _checkpoint) {
-        return "";
+    int level = sd().batteryStatus();
+
+    if (level & 0x2) {
+        return 2;
     }
 
-    _checkpoint = now;
-
-    u32 level = sd().batteryStatus();
-
-    if (level <= 1) {
-        return base + "/battery1.bmp";
-    }
-
-    return base + "/battery4.bmp";
+    return level & 0x1;
 }
 
 void cBatteryMeter::draw() {
-    std::string newFile = getBatteryFileName();
-    if (newFile != "") {
-        _battery = createBMP15FromFile(newFile);
+    std::string newFile = SFN_UI_DIRECTORY + gs().uiName + "/icons";
+    int type = getBatteryType();
+    if (type < 0) {
+        newFile += "/battery4.bmp";
+    } else if (type == 1) {
+        newFile += "/battery1.bmp";
+    } else if (type == 2) {
+        newFile += "/batterycharge.bmp";
+    } else {
+        newFile += "/battery4.bmp";
     }
 
+    _flip = !_flip;
+
+    bool visible = type != 0 || _flip;
+    if (!visible) {
+        return;
+    }
+
+    _battery = createBMP15FromFile(newFile);
+
     gdi().maskBlt(_battery.buffer(), _dx, _dy, _battery.width(), _battery.height(), selectedEngine());
-    return;
 }

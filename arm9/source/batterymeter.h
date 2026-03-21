@@ -25,12 +25,12 @@ class cBatteryMeter : public akui::cWindow {
     akui::cWindow& loadAppearance(const std::string& aFileName) { return *this; }
 
   protected:
-    std::string getBatteryFileName();
+    int getBatteryType();
 
     int _dx;
     int _dy;
     bool _show;
-    u64 _checkpoint;
+    bool _flip;
     cBMP15 _battery;
 };
 
