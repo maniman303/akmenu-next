@@ -59,6 +59,12 @@ void cSystemDetails::update() {
 	if (_chargingStatus) {
 		_batteryStatus = 0;
 	}
+
+	if (_batteryStatus == 0 || _chargingStatus) {
+		ledBlink(PM_LED_ON);
+	} else {
+		ledBlink(PM_LED_BLINK);
+	}
 }
 
 bool cSystemDetails::fifoStatus() {

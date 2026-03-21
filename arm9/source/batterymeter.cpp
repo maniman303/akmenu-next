@@ -59,7 +59,7 @@ void cBatteryMeter::draw() {
 
     _flip = !_flip;
 
-    bool visible = type != 0 || _flip;
+    bool visible = type != 1 || _flip;
     if (!visible) {
         return;
     }

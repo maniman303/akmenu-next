@@ -214,7 +214,7 @@ int main() {
 
     irqSet(IRQ_VBLANK, VblankHandler);
 
-    irqEnable(IRQ_VBLANK);
+    irqEnable(IRQ_VBLANK | IRQ_NETWORK | IRQ_FIFO_NOT_EMPTY);
 
 	if (isDSiMode() && REG_SNDEXTCNT != 0) {
 		i2cWriteRegister(0x4A, 0x12, 0x00);	// Press power-button for auto-reset
