@@ -86,10 +86,6 @@ void cCalendar::drawDayNumber(u8 day) {
     u8 firstNumber = day / 10;
     u8 secondNumber = day % 10;
 
-    if (firstNumber != 0 && firstNumber != 1 && secondNumber == 1) {
-        x += _fixOnes;
-    }
-
     bool isToday = day == datetime().day();
 
     u16 dayColor = 0;
@@ -108,6 +104,10 @@ void cCalendar::drawDayNumber(u8 day) {
         } else {
             gdi().fillRect(_dayHighlightColor, _dayHighlightColor, x - (_daySize.x / 2 - w), y - (_daySize.y - h) / 2, _daySize.x - 1, _daySize.y - 1, selectedEngine());
         }
+    }
+
+    if (firstNumber != 0 && firstNumber != 1 && secondNumber == 1) {
+        x += _fixOnes;
     }
 
     if (firstNumber == 0) {
