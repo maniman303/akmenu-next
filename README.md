@@ -35,7 +35,35 @@ Frontend for [nds-bootstrap](https://github.com/DS-Homebrew/nds-bootstrap/) and 
 - Added special font for smaller upper screen elements.
 - Makes seetings window fullscreen.
 
-## Getting Started
+## Changes in this fork
+
+- Small fixes to rendering and English typos.
+- New setting to hide file extensions.
+- Auto replace `;` from filenames with `:` when displaying text.
+- Added a new file presentation mode `Focused`, which will hide system folders and files.
+- Added a new file presentation mode `Minimal`, which will show all favorites and up to 20 games scanned from the sd card on the first page.
+- Added a `textOffset` theme setting under `[main list]`.
+- Added new theme ability to specify `main_list_item_bg.bmp` bg for main list items.
+- Added new theme ability to specify `upper_screen_cal4.bmp` for upper screen bg when month has 4 rows.
+- Added new theme ability to specify `upper_screen_cal5.bmp` for upper screen bg when month has 5 rows.
+- Added new theme ability to specify `calendar/date_selection.bmp` for date selection bg.
+- Added new theme ability to specify `calendar/day_numbers_second.bmp` for custom second digits in calendar.
+- Added a `sundayColor` theme setting under `[calendar day]`.
+- Added a `saturdayColor` theme setting under `[calendar day]`.
+- Added a `fix ones` theme setting under `[calendar day]` to offset dates `21` and `31` on x axis by a specified value.
+- Added `[small clock]` and `[small date]` with theming support.
+- Added special font for smaller upper screen elements.
+- Makes seetings window fullscreen.
+
+## Installing
+
+Please check the [AKMenu-Next Docs](https://coderkei.github.io/akmenu-next-docs/) for setting up or updating AKMenu-Next.
+
+## Installing
+
+Please check the [AKMenu-Next Docs](https://coderkei.github.io/akmenu-next-docs/) for setting up or updating AKMenu-Next.
+
+## Building from source
 
 Requires the pre-calico version of devkitarm to be installed with the `nds-dev` package.
 A docker image is available with this version on [docker hub](https://hub.docker.com/layers/devkitpro/devkitarm/20241104).
