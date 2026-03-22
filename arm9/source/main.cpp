@@ -134,7 +134,10 @@ int main(int argc, char* argv[]) {
 
     gdi().initBg(SFN_LOWER_SCREEN_BG);
 
+    swiWaitForVBlank();
+
     gdi().present(GE_SUB);
+    gdi().present(GE_MAIN);
 
     cMainWnd* wnd = new cMainWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, "main window");
     wnd->init();
@@ -230,10 +233,10 @@ int main(int argc, char* argv[]) {
             sd().update();
         }
 
+        swiWaitForVBlank();
+
         INPUT& inputs = updateInput();
         processInput(inputs);
-
-        // swiWaitForVBlank();
 
         if (ticks >= 29) {
             ticks = 0;
@@ -244,7 +247,10 @@ int main(int argc, char* argv[]) {
         windowManager().update();
         
         gdi().present(GE_MAIN);
-        irq().vblankPresent();
+
+        irq().drawTop();
+
+        gdi().present(GE_SUB);
     }
 
     return 0;

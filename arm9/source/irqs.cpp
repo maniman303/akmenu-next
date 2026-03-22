@@ -26,7 +26,7 @@ using namespace akui;
 
 bool cIRQ::_vblankStarted(false);
 
-bool cIRQ::_isReady(false);
+bool cIRQ::_control(false);
 
 void cIRQ::init() {
     irqSet(IRQ_VBLANK, vBlank);
@@ -47,17 +47,22 @@ void cIRQ::vblankStop() {
     _vblankStarted = false;
 }
 
-void cIRQ::vblankPresent() {
-    if (!_isReady) {
-        return;
-    }
-
-    gdi().present(GE_SUB);
-    _isReady = false;
-}
-
 bool cIRQ::isVblankStarted() {
     return _vblankStarted;
+}
+
+void cIRQ::setControl(bool control) {
+    _control = control;
+}
+
+void cIRQ::drawTop() {
+    calendarWnd().draw();
+    calendar().draw();
+    bigClock().draw();
+    batteryMeter().draw();
+    smallDate().draw();
+    smallClock().draw();
+    userWindow().draw();
 }
 
 void cIRQ::vBlank() {
@@ -78,19 +83,14 @@ void cIRQ::vBlank() {
         gdi().setPenColor( 1, GE_SUB );
         gdi().textOut( 40, 178, fpsText, GE_SUB );
 #endif
+        if (_control) {
+            drawTop();
+
+            gdi().present(GE_SUB);
+        }
     }
 
-    if (vBlankCounter % 2 == 0) {
-        calendarWnd().draw();
-        calendar().draw();
-        bigClock().draw();
-        batteryMeter().draw();
-        smallDate().draw();
-        smallClock().draw();
-        userWindow().draw();
-
-        _isReady = true;
-    }
+    // drawTop();
 
     animationManager().update();
 
