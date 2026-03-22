@@ -22,7 +22,8 @@ cFontPcf::cFontPcf()
       iAscent(0),
       iDescent(0),
       sFilename(""),
-      iFontHeight(gs().fontHeight) {
+      iFontHeight(gs().fontHeight),
+      iFontDescend(0) {
     // FIXME: test on nds
     // printf("%d\n",sizeof(cFontPcf::SGlyph));
 }
@@ -213,6 +214,14 @@ void cFontPcf::SetHeight(u8 height) {
 
 u8 cFontPcf::GetHeight() const {
     return iFontHeight;
+}
+
+void cFontPcf::SetDescend(u8 descend) {
+    iFontDescend = descend;
+}
+
+u8 cFontPcf::GetDescend() const {
+    return iFontDescend;
 }
 
 s32 cFontPcf::Search(u16 aCode) const {

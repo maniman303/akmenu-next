@@ -2,7 +2,11 @@
 
 [font]
 main = liberation.pcf
+main height = 10
+main descend = 2
 secondary = liberation_secondary.pcf
+secondary height = 12
+secondary descend = 0
 language = 1
 
 [start menu]

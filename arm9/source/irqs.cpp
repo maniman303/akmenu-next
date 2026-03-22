@@ -26,6 +26,8 @@ using namespace akui;
 
 bool cIRQ::_vblankStarted(false);
 
+bool cIRQ::_isReady(false);
+
 void cIRQ::init() {
     irqSet(IRQ_VBLANK, vBlank);
     irqSet(IRQ_CARD_LINE, cardMC);
@@ -43,6 +45,15 @@ void cIRQ::vblankStart() {
 
 void cIRQ::vblankStop() {
     _vblankStarted = false;
+}
+
+void cIRQ::vblankPresent() {
+    if (!_isReady) {
+        return;
+    }
+
+    gdi().present(GE_SUB);
+    _isReady = false;
 }
 
 bool cIRQ::isVblankStarted() {
@@ -77,6 +88,8 @@ void cIRQ::vBlank() {
         smallDate().draw();
         smallClock().draw();
         userWindow().draw();
+
+        _isReady = true;
     }
 
     animationManager().update();

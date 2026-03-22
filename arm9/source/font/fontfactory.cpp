@@ -22,13 +22,13 @@ cFontFactory::~cFontFactory() {
 
 void cFontFactory::makeFont(void) {
     std::string filename = lang().GetString("font", "main", SFN_DEFAULT_FONT);
+    u8 height = lang().GetInt("font", "main height", gs().fontHeight);
+    u8 descend = lang().GetInt("font", "main descend", 0);
     std::string filepath(SFN_FONTS_DIRECTORY + filename);
     _font = new cFontPcf();
     _font->Load(filepath.c_str());
-
-    if (filename == SFN_DEFAULT_FONT) {
-        _font->SetHeight(gs().fontHeight - 2);
-    }
+    _font->SetHeight(height);
+    _font->SetDescend(descend);
 
     std::string filenameSecondary = lang().GetString("font", "secondary", "");
     std::string filepathSecondary(SFN_FONTS_DIRECTORY + lang().GetString("font", "secondary", ""));
@@ -39,7 +39,8 @@ void cFontFactory::makeFont(void) {
         return;
     }
 
-    if (filenameSecondary == SFN_DEFAULT_FONT) {
-        _fontSecondary->SetHeight(gs().fontHeight - 2);
-    }
+    u8 secondaryHeight = lang().GetInt("font", "secondary height", gs().fontHeight);
+    u8 secondaryDescend = lang().GetInt("font", "secondary descend", 0);
+    _fontSecondary->SetHeight(secondaryHeight);
+    _fontSecondary->SetDescend(secondaryDescend);
 }

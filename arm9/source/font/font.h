@@ -25,6 +25,8 @@ class cFont {
   public:
     virtual void SetHeight(u8 height) = 0;
     virtual u8 GetHeight() const = 0;
+    virtual void SetDescend(u8 descend) = 0;
+    virtual u8 GetDescend() const = 0;
     virtual std::string GetFilename() const = 0;
     virtual void Info(const char* aString, u32* aWidth, u32* aSymbolCount) const = 0;
     virtual u32 TextLenght(const std::string& aString) const = 0;

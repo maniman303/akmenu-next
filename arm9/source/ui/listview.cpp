@@ -142,7 +142,7 @@ void cListView::drawText() {
 
     for (size_t i = 0; i < total; ++i) {
         for (size_t j = 0; j < columnCount; ++j) {
-            s32 height = _rows[_firstVisibleRowId + i][j].lines() * font().GetHeight();
+            s32 height = (_rows[_firstVisibleRowId + i][j].lines() * (font().GetHeight() + font().GetDescend())) - font().GetDescend();
             s32 itemX = _position.x + _columns[j].offset;
             s32 itemY = _position.y + i * _rowHeight;
             s32 textY = itemY + ((_rowHeight - height - 1) >> 1);
