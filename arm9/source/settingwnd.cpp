@@ -32,8 +32,7 @@ cSettingWnd::cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     : cForm(x, y, w, h, parent, text),
       _tabSwitcher(0, 0, w, 18, true, this, "spin"),
       _buttonOK(0, 0, 46, 18, this, "\x01 OK"),
-      _buttonCancel(0, 0, 48, 18, this, "\x02 Cancel"),
-      _buttonY(0, 0, 76, 18, this, "\x04 Common") {
+      _buttonCancel(0, 0, 48, 18, this, "\x02 Cancel") {
     _tabSwitcher.loadAppearance("");
     _tabSwitcher.changed.connect(this, &cSettingWnd::onItemChanged);
     addChildWindow(&_tabSwitcher);
@@ -46,23 +45,16 @@ cSettingWnd::cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     _buttonCancel.setStyle(cButton::press);
     _buttonCancel.setText("\x02 " + LANG("setting window", "cancel"));
     _buttonCancel.setTextColor(uis().buttonTextColor);
-    _buttonCancel.loadAppearance(SFN_BUTTON3);
+    _buttonCancel.loadAppearance(SFN_BUTTON4);
     _buttonCancel.clicked.connect(this, &cSettingWnd::onCancel);
     addChildWindow(&_buttonCancel);
 
     _buttonOK.setStyle(cButton::press);
     _buttonOK.setText("\x01 " + LANG("setting window", "ok"));
     _buttonOK.setTextColor(uis().buttonTextColor);
-    _buttonOK.loadAppearance(SFN_BUTTON3);
+    _buttonOK.loadAppearance(SFN_BUTTON4);
     _buttonOK.clicked.connect(this, &cSettingWnd::onOK);
     addChildWindow(&_buttonOK);
-
-    _buttonY.setStyle(cButton::press);
-    _buttonY.setTextColor(uis().buttonTextColor);
-    _buttonY.loadAppearance(SFN_BUTTON4);
-    addChildWindow(&_buttonY);
-    _buttonY.hide();
-    _buttonY.disableFocus();
 
     s16 nextButtonX = size().x;
     s16 buttonPitch = _buttonCancel.size().x + 8;
@@ -72,10 +64,6 @@ cSettingWnd::cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     buttonPitch = _buttonOK.size().x + 8;
     nextButtonX -= buttonPitch;
     _buttonOK.setRelativePosition(cPoint(nextButtonX, buttonY));
-
-    buttonPitch = _buttonY.size().x + 8;
-    nextButtonX -= buttonPitch;
-    _buttonY.setRelativePosition(cPoint(nextButtonX, buttonY));
 
     _maxLabelLength = 0;
     _titleOffset = 0;
@@ -167,11 +155,6 @@ bool cSettingWnd::processKeyMessage(const cKeyMessage& msg) {
                 break;
             case cKeyMessage::UI_KEY_B:
                 onCancel();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_Y: {
-                _buttonY.clicked();
-            }
                 ret = true;
                 break;
             case cKeyMessage::UI_KEY_L:
@@ -266,7 +249,6 @@ void cSettingWnd::addSettingItem(const std::string& text, const std::vector<std:
 
     _buttonCancel.setRelativePosition(cPoint(_buttonCancel.relativePosition().x, buttonY));
     _buttonOK.setRelativePosition(cPoint(_buttonOK.relativePosition().x, buttonY));
-    _buttonY.setRelativePosition(cPoint(_buttonY.relativePosition().x, buttonY));
 
     arrangeChildren();
 }

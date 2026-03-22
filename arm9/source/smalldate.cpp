@@ -43,8 +43,8 @@ void cSmallDate::draw() {
     }
     
     const cFont& textFont = fontSecondary();
-    u32 textWidth = textFont.TextLenght(formatString("%02d", first));
-    u32 exampleWidth = textFont.TextLenght("22");
+    u32 textWidth = textFont.TextWidth(formatString("%02d", first));
+    u32 exampleWidth = textFont.TextWidth("22");
     int x = _dx + (exampleWidth - textWidth);
 
     gdi().setPenColor(_textColor, _engine);

@@ -37,8 +37,8 @@ void cSmallClock::draw() {
     int minutes = datetime().minutes();
     
     const cFont& textFont = fontSecondary();
-    u32 textWidth = textFont.TextLenght(formatString("%02d", hours));
-    u32 exampleWidth = textFont.TextLenght("22");
+    u32 textWidth = textFont.TextWidth(formatString("%02d", hours));
+    u32 exampleWidth = textFont.TextWidth("22");
     int x = _dx + exampleWidth - textWidth;
 
     std::string time = formatString("%02d : %02d", hours, minutes);
@@ -49,7 +49,7 @@ void cSmallClock::draw() {
     if (_showColon) {
         x = gdi().textOut(x, _dy, ":", _engine, fontSecondary()) + 1;
     } else {
-        x += textFont.TextLenght(":") + 1;
+        x += textFont.TextWidth(":") + 1;
     }
     
     x = gdi().textOut(x, _dy, formatString("%02d", minutes).c_str(), _engine, fontSecondary());

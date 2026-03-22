@@ -35,13 +35,6 @@ class cSettingWnd : public akui::cForm {
                         size_t defaultValue);
     ssize_t getItemSelection(size_t tabId, size_t itemId);
     void setConfirmMessage(const std::string& text);
-    template <class TargetType>
-    void addYButton(std::string title, TargetType* slotHolder,
-                    void (TargetType::*aMemberFunction)()) {
-        _buttonY.setText("\x04 " + title);
-        _buttonY.clicked.connect(slotHolder, aMemberFunction);
-        _buttonY.show();
-    }
 
   protected:
     struct sSetingItem {
@@ -91,5 +84,4 @@ class cSettingWnd : public akui::cForm {
     akui::cButton _buttonOK;
     akui::cButton _buttonCancel;
     akui::cFormDesc _renderDesc;
-    akui::cButton _buttonY;
 };

@@ -172,7 +172,7 @@ void cSpinBox::onMove() {
 }
 
 void cSpinBox::arrangeText() {
-    s32 textWidth = _items.size() ? font().TextLenght(_items[_selectedItemId]) : 0;
+    s32 textWidth = _items.size() ? font().TextWidth(_items[_selectedItemId]) : 0;
     if (textWidth > _itemText.size().x) textWidth = _itemText.size().x;
 
     if (_namedAppearance) {

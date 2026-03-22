@@ -8,6 +8,7 @@
 #include <malloc.h>
 #include <cstdarg>
 #include <cstdio>
+#include <algorithm>
 
 std::string formatString(const char* fmt, ...) {
     const char* f = fmt;
@@ -57,4 +58,10 @@ std::string toLowerString(const std::string& value) {
     for (size_t i = 0; i < res.size(); i++) res[i] = tolower(res[i]);
 
     return res;
+}
+
+int linesInString(const std::string& value) {
+    if (value.empty()) return 0;
+
+    return std::count(value.begin(), value.end(), '\n') + 1;
 }

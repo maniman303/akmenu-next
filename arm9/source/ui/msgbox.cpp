@@ -38,22 +38,9 @@ namespace akui {
     cMessageBox::cMessageBox(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& title,
                             const std::string& msg, u32 style)
         : cForm(x, y, w, h, parent, title) {
-        u32 largestLineWidth = 0;
-        size_t pos1 = 0;
-        size_t pos2 = 0;
-        size_t lineCount = 0;
-
-        std::string breakedMsg = font().breakLine(msg, 192);
-
-        pos1 = breakedMsg.find('\n');
-        while (breakedMsg.npos != pos1) {
-            ++lineCount;
-            u32 lineWidth = font().getStringScreenWidth(&breakedMsg[pos2], pos1 - pos2);
-            if (largestLineWidth < lineWidth) largestLineWidth = lineWidth;
-            pos2 = pos1;
-            pos1 = breakedMsg.find('\n', pos2 + 1);
-            dbg_printf("line w %d\n", lineWidth);
-        }
+        std::string breakedMsg = font().BreakLine(msg, 192);
+        u32 largestLineWidth = font().TextWidth(breakedMsg);
+        size_t lineCount = linesInString(breakedMsg);
 
         _size.x = largestLineWidth + 48;
         if (_size.x < 192) _size.x = 192;

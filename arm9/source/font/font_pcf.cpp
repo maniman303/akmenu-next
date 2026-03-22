@@ -43,14 +43,28 @@ void cFontPcf::Info(const char* aString, u32* aWidth, u32* aSymbolCount) const {
     }
 }
 
-u32 cFontPcf::TextLenght(const std::string& aString) const {
+u32 cFontPcf::TextWidth(const std::string& aString) const {
     u32 res = 0;
+    u32 temp = 0;
     u32 len = 0;
 
     for (size_t i = 0; i < aString.length(); i++) {
+        if (aString[i] == '\n' || aString[i] == '\r') {
+            if (temp > res) {
+                res = temp;
+            }
+
+            temp = 0;
+            continue;
+        }
+
         u32 code = utf8toucs2(reinterpret_cast<const u8*>(aString.c_str() + i), &len);
         s32 index = Search(code);
-        res += (index >= 0) ? iGlyphs[index].iWidth : ((code > 0 && code < 8) ? 10 : 0);
+        temp += (index >= 0) ? iGlyphs[index].iWidth : ((code > 0 && code < 8) ? 10 : 0);
+    }
+
+    if (res == 0) {
+        res = temp;
     }
 
     return res;
