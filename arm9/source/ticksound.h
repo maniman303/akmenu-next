@@ -17,7 +17,7 @@ class cTickSound {
   protected:
     void unload();
 
-    int playTickFromWav(int soundId, u8 volume);
+    int playTickFromWav(u8 volume);
 
     u8* _rawData;
     u32  _dataSize;
@@ -26,8 +26,6 @@ class cTickSound {
     int  _soundFormat;
     u64 _checkpoint;
     int _soundId;
-    int _scheduleSoundId;
-    int _schedule;
 };
 
 typedef t_singleton<cTickSound> TickSound_s;

@@ -30,6 +30,10 @@ void cBatteryMeter::init() {
     _show = ini.GetInt("battery icon", "show", _show);
 }
 
+void cBatteryMeter::flipIcon() {
+    _flip = !_flip;
+}
+
 int cBatteryMeter::getBatteryType() {
     if (!sd().fifoStatus()) {
         return -1;
@@ -56,8 +60,6 @@ void cBatteryMeter::draw() {
     } else {
         newFile += "/battery4.bmp";
     }
-
-    _flip = !_flip;
 
     bool visible = type != 1 || _flip;
     if (!visible) {

@@ -242,7 +242,9 @@ int main(int argc, char* argv[]) {
         }
 
         windowManager().update();
+        
         gdi().present(GE_MAIN);
+        gdi().present(GE_SUB);
     }
 
     return 0;

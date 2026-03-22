@@ -58,23 +58,25 @@ void cIRQ::vBlank() {
 
     if (vBlankCounter++ >= 29) {
         vBlankCounter = 0;
-        calendarWnd().draw();
-        calendar().draw();
         bigClock().blinkColon();
-        bigClock().draw();
-        batteryMeter().draw();
-        smallDate().draw();
         smallClock().flipColon();
-        smallClock().draw();
-        userWindow().draw();
+        batteryMeter().flipIcon();
 #if 0
         char fpsText[16];
         sprintf( fpsText, "fps %.2f\n", timer().getFps() );
         gdi().setPenColor( 1, GE_SUB );
         gdi().textOut( 40, 178, fpsText, GE_SUB );
 #endif
+    }
 
-        gdi().present(GE_SUB);
+    if (vBlankCounter % 2 == 0) {
+        calendarWnd().draw();
+        calendar().draw();
+        bigClock().draw();
+        batteryMeter().draw();
+        smallDate().draw();
+        smallClock().draw();
+        userWindow().draw();
     }
 
     animationManager().update();

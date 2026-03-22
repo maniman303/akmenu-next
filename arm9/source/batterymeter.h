@@ -20,9 +20,11 @@ class cBatteryMeter : public akui::cWindow {
   public:
     void init();
 
-    void draw();
+    void flipIcon();
 
-    akui::cWindow& loadAppearance(const std::string& aFileName) { return *this; }
+    void draw() override;
+
+    akui::cWindow& loadAppearance(const std::string& aFileName) override { return *this; }
 
   protected:
     int getBatteryType();
