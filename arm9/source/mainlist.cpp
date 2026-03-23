@@ -649,9 +649,9 @@ void cMainList::onSelectChanged(u32 index) {
 
 void cMainList::onSelectedRowClicked(u32 index) {
     const INPUT& input = getInput();
-    // dbg_printf("%d %d", input.touchPt.px, _position.x );
-    if (input.touchPt.px > _position.x && input.touchPt.px < _position.x + 32)
+    if (input.touchPt.px > position().x && input.touchPt.px < position().x + 32) {
         selectedRowHeadClicked(index);
+    }
 }
 
 void cMainList::onScrolled(u32 index) {
@@ -741,9 +741,10 @@ void cMainList::drawItemBackgrounds() {
 
     for (size_t i = 0; i < total; i++) {
         s32 itemX = 0;
-        s32 itemY = _position.y + i * _rowHeight;
+        s32 itemY = position().y + i * _rowHeight;
 
-        _itemBg->draw(itemX, itemY);
+        _itemBg->setPosition(cPoint(itemX, itemY));
+        _itemBg->draw();
     }
 }
 
@@ -762,8 +763,8 @@ void cMainList::drawIcons()  // 直接画家算法画 icons
         if (_firstVisibleRowId + i == _selectedRowId && _activeIcon.visible()) {
             continue;
         }
-        s32 itemX = _position.x + 1;
-        s32 itemY = _position.y + i * _rowHeight + ((_rowHeight - icon_height) >> 1) - 1;
+        s32 itemX = position().x + 1;
+        s32 itemY = position().y + i * _rowHeight + ((_rowHeight - icon_height) >> 1) - 1;
         _romInfoList[_firstVisibleRowId + i].drawDSRomIcon(itemX, itemY, _engine, small);
     }
 }
@@ -824,8 +825,8 @@ void cMainList::updateActiveIcon(bool updateContent) {
             memcpy(_activeIcon.buffer(), backBuffer, 32 * 32 * 2);
             _activeIcon.setBufferChanged();
 
-            s32 itemX = _position.x;
-            s32 itemY = _position.y + (_selectedRowId - _firstVisibleRowId) * _rowHeight +
+            s32 itemX = position().x;
+            s32 itemY = position().y + (_selectedRowId - _firstVisibleRowId) * _rowHeight +
                         ((_rowHeight - 32) >> 1) - 1;
             _activeIcon.setPosition(itemX, itemY);
             _activeIcon.show();

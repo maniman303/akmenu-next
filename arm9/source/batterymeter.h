@@ -29,8 +29,6 @@ class cBatteryMeter : public akui::cWindow {
   protected:
     int getBatteryType();
 
-    int _dx;
-    int _dy;
     bool _show;
     bool _flip;
     cBMP15 _battery;

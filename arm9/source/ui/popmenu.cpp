@@ -18,8 +18,8 @@ namespace akui {
 
 cPopMenu::cPopMenu(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
     : cWindow(parent, text) {
-    _size = cSize(w, h);
-    _position = cPoint(x, y);
+    setSize(cSize(w, h));
+    setPosition(cPoint(x, y));
 
     _selectedItemIndex = 0;
     _itemHeight = 0;
@@ -71,10 +71,10 @@ void cPopMenu::draw() {
 void cPopMenu::drawItems() {
     // 循环绘制item文字，遇见 selected 文字就先绘制选择条
     for (size_t i = 0; i < _items.size(); ++i) {
-        s16 itemX = _position.x + _itemTopLeftPoint.x;
-        s16 itemY = _position.y + i * _itemHeight + _itemTopLeftPoint.y;
+        s16 itemX = position().x + _itemTopLeftPoint.x;
+        s16 itemY = position().y + i * _itemHeight + _itemTopLeftPoint.y;
         if (_selectedItemIndex == (s16)i) {
-            s16 barX = _position.x + _barLeft;
+            s16 barX = position().x + _barLeft;
             s16 barY = itemY - 2;
             gdi().setPenColor(_barColor, _engine);
             gdi().fillRect(_barColor, _barColor, barX, barY, barWidth(), _itemHeight, _engine);

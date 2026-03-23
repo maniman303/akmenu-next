@@ -25,8 +25,6 @@ class cSmallClock : public akui::cWindow {
     akui::cWindow& loadAppearance(const std::string& aFileName) { return *this; }
 
   protected:
-    int _dx;
-    int _dy;
     u16 _textColor;
     bool _show;
     bool _showColon;

@@ -48,11 +48,14 @@ namespace akui {
         if (_size.y > 192) _size.y = 192;
         if (_size.x & 1) --_size.x;  // 4 byte align, for speed optimization
         _size.y = lineCount * font().GetHeight() + 60;
-        _position.x = (SCREEN_WIDTH - _size.x) / 2;
-        if (_position.x & 1) --_position.x;
-        _position.y = (SCREEN_HEIGHT - _size.y) / 2;
-        _textPoision.x = _position.x + (_size.x - largestLineWidth) / 2;
-        _textPoision.y = _position.y;
+
+        s32 centerX = (SCREEN_WIDTH - _size.x) / 2;
+        if (centerX & 1) centerX--;
+        s32 centerY = (SCREEN_HEIGHT - _size.y) / 2;
+        setPosition(cPoint(centerX, centerY));
+
+        _textPoision.x = position().x + (size().x - largestLineWidth) / 2;
+        _textPoision.y = position().y;
         dbg_printf("_size.x %d largestLineWidth %d\n", _size.x, largestLineWidth);
 
         _text = title;

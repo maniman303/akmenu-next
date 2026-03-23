@@ -18,8 +18,8 @@ cButton::cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string&
     : cWindow(parent, text), _renderDesc(NULL) {
     _captured = false;
     _state = up;
-    _size = cSize(w, h);
-    _position = cPoint(x, y);
+    setSize(cSize(w, h));
+    setPosition(cPoint(x, y));
     _textColor = uiSettings().buttonTextColor;  // RGB15(0,0,0) | BIT(15);
     _style = single;
     _alignment = center;
@@ -67,9 +67,10 @@ bool cButton::process(const cMessage& msg) {
 
 bool cButton::processTouchMessage(const cTouchMessage& msg) {
     bool ret = false;
+    cRect myRect(position().x, position().y, position().x + size().x, position().y + size().y);
     if (msg.id() == cMessage::touchUp) {
         // cPoint clickedPt( msg.touchPt.x, inputs.touchPt.y );
-        cRect myRect(_position.x, _position.y, _position.x + _size.x, _position.y + _size.y);
+        
         if (_captured) {
             if (myRect.surrounds(msg.position())) {
                 onClicked();
@@ -81,10 +82,8 @@ bool cButton::processTouchMessage(const cTouchMessage& msg) {
             ret = true;
         }
         _state = up;
-    }
-    if (msg.id() == cMessage::touchDown) {
+    } else if (msg.id() == cMessage::touchDown) {
         // cPoint clickedPt( inputs.touchPt.x, inputs.touchPt.y );
-        cRect myRect(_position.x, _position.y, _position.x + _size.x, _position.y + _size.y);
         if (myRect.surrounds(msg.position())) {
             onPressed();
             pressed();
@@ -93,21 +92,7 @@ bool cButton::processTouchMessage(const cTouchMessage& msg) {
             ret = true;
         }
     }
-    //    if( inputs.touchDown ) {
-    //        cPoint clickedPt( inputs.touchPt.px, inputs.touchPt.py );
-    //        cRect myRect( _position.x, _position.y, _position.x + _size.x, _position.y + _size.y
-    //        );
-    ////        dbg_printf("%d %d %d %d, %d %d\n",
-    ////            _position.x, _position.y, _position.x + _size.x, _position.y + _size.y,
-    /// clickedPt.x, clickedPt.y );
-    //        if( myRect.surrounds( clickedPt ) ) {
-    //            //dbg_printf("in!\n");
-    //            _state = down;
-    //        } else {
-    //            _state = up;
-    //        }
-    //    } else {
-    //        _state = up;
+
     return ret;
 }
 

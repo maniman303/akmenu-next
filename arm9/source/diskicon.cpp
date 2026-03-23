@@ -18,8 +18,6 @@
 using namespace akui;
 
 cDiskIcon::cDiskIcon() : cWindow(NULL, "diskicon") {
-    _size = cSize(0, 0);
-    _position = cPoint(0, 0);
     _engine = GE_MAIN;
     _icon.init(1);
     _icon.setPosition(226, 174);

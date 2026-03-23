@@ -29,8 +29,8 @@ void cListItem::setText(const std::string& text) {
 
 cListView::cListView(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
     : cWindow(parent, text) {
-    _size = cSize(w, h);
-    _position = cPoint(x, y);
+    setSize(cSize(w, h));
+    setPosition(cPoint(x, y));
     _rowHeight = 12;
     _selectedRowId = 0;
     _firstVisibleRowId = 0;
@@ -119,8 +119,8 @@ void cListView::drawSelectionBar() {
     // if( _touchMovedAfterTouchDown )
     //     return;
 
-    s16 x = _position.x - 2;
-    s16 y = _position.y + (_selectedRowId - _firstVisibleRowId) * _rowHeight - 1;
+    s16 x = position().x - 2;
+    s16 y = position().y + (_selectedRowId - _firstVisibleRowId) * _rowHeight - 1;
     s16 w = _size.x + 4;
     s16 h = _rowHeight;
 
@@ -143,10 +143,10 @@ void cListView::drawText() {
     for (size_t i = 0; i < total; ++i) {
         for (size_t j = 0; j < columnCount; ++j) {
             s32 height = (_rows[_firstVisibleRowId + i][j].lines() * (font().GetHeight() + font().GetDescend())) - font().GetDescend();
-            s32 itemX = _position.x + _columns[j].offset;
-            s32 itemY = _position.y + i * _rowHeight;
+            s32 itemX = position().x + _columns[j].offset;
+            s32 itemY = position().y + i * _rowHeight;
             s32 textY = itemY + ((_rowHeight - height - 1) >> 1);
-            if (textY + height > (s32)(_position.y + _size.y)) break;
+            if (textY + height > (s32)(position().y + _size.y)) break;
             if (_selectedRowId == _firstVisibleRowId + i /* && !_touchMovedAfterTouchDown */)
                 gdi().setPenColor(_textColorHilight, _engine);
             else

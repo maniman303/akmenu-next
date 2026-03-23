@@ -43,8 +43,8 @@ namespace akui {
         : cWindow(parent, text)
     //_renderDesc(NULL)
     {
-        _size = cSize(w, h);
-        _position = cPoint(x, y);
+        setSize(cSize(w, h));
+        setPosition(cPoint(x, y));
         _modalRet = -1;
         _isDynamic = false;
     }
@@ -56,7 +56,7 @@ namespace akui {
 
     cForm& cForm::addChildWindow(cWindow* aWindow) {
         _childWindows.push_back(aWindow);
-        aWindow->setPosition(_position + aWindow->relativePosition());
+        aWindow->setPosition(position() + aWindow->relativePosition());
         // layouter_->addWindow(aWindow);
         return *this;
     }
@@ -70,7 +70,7 @@ namespace akui {
     cForm& cForm::arrangeChildren() {
         std::list<cWindow*>::iterator it;
         for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
-            (*it)->setPosition(_position + (*it)->relativePosition());
+            (*it)->setPosition(position() + (*it)->relativePosition());
         }
         return *this;
     }
@@ -217,8 +217,7 @@ namespace akui {
     }
 
     void cForm::centerScreen() {
-        _position.x = (SCREEN_WIDTH - _size.x) / 2;
-        _position.y = (SCREEN_HEIGHT - _size.y) / 2;
+        setPosition(cPoint((SCREEN_WIDTH - _size.x) / 2, (SCREEN_HEIGHT - _size.y) / 2));
     }
 
     bool cForm::isActive(void) const {

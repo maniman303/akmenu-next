@@ -29,8 +29,8 @@ void cProgressBar::draw() {
     // draw bar body
     u8 width = _percent * size().x / 100;
     if (_barBmp.valid()) {
-        gdi().maskBlt(_barBmp.buffer(), _barBmp.pitch() >> 1, _barBmp.height(), _position.x,
-                      _position.y, width, _barBmp.height(), _engine);
+        gdi().maskBlt(_barBmp.buffer(), _barBmp.pitch() >> 1, _barBmp.height(), position().x,
+                      position().y, width, _barBmp.height(), _engine);
     } else {
         u16 color1 = 0xfc00;
         u16 color2 = 0x800f;

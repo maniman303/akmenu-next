@@ -27,8 +27,6 @@ cUserWindow::cUserWindow() : cWindow(NULL, "UserWindow") {
     _userTextColor = 0;
     _userNameColor = 0;
     _showUserName = false;
-    _size = cSize(1, 1);
-    _position = cPoint(0, 0);
     _engine = GE_SUB;
 
     init();

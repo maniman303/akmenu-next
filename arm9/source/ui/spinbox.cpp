@@ -144,11 +144,11 @@ void cSpinBox::draw() {
 
         u8 bodyX1 = _prevButton.position().x + _prevButton.size().x;
         u8 fillWidth = windowRectangle().size().x - _nextButton.size().x - _prevButton.size().x;
-        gdi().fillRect(barColor, barColor, bodyX1, _position.y, fillWidth, _prevButton.size().y,
+        gdi().fillRect(barColor, barColor, bodyX1, position().y, fillWidth, _prevButton.size().y,
                     selectedEngine());
 
         gdi().setPenColor(_frameColor, _engine);
-        gdi().frameRect(bodyX1, _position.y, fillWidth, _prevButton.size().y, uiSettings().thickness,
+        gdi().frameRect(bodyX1, position().y, fillWidth, _prevButton.size().y, uiSettings().thickness,
                         selectedEngine());
     }
 

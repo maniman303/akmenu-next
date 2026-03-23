@@ -17,13 +17,13 @@
 using namespace akui;
 
 cBigClock::cBigClock() : cWindow(NULL, "big clock") {
-    _size = cSize(0, 0);
-    _position = cPoint(8, 80);
     _engine = GE_SUB;
     _show = false;
     _colonShow = true;
     _ampmShow = false;
     _ampmColor = RGB15(17, 12, 0);
+
+    setPosition(cPoint(8, 80));
 }
 
 void cBigClock::init() {
@@ -32,9 +32,11 @@ void cBigClock::init() {
 
 cWindow& cBigClock::loadAppearance(const std::string& aFileName) {
     CIniFile ini(aFileName);
-    _position.x = ini.GetInt("big clock", "x", 8);
-    _position.y = ini.GetInt("big clock", "y", 80);
     _show = ini.GetInt("big clock", "show", _show);
+
+    int x = ini.GetInt("big clock", "x", 8);
+    int y = ini.GetInt("big clock", "y", 80);
+    setPosition(cPoint(x, y));
 
     _ampmPosition.x = ini.GetInt("am pm", "x", 8);
     _ampmPosition.y = ini.GetInt("am pm", "y", 80);
@@ -50,7 +52,7 @@ cWindow& cBigClock::loadAppearance(const std::string& aFileName) {
 void cBigClock::drawNumber(u8 id, u8 number) {
     if (number > 10) return;
 
-    u8 x = _position.x + id * (_numbers.width() + 2);
+    u8 x = position().x + id * (_numbers.width() + 2);
     if (id > 2) {  // minute number
         x -= 8;
     }
@@ -58,15 +60,15 @@ void cBigClock::drawNumber(u8 id, u8 number) {
         u8 w = _numbers.width();
         u8 h = _numbers.height() / 10;
         u8 pitch = _numbers.pitch() >> 1;
-        gdi().maskBlt(_numbers.buffer() + number * pitch * h / 2, x, _position.y, w, h,
+        gdi().maskBlt(_numbers.buffer() + number * pitch * h / 2, x, position().y, w, h,
                       selectedEngine());
     }
 }
 
 void cBigClock::drawColon() {
-    u8 x = _position.x + 2 * _numbers.width();
+    u8 x = position().x + 2 * _numbers.width();
     if (_colon.valid()) {
-        gdi().maskBlt(_colon.buffer(), x, _position.y, _colon.width(), _colon.height(),
+        gdi().maskBlt(_colon.buffer(), x, position().y, _colon.width(), _colon.height(),
                       selectedEngine());
     }
 }

@@ -11,13 +11,8 @@
 #include "datetime.h"
 
 cBatteryMeter::cBatteryMeter() : cWindow(NULL, "BatteryMeter") {
-    _dx = 0;
-    _dy = 0;
     _show = false;
     _flip = false;
-
-    _size = cSize(1, 1);
-    _position = cPoint(0, 0);
     _engine = GE_SUB;
 }
 
@@ -25,9 +20,10 @@ cBatteryMeter::~cBatteryMeter() { }
 
 void cBatteryMeter::init() {
     CIniFile ini(SFN_UI_SETTINGS);
-    _dx = ini.GetInt("battery icon", "x", 0);
-    _dy = ini.GetInt("battery icon", "y", 0);
     _show = ini.GetInt("battery icon", "show", _show);
+    int dx = ini.GetInt("battery icon", "x", 0);
+    int dy = ini.GetInt("battery icon", "y", 0);
+    setPosition(cPoint(dx, dy));
 }
 
 void cBatteryMeter::flipIcon() {
@@ -68,5 +64,5 @@ void cBatteryMeter::draw() {
 
     _battery = createBMP15FromFile(newFile);
 
-    gdi().maskBlt(_battery.buffer(), _dx, _dy, _battery.width(), _battery.height(), selectedEngine());
+    gdi().maskBlt(_battery.buffer(), position().x, position().x, _battery.width(), _battery.height(), selectedEngine());
 }

@@ -18,8 +18,8 @@
 using namespace akui;
 
 cCalendar::cCalendar() : cWindow(NULL, "calendar") {
-    _size = cSize(0, 0);
-    _position = cPoint(134, 34);
+    setSize(cSize(0, 0));
+    setPosition(cPoint(134, 34));
     _engine = GE_SUB;
 
     _showYear = false;
