@@ -19,6 +19,7 @@
 #include "dbgtool.h"
 #include "gdi.h"
 #include "ui.h"
+#include "logger.h"
 
 #include "mainlist.h"
 #include "mainwnd.h"
@@ -82,18 +83,12 @@ int main(int argc, char* argv[]) {
 
     // init graphics
     gdi().init();
-#ifdef DEBUG
-    gdi().switchSubEngineMode();
-#endif  // DEBUG
-    dbg_printf("gdi ok\n");
 
     sd().initArm7RegStatuses();
 
-    // wait_press_b();
-    //  init fat
     fsManager().init(argc, argv);
-    
-    // wait_press_b();
+
+    logger().init();
 
     // setting scripts
     gs().loadSettings();
