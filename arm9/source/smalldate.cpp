@@ -21,7 +21,7 @@ void cSmallDate::init() {
     int dx = ini.GetInt("small date", "x", 0);
     int dy = ini.GetInt("small date", "y", 0);
 
-    setPosition(cPoint(dx, dy));
+    setRelativePosition(cPoint(dx, dy));
 }
 
 void cSmallDate::draw() {

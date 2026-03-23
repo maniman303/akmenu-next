@@ -48,7 +48,7 @@ cWindow& cStartMenu::loadAppearance(const std::string& aFileName) {
     int iy = ini.GetInt("start menu", "itemY", 12);
     int x = ini.GetInt("start menu", "x", 4);
     int y = ini.GetInt("start menu", "y", 4);
-    setPosition(cPoint(x, y));
+    setRelativePosition(cPoint(x, y));
     _itemTopLeftPoint = cPoint(ix, iy);
     _itemHeight = ini.GetInt("start menu", "itemHeight", 16);
     _itemWidth = ini.GetInt("start menu", "itemWidth", 0);

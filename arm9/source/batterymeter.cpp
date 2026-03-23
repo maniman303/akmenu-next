@@ -23,7 +23,7 @@ void cBatteryMeter::init() {
     _show = ini.GetInt("battery icon", "show", _show);
     int dx = ini.GetInt("battery icon", "x", 0);
     int dy = ini.GetInt("battery icon", "y", 0);
-    setPosition(cPoint(dx, dy));
+    setRelativePosition(cPoint(dx, dy));
 }
 
 void cBatteryMeter::flipIcon() {
@@ -64,5 +64,5 @@ void cBatteryMeter::draw() {
 
     _battery = createBMP15FromFile(newFile);
 
-    gdi().maskBlt(_battery.buffer(), position().x, position().x, _battery.width(), _battery.height(), selectedEngine());
+    gdi().maskBlt(_battery.buffer(), position().x, position().y, _battery.width(), _battery.height(), selectedEngine());
 }

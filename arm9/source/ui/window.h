@@ -47,16 +47,12 @@ class cWindow : public SlotHolder {
     cWindow& setSize(const cSize& aSize);
 
     //! returns the position of the window in app window coords
-    const cPoint& position() const { return _position; }
+    cPoint position() const;
 
     const cPoint& relativePosition() const { return _relative_position; }
-    cWindow& setRelativePosition(const cPoint& rPosition) {
-        _relative_position = rPosition;
-        return *this;
-    }
 
-    //! sets the position of the window in app window coords
-    cWindow& setPosition(const cPoint& aPosition);
+    //! sets relative position to the parent 
+    cWindow& setRelativePosition(const cPoint& rPosition);
 
     //! returns \c true if this window currently has the focus
     bool isFocused() const;

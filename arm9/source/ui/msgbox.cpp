@@ -13,17 +13,17 @@
 #include "ui.h"
 
 namespace akui {
-    void cMessageBox::showModal(cWindow* parent, const std::string& title, const std::string& msg, u32 style) {
-        showModal(parent, title, msg, {}, {});
+    void cMessageBox::showModal(const std::string& title, const std::string& msg, u32 style) {
+        showModal(title, msg, {}, {});
     }
 
-    void cMessageBox::showModal(cWindow* parent, const std::string& title, const std::string& msg, u32 style, std::function<void()> onClosed) {
-        showModal(parent, title, msg, style, onClosed, onClosed);
+    void cMessageBox::showModal(const std::string& title, const std::string& msg, u32 style, std::function<void()> onClosed) {
+        showModal(title, msg, style, onClosed, onClosed);
     }
 
-    void cMessageBox::showModal(cWindow* parent, const std::string& title, const std::string& msg, u32 style,
+    void cMessageBox::showModal(const std::string& title, const std::string& msg, u32 style,
         std::function<void()> onAccepted, std::function<void()> onRejected) {
-        cMessageBox* modal = new cMessageBox(parent, title, msg, style);
+        cMessageBox* modal = new cMessageBox(title, msg, style);
         modal->setDynamic(true);
         modal->onAccepted = onAccepted;
         modal->onRejected = onRejected;
@@ -32,12 +32,12 @@ namespace akui {
         _modals.push_back(modal);
     }
 
-    cMessageBox::cMessageBox(cWindow* parent, const std::string& title, const std::string& msg, u32 style)
-        : cMessageBox(12, 36, 232, 120, parent, title, msg, style) {}
+    cMessageBox::cMessageBox(const std::string& title, const std::string& msg, u32 style)
+        : cMessageBox(12, 36, 232, 120, title, msg, style) {}
 
-    cMessageBox::cMessageBox(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& title,
+    cMessageBox::cMessageBox(s32 x, s32 y, u32 w, u32 h, const std::string& title,
                             const std::string& msg, u32 style)
-        : cForm(x, y, w, h, parent, title) {
+        : cForm(x, y, w, h, NULL, title) {
         std::string breakedMsg = font().BreakLine(msg, 192);
         u32 largestLineWidth = font().TextWidth(breakedMsg);
         size_t lineCount = linesInString(breakedMsg);
@@ -52,7 +52,7 @@ namespace akui {
         s32 centerX = (SCREEN_WIDTH - _size.x) / 2;
         if (centerX & 1) centerX--;
         s32 centerY = (SCREEN_HEIGHT - _size.y) / 2;
-        setPosition(cPoint(centerX, centerY));
+        setRelativePosition(cPoint(centerX, centerY));
 
         _textPoision.x = position().x + (size().x - largestLineWidth) / 2;
         _textPoision.y = position().y;
@@ -146,8 +146,6 @@ namespace akui {
             buttonPitch = _buttonCANCEL->size().x + 8;
             nextButtonX -= buttonPitch;
         }
-
-        arrangeChildren();
 
         loadAppearance("");
     }

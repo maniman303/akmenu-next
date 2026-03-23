@@ -124,7 +124,7 @@ bool NdsBootstrapLauncher::prepareIni(bool hb) {
     std::string custIniPath = fsManager().resolveSystemPath("/_nds/akmenunext/ndsbs.ini");
 
     if (access(custIniPath.c_str(), F_OK) != 0) {
-        akui::cMessageBox::showModal(NULL, LANG("nds bootstrap", "inimissingtitle"), LANG("nds bootstrap", "inimissing"), MB_OK);
+        akui::cMessageBox::showModal(LANG("nds bootstrap", "inimissingtitle"), LANG("nds bootstrap", "inimissing"), MB_OK);
         return false;
     }
 
@@ -138,7 +138,7 @@ bool NdsBootstrapLauncher::prepareIni(bool hb) {
             hotkeyCheck = false;
         }
     } else {
-        akui::cMessageBox::showModal(NULL, LANG("nds bootstrap", "inimissingtitle"), LANG("nds bootstrap", "inimissing"), MB_OK);
+        akui::cMessageBox::showModal(LANG("nds bootstrap", "inimissingtitle"), LANG("nds bootstrap", "inimissing"), MB_OK);
         return false;
     }
 

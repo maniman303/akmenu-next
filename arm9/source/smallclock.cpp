@@ -22,7 +22,7 @@ void cSmallClock::init() {
     int dx = ini.GetInt("small clock", "x", 0);
     int dy = ini.GetInt("small clock", "y", 0);
 
-    setPosition(cPoint(dx, dy));
+    setRelativePosition(cPoint(dx, dy));
 }
 
 void cSmallClock::draw() {

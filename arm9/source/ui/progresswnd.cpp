@@ -16,7 +16,7 @@ cProgressWnd::cProgressWnd()  // s32 x, s32 y, u32 w, u32 h, cWindow * parent, c
     : cForm(0, 0, 0, 0, NULL, ""), _bar(0, 0, 180, 24, this, ""), _tip(0, 0, 180, 20, this, "") {
     _renderDesc.setBltMode(BM_MASKBLT);
     setSize(cSize(226, 62));
-    setPosition(cPoint(14, 64));
+    setRelativePosition(cPoint(14, 64));
 }
 
 cProgressWnd::~cProgressWnd() {}
@@ -31,7 +31,6 @@ void cProgressWnd::init() {
     _tip.setTextColor(uiSettings().formTextColor);
     _tip.setRelativePosition(cPoint(4, _size.y - 24));
     _tip.setSize(cSize(_size.x - 8, 12));
-    arrangeChildren();
     hide();
 }
 

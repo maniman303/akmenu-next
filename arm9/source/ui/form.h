@@ -30,8 +30,6 @@ class cForm : public cWindow {
 
     cForm& removeChildWindow(cWindow* aWindow);
 
-    cForm& arrangeChildren();
-
     void draw();
 
     // cWindow& loadAppearance(const std::string& aFileName );
@@ -63,10 +61,6 @@ class cForm : public cWindow {
     virtual void onOK();
 
     virtual void onCancel();
-
-    void onResize();
-
-    void onMove();
 
     bool processKeyMessage(const cKeyMessage& msg);
 

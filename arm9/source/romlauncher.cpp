@@ -280,7 +280,7 @@ TLaunchResult launchRom(const std::string& aFullPath, DSRomInfo& aRomInfo, bool 
         return ELaunchRomOk;
     }
 
-    akui::cMessageBox::showModal(NULL, message.title, message.content, MB_OK,
+    akui::cMessageBox::showModal(message.title, message.content, MB_OK,
         [launcher, aFullPath, saveName, flags, cheatOffset, cheatSize, hb]() {
             launcher->launchRom(aFullPath, saveName, flags, cheatOffset, cheatSize, hb);
         });

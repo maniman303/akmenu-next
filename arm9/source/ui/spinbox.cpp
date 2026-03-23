@@ -73,9 +73,7 @@ void cSpinBox::selectItem(u32 id) {
     //);
 
     arrangeButton();
-    // TODO: Arrange header
     arrangeText();
-    arrangeChildren();
     changed(this);
 }
 
@@ -190,16 +188,12 @@ void cSpinBox::onGainedFocus() {}
 void cSpinBox::onResize() {
     dbg_printf("spin box on resize\n");
     arrangeButton();
-    // TODO: Arrange header
     arrangeText();
-    arrangeChildren();
 }
 
 void cSpinBox::onMove() {
     arrangeButton();
-    // TODO: Arrange header
     arrangeText();
-    arrangeChildren();
 }
 
 void cSpinBox::arrangeText() {

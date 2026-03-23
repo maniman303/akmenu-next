@@ -19,7 +19,7 @@ namespace akui {
 cPopMenu::cPopMenu(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
     : cWindow(parent, text) {
     setSize(cSize(w, h));
-    setPosition(cPoint(x, y));
+    setRelativePosition(cPoint(x, y));
 
     _selectedItemIndex = 0;
     _itemHeight = 0;

@@ -19,7 +19,7 @@ cButton::cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string&
     _captured = false;
     _state = up;
     setSize(cSize(w, h));
-    setPosition(cPoint(x, y));
+    setRelativePosition(cPoint(x, y));
     _textColor = uiSettings().buttonTextColor;  // RGB15(0,0,0) | BIT(15);
     _style = single;
     _alignment = center;

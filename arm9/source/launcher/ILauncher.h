@@ -12,11 +12,11 @@
 #include "../ui/msgbox.h"
 
 static inline void printLoaderNotFound(std::string loaderPath) {
-    akui::cMessageBox::showModal(NULL, LANG("loader", "not found"), loaderPath, MB_OK);
+    akui::cMessageBox::showModal(LANG("loader", "not found"), loaderPath, MB_OK);
 }
 
 static inline void printError(std::string errorMsg) {
-    akui::cMessageBox::showModal(NULL, LANG("loader", "error"), errorMsg, MB_OK);
+    akui::cMessageBox::showModal(LANG("loader", "error"), errorMsg, MB_OK);
 }
 
 struct MessageEntry {

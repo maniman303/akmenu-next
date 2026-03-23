@@ -110,7 +110,6 @@ cRomInfoWnd::cRomInfoWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     _buttonCopy.setRelativePosition(cPoint(nextButtonX, buttonY));
 
     loadAppearance("");
-    arrangeChildren();
 }
 
 cRomInfoWnd::~cRomInfoWnd() {}
@@ -318,7 +317,7 @@ void cRomInfoWnd::onShow() {
 void cRomInfoWnd::pressSaveType(void) {
     if (!_romInfo.isDSRom() || _romInfo.isHomebrew()) return;
 
-    cSettingWnd* settingWnd = cSettingWnd::createWindow(this, LANG("game settings", "title"), [this](cSettingWnd* wnd) { saveSettings(wnd); });
+    cSettingWnd* settingWnd = cSettingWnd::createWindow(NULL, LANG("game settings", "title"), [this](cSettingWnd* wnd) { saveSettings(wnd); });
     
     settingWnd->addSettingTab(LANG("save type", "tab1"));
 

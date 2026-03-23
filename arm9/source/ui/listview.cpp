@@ -30,7 +30,7 @@ void cListItem::setText(const std::string& text) {
 cListView::cListView(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
     : cWindow(parent, text) {
     setSize(cSize(w, h));
-    setPosition(cPoint(x, y));
+    setRelativePosition(cPoint(x, y));
     _rowHeight = 12;
     _selectedRowId = 0;
     _firstVisibleRowId = 0;

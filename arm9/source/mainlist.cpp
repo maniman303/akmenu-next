@@ -524,7 +524,7 @@ bool cMainList::enterDir(const std::string& dirName) {
             if (fsManager().getFSRoot() == dirName) {
                 std::string title = LANG("sd card error", "title");
                 std::string sdError = LANG("sd card error", "text");
-                cMessageBox::showModal(this, title, sdError, MB_OK);
+                cMessageBox::showModal(title, sdError, MB_OK);
             }
             dbg_printf("Unable to open directory<%s>.\n", dirName.c_str());
             return false;
@@ -740,10 +740,10 @@ void cMainList::drawItemBackgrounds() {
     size_t total = std::min(_visibleRowCount, _rows.size() - _firstVisibleRowId);
 
     for (size_t i = 0; i < total; i++) {
-        s32 itemX = 0;
-        s32 itemY = position().y + i * _rowHeight;
+        s32 itemX = 0 - position().x;
+        s32 itemY = i * _rowHeight;
 
-        _itemBg->setPosition(cPoint(itemX, itemY));
+        _itemBg->setRelativePosition(cPoint(itemX, itemY));
         _itemBg->draw();
     }
 }

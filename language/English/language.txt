@@ -90,8 +90,8 @@ patches = Game loader settings
 
 [save type]
 title = Settings
-text = Select a save type
-Unknown = unknown/auto
+text = Save type
+Unknown = Unknown
 No Save = no save
 4K = 4K
 64K = 64K

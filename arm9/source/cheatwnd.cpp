@@ -114,7 +114,6 @@ cCheatWnd::cCheatWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::str
     addChildWindow(&_List);
 
     loadAppearance("");
-    arrangeChildren();
 }
 
 cCheatWnd::~cCheatWnd() {}
@@ -231,7 +230,7 @@ void cCheatWnd::onInfo(void) {
     std::string body(_data[index]._title);
     body += "\n\n";
     body += _data[index]._comment;
-    cMessageBox::showModal(this, LANG("cheats", "title"), body, MB_OK);
+    cMessageBox::showModal(LANG("cheats", "title"), body, MB_OK);
 }
 
 void cCheatWnd::onCancel(void) {

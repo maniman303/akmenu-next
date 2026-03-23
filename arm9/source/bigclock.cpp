@@ -23,7 +23,7 @@ cBigClock::cBigClock() : cWindow(NULL, "big clock") {
     _ampmShow = false;
     _ampmColor = RGB15(17, 12, 0);
 
-    setPosition(cPoint(8, 80));
+    setRelativePosition(cPoint(8, 80));
 }
 
 void cBigClock::init() {
@@ -36,7 +36,7 @@ cWindow& cBigClock::loadAppearance(const std::string& aFileName) {
 
     int x = ini.GetInt("big clock", "x", 8);
     int y = ini.GetInt("big clock", "y", 80);
-    setPosition(cPoint(x, y));
+    setRelativePosition(cPoint(x, y));
 
     _ampmPosition.x = ini.GetInt("am pm", "x", 8);
     _ampmPosition.y = ini.GetInt("am pm", "y", 80);

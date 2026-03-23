@@ -36,7 +36,7 @@ cHelpWnd::cHelpWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::strin
     s16 buttonY = size().y - _buttonOK.size().y - 4;
 
     _buttonOK.setStyle(cButton::press);
-    _buttonOK.setText("\x01 " + LANG("setting window", "ok"));
+    _buttonOK.setText("\x02 " + LANG("setting window", "cancel"));
     _buttonOK.setTextColor(uis().buttonTextColor);
     _buttonOK.loadAppearance(SFN_BUTTON3);
     _buttonOK.clicked.connect(this, &cHelpWnd::onOK);
@@ -50,7 +50,6 @@ cHelpWnd::cHelpWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::strin
     _buttonOK.setRelativePosition(cPoint(nextButtonX, buttonY));
 
     loadAppearance("");
-    arrangeChildren();
 
     for (size_t i = 0; i < 9; ++i) {
         std::string textIndex = formatString("item%d", i);

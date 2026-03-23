@@ -35,20 +35,20 @@ namespace akui {
 
   class cMessageBox : public cForm {
     public:
-      cMessageBox(cWindow* parent, const std::string& title, const std::string& msg, u32 style);
+      cMessageBox(const std::string& title, const std::string& msg, u32 style);
 
-      cMessageBox(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& title,
+      cMessageBox(s32 x, s32 y, u32 w, u32 h, const std::string& title,
                   const std::string& msg, u32 style);
 
       ~cMessageBox();
 
     public:
-      static void showModal(cWindow* parent, const std::string& title, const std::string& msg, u32 style);
+      static void showModal(const std::string& title, const std::string& msg, u32 style);
 
-      static void showModal(cWindow* parent, const std::string& title, const std::string& msg, u32 style,
+      static void showModal(const std::string& title, const std::string& msg, u32 style,
         std::function<void()> onAccepted);
 
-      static void showModal(cWindow* parent, const std::string& title, const std::string& msg, u32 style,
+      static void showModal(const std::string& title, const std::string& msg, u32 style,
         std::function<void()> onAccepted, std::function<void()> onRejected);
 
       void draw();

@@ -108,7 +108,6 @@ cExpWnd::cExpWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string&
     addChildWindow(&_Label);
 
     loadAppearance("");
-    arrangeChildren();
 
     CIniFile f;
     _romName = f.LoadIniFile(SFN_LAST_GBA_SAVEINFO) ? f.GetString("Save Info", "lastLoadedNOR", "") : "";

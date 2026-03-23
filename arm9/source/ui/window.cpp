@@ -31,7 +31,7 @@ cWindow::~cWindow() {
 
 cWindow& cWindow::setWindowRectangle(const cRect& rect) {
     setSize(rect.size());
-    setPosition(rect.position());
+    setRelativePosition(rect.position());
     return *this;
 }
 
@@ -111,8 +111,17 @@ cWindow& cWindow::setSize(const cSize& aSize) {
     return *this;
 }
 
-cWindow& cWindow::setPosition(const cPoint& aPosition) {
-    _position = aPosition;
+cPoint cWindow::position() const {
+    cPoint parentPosition = cPoint(0, 0);
+    if (_parent != NULL) {
+        parentPosition = _parent->position();
+    }
+
+    return parentPosition + _relative_position;
+}
+
+cWindow& cWindow::setRelativePosition(const cPoint& rPosition) {
+    _relative_position = rPosition;
     onMove();
     return *this;
 }

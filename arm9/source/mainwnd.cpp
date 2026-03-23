@@ -177,8 +177,6 @@ void cMainWnd::init() {
     diskIcon().loadAppearance(SFN_CARD_ICON_BLUE);
     diskIcon().show();
 
-    arrangeChildren();
-
     cFavorites::RemoveInvalidFavorites();
 }
 
@@ -448,7 +446,7 @@ void cMainWnd::launchSelected() {
         return;
     }
 
-    cMessageBox::showModal(this, title, text, MB_OK);
+    cMessageBox::showModal(title, text, MB_OK);
 }
 
 void cMainWnd::onKeyBPressed() {
@@ -706,7 +704,7 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
     }
 
     if (uiIndex != uiIndexAfter) {
-        cMessageBox::showModal(this, LANG("ui style changed", "title"), LANG("ui style changed", "text"), MB_YES | MB_NO,
+        cMessageBox::showModal(LANG("ui style changed", "title"), LANG("ui style changed", "text"), MB_YES | MB_NO,
             [this, uiNames, uiIndexAfter, langNames, langIndexAfter]() {
                 gs().uiName = uiNames[uiIndexAfter];
                 gs().langDirectory = langNames[langIndexAfter];
@@ -717,7 +715,7 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
             },
             {});
     }else if (langIndex != langIndexAfter) {
-        cMessageBox::showModal(this, LANG("language changed", "title"), LANG("language changed", "text"), MB_YES | MB_NO,
+        cMessageBox::showModal(LANG("language changed", "title"), LANG("language changed", "text"), MB_YES | MB_NO,
             [this, langNames, langIndexAfter]() {
                 gs().langDirectory = langNames[langIndexAfter];
                 gs().saveSettings();
@@ -781,7 +779,7 @@ void cMainWnd::onFolderChanged() {
             dbg_printf("chk %02x header checksum %02x\n", chk, GBA_HEADER.complement);
             std::string title = LANG("no gba card", "title");
             std::string text = LANG("no gba card", "text");
-            cMessageBox::showModal(this, title, text, MB_OK);
+            cMessageBox::showModal(title, text, MB_OK);
             _mainList->enterDir("...");
             _mainList->selectRow(_mainList->Slot2());
             return;
@@ -789,7 +787,7 @@ void cMainWnd::onFolderChanged() {
 
         int mode = gs().slot2mode;
         if (mode == cGlobalSettings::ESlot2Ask) {
-            cMessageBox::showModal(this, LANG("gba settings", "mode"), LANG("gba settings", "modetext"), MB_YES_NO,
+            cMessageBox::showModal(LANG("gba settings", "mode"), LANG("gba settings", "modetext"), MB_YES_NO,
                 [this]() {
                     PassMeLauncher().launchRom("slot2:/", "", 0, 0, 0, 0);
                 },

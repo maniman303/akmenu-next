@@ -74,7 +74,6 @@ cSettingWnd::cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     _simpleTabs = ini.GetInt("setting window", "simpleTabs", 0);
 
     loadAppearance("");
-    arrangeChildren();
 
     _currentTab = 0;
 }
@@ -115,7 +114,7 @@ bool cSettingWnd::process(const akui::cMessage& msg) {
 }
 
 void cSettingWnd::onOK(void) {
-    cMessageBox::showModal(this, LANG("setting window", "confirm"), _confirmMessage, MB_OK | MB_CANCEL, [this]() {
+    cMessageBox::showModal(LANG("setting window", "confirm"), _confirmMessage, MB_OK | MB_CANCEL, [this]() {
         if (onSaved) {
             onSaved(this);
         }
@@ -212,7 +211,7 @@ void cSettingWnd::addSettingItem(const std::string& text, const std::vector<std:
     // recompute window size and position
     if (_maxTabSize < (items(lastTab).size() + 1)) {
         _maxTabSize = (items(lastTab).size() + 1);
-        setPosition(cPoint((SCREEN_WIDTH - _size.x) / 2, (SCREEN_HEIGHT - _size.y) / 2));
+        setRelativePosition(cPoint((SCREEN_WIDTH - _size.x) / 2, (SCREEN_HEIGHT - _size.y) / 2));
     }
 
     // insert label, item and set their position
@@ -247,8 +246,6 @@ void cSettingWnd::addSettingItem(const std::string& text, const std::vector<std:
 
     _buttonCancel.setRelativePosition(cPoint(_buttonCancel.relativePosition().x, buttonY));
     _buttonOK.setRelativePosition(cPoint(_buttonOK.relativePosition().x, buttonY));
-
-    arrangeChildren();
 }
 
 void cSettingWnd::onShow(void) {
