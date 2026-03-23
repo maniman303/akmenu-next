@@ -32,7 +32,7 @@ class cDiskIcon : public akui::cWindow {
     void blink(void);
 
   protected:
-    bool _draw;
+    bool _show;
 
     float _lightTime;
 

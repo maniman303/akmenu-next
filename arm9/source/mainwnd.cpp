@@ -94,8 +94,7 @@ void cMainWnd::init() {
 
     // init game file list
     // waitMs( 2000 );
-    _mainList = new cMainList(4, 20, 248, 152, this, "main list");
-    _mainList->setRelativePosition(cPoint(4, 20));
+    _mainList = new cMainList(this, "main list");
     _mainList->init();
     _mainList->selectChanged.connect(this, &cMainWnd::listSelChange);
     _mainList->selectedRowClicked.connect(this, &cMainWnd::onMainListSelItemClicked);

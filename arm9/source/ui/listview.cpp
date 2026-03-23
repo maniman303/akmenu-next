@@ -54,9 +54,14 @@ void cListView::arangeColumnsSize() {
 }
 
 bool cListView::insertColumn(size_t index, const std::string& text, u8 width) {
+    return insertColumn(index, text, width, false);
+}
+
+bool cListView::insertColumn(size_t index, const std::string& text, u8 width, bool center) {
     if (index > _columns.size()) return false;
 
     cListColumn aColumn;
+    aColumn.center = center;
     aColumn.width = width;
     if (index > 0)
         aColumn.offset = _columns[index - 1].offset + _columns[index - 1].width;
@@ -108,6 +113,24 @@ void cListView::removeAllRows() {
     //_visibleRowCount = 0;
 }
 
+u32 cListView::getRowCount() {
+    return _rows.size();
+}
+
+void cListView::setRowHeight(u16 height) {
+    _rowHeight = height;
+    onResize();
+}
+
+void cListView::onResize() {
+    if (_rowHeight == 0) {
+        _visibleRowCount = 0;
+        return;
+    }
+
+    _visibleRowCount = size().y / _rowHeight;
+}
+
 void cListView::draw() {
     // dbg_printf( "cListView::draw %08x\n", this );
     // draw_frame();
@@ -142,6 +165,8 @@ void cListView::drawText() {
 
     for (size_t i = 0; i < total; ++i) {
         for (size_t j = 0; j < columnCount; ++j) {
+            bool columnCenter = _columns[j].center;
+            s32 columnWidth = _columns[j].width;
             s32 height = (_rows[_firstVisibleRowId + i][j].lines() * (font().GetHeight() + font().GetDescend())) - font().GetDescend();
             s32 itemX = position().x + _columns[j].offset;
             s32 itemY = position().y + i * _rowHeight;
@@ -153,11 +178,20 @@ void cListView::drawText() {
                 gdi().setPenColor(_textColor, _engine);
             if (ownerDraw.size()) {
                 ownerDraw(cOwnerDraw(_firstVisibleRowId + i, j, cPoint(itemX, itemY - 1),
-                                     cSize(_columns[j].width, _rowHeight), textY, height,
+                                     cSize(columnWidth, _rowHeight), textY, height,
                                      _rows[_firstVisibleRowId + i][j].text().c_str(), _engine));
-            } else {
-                gdi().textOutRect(itemX, textY, _columns[j].width, height,
+            } else if (!columnCenter && columnWidth > 0) {
+                gdi().textOutRect(itemX, textY, columnWidth, height,
                                   _rows[_firstVisibleRowId + i][j].text().c_str(), _engine);
+            } else if (columnWidth > 0) {
+                std::vector<std::string> lines = splitLines(_rows[_firstVisibleRowId + i][j].text());
+                for (size_t k = 0; k < lines.size(); k++) {
+                    std::string line = lines[k];
+                    s32 lineWidth = font().TextWidth(line);
+                    s32 lineX = itemX + ((columnWidth - lineWidth) / 2);
+                    s32 lineY = textY + 1 + k * (font().GetHeight() + font().GetDescend());
+                    gdi().textOutRect(lineX, lineY, lineWidth, height, line.c_str(), _engine);
+                }
             }
         }
     }

@@ -7,6 +7,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 std::string formatString(const char* fmt, ...);
 
@@ -21,3 +22,5 @@ std::string replaceInString(const std::string& s, const std::string& oldValue, c
 std::string toLowerString(const std::string& value);
 
 int linesInString(const std::string& value);
+
+std::vector<std::string> splitLines(const std::string& value);

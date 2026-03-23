@@ -21,6 +21,7 @@ class cListColumn {
     u32 index;
     u16 width;
     u16 offset;
+    bool center;
     std::string text;
 };
 
@@ -76,24 +77,17 @@ class cListView : public cWindow {
 
     bool insertColumn(size_t index, const std::string& text, u8 width);
 
+    bool insertColumn(size_t index, const std::string& text, u8 width, bool center);
+
     bool insertRow(size_t index, const std::vector<std::string>& text);
 
     void removeRow(size_t index);  // return id of the item next to the removed item
 
     void removeAllRows();
 
-    u32 getRowCount() { return _rows.size(); }
+    u32 getRowCount();
 
-    void setRowHeight(u16 height) {
-        _rowHeight = height;
-        setListViewSize(_size.x, _size.y);
-    }
-
-    void setListViewSize(u16 w, u16 h) {
-        setSize(cSize(w, h));
-        _visibleRowCount = h / _rowHeight;
-        // if( _visibleRowCount > _rows.size() ) _visibleRowCount = _rows.size();
-    }
+    void setRowHeight(u16 height);
 
     void arangeColumnsSize();
 
@@ -141,6 +135,8 @@ class cListView : public cWindow {
     virtual void onSelectedRowClicked(u32 index) {}
 
     virtual void onScrolled(u32 index) {}
+
+    virtual void onResize() override;
 
     virtual std::string processItemText(std::string text, int column);
 

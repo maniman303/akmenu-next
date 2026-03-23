@@ -45,14 +45,14 @@ cSettingWnd::cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     _buttonCancel.setStyle(cButton::press);
     _buttonCancel.setText("\x02 " + LANG("setting window", "cancel"));
     _buttonCancel.setTextColor(uis().buttonTextColor);
-    _buttonCancel.loadAppearance(SFN_BUTTON4);
+    _buttonCancel.loadAppearance(SFN_BUTTON3);
     _buttonCancel.clicked.connect(this, &cSettingWnd::onCancel);
     addChildWindow(&_buttonCancel);
 
     _buttonOK.setStyle(cButton::press);
     _buttonOK.setText("\x01 " + LANG("setting window", "ok"));
     _buttonOK.setTextColor(uis().buttonTextColor);
-    _buttonOK.loadAppearance(SFN_BUTTON4);
+    _buttonOK.loadAppearance(SFN_BUTTON3);
     _buttonOK.clicked.connect(this, &cSettingWnd::onOK);
     addChildWindow(&_buttonOK);
 

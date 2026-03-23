@@ -18,6 +18,7 @@
 using namespace akui;
 
 cDiskIcon::cDiskIcon() : cWindow(NULL, "diskicon") {
+    _show = true;
     _engine = GE_MAIN;
     _icon.init(1);
     _icon.setPosition(226, 174);
@@ -37,6 +38,7 @@ cWindow& cDiskIcon::loadAppearance(const std::string& aFileName) {
 
     u16 x = ini.GetInt("disk icon", "x", 238);
     u16 y = ini.GetInt("disk icon", "y", 172);
+    _show = ini.GetInt("disk icon", "show", _show);
     _icon.setPosition(x, y);
 
     cBMP15 icon = createBMP15FromFile(aFileName);
@@ -52,13 +54,18 @@ cWindow& cDiskIcon::loadAppearance(const std::string& aFileName) {
 }
 
 void cDiskIcon::blink(void) {
-    if (_icon.visible())
+    if (_icon.visible()) {
         _icon.hide();
-    else
+    } else if (_show) {
         _icon.show();
+    }
 }
 
 void cDiskIcon::turnOn() {
+    if (!_show) {
+        return;
+    }
+
     _icon.show();
 }
 

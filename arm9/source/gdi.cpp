@@ -522,7 +522,7 @@ s16 cGdi::textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENG
         } else {
             u32 ww, add;
             textFont.Info(text, &ww, &add);
-            if (x + (s16)ww < originX + w) {
+            if (x + (s16)ww <= originX + w) {
                 textFont.Draw((GE_MAIN == engine) ? (_bufferMain2 + _layerPitch) : _bufferSub2, x, y,
                             (const u8*)text, (GE_MAIN == engine) ? _penColor : _penColorSub);
             }

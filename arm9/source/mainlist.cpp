@@ -36,8 +36,8 @@
 
 using namespace akui;
 
-cMainList::cMainList(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
-    : cListView(x, y, w, h, parent, text),
+cMainList::cMainList(cWindow* parent, const std::string& text)
+    : cListView(4, 20, 248, 152, parent, text),
       _showAllFiles(false),
       _topCount(5),
       _topuSD(0),
@@ -46,6 +46,7 @@ cMainList::cMainList(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::str
       _topSlot1(2),
       _topSlot2(3) {
     _textOffset = 0;
+    _tallRowHeight = 38;
     _viewMode = VM_LIST;
     _activeIconScale = 1;
     _activeIcon.hide();
@@ -102,6 +103,15 @@ int cMainList::init() {
     _selectionBarColor1 = ini.GetInt("main list", "selectionBarColor1", RGB15(16, 20, 24));
     _selectionBarColor2 = ini.GetInt("main list", "selectionBarColor2", RGB15(20, 25, 0));
     _selectionBarOpacity = ini.GetInt("main list", "selectionBarOpacity", 100);
+    _tallRowHeight = ini.GetInt("main list", "tallRowHeight", 38);
+
+    s32 x = ini.GetInt("main list", "x", 4);
+    s32 y = ini.GetInt("main list", "y", 20);
+    setRelativePosition(cPoint(x, y));
+
+    s32 w = _parent->size().x - (2 * x);
+    s32 h = ini.GetInt("main list", "h", 152);
+    setSize(cSize(w, h));
 
     _itemBg = new akui::cImage(this);
     _itemBg->loadAppearance(SFN_MAIN_LIST_ITEM_BG);
@@ -110,7 +120,7 @@ int cMainList::init() {
 
     insertColumn(ICON_COLUMN, "icon", 0);
     insertColumn(SHOWNAME_COLUMN, "showName", 0);
-    insertColumn(INTERNALNAME_COLUMN, "internalName", 0);
+    insertColumn(INTERNALNAME_COLUMN, "internalName", 0, true);
     insertColumn(REALNAME_COLUMN, "realName", 0);  // hidden column for contain real filename
     insertColumn(SAVETYPE_COLUMN, "saveType", 0);
     insertColumn(FILESIZE_COLUMN, "fileSize", 0);
@@ -740,7 +750,7 @@ void cMainList::drawItemBackgrounds() {
     size_t total = std::min(_visibleRowCount, _rows.size() - _firstVisibleRowId);
 
     for (size_t i = 0; i < total; i++) {
-        s32 itemX = 0 - position().x;
+        s32 itemX = 0 - relativePosition().x;
         s32 itemY = i * _rowHeight;
 
         _itemBg->setRelativePosition(cPoint(itemX, itemY));
@@ -748,7 +758,7 @@ void cMainList::drawItemBackgrounds() {
     }
 }
 
-void cMainList::drawIcons()  // 直接画家算法画 icons
+void cMainList::drawIcons()
 {
     if (_viewMode == VM_LIST) {
         return;
@@ -778,31 +788,32 @@ void cMainList::setViewMode(VIEW_MODE mode) {
     switch (_viewMode) {
         case VM_LIST:
             _columns[ICON_COLUMN].width = 0;
-            _columns[SHOWNAME_COLUMN].width = 250;
+            _columns[SHOWNAME_COLUMN].width = size().x;
             _columns[INTERNALNAME_COLUMN].width = 0;
             arangeColumnsSize();
             setRowHeight(15);
             break;
         case VM_LIST_ICON:
             _columns[ICON_COLUMN].width = 21;
-            _columns[SHOWNAME_COLUMN].width = 232;
+            _columns[SHOWNAME_COLUMN].width = size().x - 21;
             _columns[INTERNALNAME_COLUMN].width = 0;
             arangeColumnsSize();
             setRowHeight(18);
             break;
         case VM_ICON:
             _columns[ICON_COLUMN].width = 36 + _textOffset;
-            _columns[SHOWNAME_COLUMN].width = 214 - _textOffset;
+            _columns[SHOWNAME_COLUMN].width = size().x - 36 - _textOffset;
             _columns[INTERNALNAME_COLUMN].width = 0;
             arangeColumnsSize();
-            setRowHeight(38);
+            setRowHeight(_tallRowHeight);
             break;
         case VM_INTERNAL:
             _columns[ICON_COLUMN].width = 36 + _textOffset;
             _columns[SHOWNAME_COLUMN].width = 0;
-            _columns[INTERNALNAME_COLUMN].width = 214 - _textOffset;
+            _columns[INTERNALNAME_COLUMN].width = size().x - 36 - _textOffset;
+            _columns[INTERNALNAME_COLUMN].center = true;
             arangeColumnsSize();
-            setRowHeight(38);
+            setRowHeight(_tallRowHeight);
             break;
     }
 

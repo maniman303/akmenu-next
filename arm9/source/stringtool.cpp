@@ -65,3 +65,19 @@ int linesInString(const std::string& value) {
 
     return std::count(value.begin(), value.end(), '\n') + 1;
 }
+
+std::vector<std::string> splitLines(const std::string& value) {
+    std::vector<std::string> result;
+
+    size_t start = 0;
+    size_t pos = 0;
+
+    while ((pos = value.find('\n', start)) != std::string::npos) {
+        result.emplace_back(value.substr(start, pos - start));
+        start = pos + 1;
+    }
+
+    result.emplace_back(value.substr(start));
+
+    return result;
+}

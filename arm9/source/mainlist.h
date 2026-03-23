@@ -35,7 +35,7 @@ class cMainList : public akui::cListView {
     };
 
   public:
-    cMainList(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text);
+    cMainList(cWindow* parent, const std::string& text);
 
     ~cMainList();
 
@@ -115,6 +115,8 @@ class cMainList : public akui::cListView {
 
   protected:
     int _textOffset;
+
+    int _tallRowHeight;
 
     akui::cImage* _itemBg;
 
