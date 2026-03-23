@@ -22,6 +22,9 @@ cSpinBox::cSpinBox(s32 x, s32 y, u32 w, u32 h, bool namedAppearance, cWindow* pa
     : cForm(x, y, w, h, parent, text),
       _prevButton(0, 0, 0, 0, this, ""),
       _nextButton(0, 0, 0, 0, this, ""),
+      _leftBg(this),
+      _middleBg(this),
+      _rightBg(this),
       _itemText(0, 0, 0, 0, this, "spinbox"),
       _namedAppearance(namedAppearance) {
     _normalColor = uiSettings().spinBoxNormalColor;  // RGB15( 0, 0, 31 );
@@ -109,21 +112,45 @@ void cSpinBox::setTextColor(COLOR color) {}
 void cSpinBox::draw() {
     // draw bar
     u16 barColor = _normalColor;
-    if (isActive()) {
+    if (_namedAppearance) {
+        _itemText.setTextColor(uiSettings().spinBoxTextNamedColor);
+    } else if (isActive()) {
         barColor = _focusedColor;
         _itemText.setTextColor(uiSettings().spinBoxTextHighLightColor);
     } else {
         _itemText.setTextColor(uiSettings().spinBoxTextColor);
     }
 
-    u8 bodyX1 = _prevButton.position().x + _prevButton.size().x;
-    u8 fillWidth = windowRectangle().size().x - _nextButton.size().x - _prevButton.size().x;
-    gdi().setPenColor(barColor, _engine);
-    gdi().fillRect(barColor, barColor, bodyX1, _position.y, fillWidth, _prevButton.size().y,
-                   selectedEngine());
-    gdi().setPenColor(_frameColor, _engine);
-    gdi().frameRect(bodyX1, _position.y, fillWidth, _prevButton.size().y, uiSettings().thickness,
+    bool drawBg = _leftBg.valid() || _middleBg.valid() || _rightBg.valid();
+    if (drawBg) {
+        s32 x = _prevButton.position().x + _prevButton.size().x;
+        s32 y = _prevButton.position().y;
+        _leftBg.draw(x, y);
+
+        x += _leftBg.size().x;
+        s32 middleWidth = _middleBg.size().x;
+        if (middleWidth > 0) {
+            s32 titleWidth = _nextButton.position().x - x - _rightBg.size().x;
+            s32 repeats = (titleWidth / middleWidth) + 1;
+            for (s32 i = 0; i < repeats; i++) {
+                _middleBg.draw(x + (i * middleWidth), y);
+            }
+        }
+
+        x = _nextButton.position().x - _rightBg.size().x;
+        _rightBg.draw(x, y);
+    } else {
+        gdi().setPenColor(barColor, _engine);
+
+        u8 bodyX1 = _prevButton.position().x + _prevButton.size().x;
+        u8 fillWidth = windowRectangle().size().x - _nextButton.size().x - _prevButton.size().x;
+        gdi().fillRect(barColor, barColor, bodyX1, _position.y, fillWidth, _prevButton.size().y,
                     selectedEngine());
+
+        gdi().setPenColor(_frameColor, _engine);
+        gdi().frameRect(bodyX1, _position.y, fillWidth, _prevButton.size().y, uiSettings().thickness,
+                        selectedEngine());
+    }
 
     // draw previous button
     _prevButton.draw();
@@ -139,6 +166,10 @@ cWindow& cSpinBox::loadAppearance(const std::string& aFileName) {
     if (_namedAppearance) {
         _prevButton.loadAppearance(SFN_SPINBUTTON_L_NAMED);
         _nextButton.loadAppearance(SFN_SPINBUTTON_R_NAMED);
+
+        _leftBg.loadAppearance(SFN_SPINBG_L_NAMED);
+        _middleBg.loadAppearance(SFN_SPINBG_M_NAMED);
+        _rightBg.loadAppearance(SFN_SPINBG_R_NAMED);
     }
 
     if (!_prevButton.valid()) {
@@ -176,8 +207,8 @@ void cSpinBox::arrangeText() {
     if (textWidth > _itemText.size().x) textWidth = _itemText.size().x;
 
     if (_namedAppearance) {
-        int headerWidth = 0;
-        int positionX = _prevButton.size().x + headerWidth + 5;
+        int xOffset = _leftBg.size().x == 0 ? 5 : _leftBg.size().x;
+        int positionX = _prevButton.size().x + xOffset;
         _itemText.setRelativePosition(cPoint(positionX, (_size.y - font().GetHeight()) >> 1));
         _itemText.setFont(true);
     } else {

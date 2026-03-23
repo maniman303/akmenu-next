@@ -14,6 +14,7 @@
 #include "button.h"
 #include "form.h"
 #include "statictext.h"
+#include "image.h"
 
 namespace akui {
 
@@ -63,6 +64,9 @@ class cSpinBox : public cForm {
     COLOR _frameColor;
     cButton _prevButton;
     cButton _nextButton;
+    cImage _leftBg;
+    cImage _middleBg;
+    cImage _rightBg;
     cStaticText _itemText;
     bool _namedAppearance;
     u32 _selectedItemId;

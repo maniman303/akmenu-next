@@ -18,6 +18,8 @@ namespace akui {
         _bitmapDesc = new cBitmapDesc();
         _bitmapDesc->loadData(aFileName);
 
+        setSize(_bitmapDesc->size());
+
         return *this;
     }
 

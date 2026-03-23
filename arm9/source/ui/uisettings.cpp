@@ -51,8 +51,8 @@ void cUISettings::loadSettings() {
     spinBoxNormalColor = ini.GetInt("global settings", "spinBoxNormalColor", spinBoxNormalColor);
     spinBoxFocusColor = ini.GetInt("global settings", "spinBoxFocusColor", spinBoxFocusColor);
     spinBoxTextColor = ini.GetInt("global settings", "spinBoxTextColor", spinBoxTextColor);
-    spinBoxTextHighLightColor =
-            ini.GetInt("global settings", "spinBoxTextHiLightColor", spinBoxTextHighLightColor);
+    spinBoxTextHighLightColor = ini.GetInt("global settings", "spinBoxTextHiLightColor", spinBoxTextHighLightColor);
+    spinBoxTextNamedColor = ini.GetInt("global settings", "spinBoxTextNamedColor", spinBoxTextColor);
     spinBoxFrameColor = ini.GetInt("global settings", "spinBoxFrameColor", spinBoxFrameColor);
     listViewBarColor1 = ini.GetInt("global settings", "listViewBarColor1", listViewBarColor1);
     listViewBarColor2 = ini.GetInt("global settings", "listViewBarColor2", listViewBarColor2);

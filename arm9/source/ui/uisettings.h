@@ -36,6 +36,7 @@ class cUISettings {
     COLOR spinBoxFocusColor;
     COLOR spinBoxTextColor;
     COLOR spinBoxTextHighLightColor;
+    COLOR spinBoxTextNamedColor;
     COLOR spinBoxFrameColor;
     COLOR listViewBarColor1;
     COLOR listViewBarColor2;
