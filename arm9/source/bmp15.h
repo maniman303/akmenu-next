@@ -16,8 +16,7 @@
 class cBMP15 {
     friend cBMP15 createBMP15(u32 width, u32 height);
     friend cBMP15 createBMP15FromFile(const std::string& filename);
-    friend cBMP15 createBMP15FromMem(void* mem);
-    // friend void destroyBMP15( cBMP15 * bmp );
+    friend void destroyBMP15(cBMP15& bmp);
 
   public:
     explicit cBMP15();
@@ -37,6 +36,10 @@ class cBMP15 {
 
     bool valid() const { return NULL != _buffer; }
 
+    std::string filename() const;
+
+    std::string filename(std::string filename);
+
   protected:
     u32 _width;
 
@@ -45,6 +48,10 @@ class cBMP15 {
     u32 _pitch;
 
     u32* _buffer;  // 按 32 位地址对齐，可以在 bitblt 的时候加快速度
+
+    std::string _filename;
+
+    void freeBuffer();
 };
 
 cBMP15 createBMP15(u32 width, u32 height);

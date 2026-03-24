@@ -56,7 +56,11 @@ void cCalendarWnd::draw() {
         bgFile = replaceInString(bgFile, ".bmp", "_cal5.bmp");
     }
 
-    _background = createBMP15FromFile(bgFile);
+    if (!_background.valid() || _background.filename() != bgFile) {
+        destroyBMP15(_background);
+        _background = createBMP15FromFile(bgFile);
+    }
+
     if (!_background.valid()) {
         _background = createBMP15FromFile(_filename);
     }

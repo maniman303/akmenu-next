@@ -14,9 +14,9 @@
 #include <string>
 #include "dbgtool.h"
 
-cBMP15::cBMP15() : _width(0), _height(0), _pitch(0), _buffer(NULL) {}
+cBMP15::cBMP15() : _width(0), _height(0), _pitch(0), _buffer(NULL), _filename("") {}
 
-cBMP15::cBMP15(u32 width, u32 height) : _width(0), _height(0), _pitch(0), _buffer(NULL) {
+cBMP15::cBMP15(u32 width, u32 height) : _width(0), _height(0), _pitch(0), _buffer(NULL), _filename("") {
     _width = width;
     _height = height;
     _pitch = (width + (width & 1)) << 1;
@@ -24,7 +24,26 @@ cBMP15::cBMP15(u32 width, u32 height) : _width(0), _height(0), _pitch(0), _buffe
 }
 
 cBMP15::~cBMP15() {
-    // dbg_printf( "cBMP15 %08x destructed\n", this );
+    // use destroyBMP15
+}
+
+void cBMP15::freeBuffer() {
+    if (_buffer == NULL) {
+        return;
+    }
+
+    delete[] _buffer;
+    _buffer = NULL;
+}
+
+std::string cBMP15::filename() const {
+    return _filename;
+}
+
+std::string cBMP15::filename(std::string filename) {
+    _filename = filename;
+
+    return _filename;
 }
 
 cBMP15 createBMP15(u32 width, u32 height) {
@@ -41,21 +60,16 @@ cBMP15 createBMP15(u32 width, u32 height) {
     return bmp;
 }
 
-typedef std::pair<std::string, cBMP15> str_bmp_pair;
-typedef std::list<str_bmp_pair> str_bmp_list;
+typedef std::list<cBMP15> str_bmp_list;
 static str_bmp_list _bmpPool;
-
-cBMP15 createBMP15FromMem(void* mem) {
-    return cBMP15();
-}
 
 cBMP15 createBMP15FromFile(const std::string& filename) {
     // dbg_printf( "createBMP15FromFile (%s)\n", filename );
 
     str_bmp_list::iterator it;
     for (it = _bmpPool.begin(); it != _bmpPool.end(); ++it) {
-        if (filename == it->first) {
-            return it->second;
+        if (it->filename() == filename) {
+            return *it;
         }
     }
 
@@ -121,9 +135,17 @@ cBMP15 createBMP15FromFile(const std::string& filename) {
         }
     }
 
-    str_bmp_pair bmpPoolItem(std::string(filename), bmp);
-    _bmpPool.push_back(bmpPoolItem);
+    bmp.filename(filename);
+    _bmpPool.push_back(bmp);
 
     // dbg_printf( "load bmp success, %08x\n", bmp.buffer() );
     return bmp;
+}
+
+void destroyBMP15(cBMP15& bmp) {
+    _bmpPool.remove_if([&](const cBMP15& testItem) {
+        return testItem.filename() == bmp.filename();
+    });
+
+    bmp.freeBuffer();
 }

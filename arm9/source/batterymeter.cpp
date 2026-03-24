@@ -62,7 +62,10 @@ void cBatteryMeter::draw() {
         return;
     }
 
-    _battery = createBMP15FromFile(newFile);
+    if (!_battery.valid() || _battery.filename() != newFile) {
+        destroyBMP15(_battery);
+        _battery = createBMP15FromFile(newFile);
+    }
 
     gdi().maskBlt(_battery.buffer(), position().x, position().y, _battery.width(), _battery.height(), selectedEngine());
 }

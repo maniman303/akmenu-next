@@ -34,6 +34,10 @@ cWindow& cBigClock::loadAppearance(const std::string& aFileName) {
     CIniFile ini(aFileName);
     _show = ini.GetInt("big clock", "show", _show);
 
+    if (!_show) {
+        return *this;
+    }
+
     int x = ini.GetInt("big clock", "x", 8);
     int y = ini.GetInt("big clock", "y", 80);
     setRelativePosition(cPoint(x, y));
