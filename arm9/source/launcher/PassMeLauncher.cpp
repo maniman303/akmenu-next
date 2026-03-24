@@ -8,23 +8,24 @@
 #include <string>
 #include <vector>
 
-#include "ILauncher.h"
 #include "PassMeLauncher.h"
 #include "nds_loader_arm9.h"
 
-bool PassMeLauncher::launchRom(std::string romPath, std::string savePath, u32 flags,
-                               u32 cheatOffset, u32 cheatSize, bool hb) {
-    const char passMeLoaderPath[] = "fat:/_nds/akmenunext/PassMeLoader.nds";
+std::unique_ptr<TaskWorker> PassMeLauncher::task() const {
+    return std::make_unique<PassMeLauncher>(*this);
+}
+
+bool PassMeLauncher::process() {
+    static const char passMeLoaderPath[] = "fat:/_nds/akmenunext/PassMeLoader.nds";
 
     if (access(passMeLoaderPath, F_OK) != 0) {
-        printLoaderNotFound(passMeLoaderPath);
-        return false;
+        showModalOk(LOADER_NOT_FOUND_TITLE, formatString(LOADER_NOT_FOUND_MESSAGE.c_str(), passMeLoaderPath));
+        return true;
     }
 
     std::vector<const char*> argv;
     argv.push_back(passMeLoaderPath);
-    eRunNdsRetCode rc = runNdsFile(argv[0], argv.size(), &argv[0]);
-    if (rc == RUN_NDS_OK) return true;
+    runNdsFile(argv[0], argv.size(), &argv[0]);
 
-    return false;
+    return true;
 }

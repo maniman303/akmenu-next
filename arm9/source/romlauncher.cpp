@@ -16,7 +16,7 @@
 
 #include "launcher/AcekardLauncher.h"
 #include "launcher/HomebrewLauncher.h"
-#include "launcher/ILauncher.h"
+#include "launcher/Launcher.h"
 #include "launcher/NdsBootstrapLauncher.h"
 #include "launcher/TopToyLauncher.h"
 #include "launcher/DSpicoLauncher.h"
@@ -142,7 +142,7 @@ TLaunchResult launchRom(const std::string& aFullPath, DSRomInfo& aRomInfo, bool 
     size_t cheatSize = 0;
     std::string saveName;
     std::string useSavesPath;
-    ILauncher* launcher = nullptr;
+    Launcher* launcher = nullptr;
     bool isDsiWare;
     bool hb = false;
 
@@ -274,17 +274,7 @@ TLaunchResult launchRom(const std::string& aFullPath, DSRomInfo& aRomInfo, bool 
         }
     }
 
-    MessageEntry message = launcher->prepareLaunchMessage();
-    if (message.empty()) {
-        launcher->launchRom(aFullPath, saveName, flags, cheatOffset, cheatSize, hb);
-        return ELaunchRomOk;
-    }
-
-    akui::cMessageBox::showModal(message.title, message.content, MB_OK,
-        [launcher, aFullPath, saveName, flags, cheatOffset, cheatSize, hb]() {
-            launcher->launchRom(aFullPath, saveName, flags, cheatOffset, cheatSize, hb);
-        });
-    
+    launcher->launchRom(aFullPath, saveName, flags, cheatOffset, cheatSize, hb);
     return ELaunchRomOk;
 }
 

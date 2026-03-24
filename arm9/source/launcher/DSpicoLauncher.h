@@ -8,20 +8,20 @@
 
 #include <nds/ndstypes.h>
 
-#include "../dsrom.h"
-#include "ILauncher.h"
+#include "Launcher.h"
+#include "DSpico/picoLoader7.h"
 
-class DSpicoLauncher : public ILauncher {
+class DSpicoLauncher : public Launcher {
   public:
-    bool launchRom(std::string romPath, std::string savePath, u32 flags, u32 cheatOffset,
-                   u32 cheatSize, bool hb) override;
+    std::unique_ptr<TaskWorker> task() const override;
+    bool process() override;
 
   private:
-    bool prepareCheats(void);
-    bool prepareIni(bool hb);
-    bool hotkeyCheck;
-    std::string mRomPath;
-    std::string mSavePath;
-    u32 mFlags;
-    DSRomInfo _romInfo;
+    FILE* _loader7;
+    FILE* _loader9;
+    pload_params_t _sLoadParams;
+    s64 _picoLoader7Size;
+    s64 _picoLoader9Size;
+    u8* _picoLoader7;
+    u8* _picoLoader9;
 };

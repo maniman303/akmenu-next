@@ -155,7 +155,7 @@ text = Version of nds-bootstrap
 release = Release
 nightly = Nightly
 firsttimetitle = Initializing nds-bootstrap
-firsttime = Press Ok to start first-time setup of nds-bootstrap. This may take a minute and is a one-time process.
+firsttime = System will now initialize the nds-bootstrap. This may take a minute and is a one-time process.
 dsmode = DS-Only Mode
 inimissingtitle = INI error
 inimissing = File ndsbs.ini from _nds/akmenunext is missing or is corrupt. Please restore this file or reinstall akmenu-next.
@@ -303,8 +303,12 @@ favorites = Favorites
 [loader]
 text = Use ROM loader
 not found = Loader not found
+not found message = Could not find '%s' loader.
+dsi pico = To run DSiWare please use Pico-Loader if available for this device.
 error = Error
 info = Information
+nds init = Initializing nds-bootstrap...
+ttmenu = Could not create TTMENU.SYS file.
 
 [loading]
 load text = Please wait...

@@ -9,12 +9,12 @@
 #include <nds/ndstypes.h>
 #include <string>
 
-#include "ILauncher.h"
+#include "Launcher.h"
 
-class TopToyLauncher : public ILauncher {
+class TopToyLauncher : public Launcher {
   public:
-    bool launchRom(std::string romPath, std::string savePath, u32 flags, u32 cheatOffset,
-                   u32 cheatSize, bool hb) override;
+    std::unique_ptr<TaskWorker> task() const override;
+    bool process() override;
 
   private:
     bool prepareCheats(void);

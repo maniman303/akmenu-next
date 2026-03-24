@@ -422,30 +422,12 @@ void cMainWnd::launchSelected() {
     dbg_printf("(%s)\n", fullPath.c_str());
     dbg_printf("%d\n", fullPath[fullPath.size() - 1]);
 
-    std::string title, text;
-    bool show = true;;
-    progressWnd().setTipText("Loading " + romName + "...");
-    progressWnd().show();
-    progressWnd().setPercent(0);
-    switch (launchRom(fullPath, rominfo,
-                      rominfo.isHomebrew() && "boot.nds" == toLowerString(fileName), savesPath)) {
-        case ELaunchNoFreeSpace:
-            title = LANG("no free space", "title");
-            text = LANG("no free space", "text");
-            break;
-        default:
-            show = false;
-            break;
-    }
-
-    progressWnd().setPercent(100);
-    progressWnd().hide();
-
-    if (!show) {
+    TLaunchResult launchRes = launchRom(fullPath, rominfo, rominfo.isHomebrew() && "boot.nds" == toLowerString(fileName), savesPath);
+    if (launchRes != ELaunchNoFreeSpace) {
         return;
     }
 
-    cMessageBox::showModal(title, text, MB_OK);
+    cMessageBox::showModal(LANG("no free space", "title"), LANG("no free space", "text"), MB_OK);
 }
 
 void cMainWnd::onKeyBPressed() {

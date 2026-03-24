@@ -19,7 +19,6 @@
 #include "../mainlist.h"
 #include "../systemfilenames.h"
 #include "../ui/progresswnd.h"
-#include "ILauncher.h"
 #include "TopToyLauncher.h"
 #include "libfat_ext/fat_ext.h"
 
@@ -122,6 +121,10 @@ typedef struct {
     u8 reserved[232];
 } PACKED TTSYSHeader;
 
+std::unique_ptr<TaskWorker> TopToyLauncher::task() const {
+    return std::make_unique<TopToyLauncher>(*this);
+}
+
 // TTMENU.SYS file creation. Sets up parameters for ttpatch.dat
 bool TopToyLauncher::prepareTTSYS(void) {
     char fname[0x1004] = {};
@@ -156,8 +159,7 @@ bool TopToyLauncher::prepareTTSYS(void) {
     return true;
 }
 
-bool TopToyLauncher::launchRom(std::string romPath, std::string savePath, u32 flags,
-                               u32 cheatOffset, u32 cheatSize, bool hb) {
+bool TopToyLauncher::process() {
     std::string loaderPath =
 #ifdef __TTLAUNCHER_M3__
             "fat:/TTMenu/m3patch.dat"
@@ -167,36 +169,38 @@ bool TopToyLauncher::launchRom(std::string romPath, std::string savePath, u32 fl
             ;
 
     if (access(loaderPath.c_str(), F_OK) != 0) {
-        printLoaderNotFound(loaderPath);
-        return false;
+        showModalOk(LOADER_NOT_FOUND_TITLE, formatString(LOADER_NOT_FOUND_MESSAGE.c_str(), loaderPath.c_str()));
+        return true;
     }
 
-    mRomPath = romPath;
-    mSavePath = savePath;
-    mFlags = flags;
+    mRomPath = _romPath;
+    mSavePath = _savePath;
+    mFlags = _flags;
 
     // Create TTMENU.SYS if it don't exist
     if (access("fat:/TTMENU.SYS", F_OK) != 0) {
-        progressWnd().setTipText("Generating TTMENU.SYS...");
-        progressWnd().show();
-        progressWnd().setPercent(0);
         FILE* TTSYSFile = fopen("fat:/TTMENU.SYS", "wb");
+        if (TTSYSFile == NULL) {
+            showModalOk(LANG("loader", "error"), LANG("loader", "ttmenu"));
+            return true;
+        }
+
         fseek(TTSYSFile, 0, SEEK_SET);
         // memdump. Actually just expanding the file seems to crash, but this works totally fine...
         fwrite((void*)0x02400000, 1, 0x400000, TTSYSFile);
         fflush(TTSYSFile);
         fclose(TTSYSFile);
-        progressWnd().setPercent(100);
-        progressWnd().hide();
     }
 
     // Prepare cheat codes if enabled
-    if (flags & PATCH_CHEATS) {
-        if (!prepareCheats()) return false;
+    if ((mFlags & PATCH_CHEATS) && !prepareCheats()) {
+        return true;
     }
 
     // Setup TTMenu system parameters
-    if (!prepareTTSYS()) return false;
+    if (!prepareTTSYS()) {
+        return true;
+    }
 
     FILE* loader = fopen(loaderPath.c_str(), "rb");
     tNDSHeader* header = (tNDSHeader*)malloc(sizeof(tNDSHeader));
@@ -238,5 +242,5 @@ bool TopToyLauncher::launchRom(std::string romPath, std::string savePath, u32 fl
 
     free(loader_arm7);
 
-    return false;
+    return true;
 }

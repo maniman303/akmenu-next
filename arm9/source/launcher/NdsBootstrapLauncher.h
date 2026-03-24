@@ -9,19 +9,21 @@
 #include <nds/ndstypes.h>
 
 #include "../dsrom.h"
-#include "ILauncher.h"
+#include "Launcher.h"
 
-class NdsBootstrapLauncher : public ILauncher {
+class NdsBootstrapLauncher : public Launcher {
   public:
-    bool launchRom(std::string romPath, std::string savePath, u32 flags, u32 cheatOffset, u32 cheatSize, bool hb) override;
-    MessageEntry prepareLaunchMessage() override;
+    std::unique_ptr<TaskWorker> task() const override;
+    bool process() override;
 
   private:
-    bool prepareCheats(void);
-    bool prepareIni(bool hb);
-    bool hotkeyCheck;
-    std::string mRomPath;
-    std::string mSavePath;
-    u32 mFlags;
+    bool prepareCheats(const std::string& mRomPath);
+    bool prepareIni(const std::string& mRomPath, const std::string& mSavePath, bool hb);
+    bool _messageBlock;
+    bool _useNightly;
+    std::string _mRomPath;
+    std::string _mSavePath;
+    u32 _mFlags;
     DSRomInfo _romInfo;
+    std::vector<const char*> _argv;
 };

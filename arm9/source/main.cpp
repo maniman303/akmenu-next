@@ -35,6 +35,7 @@
 #include "batterymeter.h"
 
 #include "ticksound.h"
+#include "taskcruncher.h"
 
 #include "smalldate.h"
 #include "smallclock.h"
@@ -155,8 +156,6 @@ int main(int argc, char* argv[]) {
     tickSound().load(SFN_UI_TICK_SOUND);
     sd().update();
 
-    gdi().initBg("", true);
-
     // set last directory
     std::string lastDirectory = "...", lastFile = "...";
     if (gs().enterLastDirWhenBoot || gs().autorunWithLastRom) {
@@ -174,6 +173,7 @@ int main(int argc, char* argv[]) {
         saveSram();
     }
 
+    gdi().initBg("", true);
     progressWnd().init();
 
     if (!fsManager().isRebooted() && gs().autorunWithLastRom && lastFile != "..." && !lastFile.empty()) {
@@ -227,7 +227,8 @@ int main(int argc, char* argv[]) {
         } else {
             ticks++;
         }
-
+        
+        taskCruncher().process();
         windowManager().update();
 
         irq().drawTop();

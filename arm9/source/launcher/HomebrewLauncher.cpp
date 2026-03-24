@@ -10,15 +10,16 @@
 
 #include "flags.h"
 #include "HomebrewLauncher.h"
-#include "ILauncher.h"
 #include "nds_loader_arm9.h"
 
-bool HomebrewLauncher::launchRom(std::string romPath, std::string savePath, u32 flags,
-                                 u32 cheatOffset, u32 cheatSize, bool hb) {
-    std::vector<const char*> argv;
-    argv.push_back(romPath.c_str());
-    eRunNdsRetCode rc = runNdsFile(argv[0], argv.size(), &argv[0]);
-    if (rc == RUN_NDS_OK) return true;
+std::unique_ptr<TaskWorker> HomebrewLauncher::task() const {
+    return std::make_unique<HomebrewLauncher>(*this);
+}
 
-    return false;
+bool HomebrewLauncher::process() {
+    std::vector<const char*> argv;
+    argv.push_back(_romPath.c_str());
+    runNdsFile(argv[0], argv.size(), &argv[0]);
+
+    return true;
 }
