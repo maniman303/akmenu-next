@@ -100,7 +100,9 @@ class cMainList : public akui::cListView {
 
     bool setupGameDir();
 
-    std::vector<std::vector<std::string>> getFavoriteRows(bool includeFolders);
+    std::vector<std::string> getLastPlayedRow();
+
+    std::vector<std::vector<std::string>> getFavoriteRows(bool exclusive);
 
     std::vector<std::vector<std::string>> getGameRows(int rowsToLoad);
 
@@ -117,6 +119,8 @@ class cMainList : public akui::cListView {
     int _textOffset;
 
     int _tallRowHeight;
+
+    bool _centerInternalColumn;
 
     akui::cImage* _itemBg;
 

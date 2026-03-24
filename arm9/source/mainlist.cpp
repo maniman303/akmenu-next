@@ -33,6 +33,8 @@
 #include "unknown_banner_bin.h"
 #include "windowmanager.h"
 #include "fsmngr.h"
+#include "savemngr.h"
+#include "logger.h"
 
 using namespace akui;
 
@@ -47,6 +49,7 @@ cMainList::cMainList(cWindow* parent, const std::string& text)
       _topSlot2(3) {
     _textOffset = 0;
     _tallRowHeight = 38;
+    _centerInternalColumn = false;
     _viewMode = VM_LIST;
     _activeIconScale = 1;
     _activeIcon.hide();
@@ -104,6 +107,7 @@ int cMainList::init() {
     _selectionBarColor2 = ini.GetInt("main list", "selectionBarColor2", RGB15(20, 25, 0));
     _selectionBarOpacity = ini.GetInt("main list", "selectionBarOpacity", 100);
     _tallRowHeight = ini.GetInt("main list", "tallRowHeight", 38);
+    _centerInternalColumn = ini.GetInt("main list", "centerInternalColumn", false);
 
     s32 x = ini.GetInt("main list", "x", 4);
     s32 y = ini.GetInt("main list", "y", 20);
@@ -120,7 +124,7 @@ int cMainList::init() {
 
     insertColumn(ICON_COLUMN, "icon", 0);
     insertColumn(SHOWNAME_COLUMN, "showName", 0);
-    insertColumn(INTERNALNAME_COLUMN, "internalName", 0, true);
+    insertColumn(INTERNALNAME_COLUMN, "internalName", 0, _centerInternalColumn);
     insertColumn(REALNAME_COLUMN, "realName", 0);  // hidden column for contain real filename
     insertColumn(SAVETYPE_COLUMN, "saveType", 0);
     insertColumn(FILESIZE_COLUMN, "fileSize", 0);
@@ -145,6 +149,12 @@ static bool itemSortComp(const cListView::itemVector& item1, const cListView::it
 
     if (realFn1.back() == '/' && realFn2.back() != '/') return true;
     if (realFn1.back() != '/' && realFn2.back() == '/') return false;
+
+    const bool isLastFn1 = (item1.size() > cMainList::IS_FAVORITE_COLUMN) && (item1[cMainList::IS_FAVORITE_COLUMN].text() == "last");
+    const bool isLastFn2 = (item2.size() > cMainList::IS_FAVORITE_COLUMN) && (item2[cMainList::IS_FAVORITE_COLUMN].text() == "last");
+
+    if (isLastFn1 && !isLastFn2) return true;
+    if (!isLastFn1 && isLastFn2) return false;
 
     const bool isFavFn1 = (item1.size() > cMainList::IS_FAVORITE_COLUMN) && (item1[cMainList::IS_FAVORITE_COLUMN].text() == "true");
     const bool isFavFn2 = (item2.size() > cMainList::IS_FAVORITE_COLUMN) && (item2[cMainList::IS_FAVORITE_COLUMN].text() == "true");
@@ -346,7 +356,32 @@ bool cMainList::setupDefaultDir(bool skipCards, bool skipFavorites) {
     return true;
 }
 
-std::vector<std::vector<std::string>> cMainList::getFavoriteRows(bool includeFolders) {
+std::vector<std::string> cMainList::getLastPlayedRow() {
+    std::vector<std::string> res;
+
+    std::string lastPlayedPath = saveManager().getLastInfo();
+    if (!fsManager().fileExists(lastPlayedPath)) {
+        return res;
+    }
+
+    std::string showName(lastPlayedPath);
+    size_t pos = showName.rfind('/', showName.length() - 2);
+    if (pos != showName.npos) {
+        showName = showName.substr(pos + 1, showName.npos);
+    }
+
+    res.push_back("");  // make a space for icon
+    res.push_back(showName);  // show name
+    res.push_back("");  // make a space for internal name
+    res.push_back(lastPlayedPath);  // real name
+    res.push_back(""); // space for save type
+    res.push_back(""); // space for file size
+    res.push_back("last"); // is last played
+
+    return res;
+}
+
+std::vector<std::vector<std::string>> cMainList::getFavoriteRows(bool exclusive) {
     std::vector<std::vector<std::string>> favoriteRows;
 
     CIniFile ini(SFN_FAVORITES);
@@ -355,7 +390,11 @@ std::vector<std::vector<std::string>> cMainList::getFavoriteRows(bool includeFol
     for (size_t i = 0; i < favoriteItems.size(); i++) {
         std::string item = favoriteItems[i];
 
-        if (item.empty() || (item.back() == '/' && !includeFolders)) {
+        if (item.empty() || (item.back() == '/' && exclusive)) {
+            continue;
+        }
+
+        if (exclusive && item == saveManager().getLastInfo()) {
             continue;
         }
         
@@ -440,6 +479,10 @@ std::vector<std::vector<std::string>> cMainList::getGameRows(int rowsToLoad) {
             }
 
             std::string fullFilePath = formatString("%s%s", path.c_str(), lfn.c_str());
+            if (fullFilePath == saveManager().getLastInfo()) {
+                continue;
+            }
+
             if (favoriteItems.find(fullFilePath) != favoriteItems.end()) {
                 continue;
             }
@@ -465,7 +508,12 @@ std::vector<std::vector<std::string>> cMainList::getGameRows(int rowsToLoad) {
 }
 
 bool cMainList::setupGameDir() {
-    std::vector<std::vector<std::string>> favoriteRows = getFavoriteRows(false);
+    std::vector<std::string> lastPlayedRow = getLastPlayedRow();
+    if (lastPlayedRow.size() > 0) {
+        insertEntryRow(getRowCount(), lastPlayedRow, DSRomInfo());
+    }
+
+    std::vector<std::vector<std::string>> favoriteRows = getFavoriteRows(true);
     for (size_t i = 0; i < favoriteRows.size(); i++) {
         insertEntryRow(getRowCount(), favoriteRows[i], DSRomInfo());
     }
@@ -522,7 +570,7 @@ bool cMainList::enterDir(const std::string& dirName) {
         removeAllRows();
         _romInfoList.clear();
 
-        std::vector<std::vector<std::string>> favoriteRows = getFavoriteRows(true);
+        std::vector<std::vector<std::string>> favoriteRows = getFavoriteRows(false);
         for (size_t i = 0; i < favoriteRows.size(); i++) {
             insertEntryRow(getRowCount(), favoriteRows[i], DSRomInfo());
         }
@@ -811,7 +859,7 @@ void cMainList::setViewMode(VIEW_MODE mode) {
             _columns[ICON_COLUMN].width = 36 + _textOffset;
             _columns[SHOWNAME_COLUMN].width = 0;
             _columns[INTERNALNAME_COLUMN].width = size().x - 36 - _textOffset;
-            _columns[INTERNALNAME_COLUMN].center = true;
+            _columns[INTERNALNAME_COLUMN].center = _centerInternalColumn;
             arangeColumnsSize();
             setRowHeight(_tallRowHeight);
             break;

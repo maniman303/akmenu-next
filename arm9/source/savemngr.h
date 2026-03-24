@@ -219,7 +219,11 @@ class cSaveManager {
 
     bool saveLastInfo(const std::string& romFilename);
 
+    bool loadLastInfo();
+
     bool loadLastInfo(std::string& lastLoadedFilename);
+
+    std::string getLastInfo();
 
     bool clearLastInfo();
 
@@ -238,6 +242,8 @@ class cSaveManager {
     std::vector<SAVE_INFO> _saveList;
 
     std::vector<SAVE_INFO_EX> _customSaveList;
+
+    std::string _lastLoadedFilename;
 };
 
 typedef t_singleton<cSaveManager> SaveManager_s;

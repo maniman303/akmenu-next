@@ -93,6 +93,8 @@ int main(int argc, char* argv[]) {
     // setting scripts
     gs().loadSettings();
 
+    saveManager().loadLastInfo()
+
     // init unicode
     // if( initUnicode() )
     //    _FAT_unicode_init( unicodeL2UTable, unicodeU2LTable, unicodeAnkTable );
@@ -152,53 +154,48 @@ int main(int argc, char* argv[]) {
     // enter last directory
     std::string lastDirectory = "...", lastFile = "...";
     if (gs().enterLastDirWhenBoot || gs().autorunWithLastRom) {
-        CIniFile f;
-        if (f.LoadIniFile(SFN_LAST_SAVEINFO)) {
-            lastFile = f.GetString("Save Info", "lastLoaded", "");
-            if ("" == lastFile) {
-                lastFile = "...";
-            } else if (gs().enterLastDirWhenBoot && gs().filePresentationMode < 2) {
-                size_t slashPos = lastFile.find_last_of('/');
-                if (lastFile.npos != slashPos) lastDirectory = lastFile.substr(0, slashPos + 1);
-            }
+        lastFile = saveManager().getLastInfo();
+        if ("" == lastFile) {
+            lastFile = "...";
+        } else if (gs().enterLastDirWhenBoot && gs().filePresentationMode < 2) {
+            size_t slashPos = lastFile.find_last_of('/');
+            if (lastFile.npos != slashPos) lastDirectory = lastFile.substr(0, slashPos + 1);
         }
     }
 
-    {  // backup save data from chip to flash. pressing LShift+Up aborts backup.
-        saveManager().clearLastInfo();
-        // backup gba sram save date to flash.
-        if (gs().gbaAutoSave && expansion().IsValid()) {
-            CIniFile f;
-            if (f.LoadIniFile(SFN_LAST_GBA_SAVEINFO)) {
-                std::string psramFile = f.GetString("Save Info", "lastLoaded", "");
-                if (psramFile != "") {
-                    cSram::SaveSramToFile(psramFile.c_str(), cExpansion::EPsramPage);
-                    f.SetString("Save Info", "lastLoaded", "");
-                    f.SaveIniFile(SFN_LAST_GBA_SAVEINFO);
-                }
-                std::string norFile = f.GetString("Save Info", "lastLoadedNOR", "");
-                if (norFile != "") {
-                    std::string norFileSave = norFile + ".sav";
-                    FILE* saveFile = fopen(norFileSave.c_str(), "rb");
-                    if (saveFile) {
-                        cSram::sSaveInfo saveInfo;
-                        cSram::ProcessRAW(saveFile, saveInfo);
-                        u8* bufFile = (u8*)malloc(saveInfo.size);
-                        if (bufFile) {
-                            memset(bufFile, 0, saveInfo.size);
-                            fread(bufFile, saveInfo.size, 1, saveFile);
-                            u8* bufData =
-                                    cSram::SaveSramToMemory(cExpansion::ENorPage, saveInfo, false);
-                            if (bufData) {
-                                if (memcmp(bufFile, bufData, saveInfo.size) != 0) {
-                                    cSram::SaveSramToFile(norFile.c_str(), cExpansion::ENorPage);
-                                }
-                                free(bufData);
+    // backup save data from chip to flash. pressing LShift+Up aborts backup.
+    // backup gba sram save date to flash.
+    if (gs().gbaAutoSave && expansion().IsValid()) {
+        CIniFile f;
+        if (f.LoadIniFile(SFN_LAST_GBA_SAVEINFO)) {
+            std::string psramFile = f.GetString("Save Info", "lastLoaded", "");
+            if (psramFile != "") {
+                cSram::SaveSramToFile(psramFile.c_str(), cExpansion::EPsramPage);
+                f.SetString("Save Info", "lastLoaded", "");
+                f.SaveIniFile(SFN_LAST_GBA_SAVEINFO);
+            }
+            std::string norFile = f.GetString("Save Info", "lastLoadedNOR", "");
+            if (norFile != "") {
+                std::string norFileSave = norFile + ".sav";
+                FILE* saveFile = fopen(norFileSave.c_str(), "rb");
+                if (saveFile) {
+                    cSram::sSaveInfo saveInfo;
+                    cSram::ProcessRAW(saveFile, saveInfo);
+                    u8* bufFile = (u8*)malloc(saveInfo.size);
+                    if (bufFile) {
+                        memset(bufFile, 0, saveInfo.size);
+                        fread(bufFile, saveInfo.size, 1, saveFile);
+                        u8* bufData =
+                                cSram::SaveSramToMemory(cExpansion::ENorPage, saveInfo, false);
+                        if (bufData) {
+                            if (memcmp(bufFile, bufData, saveInfo.size) != 0) {
+                                cSram::SaveSramToFile(norFile.c_str(), cExpansion::ENorPage);
                             }
-                            free(bufFile);
+                            free(bufData);
                         }
-                        fclose(saveFile);
+                        free(bufFile);
                     }
+                    fclose(saveFile);
                 }
             }
         }

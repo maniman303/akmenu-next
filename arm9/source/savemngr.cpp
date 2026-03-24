@@ -26,7 +26,7 @@
 
 using namespace akui;
 
-cSaveManager::cSaveManager() {}
+cSaveManager::cSaveManager() : _lastLoadedFilename("") {}
 
 cSaveManager::~cSaveManager() {}
 
@@ -142,20 +142,31 @@ bool cSaveManager::saveLastInfo(const std::string& romFilename) {
     f.SetString("Save Info", "lastLoaded", romFilename);
     if (!f.SaveIniFile(SFN_LAST_SAVEINFO)) return false;
 
+    _lastLoadedFilename = romFilename;
+
     return true;
+}
+
+bool cSaveManager::loadLastInfo() {
+    std::string filename;
+    return loadLastInfo(filename);
 }
 
 bool cSaveManager::loadLastInfo(std::string& lastLoadedFilename) {
     CIniFile f;
     if (!f.LoadIniFile(SFN_LAST_SAVEINFO)) {
-        lastLoadedFilename = "";
+        _lastLoadedFilename = lastLoadedFilename = "";
         return false;
     }
 
-    lastLoadedFilename = f.GetString("Save Info", "lastLoaded", "");
+    _lastLoadedFilename = lastLoadedFilename = f.GetString("Save Info", "lastLoaded", "");
     if ("" == lastLoadedFilename) return false;
 
     return true;
+}
+
+std::string cSaveManager::getLastInfo() {
+    return _lastLoadedFilename;
 }
 
 bool cSaveManager::clearLastInfo() {
@@ -163,6 +174,7 @@ bool cSaveManager::clearLastInfo() {
     if (loadLastInfo(loadLoadedFile)) {
         return saveLastInfo("");
     }
+    
     return true;
 }
 
