@@ -92,12 +92,16 @@ void cGdi::init() {
     cSprite::sysinit();
 }
 
-void cGdi::initBg(const std::string& aFileName) {
+void cGdi::initBg(const std::string& aFileName, bool refresh) {
+    if (_sprites != NULL) {
+        delete[] _sprites;
+    }
+
     _sprites = new cSprite[12];
     _background = createBMP15FromFile(aFileName);
-    if (_background.width() < SCREEN_WIDTH && _background.height() < SCREEN_WIDTH) {
+    if (!_background.valid() || (_background.width() < SCREEN_WIDTH && _background.height() < SCREEN_WIDTH)) {
         _background = createBMP15(SCREEN_WIDTH, SCREEN_HEIGHT);
-        zeroMemory(_background.buffer(), _background.height() * _background.pitch());
+        fillMemory(_background.buffer(), _background.height() * _background.pitch(), 0xffffffff);
     }
     u32 pitch = _background.pitch() >> 1;
     for (size_t ii = 0; ii < 3; ++ii) {
@@ -117,7 +121,10 @@ void cGdi::initBg(const std::string& aFileName) {
             _sprites[index].show();
         }
     }
-    oamUpdate(&oamMain);
+
+    if (refresh) {
+        oamUpdate(&oamMain);
+    }
 }
 
 void cGdi::swapLCD(void) {

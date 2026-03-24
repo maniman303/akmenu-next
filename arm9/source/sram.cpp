@@ -103,16 +103,11 @@ void cSram::SaveSramToFile(const char* romName, u16 aStartPage) {
     saveFile = fopen(saveName, "wb");
     if (saveFile) {
         fwrite(&saveInfo, sizeof(saveInfo), 1, saveFile);
-        progressWnd().setTipText(LANG("progress window", "gba save store"));
-        progressWnd().show();
-        progressWnd().setPercent(0);
         u8* buf = SaveSramToMemory(aStartPage, saveInfo, true);
         if (buf) {
             fwrite(buf, saveInfo.size, 1, saveFile);
             free(buf);
         }
-        progressWnd().setPercent(100);
-        progressWnd().hide();
         fclose(saveFile);
     }
 }
@@ -124,7 +119,7 @@ u8* cSram::SaveSramToMemory(u16 aStartPage, sSaveInfo& aSaveInfo, bool aShowProg
         memset(buf, 0, aSaveInfo.size);
 
         int page = aSaveInfo.offset / SRAM_PAGE_SIZE, offset = aSaveInfo.offset % SRAM_PAGE_SIZE,
-            size = aSaveInfo.size, bufOffset = 0, ii = 0;
+            size = aSaveInfo.size, bufOffset = 0;
         while (page < SRAM_SAVE_PAGES && size > 0) {
             expansion().SetRampage(page + aStartPage);
             int maxSize = SRAM_PAGE_SIZE - offset, bufSize = (size > maxSize) ? maxSize : size;
@@ -133,8 +128,6 @@ u8* cSram::SaveSramToMemory(u16 aStartPage, sSaveInfo& aSaveInfo, bool aShowProg
             size -= bufSize;
             offset = 0;
             page++;
-            if (aShowProgress && ii++ % 4 == 0)
-                progressWnd().setPercent(bufOffset * 90 / aSaveInfo.size);
         }
         cExpansion::CloseNorWrite();
     }

@@ -268,7 +268,6 @@ bool NdsBootstrapLauncher::launchRom(std::string romPath, std::string savePath, 
         }
         progressWnd().setTipText("Initializing nds-bootstrap...");
         progressWnd().show();
-        progressWnd().setPercent(0);
         //Clean up old INI
         if (access("/_nds/nds-bootstrap/nds-bootstrap.ini", F_OK) == 0) {
         remove("/_nds/nds-bootstrap/nds-bootstrap.ini");

@@ -62,6 +62,51 @@ void __libnds_exit(int rc) {}
 }
 #endif
 
+void saveSram() {
+    CIniFile f;
+    if (!f.LoadIniFile(SFN_LAST_GBA_SAVEINFO)) {
+        return;
+    }
+
+    std::string psramFile = f.GetString("Save Info", "lastLoaded", "");
+    if (psramFile != "") {
+        cSram::SaveSramToFile(psramFile.c_str(), cExpansion::EPsramPage);
+        f.SetString("Save Info", "lastLoaded", "");
+        f.SaveIniFile(SFN_LAST_GBA_SAVEINFO);
+    }
+
+    std::string norFile = f.GetString("Save Info", "lastLoadedNOR", "");
+    if (norFile.empty()) {
+        return; 
+    }
+    
+    std::string norFileSave = norFile + ".sav";
+    FILE* saveFile = fopen(norFileSave.c_str(), "rb");
+    if (saveFile == NULL) {
+        return;
+    }
+
+    cSram::sSaveInfo saveInfo;
+    cSram::ProcessRAW(saveFile, saveInfo);
+    u8* bufFile = (u8*)malloc(saveInfo.size);
+    if (bufFile) {
+        memset(bufFile, 0, saveInfo.size);
+        fread(bufFile, saveInfo.size, 1, saveFile);
+        u8* bufData = cSram::SaveSramToMemory(cExpansion::ENorPage, saveInfo, false);
+        if (bufData) {
+            if (memcmp(bufFile, bufData, saveInfo.size) != 0) {
+                cSram::SaveSramToFile(norFile.c_str(), cExpansion::ENorPage);
+            }
+
+            free(bufData);
+        }
+        
+        free(bufFile);
+    }
+
+    fclose(saveFile);
+}
+
 int main(int argc, char* argv[]) {
     irq().init();
 
@@ -94,10 +139,7 @@ int main(int argc, char* argv[]) {
     gs().loadSettings();
 
     saveManager().loadLastInfo()
-
-    // init unicode
-    // if( initUnicode() )
-    //    _FAT_unicode_init( unicodeL2UTable, unicodeU2LTable, unicodeAnkTable );
+    
     cwl();
 
     lang();  // load language file
@@ -113,49 +155,13 @@ int main(int argc, char* argv[]) {
     tickSound().load(SFN_UI_TICK_SOUND);
     sd().update();
 
-    calendarWnd().init();
-    calendarWnd().draw();
-    calendar().init();
-    calendar().draw();
-    bigClock().init();
-    bigClock().draw();
-    batteryMeter().init();
-    batteryMeter().draw();
+    gdi().initBg("", true);
 
-    smallDate().init();
-    smallDate().draw();
-    smallClock().init();
-    smallClock().draw();
-
-    userWindow().draw();
-
-    gdi().initBg(SFN_LOWER_SCREEN_BG);
-
-    swiWaitForVBlank();
-
-    gdi().present(GE_SUB);
-    gdi().present(GE_MAIN);
-
-    cMainWnd* wnd = new cMainWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, "main window");
-    wnd->init();
-
-    timer().updateFps();
-
-    progressWnd().init();
-    
-    windowManager().update();
-
-    gdi().present(GE_MAIN);
-
-    dbg_printf("loop start\n");
-
-    irq().vblankStart();
-
-    // enter last directory
+    // set last directory
     std::string lastDirectory = "...", lastFile = "...";
     if (gs().enterLastDirWhenBoot || gs().autorunWithLastRom) {
         lastFile = saveManager().getLastInfo();
-        if ("" == lastFile) {
+        if (lastFile.empty()) {
             lastFile = "...";
         } else if (gs().enterLastDirWhenBoot && gs().filePresentationMode < 2) {
             size_t slashPos = lastFile.find_last_of('/');
@@ -163,48 +169,32 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    // backup save data from chip to flash. pressing LShift+Up aborts backup.
-    // backup gba sram save date to flash.
+    // Backup save data from chip and gba sram save data to flash.
     if (gs().gbaAutoSave && expansion().IsValid()) {
-        CIniFile f;
-        if (f.LoadIniFile(SFN_LAST_GBA_SAVEINFO)) {
-            std::string psramFile = f.GetString("Save Info", "lastLoaded", "");
-            if (psramFile != "") {
-                cSram::SaveSramToFile(psramFile.c_str(), cExpansion::EPsramPage);
-                f.SetString("Save Info", "lastLoaded", "");
-                f.SaveIniFile(SFN_LAST_GBA_SAVEINFO);
-            }
-            std::string norFile = f.GetString("Save Info", "lastLoadedNOR", "");
-            if (norFile != "") {
-                std::string norFileSave = norFile + ".sav";
-                FILE* saveFile = fopen(norFileSave.c_str(), "rb");
-                if (saveFile) {
-                    cSram::sSaveInfo saveInfo;
-                    cSram::ProcessRAW(saveFile, saveInfo);
-                    u8* bufFile = (u8*)malloc(saveInfo.size);
-                    if (bufFile) {
-                        memset(bufFile, 0, saveInfo.size);
-                        fread(bufFile, saveInfo.size, 1, saveFile);
-                        u8* bufData =
-                                cSram::SaveSramToMemory(cExpansion::ENorPage, saveInfo, false);
-                        if (bufData) {
-                            if (memcmp(bufFile, bufData, saveInfo.size) != 0) {
-                                cSram::SaveSramToFile(norFile.c_str(), cExpansion::ENorPage);
-                            }
-                            free(bufData);
-                        }
-                        free(bufFile);
-                    }
-                    fclose(saveFile);
-                }
-            }
-        }
+        saveSram();
     }
 
-    if (!fsManager().isRebooted() && gs().autorunWithLastRom && "..." != lastFile) {
+    progressWnd().init();
+
+    if (!fsManager().isRebooted() && gs().autorunWithLastRom && lastFile != "..." && !lastFile.empty()) {
         INPUT& inputs = updateInput();
         if (!(inputs.keysHeld & KEY_B)) autoLaunchRom(lastFile);
     }
+
+    calendarWnd().init();
+    calendar().init();
+    bigClock().init();
+    batteryMeter().init();
+
+    smallDate().init();
+    smallClock().init();
+
+    cMainWnd* wnd = new cMainWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, "main window");
+    wnd->init();
+
+    timer().updateFps();
+
+    irq().vblankStart();
 
     dbg_printf("lastDirectory '%s'\n", lastDirectory.c_str());
     if (!wnd->_mainList->enterDir("..." != lastDirectory ? lastDirectory : gs().startupFolder))
@@ -216,6 +206,8 @@ int main(int argc, char* argv[]) {
     }
 
     u16 ticks = 0;
+
+    bool isBgInit = false;
 
     while (true) {
         timer().updateFps();
@@ -237,12 +229,16 @@ int main(int argc, char* argv[]) {
         }
 
         windowManager().update();
-        
-        gdi().present(GE_MAIN);
 
         irq().drawTop();
 
+        if (!isBgInit) {
+            gdi().initBg(SFN_LOWER_SCREEN_BG, false);
+            isBgInit = true;
+        }
+
         gdi().present(GE_SUB);
+        gdi().present(GE_MAIN);
     }
 
     return 0;

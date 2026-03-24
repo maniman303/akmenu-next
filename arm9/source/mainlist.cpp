@@ -237,14 +237,6 @@ bool cMainList::insertEntryRow(size_t index, const std::vector<std::string>& tex
 void cMainList::processDirIcons() {
     std::string folder = getIconPath("folder_banner.bin");
     for (size_t ii = 0; ii < _rows.size(); ++ii) {
-        ////_romInfoList.push_back( rominfo );
-
-        // 这段代码会引起拷贝文件完成后的图标显示不正确，因为图标的内容还没有被读入，就去更新了active
-        // icon的内容
-        // u8 percent = ii * 100 / _rows.size();
-        // if( !(percent & 0x07) )
-        //    progressWnd().setPercent( percent );
-
         DSRomInfo& rominfo = _romInfoList[ii];
         std::string filename = _rows[ii][REALNAME_COLUMN].text();
 
