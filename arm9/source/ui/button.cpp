@@ -164,10 +164,12 @@ void cButtonDesc::loadData(const std::string& filename) {
     if (!_background.valid()) {
         _background = createBMP15FromFile(filename);
         if (_background.valid()) {
-            if (_button->style() == cButton::single)
+            if (_button->style() == cButton::single) {
                 height = _background.height();
-            else
+            } else {
                 height = _background.height() / 2;
+            }
+                
             _button->setSize(cSize(_background.width(), height));
         }
     }

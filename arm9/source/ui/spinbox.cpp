@@ -197,7 +197,8 @@ void cSpinBox::onMove() {
 }
 
 void cSpinBox::arrangeText() {
-    s32 textWidth = _items.size() ? font().TextWidth(_items[_selectedItemId]) : 0;
+    cFont& textFont = _namedAppearance ? font() : fontSecondary();
+    s32 textWidth = _items.size() ? textFont.TextWidth(_items[_selectedItemId]) : 0;
     if (textWidth > _itemText.size().x) textWidth = _itemText.size().x;
 
     if (_namedAppearance) {
@@ -206,7 +207,8 @@ void cSpinBox::arrangeText() {
         _itemText.setRelativePosition(cPoint(positionX, (_size.y - font().GetHeight()) >> 1));
         _itemText.setFont(true);
     } else {
-        _itemText.setRelativePosition(cPoint((_size.x - textWidth) >> 1, (_size.y - fontSecondary().GetHeight()) >> 1));
+        int textX = _prevButton.relativePosition().x + _prevButton.size().x + ((size().x - _prevButton.size().x - _nextButton.size().x - textWidth) / 2);
+        _itemText.setRelativePosition(cPoint(textX, (_size.y - fontSecondary().GetHeight()) >> 1));
         _itemText.setFont(false);
     }
 }
@@ -214,10 +216,6 @@ void cSpinBox::arrangeText() {
 void cSpinBox::arrangeButton() {
     u8 x = 0;
     _prevButton.setRelativePosition(cPoint(x, (_size.y - _prevButton.size().y) / 2));
-
-    x = _prevButton.size().x;
-    u8 fontHeight = _namedAppearance ? font().GetHeight() : fontSecondary().GetHeight();
-    _itemText.setRelativePosition(cPoint(x, (_size.y - fontHeight) / 2));
 
     x = size().x - _nextButton.size().x;
     _nextButton.setRelativePosition(cPoint(x, (_size.y - _nextButton.size().y)));

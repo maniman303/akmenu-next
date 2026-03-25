@@ -28,7 +28,7 @@ cStaticText::~cStaticText() {}
 
 void cStaticText::draw() {
     gdi().setPenColor(_textColor, _engine);
-    gdi().textOutRect(position().x, position().y, _size.x, _size.y, _text.c_str(), selectedEngine(), _primaryFont ? font() : fontSecondary());
+    gdi().textOutRect(position().x, position().y, size().x, size().y, _text.c_str(), selectedEngine(), _primaryFont ? font() : fontSecondary());
 }
 
 cWindow& cStaticText::loadAppearance(const std::string& aFileName) {

@@ -33,6 +33,7 @@
 #include "calendarwnd.h"
 #include "datetime.h"
 #include "batterymeter.h"
+#include "screenoverlay.h"
 
 #include "ticksound.h"
 #include "taskcruncher.h"
@@ -178,6 +179,11 @@ int main(int argc, char* argv[]) {
     gdi().initBg("", true);
     progressWnd().init();
 
+    *(u32*)(0xCFFFD0C) = 0x454D4D43;
+    while (*(u32*)(0xCFFFD0C) != 0) {
+        swiDelay(100);
+    }
+
     if (!fsManager().isRebooted() && gs().autorunWithLastRom && lastFile != "..." && !lastFile.empty()) {
         INPUT& inputs = updateInput();
         if (!(inputs.keysHeld & KEY_B)) {
@@ -186,19 +192,23 @@ int main(int argc, char* argv[]) {
                 runAutoLoop = false;
             });
 
+            windowManager().addWindow(&screenOverlay());
+
             while (runAutoLoop) {
+                swiWaitForVBlank();
+
                 inputs = updateInput();
                 processInput(inputs);
                 
                 taskCruncher().process();
                 windowManager().update();
 
-                swiWaitForVBlank();
-
                 gdi().present(GE_MAIN);
             }
         }
     }
+
+    windowManager().removeWindow(&screenOverlay());
 
     calendarWnd().init();
     calendar().init();
@@ -218,11 +228,6 @@ int main(int argc, char* argv[]) {
     dbg_printf("lastDirectory '%s'\n", lastDirectory.c_str());
     if (!wnd->_mainList->enterDir("..." != lastDirectory ? lastDirectory : gs().startupFolder))
         wnd->_mainList->enterDir("...");
-
-    *(u32*)(0xCFFFD0C) = 0x454D4D43;
-    while (*(u32*)(0xCFFFD0C) != 0) {
-        swiDelay(100);
-    }
 
     u16 ticks = 0;
 

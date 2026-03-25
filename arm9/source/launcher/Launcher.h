@@ -2,6 +2,7 @@
 
 #include <nds/ndstypes.h>
 #include <string>
+#include <memory>
 #include "../language.h"
 #include "../ui/msgbox.h"
 #include "../taskworker.h"

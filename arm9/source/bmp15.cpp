@@ -9,9 +9,9 @@
 
 //�
 
-#include "bmp15.h"
 #include <list>
 #include <string>
+#include "bmp15.h"
 #include "dbgtool.h"
 
 cBMP15::cBMP15() : _width(0), _height(0), _pitch(0), _buffer(NULL), _filename("") {}
@@ -57,6 +57,13 @@ cBMP15 createBMP15(u32 width, u32 height) {
     if (bufferSize & 3)  // 如果 bufferSize 不是按4字节对齐，就把他调整到对齐
         bufferSize += 4 - (bufferSize & 3);
     bmp._buffer = new u32[bufferSize >> 2];
+    return bmp;
+}
+
+cBMP15 createBMP15(u32 width, u32 height, u32 color) {
+    cBMP15 bmp = createBMP15(width, height);
+    swiFastCopy((void*)(&color), bmp.buffer(), ((bmp.height() * bmp.pitch()) >> 2) | COPY_MODE_WORD | COPY_MODE_FILL);
+
     return bmp;
 }
 

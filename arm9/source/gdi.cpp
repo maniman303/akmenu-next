@@ -100,8 +100,7 @@ void cGdi::initBg(const std::string& aFileName, bool refresh) {
     _sprites = new cSprite[12];
     _background = createBMP15FromFile(aFileName);
     if (!_background.valid() || (_background.width() < SCREEN_WIDTH && _background.height() < SCREEN_WIDTH)) {
-        _background = createBMP15(SCREEN_WIDTH, SCREEN_HEIGHT);
-        fillMemory(_background.buffer(), _background.height() * _background.pitch(), 0xffffffff);
+        _background = createBMP15(SCREEN_WIDTH, SCREEN_HEIGHT, 0xffffffff);
     }
     u32 pitch = _background.pitch() >> 1;
     for (size_t ii = 0; ii < 3; ++ii) {
