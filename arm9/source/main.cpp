@@ -179,11 +179,6 @@ int main(int argc, char* argv[]) {
     gdi().initBg("", true);
     progressWnd().init();
 
-    *(u32*)(0xCFFFD0C) = 0x454D4D43;
-    while (*(u32*)(0xCFFFD0C) != 0) {
-        swiDelay(100);
-    }
-
     if (!fsManager().isRebooted() && gs().autorunWithLastRom && lastFile != "..." && !lastFile.empty()) {
         INPUT& inputs = updateInput();
         if (!(inputs.keysHeld & KEY_B)) {
@@ -230,8 +225,12 @@ int main(int argc, char* argv[]) {
         wnd->_mainList->enterDir("...");
 
     u16 ticks = 0;
-
     bool isBgInit = false;
+
+    *(u32*)(0xCFFFD0C) = 0x454D4D43;
+    while (*(u32*)(0xCFFFD0C) != 0) {
+        swiDelay(100);
+    }
 
     while (true) {
         timer().updateFps();
