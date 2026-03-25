@@ -10,12 +10,14 @@
 #include "gdi.h"
 #include <cstdio>
 #include <cstring>
+#include <string>
 #include "../../share/memtool.h"
 #include "dbgtool.h"
 #include "fontfactory.h"
 #include "globalsettings.h"
 #include "sprite.h"
 #include "userinput.h"
+#include "logger.h"
 
 static inline void dmaCopyWordsGdi(uint8 channel, const void* src, void* dest, uint32 size) {
     DC_FlushRange(src, size);
@@ -407,23 +409,32 @@ void cGdi::bitBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16
 void cGdi::bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH,
                   GRAPHICS_ENGINE engine) {
     u16* pSrc = (u16*)src;
-    u16* pDest = NULL;
-
-    if (GE_MAIN == engine)
-        pDest = _bufferMain2 + (destY)*256 + destX + _layerPitch;
-    else
-        pDest = _bufferSub2 + (destY)*256 + destX;
+    u16* pDest = (engine == GE_MAIN) ? 
+                    (_bufferMain2 + (destY * 256) + destX + _layerPitch) : 
+                    (_bufferSub2 + (destY * 256) + destX);
 
     u16 pitchPixel = (destW + (destW & 1));
     u16 destInc = 256 - pitchPixel;
     u16 halfPitch = pitchPixel >> 1;
-    u16 remain = pitchPixel & 1;
+
+    bool destAligned = !(destX & 1);
+    if (!destAligned) {
+        for (u16 i = 0; i < destH; ++i) {
+            for (u16 j = 0; j < pitchPixel; ++j) {
+                *pDest = *pSrc;
+                pDest++;
+                pSrc++;
+            }
+            pDest += destInc;
+        }
+
+        return;
+    }
 
     for (u16 i = 0; i < destH; ++i) {
         swiFastCopy(pSrc, pDest, COPY_MODE_WORD | COPY_MODE_COPY | halfPitch);
         pDest += halfPitch << 1;
         pSrc += halfPitch << 1;
-        if (remain) *pDest++ = *pSrc++;
         pDest += destInc;
     }
 }

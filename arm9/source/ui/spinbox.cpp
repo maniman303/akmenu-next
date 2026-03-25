@@ -7,10 +7,12 @@
     SPDX-License-Identifier: GPL-3.0-or-later
 */
 
+#include <math.h>
+#include <string>
 #include "spinbox.h"
 #include "fontfactory.h"
 #include "ui.h"
-#include <math.h>
+#include "logger.h"
 
 //#include "windowmanager.h"
 
@@ -135,6 +137,7 @@ void cSpinBox::draw() {
             }
         }
 
+        // logger().info("Right bg size x: " + std::to_string(_rightBg.size().x) + ".");
         x = _nextButton.position().x - _rightBg.size().x;
         _rightBg.draw(x, y);
     } else {

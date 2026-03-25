@@ -20,7 +20,6 @@ cBMP15::cBMP15(u32 width, u32 height) : _width(0), _height(0), _pitch(0), _buffe
     _width = width;
     _height = height;
     _pitch = (width + (width & 1)) << 1;
-    // u32 pitch = (((width*16)+31)>>5)<<2;            // 通用算法？
 }
 
 cBMP15::~cBMP15() {
@@ -86,7 +85,6 @@ cBMP15 createBMP15FromFile(const std::string& filename) {
         return cBMP15();
     }
 
-    // 读取文件长度
     fseek(f, 0, SEEK_END);
     int fileSize = ftell(f);
 
@@ -104,14 +102,12 @@ cBMP15 createBMP15FromFile(const std::string& filename) {
         return cBMP15();
     }
 
-    // 找出bmp高和宽
     u32 width = 0;
     u32 height = 0;
     fseek(f, 0x12, SEEK_SET);
     fread(&width, 1, 4, f);
     fseek(f, 0x16, SEEK_SET);
     fread(&height, 1, 4, f);
-    // dbg_printf( "w:%d h:%d\n", width, height );
 
     cBMP15 bmp = createBMP15(width, height);
 
