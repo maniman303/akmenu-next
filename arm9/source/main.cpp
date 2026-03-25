@@ -63,6 +63,8 @@ void __libnds_exit(int rc) {}
 }
 #endif
 
+static bool runAutoLoop = false;
+
 void saveSram() {
     CIniFile f;
     if (!f.LoadIniFile(SFN_LAST_GBA_SAVEINFO)) {
@@ -178,7 +180,24 @@ int main(int argc, char* argv[]) {
 
     if (!fsManager().isRebooted() && gs().autorunWithLastRom && lastFile != "..." && !lastFile.empty()) {
         INPUT& inputs = updateInput();
-        if (!(inputs.keysHeld & KEY_B)) autoLaunchRom(lastFile);
+        if (!(inputs.keysHeld & KEY_B)) {
+            runAutoLoop = true;
+            autoLaunchRom(lastFile, []() {
+                runAutoLoop = false;
+            });
+
+            while (runAutoLoop) {
+                inputs = updateInput();
+                processInput(inputs);
+                
+                taskCruncher().process();
+                windowManager().update();
+
+                swiWaitForVBlank();
+
+                gdi().present(GE_MAIN);
+            }
+        }
     }
 
     calendarWnd().init();

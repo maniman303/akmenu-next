@@ -153,6 +153,7 @@ void cGlobalSettings::saveSettings() {
     ini.SetInt("system", "savedir", saveDir);
     ini.SetInt("system", "nightly", nightly);
     ini.SetInt("system", "Show12hrClock", show12hrClock);
+    ini.SetInt("system", "autorunWithLastRom", autorunWithLastRom);
     ini.SetInt("system", "homebrewreset", homebrewreset);
     ini.SetInt("system", "resethotkey", resetHotKey);
     ini.SetInt("system", "dsonly", dsOnly);

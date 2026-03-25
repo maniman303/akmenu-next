@@ -137,6 +137,10 @@ static u32 SaveSize(SAVE_TYPE st) {
 }
 
 TLaunchResult launchRom(const std::string& aFullPath, DSRomInfo& aRomInfo, bool aMenu, const std::string& savesPath) {
+    return launchRom(aFullPath, aRomInfo, aMenu, savesPath, {});
+}
+
+TLaunchResult launchRom(const std::string& aFullPath, DSRomInfo& aRomInfo, bool aMenu, const std::string& savesPath, std::function<void()> onCompleted) {
     u32 flags = 0;
     long cheatOffset = 0;
     size_t cheatSize = 0;
@@ -268,17 +272,18 @@ TLaunchResult launchRom(const std::string& aFullPath, DSRomInfo& aRomInfo, bool 
         {
             hb = true;
             launcher = new NdsBootstrapLauncher();
-        }
-        else{
+        } else {
             launcher = new HomebrewLauncher();
         }
     }
 
+    launcher->setOnCompleted(onCompleted);
     launcher->launchRom(aFullPath, saveName, flags, cheatOffset, cheatSize, hb);
+
     return ELaunchRomOk;
 }
 
-void autoLaunchRom(const std::string& aFullPath) {
+void autoLaunchRom(const std::string& aFullPath, std::function<void()> onCompleted) {
     DSRomInfo rominfo;
     rominfo.MayBeDSRom(aFullPath);
     if (rominfo.isDSRom()) {

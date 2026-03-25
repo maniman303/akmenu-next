@@ -579,6 +579,11 @@ void cMainWnd::showSettings(void) {
         settingWnd->addSettingItem(LANG("nds bootstrap", "loader"), _values, gs().pico);
     }
 
+    _values.clear();
+    _values.push_back(LANG("switches", "Disable"));
+    _values.push_back(LANG("switches", "Enable"));
+    settingWnd->addSettingItem(LANG("nds bootstrap", "auto run"), _values, gs().autorunWithLastRom);
+
 #ifdef __KERNEL_LAUNCHER_SUPPORT__
     _values.clear();
     _values.push_back("Kernel");
@@ -665,16 +670,22 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
     gs().nightly = settingWnd->getItemSelection(3, 1);
     gs().languageOverride = settingWnd->getItemSelection(3,2);
 
+    size_t autoRunItem = 3;
     if (isDSiMode()) {
+        autoRunItem++;
         gs().phatCol = settingWnd->getItemSelection(3, 3);
 
         if (fsManager().isFlashcart()){
+            autoRunItem++;
             gs().pico = settingWnd->getItemSelection(3, 4);
         }
         
-    }else if (fsManager().isFlashcart()) {
+    } else if (fsManager().isFlashcart()) {
+        autoRunItem++;
         gs().pico = settingWnd->getItemSelection(3, 3);
     }
+
+    gs().autorunWithLastRom = settingWnd->getItemSelection(3, autoRunItem);
 
     // page 5: other
     gs().cheats = settingWnd->getItemSelection(4, 0);

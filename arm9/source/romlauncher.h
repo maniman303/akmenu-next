@@ -8,6 +8,7 @@
 #pragma once
 
 #include "dsrom.h"
+#include "functional"
 
 enum TLaunchResult {
     ELaunchRomOk,
@@ -18,4 +19,5 @@ enum TLaunchResult {
 };
 
 TLaunchResult launchRom(const std::string& aFullPath, DSRomInfo& aRomInfo, bool aMenu, const std::string& savesPath);
-void autoLaunchRom(const std::string& aFullPath);
+TLaunchResult launchRom(const std::string& aFullPath, DSRomInfo& aRomInfo, bool aMenu, const std::string& savesPath, std::function<void()> onCompleted);
+void autoLaunchRom(const std::string& aFullPath, std::function<void()> onCompleted);
