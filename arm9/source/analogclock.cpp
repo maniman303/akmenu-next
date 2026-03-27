@@ -50,5 +50,5 @@ void cAnalogClock::draw() {
     gdi().drawRadiusLine(position().x, position().y, 2, _lengthMinutes, degreesMinutes, _colorMinutes, selectedEngine());
     gdi().drawRadiusLine(position().x, position().y, 2, _lengthHours, degreesHours, _colorHours, selectedEngine());
     gdi().drawRadiusLine(position().x, position().y, 2, _lengthAlarm, degreesAlarm, _colorAlarm, selectedEngine());
-    gdi().fillRect(_colorDot, _colorDot, position().x - 1, position().y - 1, 4, 4, selectedEngine());
+    gdi().fillRect(_colorDot, _colorDot, position().x - 2, position().y - 2, 5, 5, selectedEngine());
 }

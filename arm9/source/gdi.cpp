@@ -305,14 +305,13 @@ static inline void putScreenPixel(u16* buffer, int x, int y, u16 color) {
 void cGdi::drawRadiusLine(s16 sx, s16 sy, u16 width, u16 length, s16 degrees, u16 color, GRAPHICS_ENGINE engine) {
     static const double PI = 3.14159265358979323846;
 
-    if (length <= width || width <= 0) {
+    if (length <= width || width <= 1) {
         return;
     }
 
-    color = color | BIT(15);
-
     length -= width;
-    length++;
+
+    color = color | BIT(15);
 
     u16* buffer = engine == GE_MAIN ? _bufferMain2 + _layerPitch : _bufferSub2;
 
@@ -330,13 +329,28 @@ void cGdi::drawRadiusLine(s16 sx, s16 sy, u16 width, u16 length, s16 degrees, u1
 
     int err = dx_abs - dy_abs;
 
+    int xDir = -1;
+    int yDir = -1;
+
+    if (dx > sx || (dx >= sx && dy < sy)) {
+        // sy -= (width - 1);
+        // dy -= (width - 1);
+        xDir = 1;
+    }
+
+    if (dy > sy || (dy >= sy && dx < sx)) {
+        // sx -= (width - 1);
+        // dx -= (width - 1);
+        yDir = 1;
+    }
+
     int x = sx;
     int y = sy;
 
     while (true) {
         for (int i = 0; i < width; i++) {
             for (int k = 0; k < width; k++) {
-                putScreenPixel(buffer, x + i, y + k, color);
+                putScreenPixel(buffer, x + xDir * i, y + yDir * k, color);
             }
         }
 
