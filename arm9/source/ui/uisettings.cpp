@@ -8,7 +8,7 @@
 */
 
 #include "uisettings.h"
-#include "inifile.h"
+#include "cachedinifile.h"
 #include "ui.h"
 
 cUISettings::cUISettings() {
@@ -38,7 +38,7 @@ cUISettings::cUISettings() {
 cUISettings::~cUISettings() {}
 
 void cUISettings::loadSettings() {
-    CIniFile ini(SFN_UI_SETTINGS);
+    CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
 
     showCalendar = ini.GetInt("global settings", "showCalendar", showCalendar);
     formFrameColor = ini.GetInt("global settings", "formFrameColor", formFrameColor);

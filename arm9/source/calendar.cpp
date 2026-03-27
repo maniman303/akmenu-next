@@ -10,7 +10,7 @@
 #include "calendar.h"
 #include "../../share/memtool.h"
 #include "globalsettings.h"
-#include "inifile.h"
+#include "cachedinifile.h"
 #include "stringtool.h"
 #include "systemfilenames.h"
 #include "windowmanager.h"
@@ -44,7 +44,7 @@ cWindow& cCalendar::loadAppearance(const std::string& aFileName) {
 
     _dateSelection = createBMP15FromFile(SFN_DATE_SELECTION);
 
-    CIniFile ini(aFileName);
+    CIniFile ini = iniFiles().get(aFileName);
     _dayPosition.x = ini.GetInt("calendar day", "x", 134);
     _dayPosition.y = ini.GetInt("calendar day", "y", 34);
     _daySize.x = ini.GetInt("calendar day", "dw", 16);

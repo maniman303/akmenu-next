@@ -7,6 +7,7 @@
     SPDX-License-Identifier: GPL-3.0-or-later
 */
 
+#include "cachedinifile.h"
 #include "rominfownd.h"
 #include <sys/stat.h>
 #include "cheatwnd.h"
@@ -23,7 +24,7 @@
 using namespace akui;
 
 cRomInfoWnd* cRomInfoWnd::createWindow(cWindow* parent, const std::string& text, std::function<void(cRomInfoWnd*)> onSaved) {
-    CIniFile ini(SFN_UI_SETTINGS);
+    CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
     u32 w = 240;
     u32 h = 144;
     w = ini.GetInt("rom info window", "w", w);

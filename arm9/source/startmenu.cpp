@@ -8,7 +8,7 @@
 */
 
 #include "startmenu.h"
-#include "inifile.h"
+#include "cachedinifile.h"
 #include "favorites.h"
 #include "language.h"
 #include "mainlist.h"
@@ -42,7 +42,7 @@ cWindow& cStartMenu::loadAppearance(const std::string& aFileName) {
     _renderDesc->loadData(SFN_STARTMENU_BG);
     _size = _renderDesc->size();
 
-    CIniFile ini(aFileName);
+    CIniFile ini = iniFiles().get(aFileName);
     // std::string bgFile = ini.GetString( "bg", "file",  );
     int ix = ini.GetInt("start menu", "itemX", 4);
     int iy = ini.GetInt("start menu", "itemY", 12);

@@ -5,7 +5,7 @@
 #include "irqs.h"
 #include "fifotool.h"
 #include "globalsettings.h"
-#include "inifile.h"
+#include "cachedinifile.h"
 #include "systemfilenames.h"
 #include "systemdetails.h"
 #include "datetime.h"
@@ -19,7 +19,7 @@ cBatteryMeter::cBatteryMeter() : cWindow(NULL, "BatteryMeter") {
 cBatteryMeter::~cBatteryMeter() { }
 
 void cBatteryMeter::init() {
-    CIniFile ini(SFN_UI_SETTINGS);
+    CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
     _show = ini.GetInt("battery icon", "show", _show);
     int dx = ini.GetInt("battery icon", "x", 0);
     int dy = ini.GetInt("battery icon", "y", 0);

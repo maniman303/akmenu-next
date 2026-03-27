@@ -11,7 +11,7 @@
 #include "../../share/memtool.h"
 #include "bmp15.h"
 #include "globalsettings.h"
-#include "inifile.h"
+#include "cachedinifile.h"
 #include "systemfilenames.h"
 #include "timetool.h"
 
@@ -34,8 +34,7 @@ void cDiskIcon::draw() {
 }
 
 cWindow& cDiskIcon::loadAppearance(const std::string& aFileName) {
-    CIniFile ini(SFN_UI_SETTINGS);
-
+    CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
     u16 x = ini.GetInt("disk icon", "x", 238);
     u16 y = ini.GetInt("disk icon", "y", 172);
     _show = ini.GetInt("disk icon", "show", _show);

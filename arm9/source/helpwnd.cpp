@@ -7,6 +7,7 @@
     SPDX-License-Identifier: GPL-3.0-or-later
 */
 
+#include "cachedinifile.h"
 #include "helpwnd.h"
 #include "fontfactory.h"
 #include "language.h"
@@ -18,7 +19,7 @@
 using namespace akui;
 
 void cHelpWnd::showModal(cWindow* parent) {
-    CIniFile ini(SFN_UI_SETTINGS);
+    CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
     u32 w = 200;
     u32 h = 160;
     w = ini.GetInt("help window", "w", w);

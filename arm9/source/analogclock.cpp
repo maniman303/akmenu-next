@@ -1,6 +1,6 @@
 #include "analogclock.h"
 #include "globalsettings.h"
-#include "inifile.h"
+#include "cachedinifile.h"
 #include "datetime.h"
 #include "systemfilenames.h"
 
@@ -19,7 +19,7 @@ cAnalogClock::cAnalogClock() {
 cAnalogClock::~cAnalogClock() {}
 
 void cAnalogClock::init() {
-    CIniFile ini(SFN_UI_SETTINGS);
+    CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
     _show = ini.GetInt("analog clock", "show", _show);
     int dx = ini.GetInt("analog clock", "x", 0);
     int dy = ini.GetInt("analog clock", "y", 0);

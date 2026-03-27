@@ -23,7 +23,7 @@
 #include "favorites.h"
 #include "gbaloader.h"
 #include "helpwnd.h"
-#include "inifile.h"
+#include "cachedinifile.h"
 #include "language.h"
 #include "progresswnd.h"
 #include "romlauncher.h"
@@ -85,7 +85,7 @@ void cMainWnd::init() {
     COLOR color = 0;
     std::string file("");
     std::string text("");
-    CIniFile ini(SFN_UI_SETTINGS);
+    CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
 
     // self init
     dbg_printf("mainwnd init() %08x\n", this);

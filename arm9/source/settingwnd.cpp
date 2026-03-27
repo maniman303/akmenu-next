@@ -7,6 +7,7 @@
     SPDX-License-Identifier: GPL-3.0-or-later
 */
 
+#include "cachedinifile.h"
 #include "settingwnd.h"
 #include "globalsettings.h"
 #include "language.h"
@@ -69,7 +70,7 @@ cSettingWnd::cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     _titleOffset = 0;
     _maxTabSize = 0;
     _confirmMessage = LANG("setting window", "confirm text");
-    CIniFile ini(SFN_UI_SETTINGS);
+    CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
     _spinBoxWidth = ini.GetInt("setting window", "spinBoxWidth", 108);
     _simpleTabs = ini.GetInt("setting window", "simpleTabs", 0);
 

@@ -1,7 +1,7 @@
 #include <chrono>
 #include "smallclock.h"
 #include "globalsettings.h"
-#include "inifile.h"
+#include "cachedinifile.h"
 #include "fontfactory.h"
 #include "stringtool.h"
 #include "systemfilenames.h"
@@ -16,7 +16,7 @@ cSmallClock::cSmallClock() : cWindow(NULL, "SmallClock") {
 }
 
 void cSmallClock::init() {
-    CIniFile ini(SFN_UI_SETTINGS);
+    CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
     _textColor = ini.GetInt("small clock", "color", 0xFFFF);
     _show = ini.GetInt("small clock", "show", _show);
     int dx = ini.GetInt("small clock", "x", 0);

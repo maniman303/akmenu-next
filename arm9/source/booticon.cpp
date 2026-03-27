@@ -1,7 +1,7 @@
 #include <string>
 #include "booticon.h"
 #include "globalsettings.h"
-#include "inifile.h"
+#include "cachedinifile.h"
 #include "systemfilenames.h"
 
 cBootIcon::cBootIcon() {
@@ -12,7 +12,7 @@ cBootIcon::cBootIcon() {
 cBootIcon::~cBootIcon() {}
 
 void cBootIcon::init() {
-    CIniFile ini(SFN_UI_SETTINGS);
+    CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
     _show = ini.GetInt("boot icon", "show", _show);
     int dx = ini.GetInt("boot icon", "x", 0);
     int dy = ini.GetInt("boot icon", "y", 0);

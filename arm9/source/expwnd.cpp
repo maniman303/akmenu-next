@@ -16,6 +16,7 @@
 #include "progresswnd.h"
 #include "uisettings.h"
 #include "windowmanager.h"
+#include "cachedinifile.h"
 
 using namespace akui;
 
@@ -91,7 +92,7 @@ cExpWnd::cExpWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string&
     for (size_t i = 0; i < 4; ++i) {
         _Rumble.insertItem(LANG("exp window", rumbleLang[i]), i);
     }
-    CIniFile ini(SFN_UI_SETTINGS);
+    CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
     u32 spinBoxWidth = ini.GetInt("setting window", "spinBoxWidth", 108);
     _Rumble.loadAppearance("");
     _Rumble.setSize(cSize(spinBoxWidth, 18));

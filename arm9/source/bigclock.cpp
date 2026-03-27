@@ -9,7 +9,7 @@
 
 #include "bigclock.h"
 #include "globalsettings.h"
-#include "inifile.h"
+#include "cachedinifile.h"
 #include "stringtool.h"
 #include "systemfilenames.h"
 #include "windowmanager.h"
@@ -31,7 +31,7 @@ void cBigClock::init() {
 }
 
 cWindow& cBigClock::loadAppearance(const std::string& aFileName) {
-    CIniFile ini(aFileName);
+    CIniFile ini = iniFiles().get(aFileName);
     _show = ini.GetInt("big clock", "show", _show);
 
     if (!_show) {

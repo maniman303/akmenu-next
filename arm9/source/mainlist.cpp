@@ -20,7 +20,7 @@
 #include "gbaloader.h"
 #include "folder_banner_bin.h"
 #include "gba_banner_bin.h"
-#include "inifile.h"
+#include "cachedinifile.h"
 #include "language.h"
 #include "microsd_banner_bin.h"
 #include "nand_banner_bin.h"
@@ -99,7 +99,7 @@ cMainList::~cMainList() {
 }
 
 int cMainList::init() {
-    CIniFile ini(SFN_UI_SETTINGS);
+    CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
     _textOffset = ini.GetInt("main list", "textOffset", 0);
     _textColor = ini.GetInt("main list", "textColor", RGB15(7, 7, 7));
     _textColorHilight = ini.GetInt("main list", "textColorHilight", RGB15(31, 0, 31));
