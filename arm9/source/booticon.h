@@ -11,30 +11,25 @@ using namespace akui;
 #define PM_BATTERY_LOW   BIT(0)
 #define PM_AC_PRESENT    BIT(1)
 
-class cBatteryMeter : public cWindow {
+class cBootIcon : public cWindow {
   public:
-    cBatteryMeter();
+    cBootIcon();
 
-    ~cBatteryMeter();
+    ~cBootIcon();
 
   public:
     void init();
-
-    void flipIcon();
 
     void draw() override;
 
     cWindow& loadAppearance(const std::string& aFileName) override { return *this; }
 
   protected:
-    int getBatteryType();
-
     bool _show;
-    bool _flip;
-    cBMP15 _battery;
+    cBMP15 _icon;
 };
 
-typedef t_singleton<cBatteryMeter> BatteryMeter_s;
-inline cBatteryMeter& batteryMeter() {
-    return BatteryMeter_s::instance();
+typedef t_singleton<cBootIcon> BootIcon_s;
+inline cBootIcon& bootIcon() {
+    return BootIcon_s::instance();
 }

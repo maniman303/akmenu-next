@@ -54,6 +54,8 @@
 #define SFN_PROGRESS_BAR_BG SFN_UI_DIRECTORY + gs().uiName + "/progress_bar.bmp"
 #define SFN_GBAFRAME SFN_UI_DIRECTORY + gs().uiName + "/gbaframe.bmp"
 #define SFN_UI_ICONS_DIRECTORY SFN_UI_DIRECTORY + gs().uiName + "/icons/"
+#define SFN_UI_BOOT_AUTO_ICON SFN_UI_ICONS_DIRECTORY + "boot_auto.bmp"
+#define SFN_UI_BOOT_MANUAL_ICON SFN_UI_ICONS_DIRECTORY + "boot_manual.bmp"
 #define SFN_UI_TICK_SOUND SFN_UI_DIRECTORY + gs().uiName + "/sounds/tick.wav"
 
 #define SFN_LANGUAGE_DIRECTORY SFN_SYSTEM_DIR + "language/"

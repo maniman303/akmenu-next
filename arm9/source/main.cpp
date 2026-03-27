@@ -33,6 +33,7 @@
 #include "calendarwnd.h"
 #include "datetime.h"
 #include "batterymeter.h"
+#include "booticon.h"
 #include "screenoverlay.h"
 
 #include "ticksound.h"
@@ -209,6 +210,7 @@ int main(int argc, char* argv[]) {
     calendar().init();
     bigClock().init();
     batteryMeter().init();
+    bootIcon().init();
 
     smallDate().init();
     smallClock().init();

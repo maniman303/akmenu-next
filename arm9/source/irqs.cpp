@@ -13,6 +13,7 @@
 #include "calendar.h"
 #include "calendarwnd.h"
 #include "batterymeter.h"
+#include "booticon.h"
 #include "smalldate.h"
 #include "smallclock.h"
 #include "dbgtool.h"
@@ -60,6 +61,7 @@ void cIRQ::drawTop() {
     calendar().draw();
     bigClock().draw();
     batteryMeter().draw();
+    bootIcon().draw();
     smallDate().draw();
     smallClock().draw();
     userWindow().draw();

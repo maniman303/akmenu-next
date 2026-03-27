@@ -13,7 +13,7 @@
 cBatteryMeter::cBatteryMeter() : cWindow(NULL, "BatteryMeter") {
     _show = false;
     _flip = false;
-    _engine = GE_SUB;
+    setEngine(GE_SUB);
 }
 
 cBatteryMeter::~cBatteryMeter() { }
