@@ -17,43 +17,32 @@ Frontend for [nds-bootstrap](https://github.com/DS-Homebrew/nds-bootstrap/) and 
 
 ## Changes in this fork
 
-- Small fixes to rendering and English typos.
-- New setting to hide file extensions.
-- Auto replace `;` from filenames with `:` when displaying text.
-- Added a new file presentation mode `Focused`, which will hide system folders and files.
-- Added a new file presentation mode `Minimal`, which will show all favorites and up to 20 games scanned from the sd card on the first page.
-- Added a `textOffset` theme setting under `[main list]`.
-- Added new theme ability to specify `main_list_item_bg.bmp` bg for main list items.
-- Added new theme ability to specify `upper_screen_cal4.bmp` for upper screen bg when month has 4 rows.
-- Added new theme ability to specify `upper_screen_cal5.bmp` for upper screen bg when month has 5 rows.
-- Added new theme ability to specify `calendar/date_selection.bmp` for date selection bg.
-- Added new theme ability to specify `calendar/day_numbers_second.bmp` for custom second digits in calendar.
-- Added a `sundayColor` theme setting under `[calendar day]`.
-- Added a `saturdayColor` theme setting under `[calendar day]`.
-- Added a `fix ones` theme setting under `[calendar day]` to offset dates `21` and `31` on x axis by a specified value.
-- Added `[small clock]` and `[small date]` with theming support.
-- Added special font for smaller upper screen elements.
-- Makes seetings window fullscreen.
+This fork is a work in progress to rewrite the UI part of **akmenu-next**. Currently it includes following changes:
 
-## Changes in this fork
+- Rendering went through overhaul with bugfixes, new features, and code duplication removal.
+- Font rendering was significantly enhanced, secondary small font added.
+- Modal dialogs were rewritten from scratch to unblock main loop.
+- Rom launchers were rewritten froms scratch with a brand new system of splitting tasks per frames.
+- Many new UI elements were added like battery meter, boot icon, small date, small clock.
+- Some UI elements enhanced, enriched, like settings tab with proper theme.
+- First sound effects were created, like clock ticking sound.
+- Improved visuals of auto booting last played games.
+- New ways to display games.
+- Many bug fixes.
 
-- Small fixes to rendering and English typos.
-- New setting to hide file extensions.
-- Auto replace `;` from filenames with `:` when displaying text.
-- Added a new file presentation mode `Focused`, which will hide system folders and files.
-- Added a new file presentation mode `Minimal`, which will show all favorites and up to 20 games scanned from the sd card on the first page.
-- Added a `textOffset` theme setting under `[main list]`.
-- Added new theme ability to specify `main_list_item_bg.bmp` bg for main list items.
-- Added new theme ability to specify `upper_screen_cal4.bmp` for upper screen bg when month has 4 rows.
-- Added new theme ability to specify `upper_screen_cal5.bmp` for upper screen bg when month has 5 rows.
-- Added new theme ability to specify `calendar/date_selection.bmp` for date selection bg.
-- Added new theme ability to specify `calendar/day_numbers_second.bmp` for custom second digits in calendar.
-- Added a `sundayColor` theme setting under `[calendar day]`.
-- Added a `saturdayColor` theme setting under `[calendar day]`.
-- Added a `fix ones` theme setting under `[calendar day]` to offset dates `21` and `31` on x axis by a specified value.
-- Added `[small clock]` and `[small date]` with theming support.
-- Added special font for smaller upper screen elements.
-- Makes seetings window fullscreen.
+The end goal is to recreate (with proper theme that's not included yet) the aesthetic and feel of original Nintendo DS bios.
+
+Here are planned features:
+- Analog clock.
+- Tab icons in settings.
+- Rewrite of input processing.
+- Animated focus border in main list.
+- Redesigned help menu.
+- Button bar used in settings, modal dialogs, help menu.
+- Top screen header used in settings, file manager, help menu.
+- Navigation sounds.
+- Animations.
+- Redesigned start menu inspired by bios settings.
 
 ## Installing
 
