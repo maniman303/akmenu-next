@@ -483,8 +483,7 @@ void cGdi::bitBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16
     }
 }
 
-void cGdi::bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH,
-                  GRAPHICS_ENGINE engine) {
+void cGdi::bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH, GRAPHICS_ENGINE engine) {
     u16* pSrc = (u16*)src;
     u16* pDest = (engine == GE_MAIN) ? 
                     (_bufferMain2 + (destY * 256) + destX + _layerPitch) : 
@@ -494,15 +493,9 @@ void cGdi::bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH,
     u16 destInc = 256 - pitchPixel;
     u16 halfPitch = pitchPixel >> 1;
 
-    bool destAligned = !(destX & 1) || !(destW & 1);
+    bool destAligned = !(destX & 1);
     if (!destAligned) {
         for (u16 i = 0; i < destH; ++i) {
-            // for (u16 j = 0; j < pitchPixel; ++j) {
-            //     *pDest = *pSrc;
-            //     pDest++;
-            //     pSrc++;
-            // }
-
             swiCopy(pSrc, pDest, COPY_MODE_COPY | pitchPixel);
 
             pDest += pitchPixel;
