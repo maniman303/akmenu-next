@@ -309,7 +309,10 @@ void cGdi::drawRadiusLine(s16 sx, s16 sy, u16 width, u16 length, s16 degrees, u1
         return;
     }
 
+    color = color | BIT(15);
+
     length -= width;
+    length++;
 
     u16* buffer = engine == GE_MAIN ? _bufferMain2 + _layerPitch : _bufferSub2;
 

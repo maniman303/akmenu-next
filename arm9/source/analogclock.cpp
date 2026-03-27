@@ -27,10 +27,12 @@ void cAnalogClock::init() {
     _lengthSeconds = ini.GetInt("analog clock", "lengthSeconds", 0);
     _lengthMinutes = ini.GetInt("analog clock", "lengthMinutes", 0);
     _lengthHours = ini.GetInt("analog clock", "lengthHours", 0);
-    _colorSeconds = ini.GetInt("analog clock", "colorSeconds", 0) | BIT(15);
-    _colorMinutes = ini.GetInt("analog clock", "colorMinutes", 0) | BIT(15);
-    _colorHours = ini.GetInt("analog clock", "colorHours", 0) | BIT(15);
-    _colorDot = ini.GetInt("analog clock", "colorDot", 0) | BIT(15);
+    _lengthAlarm = ini.GetInt("analog clock", "lengthAlarm", 0);
+    _colorSeconds = ini.GetInt("analog clock", "colorSeconds", 0);
+    _colorMinutes = ini.GetInt("analog clock", "colorMinutes", 0);
+    _colorHours = ini.GetInt("analog clock", "colorHours", 0);
+    _colorAlarm = ini.GetInt("analog clock", "colorAlarm", 0);
+    _colorDot = ini.GetInt("analog clock", "colorDot", 0);
 }
 
 void cAnalogClock::draw() {
@@ -41,9 +43,12 @@ void cAnalogClock::draw() {
     s16 degreesSeconds = datetime().seconds() * 6;
     s16 degreesMinutes = datetime().minutes() * 6;
     s16 degreesHours = (datetime().hours() % 12) * 30;
+    s16 degreesAlarm = (PersonalData->alarmHour % 12) * 30;
+    degreesAlarm += (PersonalData->alarmMinute / 2);
 
     gdi().drawRadiusLine(position().x, position().y, 2, _lengthSeconds, degreesSeconds, _colorSeconds, selectedEngine());
     gdi().drawRadiusLine(position().x, position().y, 2, _lengthMinutes, degreesMinutes, _colorMinutes, selectedEngine());
     gdi().drawRadiusLine(position().x, position().y, 2, _lengthHours, degreesHours, _colorHours, selectedEngine());
+    gdi().drawRadiusLine(position().x, position().y, 2, _lengthAlarm, degreesAlarm, _colorAlarm, selectedEngine());
     gdi().fillRect(_colorDot, _colorDot, position().x - 1, position().y - 1, 4, 4, selectedEngine());
 }

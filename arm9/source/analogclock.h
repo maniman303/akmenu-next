@@ -27,9 +27,11 @@ class cAnalogClock : public cWindow {
     u16 _lengthSeconds;
     u16 _lengthMinutes;
     u16 _lengthHours;
+    u16 _lengthAlarm;
     u16 _colorSeconds;
     u16 _colorMinutes;
     u16 _colorHours;
+    u16 _colorAlarm;
     u16 _colorDot;
 };
 
