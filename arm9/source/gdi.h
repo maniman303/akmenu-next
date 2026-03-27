@@ -46,6 +46,8 @@ class cGdi {
 
     void drawLine(s16 x1, s16 y1, s16 x2, s16 y2, GRAPHICS_ENGINE engine);
 
+    void drawRadiusLine(s16 sx, s16 sy, u16 width, u16 length, s16 degrees, u16 color, GRAPHICS_ENGINE engine);
+
     void frameRect(s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine);
 
     void frameRect(s16 x, s16 y, u16 w, u16 h, u16 thickness, GRAPHICS_ENGINE engine);

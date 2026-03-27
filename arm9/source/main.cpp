@@ -28,6 +28,7 @@
 #include "timer.h"
 #include "systemdetails.h"
 
+#include "analogclock.h"
 #include "bigclock.h"
 #include "calendar.h"
 #include "calendarwnd.h"
@@ -208,6 +209,7 @@ int main(int argc, char* argv[]) {
 
     calendarWnd().init();
     calendar().init();
+    analogClock().init();
     bigClock().init();
     batteryMeter().init();
     bootIcon().init();

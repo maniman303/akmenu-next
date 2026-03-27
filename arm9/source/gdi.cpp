@@ -11,6 +11,7 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
+#include <math.h>
 #include "../../share/memtool.h"
 #include "dbgtool.h"
 #include "fontfactory.h"
@@ -290,6 +291,65 @@ void cGdi::drawLine(s16 x1, s16 y1, s16 x2, s16 y2, GRAPHICS_ENGINE engine) {
             py += yv;
         }
         return;
+    }
+}
+
+static inline void putScreenPixel(u16* buffer, int x, int y, u16 color) {
+    if (x < 0 || x >= SCREEN_WIDTH || y < 0 || y >= SCREEN_HEIGHT) {
+        return;
+    }
+
+    buffer[y * 256 + x] = color;
+}
+
+void cGdi::drawRadiusLine(s16 sx, s16 sy, u16 width, u16 length, s16 degrees, u16 color, GRAPHICS_ENGINE engine) {
+    static const double PI = 3.14159265358979323846;
+
+    if (length <= width || width <= 0) {
+        return;
+    }
+
+    length -= width;
+
+    u16* buffer = engine == GE_MAIN ? _bufferMain2 + _layerPitch : _bufferSub2;
+
+    degrees = (90 - degrees) % 360;
+    double radius = degrees * PI / 180.0;
+
+    s16 dx = sx + static_cast<s16>(length * std::cos(radius));
+    s16 dy = sy - static_cast<s16>(length * std::sin(radius));
+
+    int dx_abs = abs(dx - sx);
+    int dy_abs = abs(dy - sy);
+
+    int step_x = (sx < dx) ? 1 : -1;
+    int step_y = (sy < dy) ? 1 : -1;
+
+    int err = dx_abs - dy_abs;
+
+    int x = sx;
+    int y = sy;
+
+    while (true) {
+        for (int i = 0; i < width; i++) {
+            for (int k = 0; k < width; k++) {
+                putScreenPixel(buffer, x + i, y + k, color);
+            }
+        }
+
+        if (x == dx && y == dy) break;
+
+        int e2 = 2 * err;
+
+        if (e2 > -dy_abs) {
+            err -= dy_abs;
+            x += step_x;
+        }
+
+        if (e2 < dx_abs) {
+            err += dx_abs;
+            y += step_y;
+        }
     }
 }
 

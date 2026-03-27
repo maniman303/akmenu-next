@@ -5,8 +5,8 @@
 #include "systemfilenames.h"
 
 cBootIcon::cBootIcon() {
-    _show = false;
     setEngine(GE_SUB);
+    _show = false;
 }
 
 cBootIcon::~cBootIcon() {}

@@ -9,6 +9,7 @@
 
 #include "irqs.h"
 #include "animation.h"
+#include "analogclock.h"
 #include "bigclock.h"
 #include "calendar.h"
 #include "calendarwnd.h"
@@ -59,6 +60,7 @@ void cIRQ::setControl(bool control) {
 void cIRQ::drawTop() {
     calendarWnd().draw();
     calendar().draw();
+    analogClock().draw();
     bigClock().draw();
     batteryMeter().draw();
     bootIcon().draw();
