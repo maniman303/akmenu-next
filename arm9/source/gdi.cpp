@@ -417,14 +417,19 @@ void cGdi::bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH,
     u16 destInc = 256 - pitchPixel;
     u16 halfPitch = pitchPixel >> 1;
 
-    bool destAligned = !(destX & 1);
+    bool destAligned = !(destX & 1) || !(destW & 1);
     if (!destAligned) {
         for (u16 i = 0; i < destH; ++i) {
-            for (u16 j = 0; j < pitchPixel; ++j) {
-                *pDest = *pSrc;
-                pDest++;
-                pSrc++;
-            }
+            // for (u16 j = 0; j < pitchPixel; ++j) {
+            //     *pDest = *pSrc;
+            //     pDest++;
+            //     pSrc++;
+            // }
+
+            swiCopy(pSrc, pDest, COPY_MODE_COPY | pitchPixel);
+
+            pDest += pitchPixel;
+            pSrc += pitchPixel;
             pDest += destInc;
         }
 
@@ -433,6 +438,7 @@ void cGdi::bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH,
 
     for (u16 i = 0; i < destH; ++i) {
         swiFastCopy(pSrc, pDest, COPY_MODE_WORD | COPY_MODE_COPY | halfPitch);
+
         pDest += halfPitch << 1;
         pSrc += halfPitch << 1;
         pDest += destInc;
