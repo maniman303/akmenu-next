@@ -35,7 +35,7 @@ class cBMP15 {
 
     const u32* buffer() const { return _buffer.get(); }
 
-    bool valid() const { return _buffer != NULL; }
+    bool valid() const { return buffer() != NULL; }
 
     const std::string& filename() const;
 
