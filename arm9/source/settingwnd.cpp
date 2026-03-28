@@ -197,8 +197,9 @@ void cSettingWnd::addSettingTab(const std::string& text) {
         _titleOffset = 0;
     }
 
-    _tabSwitcher.insertItem(text, _tabs.size());
-    _tabs.push_back(sSetingTab(new std::vector<sSetingItem>, text));
+    sSettingTab tab(new std::vector<sSettingItem>, text, _tabs.size());
+    _tabs.push_back(tab);
+    _tabSwitcher.insertItem(tab);
     _tabSwitcher.show();
 }
 
@@ -240,7 +241,7 @@ void cSettingWnd::addSettingItem(const std::string& text, const std::vector<std:
     label->hide();
     addChildWindow(label);
 
-    items(lastTab).push_back(sSetingItem(label, item));
+    items(lastTab).push_back(sSettingItem(label, item));
 
     // recompute button position
     s16 buttonY = size().y - _buttonCancel.size().y - 4;

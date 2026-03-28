@@ -37,16 +37,15 @@ class cSettingWnd : public akui::cForm {
     void setConfirmMessage(const std::string& text);
 
   protected:
-    struct sSetingItem {
+    struct sSettingItem {
         akui::cStaticText* _label;
         akui::cSpinBox* _item;
-        sSetingItem(akui::cStaticText* label, akui::cSpinBox* item) : _label(label), _item(item){};
+        sSettingItem(akui::cStaticText* label, akui::cSpinBox* item) : _label(label), _item(item){};
     };
-    struct sSetingTab {
-        std::vector<sSetingItem>* _tab;
-        std::string _title;
-        sSetingTab(std::vector<sSetingItem>* tab, const std::string& title)
-            : _tab(tab), _title(title){};
+    struct sSettingTab : akui::cSpinBox::cSpinItem {
+        std::vector<sSettingItem>* _tab;
+        sSettingTab(std::vector<sSettingItem>* tab, const std::string& title, u32 position)
+            : akui::cSpinBox::cSpinItem(title, position), _tab(tab) {};
     };
 
   protected:
@@ -69,13 +68,13 @@ class cSettingWnd : public akui::cForm {
     void ShowTab(size_t index);
     void SwitchTab(size_t oldIndex, size_t newIndex);
 
-    std::vector<sSetingItem>& items(size_t index) { return *_tabs[index]._tab; };
+    std::vector<sSettingItem>& items(size_t index) { return *_tabs[index]._tab; };
 
     u32 _titleOffset;
     u32 _maxLabelLength;
     u32 _spinBoxWidth;
     bool _simpleTabs;
-    std::vector<sSetingTab> _tabs;
+    std::vector<sSettingTab> _tabs;
     size_t _currentTab;
     size_t _maxTabSize;
     std::string _confirmMessage;

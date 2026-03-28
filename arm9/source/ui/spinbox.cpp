@@ -67,7 +67,7 @@ void cSpinBox::selectItem(u32 id) {
     _selectedItemId = id;
     if (_selectedItemId >= _items.size()) return;
 
-    _itemText.setText(_items[_selectedItemId]);
+    _itemText.setText(_items[_selectedItemId]._text);
 
     // s32 textWidth = _items[_selectedItemId].length() * 6;
     // s32 textHeight = 12;
@@ -92,9 +92,15 @@ void cSpinBox::selectPrev() {
 }
 
 void cSpinBox::insertItem(const std::string& item, u32 position) {
-    if (position > _items.size()) return;
+    insertItem(cSpinItem(item, position));
+}
 
-    _items.insert(_items.begin() + position, item);
+void cSpinBox::insertItem(cSpinItem item) {
+    if (item._position > _items.size()) {
+        return;
+    }
+
+    _items.insert(_items.begin() + item._position, item);
 
     if (_items.size() == 1) {
         selectItem(0);
@@ -201,7 +207,7 @@ void cSpinBox::onMove() {
 
 void cSpinBox::arrangeText() {
     cFont& textFont = _namedAppearance ? font() : fontSecondary();
-    s32 textWidth = _items.size() ? textFont.TextWidth(_items[_selectedItemId]) : 0;
+    s32 textWidth = _items.size() ? textFont.TextWidth(_items[_selectedItemId]._text) : 0;
     if (textWidth > _itemText.size().x) textWidth = _itemText.size().x;
 
     if (_namedAppearance) {

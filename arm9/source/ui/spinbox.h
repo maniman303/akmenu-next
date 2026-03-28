@@ -25,6 +25,13 @@ class cSpinBox : public cForm {
     ~cSpinBox();
 
   public:
+    struct cSpinItem {
+      std::string _text;
+      u32 _position;
+      cSpinItem(std::string text, u32 position) : _text(text), _position(position) {}
+    };
+
+  public:
     void draw();
 
     cWindow& loadAppearance(const std::string& aFileName);
@@ -38,6 +45,8 @@ class cSpinBox : public cForm {
     void selectPrev();
 
     void insertItem(const std::string& item, u32 position);
+
+    void insertItem(cSpinItem item);
 
     void removeItem(u32 position);
 
@@ -70,7 +79,7 @@ class cSpinBox : public cForm {
     cStaticText _itemText;
     bool _namedAppearance;
     u32 _selectedItemId;
-    std::vector<std::string> _items;
+    std::vector<cSpinItem> _items;
 };
 
 }  // namespace akui
