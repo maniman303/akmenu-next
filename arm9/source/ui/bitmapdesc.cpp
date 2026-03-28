@@ -12,39 +12,42 @@
 #include "dbgtool.h"
 
 namespace akui {
-
-///////////////////////////////// desc ////////////////
-cBitmapDesc::cBitmapDesc() {
-    _bltmode = BM_BITBLT;
-    _background = cBMP15();
-}
-
-cBitmapDesc::~cBitmapDesc() {}
-
-void cBitmapDesc::draw(const cRect& area, GRAPHICS_ENGINE engine) const {
-    if (_background.valid()) {
-        if (BM_BITBLT == _bltmode)
-            gdi().bitBlt(_background.buffer(), area.position().x, area.position().y,
-                         _background.width(), _background.height(), engine);
-        else
-            gdi().maskBlt(_background.buffer(), area.position().x, area.position().y,
-                          _background.width(), _background.height(), engine);
+    ///////////////////////////////// desc ////////////////
+    cBitmapDesc::cBitmapDesc() {
+        _bltmode = BM_BITBLT;
+        _background = cBMP15();
     }
-}
 
-void cBitmapDesc::loadData(const std::string& filename) {
-    _background = createBMP15FromFile(filename);
-}
+    cBitmapDesc::~cBitmapDesc() {
+        if (_background.valid()) {
+            destroyBMP15(_background);
+        }
+    }
 
-cSize cBitmapDesc::size() {
-    if (_background.valid())
-        return cSize(_background.width(), _background.height());
-    else
-        return cSize(0, 0);
-}
+    void cBitmapDesc::draw(const cRect& area, GRAPHICS_ENGINE engine) const {
+        if (_background.valid()) {
+            if (BM_BITBLT == _bltmode)
+                gdi().bitBlt(_background.buffer(), area.position().x, area.position().y,
+                            _background.width(), _background.height(), engine);
+            else
+                gdi().maskBlt(_background.buffer(), area.position().x, area.position().y,
+                            _background.width(), _background.height(), engine);
+        }
+    }
 
-bool cBitmapDesc::valid() {
-    return _background.valid();
-}
+    void cBitmapDesc::loadData(const std::string& filename) {
+        _background = createBMP15FromFile(filename);
+    }
+
+    cSize cBitmapDesc::size() {
+        if (_background.valid())
+            return cSize(_background.width(), _background.height());
+        else
+            return cSize(0, 0);
+    }
+
+    bool cBitmapDesc::valid() {
+        return _background.valid();
+    }
 
 }  // namespace akui

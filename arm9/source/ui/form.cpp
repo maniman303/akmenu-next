@@ -10,7 +10,7 @@
 #include "form.h"
 #include "timer.h"
 #include "ui.h"
-#include "ticksound.h"
+#include "logger.h"
 //#include "dbgtool.h"
 //#include "windowmanager.h"
 
@@ -172,8 +172,9 @@ namespace akui {
 
     void cForm::doModal() {
         cleanModals(this);
-        windowManager().addWindow(this);
         show();
+        windowManager().addWindow(this);
+        // logger().info("Do modal.");
     }
 
     void cForm::onOK() {

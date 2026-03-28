@@ -17,221 +17,225 @@
 //#include "windowmanager.h"
 
 namespace akui {
+    cSpinBox::cSpinBox(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text) : cSpinBox(x, y, w, h, false, parent, text) {}
 
-cSpinBox::cSpinBox(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text) : cSpinBox(x, y, w, h, false, parent, text) {}
+    cSpinBox::cSpinBox(s32 x, s32 y, u32 w, u32 h, bool namedAppearance, cWindow* parent, const std::string& text)
+        : cForm(x, y, w, h, parent, text),
+        _prevButton(0, 0, 0, 0, this, ""),
+        _nextButton(0, 0, 0, 0, this, ""),
+        _leftBg(this),
+        _middleBg(this),
+        _rightBg(this),
+        _prefixIcon(this),
+        _itemText(0, 0, 0, 0, this, "spinbox"),
+        _namedAppearance(namedAppearance) {
+        _normalColor = uiSettings().spinBoxNormalColor;  // RGB15( 0, 0, 31 );
+        _focusedColor = uiSettings().spinBoxFocusColor;  // RGB15( 0, 31, 0 );
+        _frameColor = uiSettings().spinBoxFrameColor;
+        _itemText.setTextColor(uiSettings().spinBoxTextColor);
+        _itemText.setFont(false);
 
-cSpinBox::cSpinBox(s32 x, s32 y, u32 w, u32 h, bool namedAppearance, cWindow* parent, const std::string& text)
-    : cForm(x, y, w, h, parent, text),
-      _prevButton(0, 0, 0, 0, this, ""),
-      _nextButton(0, 0, 0, 0, this, ""),
-      _leftBg(this),
-      _middleBg(this),
-      _rightBg(this),
-      _itemText(0, 0, 0, 0, this, "spinbox"),
-      _namedAppearance(namedAppearance) {
-    _normalColor = uiSettings().spinBoxNormalColor;  // RGB15( 0, 0, 31 );
-    _focusedColor = uiSettings().spinBoxFocusColor;  // RGB15( 0, 31, 0 );
-    _frameColor = uiSettings().spinBoxFrameColor;
-    _itemText.setTextColor(uiSettings().spinBoxTextColor);
-    _itemText.setFont(false);
+        _prevButton.pressed.connect(this, &cSpinBox::selectPrev);
+        _prevButton.pressed.connect(this, &cSpinBox::onCmponentClicked);
+        _nextButton.pressed.connect(this, &cSpinBox::selectNext);
+        _nextButton.pressed.connect(this, &cSpinBox::onCmponentClicked);
 
-    _prevButton.pressed.connect(this, &cSpinBox::selectPrev);
-    _prevButton.pressed.connect(this, &cSpinBox::onCmponentClicked);
-    _nextButton.pressed.connect(this, &cSpinBox::selectNext);
-    _nextButton.pressed.connect(this, &cSpinBox::onCmponentClicked);
+        addChildWindow(&_itemText);
+        addChildWindow(&_prevButton);
+        addChildWindow(&_nextButton);
 
-    addChildWindow(&_itemText);
-    addChildWindow(&_prevButton);
-    addChildWindow(&_nextButton);
+        _itemText.setTextColor(RGB15(31, 31, 31));
 
-    _itemText.setTextColor(RGB15(31, 31, 31));
+        u8 cx = 0;
+        _prevButton.setRelativePosition(cPoint(cx, 0));
 
-    u8 cx = 0;
-    _prevButton.setRelativePosition(cPoint(cx, 0));
+        cx = 0 + _prevButton.windowRectangle().width();
+        _itemText.setRelativePosition(cPoint(cx, 0));
+        _itemText.setSize(cSize(w - 18 * 2, 18));
 
-    cx = 0 + _prevButton.windowRectangle().width();
-    _itemText.setRelativePosition(cPoint(cx, 0));
-    _itemText.setSize(cSize(w - 18 * 2, 18));
+        cx = windowRectangle().width() - _nextButton.windowRectangle().width();
+        _nextButton.setRelativePosition(cPoint(cx, 0));
 
-    cx = windowRectangle().width() - _nextButton.windowRectangle().width();
-    _nextButton.setRelativePosition(cPoint(cx, 0));
-
-    selectItem(0);
-}
-
-cSpinBox::~cSpinBox() {}
-
-void cSpinBox::selectItem(u32 id) {
-    // danger !!!! it may cause system halt when cSpinBox destruct
-    // windowManager().setFocusedWindow( this );
-    _selectedItemId = id;
-    if (_selectedItemId >= _items.size()) return;
-
-    _itemText.setText(_items[_selectedItemId]._text);
-
-    // s32 textWidth = _items[_selectedItemId].length() * 6;
-    // s32 textHeight = 12;
-    //_itemText.setRelativePosition( cPoint((_size.x - textWidth) >> 1, (_size.y - textHeight) >> 1)
-    //);
-
-    arrangeButton();
-    arrangeText();
-    changed(this);
-}
-
-void cSpinBox::selectNext() {
-    if (_items.size() - 1 == _selectedItemId) return;
-
-    selectItem(_selectedItemId + 1);
-}
-
-void cSpinBox::selectPrev() {
-    if (0 == _selectedItemId) return;
-
-    selectItem(_selectedItemId - 1);
-}
-
-void cSpinBox::insertItem(const std::string& item, u32 position) {
-    insertItem(cSpinItem(item, position));
-}
-
-void cSpinBox::insertItem(cSpinItem item) {
-    if (item._position > _items.size()) {
-        return;
-    }
-
-    _items.insert(_items.begin() + item._position, item);
-
-    if (_items.size() == 1) {
         selectItem(0);
     }
-}
 
-void cSpinBox::removeItem(u32 position) {
-    if (position > _items.size() - 1) return;
+    cSpinBox::~cSpinBox() {}
 
-    _items.erase(_items.begin() + position);
-}
-
-void cSpinBox::setTextColor(COLOR color) {}
-
-void cSpinBox::draw() {
-    // draw bar
-    u16 barColor = _normalColor;
-    if (_namedAppearance) {
-        _itemText.setTextColor(uiSettings().spinBoxTextNamedColor);
-    } else if (isActive()) {
-        barColor = _focusedColor;
-        _itemText.setTextColor(uiSettings().spinBoxTextHighLightColor);
-    } else {
-        _itemText.setTextColor(uiSettings().spinBoxTextColor);
-    }
-
-    bool drawBg = _leftBg.valid() || _middleBg.valid() || _rightBg.valid();
-    if (drawBg) {
-        s32 x = _prevButton.position().x + _prevButton.size().x;
-        s32 y = _prevButton.position().y;
-        _leftBg.draw(x, y);
-
-        x += _leftBg.size().x;
-        s32 middleWidth = _middleBg.size().x;
-        if (middleWidth > 0) {
-            s32 titleWidth = _nextButton.position().x - x - _rightBg.size().x;
-            s32 repeats = (titleWidth / middleWidth) + 1;
-            for (s32 i = 0; i < repeats; i++) {
-                _middleBg.draw(x + (i * middleWidth), y);
-            }
+    void cSpinBox::selectItem(u32 id) {
+        _selectedItemId = id;
+        if (_selectedItemId >= _items.size()) {
+            return;
         }
 
-        // logger().info("Right bg size x: " + std::to_string(_rightBg.size().x) + ".");
-        x = _nextButton.position().x - _rightBg.size().x;
-        _rightBg.draw(x, y);
-    } else {
-        gdi().setPenColor(barColor, _engine);
+        _itemText.setText(_items[_selectedItemId]);
 
-        u8 bodyX1 = _prevButton.position().x + _prevButton.size().x;
-        u8 fillWidth = windowRectangle().size().x - _nextButton.size().x - _prevButton.size().x;
-        gdi().fillRect(barColor, barColor, bodyX1, position().y, fillWidth, _prevButton.size().y,
-                    selectedEngine());
+        onResize();
 
-        gdi().setPenColor(_frameColor, _engine);
-        gdi().frameRect(bodyX1, position().y, fillWidth, _prevButton.size().y, uiSettings().thickness,
+        changed(this);
+    }
+
+    void cSpinBox::selectNext() {
+        if (_items.size() - 1 == _selectedItemId) return;
+
+        selectItem(_selectedItemId + 1);
+    }
+
+    void cSpinBox::selectPrev() {
+        if (0 == _selectedItemId) return;
+
+        selectItem(_selectedItemId - 1);
+    }
+
+    void cSpinBox::insertItem(const std::string& item, u32 position) {
+        if (position > _items.size()) {
+            return;
+        }
+
+        _items.insert(_items.begin() + position, item);
+
+        if (_items.size() == 1) {
+            selectItem(0);
+        }
+    }
+
+    void cSpinBox::removeItem(u32 position) {
+        if (position > _items.size() - 1) return;
+
+        _items.erase(_items.begin() + position);
+    }
+
+    void cSpinBox::setPrefixIcon(const std::string& filename)  {
+        if (!_namedAppearance) {
+            return;
+        }
+
+        _prefixIcon.loadAppearance(filename);
+
+        onResize();
+    }
+
+    void cSpinBox::draw() {
+        // draw bar
+        u16 barColor = _normalColor;
+        if (_namedAppearance) {
+            _itemText.setTextColor(uiSettings().spinBoxTextNamedColor);
+        } else if (isActive()) {
+            barColor = _focusedColor;
+            _itemText.setTextColor(uiSettings().spinBoxTextHighLightColor);
+        } else {
+            _itemText.setTextColor(uiSettings().spinBoxTextColor);
+        }
+
+        _prefixIcon.draw();
+
+        bool drawBg = _leftBg.valid() || _middleBg.valid() || _rightBg.valid();
+        if (drawBg) {
+            s32 x = _prevButton.position().x + _prevButton.size().x + _prefixIcon.size().x;
+            s32 y = _prevButton.position().y;
+            _leftBg.draw(x, y);
+
+            x += _leftBg.size().x;
+            s32 middleWidth = _middleBg.size().x;
+            if (middleWidth > 0) {
+                s32 titleWidth = _nextButton.position().x - x - _rightBg.size().x;
+                s32 repeats = (titleWidth / middleWidth) + 1;
+                for (s32 i = 0; i < repeats; i++) {
+                    _middleBg.draw(x + (i * middleWidth), y);
+                }
+            }
+
+            // logger().info("Right bg size x: " + std::to_string(_rightBg.size().x) + ".");
+            x = _nextButton.position().x - _rightBg.size().x;
+            _rightBg.draw(x, y);
+        } else {
+            gdi().setPenColor(barColor, _engine);
+
+            u8 bodyX1 = _prevButton.position().x + _prevButton.size().x;
+            u8 fillWidth = windowRectangle().size().x - _nextButton.size().x - _prevButton.size().x;
+            gdi().fillRect(barColor, barColor, bodyX1, position().y, fillWidth, _prevButton.size().y,
                         selectedEngine());
+
+            gdi().setPenColor(_frameColor, _engine);
+            gdi().frameRect(bodyX1, position().y, fillWidth, _prevButton.size().y, uiSettings().thickness,
+                            selectedEngine());
+        }
+
+        // draw previous button
+        _prevButton.draw();
+
+        // draw text
+        _itemText.draw();
+
+        // draw next button
+        _nextButton.draw();
     }
 
-    // draw previous button
-    _prevButton.draw();
+    cWindow& cSpinBox::loadAppearance(const std::string& aFileName) {
+        if (_namedAppearance) {
+            _prevButton.loadAppearance(SFN_SPINBUTTON_L_NAMED);
+            _nextButton.loadAppearance(SFN_SPINBUTTON_R_NAMED);
 
-    // draw text
-    _itemText.draw();
+            _leftBg.loadAppearance(SFN_SPINBG_L_NAMED);
+            _middleBg.loadAppearance(SFN_SPINBG_M_NAMED);
+            _rightBg.loadAppearance(SFN_SPINBG_R_NAMED);
+        }
 
-    // draw next button
-    _nextButton.draw();
-}
+        if (!_prevButton.valid()) {
+            _prevButton.loadAppearance(SFN_SPINBUTTON_L);
+        }
 
-cWindow& cSpinBox::loadAppearance(const std::string& aFileName) {
-    if (_namedAppearance) {
-        _prevButton.loadAppearance(SFN_SPINBUTTON_L_NAMED);
-        _nextButton.loadAppearance(SFN_SPINBUTTON_R_NAMED);
+        if (!_nextButton.valid()) {
+            _nextButton.loadAppearance(SFN_SPINBUTTON_R);
+        }
 
-        _leftBg.loadAppearance(SFN_SPINBG_L_NAMED);
-        _middleBg.loadAppearance(SFN_SPINBG_M_NAMED);
-        _rightBg.loadAppearance(SFN_SPINBG_R_NAMED);
+        setSize(cSize(size().x, std::max(_prevButton.size().y, _nextButton.size().y)));
+
+        return *this;
     }
 
-    if (!_prevButton.valid()) {
-        _prevButton.loadAppearance(SFN_SPINBUTTON_L);
+    void cSpinBox::onGainedFocus() {}
+
+    void cSpinBox::onResize() {
+        dbg_printf("spin box on resize\n");
+        arrangeButton();
+        arrangeText();
     }
 
-    if (!_nextButton.valid()) {
-        _nextButton.loadAppearance(SFN_SPINBUTTON_R);
+    void cSpinBox::onMove() {
+        arrangeButton();
+        arrangeText();
     }
 
-    setSize(cSize(size().x, std::max(_prevButton.size().y, _nextButton.size().y)));
+    void cSpinBox::arrangeText() {
+        cFont& textFont = _namedAppearance ? font() : fontSecondary();
+        s32 textWidth = _items.size() ? textFont.TextWidth(_items[_selectedItemId]) : 0;
+        if (textWidth > _itemText.size().x) textWidth = _itemText.size().x;
 
-    return *this;
-}
+        if (_namedAppearance) {
+            int xOffset = _leftBg.size().x == 0 ? 5 : _leftBg.size().x;
+            xOffset += _prefixIcon.size().x;
 
-void cSpinBox::onGainedFocus() {}
-
-void cSpinBox::onResize() {
-    dbg_printf("spin box on resize\n");
-    arrangeButton();
-    arrangeText();
-}
-
-void cSpinBox::onMove() {
-    arrangeButton();
-    arrangeText();
-}
-
-void cSpinBox::arrangeText() {
-    cFont& textFont = _namedAppearance ? font() : fontSecondary();
-    s32 textWidth = _items.size() ? textFont.TextWidth(_items[_selectedItemId]._text) : 0;
-    if (textWidth > _itemText.size().x) textWidth = _itemText.size().x;
-
-    if (_namedAppearance) {
-        int xOffset = _leftBg.size().x == 0 ? 5 : _leftBg.size().x;
-        int positionX = _prevButton.size().x + xOffset;
-        _itemText.setRelativePosition(cPoint(positionX, (_size.y - font().GetHeight()) >> 1));
-        _itemText.setFont(true);
-    } else {
-        int textX = _prevButton.relativePosition().x + _prevButton.size().x + ((size().x - _prevButton.size().x - _nextButton.size().x - textWidth) / 2);
-        _itemText.setRelativePosition(cPoint(textX, (_size.y - fontSecondary().GetHeight()) >> 1));
-        _itemText.setFont(false);
+            int positionX = _prevButton.size().x + xOffset;
+            _itemText.setRelativePosition(cPoint(positionX, (_size.y - font().GetHeight()) >> 1));
+            _itemText.setFont(true);
+        } else {
+            int textX = _prevButton.relativePosition().x + _prevButton.size().x + ((size().x - _prevButton.size().x - _nextButton.size().x - textWidth) / 2);
+            _itemText.setRelativePosition(cPoint(textX, (_size.y - fontSecondary().GetHeight()) >> 1));
+            _itemText.setFont(false);
+        }
     }
-}
 
-void cSpinBox::arrangeButton() {
-    u8 x = 0;
-    _prevButton.setRelativePosition(cPoint(x, (_size.y - _prevButton.size().y) / 2));
+    void cSpinBox::arrangeButton() {
+        u8 x = 0;
+        _prevButton.setRelativePosition(cPoint(x, (_size.y - _prevButton.size().y) / 2));
 
-    x = size().x - _nextButton.size().x;
-    _nextButton.setRelativePosition(cPoint(x, (_size.y - _nextButton.size().y)));
-}
+        _prefixIcon.setRelativePosition(cPoint(_prevButton.size().x, (_size.y - _prefixIcon.size().y) / 2));
 
-void cSpinBox::onCmponentClicked() {
-    componentClicked(this);
-}
+        x = size().x - _nextButton.size().x;
+        _nextButton.setRelativePosition(cPoint(x, (_size.y - _nextButton.size().y)));
+    }
 
+    void cSpinBox::onCmponentClicked() {
+        componentClicked(this);
+    }
 }  // namespace akui

@@ -11,6 +11,7 @@
 
 #include <nds.h>
 #include <string>
+#include <memory>
 
 class cBMP15 {
     friend cBMP15 createBMP15(u32 width, u32 height);
@@ -30,15 +31,15 @@ class cBMP15 {
 
     u32 pitch() const { return _pitch; }  // pitch returns bytes per line
 
-    u32* buffer() { return _buffer; }
+    u32* buffer() { return _buffer.get(); }
 
-    const u32* buffer() const { return _buffer; }
+    const u32* buffer() const { return _buffer.get(); }
 
     bool valid() const { return _buffer != NULL; }
 
-    std::string filename() const;
+    const std::string& filename() const;
 
-    std::string filename(std::string filename);
+    const std::string& filename(std::string filename);
 
   protected:
     u32 _width;
@@ -47,11 +48,11 @@ class cBMP15 {
 
     u32 _pitch;
 
-    u32* _buffer;  // 按 32 位地址对齐，可以在 bitblt 的时候加快速度
+    std::shared_ptr<u32[]> _buffer;  // 按 32 位地址对齐，可以在 bitblt 的时候加快速度
 
     std::string _filename;
 
-    void freeBuffer();
+    void clear();
 };
 
 cBMP15 createBMP15(u32 width, u32 height);

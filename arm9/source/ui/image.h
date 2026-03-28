@@ -19,6 +19,6 @@ namespace akui {
         void draw();
 
       protected:
-        cBitmapDesc* _bitmapDesc;
+        cBitmapDesc _bitmapDesc;
     };
 }

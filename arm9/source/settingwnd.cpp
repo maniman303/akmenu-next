@@ -16,12 +16,13 @@
 #include "uisettings.h"
 #include "windowmanager.h"
 #include "fontfactory.h"
+#include "logger.h"
 #define TOP_MARGIN 4
 
 using namespace akui;
 
-cSettingWnd* cSettingWnd::createWindow(cWindow* parent, const std::string& text, std::function<void(cSettingWnd*)> onSaved) {
-    cSettingWnd* wnd = new cSettingWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, parent, text);
+cSettingWnd* cSettingWnd::createWindow(cWindow* parent, const std::string& text, const std::string& id, std::function<void(cSettingWnd*)> onSaved) {
+    cSettingWnd* wnd = new cSettingWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, parent, text, id);
     wnd->setDynamic(true);
     wnd->onSaved = onSaved;
     _modals.push_back(wnd);
@@ -29,7 +30,7 @@ cSettingWnd* cSettingWnd::createWindow(cWindow* parent, const std::string& text,
     return wnd;
 }
 
-cSettingWnd::cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
+cSettingWnd::cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text, const std::string& id)
     : cForm(x, y, w, h, parent, text),
       _tabSwitcher(0, 0, w, 18, true, this, "spin"),
       _buttonOK(0, 0, 46, 18, this, "\x01 OK"),
@@ -70,6 +71,7 @@ cSettingWnd::cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     _titleOffset = 0;
     _maxTabSize = 0;
     _confirmMessage = LANG("setting window", "confirm text");
+    _id = id;
     CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
     _spinBoxWidth = ini.GetInt("setting window", "spinBoxWidth", 108);
     _simpleTabs = ini.GetInt("setting window", "simpleTabs", 0);
@@ -77,10 +79,6 @@ cSettingWnd::cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     loadAppearance("");
 
     _currentTab = 0;
-}
-
-void cSettingWnd::setConfirmMessage(const std::string& text) {
-    _confirmMessage = text;
 }
 
 cSettingWnd::~cSettingWnd() {
@@ -190,6 +188,10 @@ cWindow& cSettingWnd::loadAppearance(const std::string& aFileName) {
     return *this;
 }
 
+void cSettingWnd::setConfirmMessage(const std::string& text) {
+    _confirmMessage = text;
+}
+
 void cSettingWnd::addSettingTab(const std::string& text) {
     if (_tabs.size() == 0 && _simpleTabs) {
         _renderDesc.loadData("", "", "");
@@ -197,9 +199,8 @@ void cSettingWnd::addSettingTab(const std::string& text) {
         _titleOffset = 0;
     }
 
-    sSettingTab tab(new std::vector<sSettingItem>, text, _tabs.size());
-    _tabs.push_back(tab);
-    _tabSwitcher.insertItem(tab);
+    _tabSwitcher.insertItem(text, _tabs.size());
+    _tabs.push_back(sSettingTab(new std::vector<sSettingItem>, text));
     _tabSwitcher.show();
 }
 
@@ -250,7 +251,8 @@ void cSettingWnd::addSettingItem(const std::string& text, const std::vector<std:
     _buttonOK.setRelativePosition(cPoint(_buttonOK.relativePosition().x, buttonY));
 }
 
-void cSettingWnd::onShow(void) {
+void cSettingWnd::onShow() {
+    // logger().info("On show.");
     ShowTab(_currentTab);
 }
 
@@ -332,11 +334,17 @@ void cSettingWnd::HideTab(size_t index) {
 }
 
 void cSettingWnd::ShowTab(size_t index) {
-    if (index >= _tabs.size()) return;
+    if (index >= _tabs.size()) {
+        return;
+    }
+
     for (size_t ii = 0; ii < items(index).size(); ++ii) {
         items(index)[ii]._label->show();
         items(index)[ii]._item->show();
     }
+
+    _tabSwitcher.setPrefixIcon(SFN_UI_PREFIXES_DIRECTORY + prefixIconName(index));
+
     if (items(index).size()) windowManager().setFocusedWindow(items(index)[0]._item);
 }
 

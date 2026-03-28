@@ -23,23 +23,21 @@ cBMP15::cBMP15(u32 width, u32 height) : _width(0), _height(0), _pitch(0), _buffe
 }
 
 cBMP15::~cBMP15() {
-    // use destroyBMP15
+    clear();
 }
 
-void cBMP15::freeBuffer() {
-    if (_buffer == NULL) {
-        return;
-    }
-
-    delete[] _buffer;
-    _buffer = NULL;
+void cBMP15::clear() {
+    _width = 0;
+    _height = 0;
+    _pitch = 0;
+    _filename = "";
 }
 
-std::string cBMP15::filename() const {
+const std::string& cBMP15::filename() const {
     return _filename;
 }
 
-std::string cBMP15::filename(std::string filename) {
+const std::string& cBMP15::filename(std::string filename) {
     _filename = filename;
 
     return _filename;
@@ -55,7 +53,7 @@ cBMP15 createBMP15(u32 width, u32 height) {
     u32 bufferSize = height * pitch;
     if (bufferSize & 3)  // 如果 bufferSize 不是按4字节对齐，就把他调整到对齐
         bufferSize += 4 - (bufferSize & 3);
-    bmp._buffer = new u32[bufferSize >> 2];
+    bmp._buffer = std::shared_ptr<u32[]>(new u32[bufferSize >> 2]);
     return bmp;
 }
 
@@ -74,7 +72,7 @@ cBMP15 createBMP15FromFile(const std::string& filename) {
 
     str_bmp_list::iterator it;
     for (it = _bmpPool.begin(); it != _bmpPool.end(); ++it) {
-        if (it->filename() == filename) {
+        if (it->valid() && it->filename() == filename) {
             return *it;
         }
     }
@@ -109,7 +107,8 @@ cBMP15 createBMP15FromFile(const std::string& filename) {
     fseek(f, 0x16, SEEK_SET);
     fread(&height, 1, 4, f);
 
-    cBMP15 bmp = createBMP15(width, height);
+    _bmpPool.push_back(createBMP15(width, height));
+    cBMP15& bmp = _bmpPool.back();
 
     u32 bmpDataOffset = 0;
     fseek(f, 0x0a, SEEK_SET);
@@ -125,6 +124,7 @@ cBMP15 createBMP15FromFile(const std::string& filename) {
         pbuffer -= bmp.pitch() >> 1;
         fseek(f, position, SEEK_SET);
     }
+
     fclose(f);
 
     pbuffer = (u16*)bmp.buffer();
@@ -139,16 +139,15 @@ cBMP15 createBMP15FromFile(const std::string& filename) {
     }
 
     bmp.filename(filename);
-    _bmpPool.push_back(bmp);
 
     // dbg_printf( "load bmp success, %08x\n", bmp.buffer() );
     return bmp;
 }
 
 void destroyBMP15(cBMP15& bmp) {
-    _bmpPool.remove_if([&](const cBMP15& testItem) {
-        return testItem.filename() == bmp.filename();
-    });
-
-    bmp.freeBuffer();
+    if (!bmp.filename().empty()) {
+        _bmpPool.remove_if([&](cBMP15& testItem) {
+            return testItem.filename() == bmp.filename();
+        });
+    }
 }

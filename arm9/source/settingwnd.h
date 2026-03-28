@@ -19,11 +19,11 @@
 
 class cSettingWnd : public akui::cForm {
   public:
-    cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text);
+    cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text, const std::string& id);
     ~cSettingWnd();
 
   public:
-    static cSettingWnd* createWindow(cWindow* parent, const std::string& text, std::function<void(cSettingWnd*)> onSaved);
+    static cSettingWnd* createWindow(cWindow* parent, const std::string& text, const std::string& id, std::function<void(cSettingWnd*)> onSaved);
 
     std::function<void(cSettingWnd*)> onSaved;
 
@@ -42,16 +42,17 @@ class cSettingWnd : public akui::cForm {
         akui::cSpinBox* _item;
         sSettingItem(akui::cStaticText* label, akui::cSpinBox* item) : _label(label), _item(item){};
     };
-    struct sSettingTab : akui::cSpinBox::cSpinItem {
+    struct sSettingTab {
         std::vector<sSettingItem>* _tab;
-        sSettingTab(std::vector<sSettingItem>* tab, const std::string& title, u32 position)
-            : akui::cSpinBox::cSpinItem(title, position), _tab(tab) {};
+        std::string _title;
+        sSettingTab(std::vector<sSettingItem>* tab, const std::string& title)
+            : _tab(tab), _title(title) {};
     };
 
   protected:
     void onOK(void) override;
     void onCancel(void) override;
-    void onShow(void) override;
+    void onShow() override;
     void onUIKeyUP(void);
     void onUIKeyDOWN(void);
     void onUIKeyLEFT(void);
@@ -70,6 +71,8 @@ class cSettingWnd : public akui::cForm {
 
     std::vector<sSettingItem>& items(size_t index) { return *_tabs[index]._tab; };
 
+    std::string prefixIconName(size_t index) { return _id + "_" + std::to_string(index) + ".bmp"; }
+
     u32 _titleOffset;
     u32 _maxLabelLength;
     u32 _spinBoxWidth;
@@ -78,6 +81,7 @@ class cSettingWnd : public akui::cForm {
     size_t _currentTab;
     size_t _maxTabSize;
     std::string _confirmMessage;
+    std::string _id;
 
     akui::cSpinBox _tabSwitcher;
     akui::cButton _buttonOK;

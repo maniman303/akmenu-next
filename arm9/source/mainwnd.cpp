@@ -439,7 +439,7 @@ void cMainWnd::showSettings(void) {
         return;
     }
 
-    cSettingWnd* settingWnd = cSettingWnd::createWindow(this, LANG("start menu", "Setting"), [this](cSettingWnd* wnd) { saveSettings(wnd); });
+    cSettingWnd* settingWnd = cSettingWnd::createWindow(this, LANG("start menu", "Setting"), "main_settings", [this](cSettingWnd* wnd) { saveSettings(wnd); });
     settingWnd->addSettingTab(LANG("system setting", "title"));
 
     // page 1: system

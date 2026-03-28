@@ -318,7 +318,7 @@ void cRomInfoWnd::onShow() {
 void cRomInfoWnd::pressSaveType(void) {
     if (!_romInfo.isDSRom() || _romInfo.isHomebrew()) return;
 
-    cSettingWnd* settingWnd = cSettingWnd::createWindow(NULL, LANG("game settings", "title"), [this](cSettingWnd* wnd) { saveSettings(wnd); });
+    cSettingWnd* settingWnd = cSettingWnd::createWindow(NULL, LANG("game settings", "title"), "rom_info", [this](cSettingWnd* wnd) { saveSettings(wnd); });
     
     settingWnd->addSettingTab(LANG("save type", "tab1"));
 
