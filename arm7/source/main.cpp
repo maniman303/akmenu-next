@@ -51,26 +51,7 @@ static void prepairResetTT() {
 
 typedef void (*pico_loader_7_func_t)(void);
 
-volatile bool reset_pico = false;
-
-static void resetDSPico() {
-    zeroMemory((void*)0x40000B0, 0x30);
-
-    REG_IME = IME_DISABLE;
-    REG_IE = 0;
-    REG_IF = ~0;
-
-    auto header7 = (pload_header7_t*)0x06000000;
-    // header7->dldiDriver = (void*)0x037F8000;
-    ((pico_loader_7_func_t)header7->entryPoint)();
-}
-
 static void prepairReset() {
-    // enable sound
-    if (2 == getSystem())
-        writePowerManagement(PM_CONTROL_REG,
-                             (readPowerManagement(PM_CONTROL_REG) & ~PM_SOUND_MUTE) | PM_SOUND_AMP);
-
     // disble rtc irq, on some games enabled rtc irq caused tearing.
     uint8 command[2];
     command[0] = WRITE_STATUS_REG2;
@@ -138,6 +119,19 @@ static u8 check3DS(void) {
     return is3DS;
 }
 
+typedef void (*pico_loader_7_func_t)(void);
+static void picoLoaderStart() {
+    // Disable all IRQs
+    irqDisable(IRQ_ALL);
+    REG_IME = IME_DISABLE;
+    REG_IE = 0;
+    REG_IF = ~0;
+
+    // Reset
+    pload_header7_t* header7 = (pload_header7_t*)0x06000000;
+    ((pico_loader_7_func_t)header7->entryPoint)();
+}
+
 static void menuValue32Handler(u32 value, void* data) {
     switch (value) {
         case MENU_MSG_GBA: {
@@ -157,7 +151,7 @@ static void menuValue32Handler(u32 value, void* data) {
             swiSoftReset();
             break;
         case MENU_MSG_ARM7_REBOOT_PICOLOADER:
-            reset_pico = true;
+            picoLoaderStart();
             break;
         case MENU_MSG_BRIGHTNESS_NEXT:
             brightnessNext();
@@ -207,9 +201,11 @@ int main() {
 	dmaFillWords(0, (void*)0x04000400, 0x100);
 
 	REG_SOUNDCNT |= SOUND_ENABLE;
+
     // switch on backlight on both screens
-    writePowerManagement(PM_CONTROL_REG, (readPowerManagement(PM_CONTROL_REG) & ~PM_SOUND_MUTE) |
-        PM_BACKLIGHT_BOTTOM | PM_BACKLIGHT_TOP | PM_SOUND_AMP);
+    writePowerManagement(PM_CONTROL_REG, (readPowerManagement(PM_CONTROL_REG)) | PM_BACKLIGHT_BOTTOM | PM_BACKLIGHT_TOP);
+
+    // power on sound
     powerOn(POWER_SOUND);
 
     // read User Settings from firmware
@@ -247,12 +243,6 @@ int main() {
 
         if (ticks == 0) {
             probeBatteryStatus();
-        }
-
-        swiWaitForVBlank();
-
-        if (reset_pico) {
-            resetDSPico();
         }
 
         swiWaitForVBlank();

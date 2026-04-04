@@ -15,7 +15,7 @@
 
 #include <nds/ndstypes.h>
 
-#include "../cheatwnd.h"
+#include "../cheat.h"
 #include "../dsrom.h"
 #include "../flags.h"
 #include "../inifile.h"
@@ -64,16 +64,16 @@ std::unique_ptr<TaskWorker> NdsBootstrapLauncher::task() const {
 bool NdsBootstrapLauncher::prepareCheats(const std::string& mRomPath) {
     u32 gameCode, crc32;
 
-    if (cCheatWnd::romData(mRomPath, gameCode, crc32)) {
+    if (cCheat::romData(mRomPath, gameCode, crc32)) {
         FILE* cheatDb = fopen((SFN_CHEATS).c_str(), "rb");
         if (!cheatDb) goto cheat_failed;
         long cheatOffset;
         size_t cheatSize;
-        if (cCheatWnd::searchCheatData(cheatDb, gameCode, crc32, cheatOffset, cheatSize)) {
-            cCheatWnd chtwnd((256) / 2, (192) / 2, 100, 100, NULL, mRomPath);
+        if (cCheat::searchCheatData(cheatDb, gameCode, crc32, cheatOffset, cheatSize)) {
+            cCheat cheat;
 
-            chtwnd.parse(mRomPath);
-            chtwnd.writeCheatsToFile("/_nds/nds-bootstrap/cheatData.bin");
+            cheat.parse(mRomPath);
+            cheat.writeCheatsToFile("/_nds/nds-bootstrap/cheatData.bin");
             FILE* cheatData = fopen("/_nds/nds-bootstrap/cheatData.bin", "rb");
             if (cheatData) {
                 u32 check[2];

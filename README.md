@@ -95,8 +95,7 @@ Here is an example VS Code setup:
                 "__arm__",
                 "ARM9",
                 "ARM11",
-                "_GNU_SOURCE",
-                "__cplusplus"
+                "_GNU_SOURCE"
             ],
             "compilerPath": "/opt/devkitpro/devkitARM/bin/arm-none-eabi-g++",
             "cStandard": "c17",

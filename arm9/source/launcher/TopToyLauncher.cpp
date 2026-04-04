@@ -13,7 +13,7 @@
 
 #include <nds/ndstypes.h>
 
-#include "../cheatwnd.h"
+#include "../cheat.h"
 #include "../dsrom.h"
 #include "../flags.h"
 #include "../mainlist.h"
@@ -58,16 +58,20 @@ typedef struct {
 bool TopToyLauncher::prepareCheats() {
     u32 gameCode, crc32;
 
-    if (cCheatWnd::romData(mRomPath, gameCode, crc32)) {
+    if (cCheat::romData(mRomPath, gameCode, crc32)) {
         FILE* cheatDb = fopen((SFN_CHEATS).c_str(), "rb");
         if (!cheatDb) goto cheat_failed;
         long cheatOffset;
         size_t cheatSize;
-        if (cCheatWnd::searchCheatData(cheatDb, gameCode, crc32, cheatOffset, cheatSize)) {
+        if (cCheat::searchCheatData(cheatDb, gameCode, crc32, cheatOffset, cheatSize)) {
             // Read cheat codes
-            cCheatWnd chtwnd((256) / 2, (192) / 2, 100, 100, NULL, mRomPath);
-            chtwnd.parse(mRomPath);
-            std::vector<u32> cheats(chtwnd.getCheats());
+            cCheat cheat;
+            cheat.parse(mRomPath);
+            std::vector<cCheatDatItem> enabledCheats = cheat.getEnabledCheats();
+            std::vector<u32> cheats;
+            for (size_t i = 0; i < enabledCheats.size(); i++) {
+                cheats.insert(cheats.end(), enabledCheats[i]._cheat.begin(), enabledCheats[i]._cheat.end());
+            }
 
             // YSMENU.ARP file creation
             ALIGN(4) TTARHeader arHeader = {};

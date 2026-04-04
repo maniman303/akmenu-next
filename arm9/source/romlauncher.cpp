@@ -19,7 +19,7 @@
 #include "launcher/Launcher.h"
 #include "launcher/NdsBootstrapLauncher.h"
 #include "launcher/TopToyLauncher.h"
-#include "launcher/DSpicoLauncher.h"
+#include "launcher/PicoLoaderLauncher.h"
 
 static SAVE_TYPE PrefillGame(u32 aGameCode) {
     if (0x45444759 == aGameCode)  // YGDE: 2209 - Diary Girl (USA)
@@ -260,7 +260,7 @@ TLaunchResult launchRom(const std::string& aFullPath, DSRomInfo& aRomInfo, bool 
         u8 loader = aRomInfo.saveInfo().getLoader();
         // loader = 0: pico, 1: nds-bootstrap, 2: global
         if(((gs().pico && loader == 2) || loader == 0) && aFullPath[0] != 's'){ //roms can only be launched from the sd with nds-bootstrap
-            launcher = new DSpicoLauncher();
+            launcher = new PicoLoaderLauncher();
         }
         else {
             launcher = new NdsBootstrapLauncher();

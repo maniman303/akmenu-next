@@ -9,14 +9,18 @@
 #include <nds/ndstypes.h>
 
 #include "Launcher.h"
-#include "DSpico/picoLoader7.h"
+#include "PicoLoader/picoLoader7.h"
 
-class DSpicoLauncher : public Launcher {
+class PicoLoaderLauncher : public Launcher {
   public:
     std::unique_ptr<TaskWorker> task() const override;
     bool process() override;
 
   private:
+    void copyToVram(const char* loaderPath, void* destination);
+    bool prepareCheats(void);
+    bool setParameters(void);
+    pload_cheats_t* mCheats;
     FILE* _loader7;
     FILE* _loader9;
     pload_params_t _sLoadParams;

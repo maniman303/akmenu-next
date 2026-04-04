@@ -212,8 +212,10 @@ bool cSaveManager::initializeSaveFile(const std::string& romFilename, u8 slot, u
                 progressWnd().hide();
             }
         }
+
         close(f);
     }
+    
     return res;
 }
 

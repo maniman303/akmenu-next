@@ -17,7 +17,7 @@ SOURCE_PATH := ../arm9
 # all directories are relative to this makefile
 #---------------------------------------------------------------------------------
 BUILD    := build
-SOURCES  := $(SOURCE_PATH)/source $(SOURCE_PATH)/source/ui $(SOURCE_PATH)/source/font $(SOURCE_PATH)/source/launcher/slot2 $(SOURCE_PATH)/source/launcher $(SOURCE_PATH)/source/saves
+SOURCES  := $(SOURCE_PATH)/source $(SOURCE_PATH)/source/blockds $(SOURCE_PATH)/source/ui $(SOURCE_PATH)/source/font $(SOURCE_PATH)/source/launcher/slot2 $(SOURCE_PATH)/source/launcher $(SOURCE_PATH)/source/saves
 INCLUDES := $(SOURCE_PATH)/include ../share $(SOURCES)
 DATA     := $(SOURCE_PATH)/data ../data
 GRAPHICS :=
@@ -34,7 +34,7 @@ CFLAGS   := -g -Wall -O3\
 CFLAGS   += -D_NO_BOOTSTUB_
 
 CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions
-ASFLAGS  := -g $(ARCH) $(INCLUDE)
+ASFLAGS  := -g $(ARCH) $(INCLUDE) -DARM9
 LDFLAGS   = -specs=ds_arm9.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
 #---------------------------------------------------------------------------------

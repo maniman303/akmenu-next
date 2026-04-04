@@ -8,7 +8,6 @@
 
 #include <nds/ndstypes.h>
 #include <string>
-
 #include "Launcher.h"
 
 class TopToyLauncher : public Launcher {
