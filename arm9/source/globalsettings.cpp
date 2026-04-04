@@ -23,7 +23,6 @@ cGlobalSettings::cGlobalSettings() {
     startupFolder = "...";
     dateFormat = 0;
     fileListType = 0;
-    romTrim = 0;
     showHiddenFiles = false;
     clockSound = false;
     filePresentationMode = 0;
@@ -73,7 +72,6 @@ void cGlobalSettings::loadSettings() {
     dateFormat = ini.GetInt("system", "dateFormat", dateFormat);
     fileListType = ini.GetInt("system", "fileListType", fileListType);
     clockSound = ini.GetInt("system", "clockSound", clockSound);
-    romTrim = ini.GetInt("system", "romTrim", romTrim);
     showHiddenFiles = ini.GetInt("system", "showHiddenFiles", showHiddenFiles);
     filePresentationMode = ini.GetInt("system", "filePresentationMode", filePresentationMode);
     minimalModeRomsCount = ini.GetInt("system", "minimalModeRomsCount", minimalModeRomsCount);
@@ -133,7 +131,6 @@ void cGlobalSettings::saveSettings() {
     ini.SetString("system", "langDirectory", langDirectory);
     ini.SetInt("system", "dateFormat", dateFormat);
     ini.SetInt("system", "fileListType", fileListType);
-    ini.SetInt("system", "romTrim", romTrim);
     ini.SetInt("system", "showHiddenFiles", showHiddenFiles);
     ini.SetInt("system", "clockSound", clockSound);
     ini.SetInt("system", "filePresentationMode", filePresentationMode);
