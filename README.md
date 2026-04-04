@@ -48,10 +48,6 @@ Here are planned features:
 
 Please check the [AKMenu-Next Docs](https://coderkei.github.io/akmenu-next-docs/) for setting up or updating AKMenu-Next.
 
-## Installing
-
-Please check the [AKMenu-Next Docs](https://coderkei.github.io/akmenu-next-docs/) for setting up or updating AKMenu-Next.
-
 ## Building from source
 
 Requires the pre-calico version of devkitarm to be installed with the `nds-dev` package.
@@ -99,7 +95,8 @@ Here is an example VS Code setup:
                 "__arm__",
                 "ARM9",
                 "ARM11",
-                "_GNU_SOURCE"
+                "_GNU_SOURCE",
+                "__cplusplus"
             ],
             "compilerPath": "/opt/devkitpro/devkitARM/bin/arm-none-eabi-g++",
             "cStandard": "c17",

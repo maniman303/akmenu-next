@@ -19,6 +19,7 @@ class NdsBootstrapLauncher : public Launcher {
   private:
     bool prepareCheats(const std::string& mRomPath);
     bool prepareIni(const std::string& mRomPath, const std::string& mSavePath, bool hb);
+    bool is3DS(void);
     bool _messageBlock;
     bool _useNightly;
     std::string _mRomPath;
