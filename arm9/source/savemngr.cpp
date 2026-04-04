@@ -181,7 +181,7 @@ bool cSaveManager::clearLastInfo() {
 bool cSaveManager::initializeSaveFile(const std::string& romFilename, u8 slot, u32 size) {
     bool res = false;
     std::string saveFilename = generateSaveName(romFilename, slot);
-    int f = open(saveFilename.c_str(), O_WRONLY | O_CREAT);
+    int f = open(saveFilename.c_str(), O_WRONLY | O_CREAT | O_APPEND);
     if (f >= 0) {
         off_t filesize = lseek(f, 0, SEEK_END);
         if (filesize >= 0) {
