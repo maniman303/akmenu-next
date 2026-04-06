@@ -216,7 +216,7 @@ int main() {
     fifoInit();
 	touchInit();
 
-    initClockIRQ();
+    initClockIRQTimer(LIBNDS_DEFAULT_TIMER_RTC);
 
     installSystemFIFO();
     installSoundFIFO();
