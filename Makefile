@@ -17,6 +17,16 @@ GAME_SUBTITLE :=
 GAME_AUTHOR := github.com/coderkei
 GAME_ICON 	:= icon.bmp
 
+# Set make cia tools
+ifeq ($(OS),Windows_NT)
+    MAKE_CIA = ./tools/make_cia.exe
+else
+    UNAME_S := $(shell uname -s)
+    ifeq ($(UNAME_S),Linux)
+        MAKE_CIA = ./tools/make_cia
+    endif
+endif
+
 # DLDI and internal SD slot of DSi
 # --------------------------------
 
@@ -65,7 +75,7 @@ ROM_PICO	:= $(NAME)_pico.nds
 
 .PHONY: all clean arm9 arm7 dldipatch sdimage
 
-all: $(ROM) $(ROM_AK2) $(ROM_DSI) $(ROM_PICO)
+all: $(ROM) $(ROM_PICO) $(ROM_DSI) make_cia
 
 clean:
 	@echo "  CLEAN"
@@ -153,4 +163,4 @@ organize_files:
 	cp -r language package/_nds/akmenunext/
 
 make_cia:
-	$(MAKE_CIA) --srl=$(CURDIR)/package/$(NAME).dsi -o $(CURDIR)/package/$(NAME).cia
+	$(MAKE_CIA) --srl=$(CURDIR)/$(NAME).dsi -o $(CURDIR)/$(NAME).cia
