@@ -9,18 +9,18 @@
 
 //�
 
-#include "savemngr.h"
 #include <fat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include "savemngr.h"
 #include "datetime.h"
 #include "dbgtool.h"
 #include "dsrom.h"
 #include "inifile.h"
 #include "language.h"
-#include "progresswnd.h"
 #include "systemfilenames.h"
-#include "ui.h"
+#include "ui/progresswnd.h"
+#include "ui/ui.h"
 
 #include "saves/ROMList.h"
 

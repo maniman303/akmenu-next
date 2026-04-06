@@ -8,6 +8,7 @@
 
 #include <nds.h>
 #include <nds/system.h>
+#include <nds/arm7/sdmmc.h>
 #include <string.h>
 #include "../../share/fifotool.h"
 #include "../../share/memtool.h"
@@ -236,11 +237,6 @@ int main() {
     u32 ticks = 0;
        
     while (true) {
-        if (*(u32*)(0x2FFFD0C) == 0x454D4D43) {
-            sdmmc_get_cid(true, (u32*)0x2FFD7BC);    // Get eMMC CID
-            *(u32*)(0x2FFFD0C) = 0;
-        }
-
         if (ticks == 0) {
             probeBatteryStatus();
         }

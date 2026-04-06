@@ -15,12 +15,12 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include "../../share/fifotool.h"
 #include "exptools.h"
 #include "gbapatcher.h"
 #include "language.h"
-#include "progresswnd.h"
 #include "sram.h"
+#include "ui/progresswnd.h"
+#include "../../share/fifotool.h"
 
 #define LEN 0x100000
 #define LEN_NOR 0x8000

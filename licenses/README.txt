@@ -6,6 +6,6 @@ This provided source integrates Slot-2 cartridge interface code from Chishm, whi
 
 This provided source integrates ROM list code from the melonDS project, which is licensed under the GPL-3.0-or-later license. See GPL3.txt for more info.
 
-This provided source integrates devkitPro's bootloader, which is licensed under the GPL-2.0-or-later license. See GPL2.txt for more info.
+This provided source integrates BlockDS's bootloader, which is licensed under the GPL-2.0-or-later license. See GPL2.txt for more info.
 
 This provided source is collectively licensed under the GPL-3.0-or-later license.

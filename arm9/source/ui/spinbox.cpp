@@ -10,9 +10,9 @@
 #include <math.h>
 #include <string>
 #include "spinbox.h"
-#include "fontfactory.h"
 #include "ui.h"
-#include "logger.h"
+#include "../logger.h"
+#include "../font/fontfactory.h"
 
 //#include "windowmanager.h"
 

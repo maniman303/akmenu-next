@@ -6,13 +6,13 @@
     SPDX-License-Identifier: GPL-3.0-or-later
 */
 
-#include "sram.h"
 #include <fat.h>
 #include <malloc.h>
 #include <string.h>
+#include "sram.h"
 #include "exptools.h"
 #include "language.h"
-#include "progresswnd.h"
+#include "ui/progresswnd.h"
 
 bool cSram::SaveFileName(const char* romName, char* saveName) {
     saveName[0] = 0;

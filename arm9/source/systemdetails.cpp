@@ -61,9 +61,9 @@ void cSystemDetails::update() {
 	}
 
 	if (_batteryStatus == 0 || _chargingStatus) {
-		ledBlink(PM_LED_ON);
+		ledBlink(LED_ALWAYS_ON);
 	} else {
-		ledBlink(PM_LED_BLINK);
+		ledBlink(LED_BLINK_FAST);
 	}
 }
 

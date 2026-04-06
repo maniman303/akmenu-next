@@ -8,6 +8,7 @@
 */
 
 #include <nds.h>
+#include <nds/system.h>
 #include <nds/arm9/dldi.h>
 #include <cstdio>
 #include <list>
@@ -16,9 +17,12 @@
 
 #include <fat.h>
 
+#include "font/fontfactory.h"
+#include "ui/ui.h"
+#include "ui/progresswnd.h"
+
 #include "dbgtool.h"
 #include "gdi.h"
-#include "ui.h"
 #include "logger.h"
 
 #include "mainlist.h"
@@ -46,9 +50,7 @@
 #include "inifile.h"
 #include "irqs.h"
 
-#include "fontfactory.h"
 #include "language.h"
-#include "progresswnd.h"
 
 #include "exptools.h"
 #include "romlauncher.h"
@@ -57,14 +59,6 @@
 #include "fsmngr.h"
 
 using namespace akui;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-void __libnds_exit(int rc) {}
-#ifdef __cplusplus
-}
-#endif
 
 static bool runAutoLoop = false;
 
@@ -128,7 +122,7 @@ int main(int argc, char* argv[]) {
     initInput();
 
     // turn led on
-    ledBlink(PM_LED_ON);
+    ledBlink(LED_ALWAYS_ON);
 
     // soundEnable();
 

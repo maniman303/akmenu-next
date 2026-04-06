@@ -20,7 +20,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 ------------------------------------------------------------------*/
-#include <string.h>
+
 #include <nds.h>
 #include <nds/arm9/dldi.h>
 #include <sys/stat.h>
@@ -29,7 +29,12 @@
 #include <unistd.h>
 #include <fat.h>
 
-#include "load_bin.h"
+#include <string>
+
+/* LHS CHANGE START - load bootlib from disk */
+//#include "load_bin.h"
+#include <systemfilenames.h>
+/* LHS CHANGE END - load bootlib from disk */
 
 #ifndef _NO_BOOTSTUB_
 #include "bootstub_bin.h"
@@ -287,7 +292,6 @@ eRunNdsRetCode runNds (const void* loader, u32 loaderSize, u32 cluster, bool ini
 	if (!isDSiMode()){
 		memset (LCDC_BANK_C, 0x00, 128 * 1024);
 	}
-
 	// Load the loader/patcher into the correct address
 	vramcpy (LCDC_BANK_C, loader, loaderSize);
 
@@ -369,7 +373,22 @@ eRunNdsRetCode runNdsFile (const char* filename, int argc, const char** argv)  {
 	int pathLen;
 	const char* args[1];
 
-	
+	/* LHS CHANGE START - load bootlib from disk */
+	u8 *load_bin;
+	u32 load_bin_size;
+
+	std::string bootlib = SFN_BOOTLIB;
+	FILE* loadBinaryFile = fopen(bootlib.c_str(), "rb");
+	if (!loadBinaryFile)
+		return RUN_NDS_LOADER_MISSING;
+	fseek(loadBinaryFile, 0, SEEK_END);
+	load_bin_size = ftell(loadBinaryFile);
+	fseek(loadBinaryFile, 0, SEEK_SET);
+	load_bin = (u8*)malloc(load_bin_size);
+	fread(load_bin, 1, load_bin_size, loadBinaryFile);
+	fclose(loadBinaryFile);
+	/* LHS CHANGE END - load bootlib from disk */
+
 	if (stat (filename, &st) < 0) {
 		return RUN_NDS_STAT_FAILED;
 	}

@@ -8,9 +8,9 @@
 */
 
 #include "button.h"
-#include "fontfactory.h"
 #include "ui.h"
 #include "window.h"
+#include "../font/fontfactory.h"
 
 namespace akui {
 

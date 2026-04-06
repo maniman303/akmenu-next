@@ -13,7 +13,7 @@
 #include <vector>
 #include "bmp15.h"
 #include "singleton.h"
-#include "font.h"
+#include "font/font.h"
 
 #define SYSTEM_FONT_HEIGHT 12
 #define COLOR u16

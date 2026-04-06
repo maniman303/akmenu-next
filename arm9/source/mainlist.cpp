@@ -15,7 +15,6 @@
 #include <unordered_set>
 #include <queue>
 #include <algorithm>
-#include "../../share/memtool.h"
 #include "dbgtool.h"
 #include "gbaloader.h"
 #include "folder_banner_bin.h"
@@ -25,16 +24,17 @@
 #include "microsd_banner_bin.h"
 #include "nand_banner_bin.h"
 #include "nds_save_banner_bin.h"
-#include "progresswnd.h"
 #include "startmenu.h"
 #include "systemfilenames.h"
 #include "timetool.h"
 #include "unicode.h"
 #include "unknown_banner_bin.h"
-#include "windowmanager.h"
 #include "fsmngr.h"
 #include "savemngr.h"
 #include "logger.h"
+#include "ui/progresswnd.h"
+#include "ui/windowmanager.h"
+#include "../../share/memtool.h"
 
 using namespace akui;
 

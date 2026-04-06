@@ -29,19 +29,17 @@ void cFSManager::init(int argc, char* argv[]) {
     }
 
     // Mount devices
-    // If we can mount fat, we're on a flashcart
-    if (fatMountSimple("fat", dldiGetInternal())) {
-        chdir("fat:/");
-
-        _isFlashcart = true;
-        _fsRoot = "fat:";
+    if (!fatInitDefault()) {
+        return;
     }
 
-    if (isSDInserted()) {
-        fatMountSimple("sd", get_io_dsisd());
+    chdir("fat:/");
+    _isFlashcart = true;
+    _fsRoot = "fat:";
 
-        if (!isFlashcart()) {
-            chdir("sd:/");
+    if (isSDInserted() && !isFlashcart()) {
+        if (chdir("sd:/") == 0) {
+            _isFlashcart = false;
             _fsRoot = "sd:";
         }
     }

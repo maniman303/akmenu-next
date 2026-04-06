@@ -11,9 +11,9 @@
 
 #include "bmp15.h"
 #include "datetime.h"
-#include "point.h"
+#include "ui/point.h"
+#include "ui/window.h"
 #include "singleton.h"
-#include "window.h"
 
 class cCalendar : public akui::cWindow {
   public:

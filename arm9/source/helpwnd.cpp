@@ -9,12 +9,12 @@
 
 #include "cachedinifile.h"
 #include "helpwnd.h"
-#include "fontfactory.h"
 #include "language.h"
-#include "msgbox.h"
-#include "uisettings.h"
 #include "version.h"
-#include "windowmanager.h"
+#include "font/fontfactory.h"
+#include "ui/msgbox.h"
+#include "ui/uisettings.h"
+#include "ui/windowmanager.h"
 
 using namespace akui;
 

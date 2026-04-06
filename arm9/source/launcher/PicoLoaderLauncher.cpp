@@ -13,9 +13,8 @@
 #include <nds/arm9/video.h>
 #include <nds/bios.h>
 #include <nds/dma.h>
-#include "../blockds/cp15.h"
-#include "../blockds/dma.h"
-#include "../blockds/ndma.h"
+#include <nds/arm9/cp15.h>
+#include <nds/ndma.h>
 #include <nds/fifocommon.h>
 #include <nds/interrupts.h>
 #include <nds/memory.h>

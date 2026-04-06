@@ -11,7 +11,7 @@
 
 #include "popmenu.h"
 #include "ui.h"
-#include "fontfactory.h"
+#include "../font/fontfactory.h"
 //#include "windowmanager.h"
 
 namespace akui {

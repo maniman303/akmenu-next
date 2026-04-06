@@ -1,90 +1,156 @@
-#---------------------------------------------------------------------------------
-.SUFFIXES:
-#---------------------------------------------------------------------------------
-ifeq ($(strip $(DEVKITARM)),)
-$(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>devkitARM")
-endif
+# SPDX-License-Identifier: CC0-1.0
+#
+# SPDX-FileContributor: Antonio Niño Díaz, 2023
 
-export TARGET := $(shell basename $(CURDIR))
-export TOPDIR := $(CURDIR)
+BLOCKSDS	?= /opt/blocksds/core
+BLOCKSDSEXT	?= /opt/blocksds/external
 
-# GMAE_ICON is the image used to create the game icon, leave blank to use default rule
-GAME_ICON := icon.bmp
+# User config
+# ===========
 
-# specify a directory which contains the nitro filesystem
-# this is relative to the Makefile
-NITRO_FILES :=
+NAME := $(shell basename $(CURDIR))
 
-# These set the information text in the nds file
-GAME_TITLE     := AKMenu-Next
-GAME_SUBTITLE1 := github.com/coderkei
+PLATFORM	?=
 
-ifeq ($(OS),Windows_NT)
-    MAKE_CIA = ./tools/make_cia.exe
+GAME_TITLE  := AKMenu-Next
+GAME_SUBTITLE :=  
+GAME_AUTHOR := github.com/coderkei
+GAME_ICON 	:= icon.bmp
+
+# DLDI and internal SD slot of DSi
+# --------------------------------
+
+# Root folder of the SD image
+SDROOT		:= sdroot
+# Name of the generated image it "DSi-1.sd" for no$gba in DSi mode
+SDIMAGE		:= image.bin
+
+# Source code paths
+# -----------------
+
+# List of folders to combine into the root of NitroFS:
+NITROFSDIR	:=
+
+# Tools
+# -----
+
+MKDIR		:= mkdir
+RM		:= rm -rf
+
+# Verbose flag
+# ------------
+
+ifeq ($(VERBOSE),1)
+V		:=
 else
-    UNAME_S := $(shell uname -s)
-    ifeq ($(UNAME_S),Linux)
-        MAKE_CIA = ./tools/make_cia
-    endif
+V		:= @
 endif
 
-include $(DEVKITARM)/ds_rules
+# Directories
+# -----------
 
-.PHONY: nds-bootloader checkarm7 checkarm9 clean
+ARM9DIR		:= arm9
+ARM7DIR		:= arm7
 
-#---------------------------------------------------------------------------------
-# main targets
-#---------------------------------------------------------------------------------
-all:$(TARGET).nds $(TARGET).dsi
-	@$(MAKE) organize_files
+# Build artfacts
+# --------------
 
-data:
-	@mkdir -p data
+ROM			:= $(NAME).nds
+ROM_AK2		:= $(NAME)_ak2.nds
+ROM_DSI		:= $(NAME).dsi
+ROM_PICO	:= $(NAME)_pico.nds
 
-nds-bootloader: data
-	$(MAKE) -C nds-bootloader LOADBIN=$(CURDIR)/data/load.bin
+# Targets
+# -------
 
-#---------------------------------------------------------------------------------
-checkarm7:
-	$(MAKE) -C arm7
+.PHONY: all clean arm9 arm7 dldipatch sdimage
 
-#---------------------------------------------------------------------------------
-checkarm9: nds-bootloader
-	$(MAKE) -C arm9
+all: $(ROM) $(ROM_AK2) $(ROM_DSI) $(ROM_PICO)
 
-#---------------------------------------------------------------------------------
+clean:
+	@echo "  CLEAN"
+	$(V)$(MAKE) -f Makefile.arm9 clean --no-print-directory
+	$(V)$(MAKE) -f Makefile.arm7 clean --no-print-directory
+	$(V)$(RM) $(ROM) build $(SDIMAGE)
+	$(V)$(RM) -f package/*.nds package/*.dsi package/*.cia
+	$(V)$(RM) -f *.nds *.dsi
+	$(V)$(RM) -rf package/_nds/akmenunext/language
 
-$(TARGET).nds : $(NITRO_FILES) checkarm7 checkarm9
-	ndstool	-c $(TARGET).nds -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf \
-	-h 0x200 -t banner.bin \
-	$(_ADDFILES)
+arm9:
+	$(V)+$(MAKE) -f Makefile.arm9 --no-print-directory
 
-$(TARGET).dsi : $(NITRO_FILES) checkarm7 checkarm9
-	ndstool	-c $@ -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf \
-	-t banner.bin \
-	-g NEXT 01 "AKMENU" -z 80040407 -u 00030004 -a 00000138 -p 0001 \
-	$(_ADDFILES)
+arm9_ak2:
+	$(V)+$(MAKE) -f Makefile.arm9 PLATFORM=ak2 --no-print-directory
 
-#---------------------------------------------------------------------------------
+arm9_dsi:
+	$(V)+$(MAKE) -f Makefile.arm9 PLATFORM=dsi --no-print-directory
+
+arm9_pico:
+	$(V)+$(MAKE) -f Makefile.arm9 PLATFORM=pico --no-print-directory
+
+arm7:
+	$(V)+$(MAKE) -f Makefile.arm7 --no-print-directory
+
+ifneq ($(strip $(NITROFSDIR)),)
+# Additional arguments for ndstool
+NDSTOOL_ARGS	:= -d $(NITROFSDIR)
+
+# Make the NDS ROM depend on the filesystem only if it is needed
+$(ROM): $(NITROFSDIR)
+endif
+
+# Combine the title strings
+ifeq ($(strip $(GAME_SUBTITLE)),)
+    GAME_FULL_TITLE := $(GAME_TITLE);$(GAME_AUTHOR)
+else
+    GAME_FULL_TITLE := $(GAME_TITLE);$(GAME_SUBTITLE);$(GAME_AUTHOR)
+endif
+
+$(ROM): arm9 arm7
+	@echo "  NDSTOOL $@"
+	$(V)$(BLOCKSDS)/tools/ndstool/ndstool -c $@ \
+		-7 build/arm7.elf -9 build/arm9_default.elf \
+		-b $(GAME_ICON) "$(GAME_FULL_TITLE)" \
+		$(NDSTOOL_ARGS)
+
+$(ROM_AK2): arm9_ak2 arm7
+	@echo "  NDSTOOL $@"
+	$(V)$(BLOCKSDS)/tools/ndstool/ndstool -c $@ \
+		-7 build/arm7.elf -9 build/arm9_ak2.elf \
+		-b $(GAME_ICON) "$(GAME_FULL_TITLE)" \
+		$(NDSTOOL_ARGS)
+
+$(ROM_DSI): arm9_dsi arm7
+	@echo "  NDSTOOL $@"
+	$(V)$(BLOCKSDS)/tools/ndstool/ndstool -c $@ \
+		-7 build/arm7.elf -9 build/arm9_dsi.elf \
+		-b $(GAME_ICON) "$(GAME_FULL_TITLE)" \
+		$(NDSTOOL_ARGS)
+
+$(ROM_PICO): arm9_pico arm7
+	@echo "  NDSTOOL $@"
+	$(V)$(BLOCKSDS)/tools/ndstool/ndstool -c $@ \
+		-7 build/arm7.elf -9 build/arm9_pico.elf \
+		-b $(GAME_ICON) "$(GAME_FULL_TITLE)" \
+		$(NDSTOOL_ARGS)
+
+sdimage:
+	@echo "  MKFATIMG $(SDIMAGE) $(SDROOT)"
+	$(V)$(BLOCKSDS)/tools/mkfatimg/mkfatimg -t $(SDROOT) $(SDIMAGE)
+
+dldipatch: $(ROM)
+	@echo "  DLDIPATCH $(ROM)"
+	$(V)$(BLOCKSDS)/tools/dldipatch/dldipatch patch \
+		$(BLOCKSDS)/sys/dldi_r4/r4tf.dldi $(ROM)
+
 organize_files:
-	@mv -f $(TARGET).nds $(TARGET).dsi package/
-	cp package/$(TARGET).dsi package/title/00030004/4e455854/content/00000000.app
-	cp package/$(TARGET).nds package/boot.nds
-	cp package/$(TARGET).dsi package/boot.dsi
+	@mv -f $(NAME).nds $(NAME).dsi package/
+	cp package/$(NAME).dsi package/title/00030004/4e455854/content/00000000.app
+	cp package/$(NAME).nds package/boot.nds
+	cp package/$(NAME).dsi package/boot.dsi
 	@$(MAKE) make_cia
-	rm -f package/$(TARGET).nds package/$(TARGET).dsi
+	rm -f package/$(NAME).nds package/$(NAME).dsi
 	cp -r language package/_nds/akmenunext/
 
-#---------------------------------------------------------------------------------
 make_cia:
-	$(MAKE_CIA) --srl=$(CURDIR)/package/$(TARGET).dsi -o $(CURDIR)/package/$(TARGET).cia
-
-#---------------------------------------------------------------------------------
-clean:
-	$(MAKE) -C arm9 clean
-	$(MAKE) -C nds-bootloader clean
-	$(MAKE) -C arm7 clean
-	rm -rf data
-	rm -f package/*.nds package/*.dsi package/*.cia
-	rm -f *.nds *.dsi
-	rm -rf package/_nds/akmenunext/language
+	$(MAKE_CIA) --srl=$(CURDIR)/package/$(NAME).dsi -o $(CURDIR)/package/$(NAME).cia

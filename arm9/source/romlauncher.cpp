@@ -7,18 +7,18 @@
 
 #include <sys/stat.h>
 #include "romlauncher.h"
-#include "msgbox.h"
 #include "cheatwnd.h"
 #include "exptools.h"
 #include "flags.h"
 #include "language.h"
 #include "globalsettings.h"
 
+#include "ui/msgbox.h"
+
 #include "launcher/AcekardLauncher.h"
 #include "launcher/HomebrewLauncher.h"
 #include "launcher/Launcher.h"
 #include "launcher/NdsBootstrapLauncher.h"
-#include "launcher/TopToyLauncher.h"
 #include "launcher/PicoLoaderLauncher.h"
 
 static SAVE_TYPE PrefillGame(u32 aGameCode) {

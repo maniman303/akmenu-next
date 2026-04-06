@@ -2,7 +2,6 @@
 #include <nds/system.h>
 #include <math.h>
 #include "batterymeter.h"
-#include "irqs.h"
 #include "fifotool.h"
 #include "globalsettings.h"
 #include "cachedinifile.h"

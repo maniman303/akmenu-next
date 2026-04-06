@@ -1,10 +1,10 @@
 #pragma once
 
 #include "bmp15.h"
-#include "point.h"
+#include "ui/point.h"
+#include "ui/bitmapdesc.h"
+#include "ui/window.h"
 #include "singleton.h"
-#include "bitmapdesc.h"
-#include "window.h"
 
 using namespace akui;
 

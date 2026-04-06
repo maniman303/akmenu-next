@@ -12,13 +12,13 @@
 #include <cstring>
 #include <string>
 #include <math.h>
-#include "../../share/memtool.h"
 #include "dbgtool.h"
-#include "fontfactory.h"
 #include "globalsettings.h"
 #include "sprite.h"
 #include "userinput.h"
 #include "logger.h"
+#include "font/fontfactory.h"
+#include "../../share/memtool.h"
 
 static inline void dmaCopyWordsGdi(uint8 channel, const void* src, void* dest, uint32 size) {
     DC_FlushRange(src, size);

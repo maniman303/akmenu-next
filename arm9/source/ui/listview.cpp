@@ -11,7 +11,7 @@
 
 #include "listview.h"
 #include "ui.h"
-#include "fontfactory.h"
+#include "../font/fontfactory.h"
 //#include "gdi.h"
 //#include "dbgtool.h"
 

@@ -7,12 +7,12 @@
     SPDX-License-Identifier: GPL-3.0-or-later
 */
 
-#include "userinput.h"
 #include <cstring>
+#include "userinput.h"
 #include "dbgtool.h"
-#include "keymessage.h"
 #include "timer.h"
-#include "windowmanager.h"
+#include "ui/keymessage.h"
+#include "ui/windowmanager.h"
 
 using namespace akui;
 

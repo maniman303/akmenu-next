@@ -8,15 +8,11 @@
 */
 
 #include "mainwnd.h"
-#include "../../share/fifotool.h"
 #include "dbgtool.h"
-#include "msgbox.h"
 #include "systemfilenames.h"
 #include "timer.h"
 #include "timetool.h"
-#include "windowmanager.h"
 #include "diskicon.h"
-
 #include "datetime.h"
 
 #include "expwnd.h"
@@ -25,17 +21,21 @@
 #include "helpwnd.h"
 #include "cachedinifile.h"
 #include "language.h"
-#include "progresswnd.h"
 #include "romlauncher.h"
 
 #include <dirent.h>
 #include <fat.h>
-#include <sys/iosupport.h>
+
+#include "ui/msgbox.h"
+#include "ui/progresswnd.h"
+#include "ui/windowmanager.h"
 
 #include "launcher/HomebrewLauncher.h"
 #include "launcher/NdsBootstrapLauncher.h"
 #include "launcher/PassMeLauncher.h"
 #include "launcher/Slot1Launcher.h"
+
+#include "../../share/fifotool.h"
 
 using namespace akui;
 
@@ -588,7 +588,7 @@ void cMainWnd::showSettings(void) {
     _values.clear();
     _values.push_back("Kernel");
     _values.push_back("nds-bootstrap");
-    settingWnd.addSettingItem(LANG("loader", "text"), _values, gs().romLauncher);
+    settingWnd->addSettingItem(LANG("loader", "text"), _values, gs().romLauncher);
 #endif
 
     // page 5: other

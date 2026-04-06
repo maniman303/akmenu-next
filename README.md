@@ -65,7 +65,7 @@ Here is an example VS Code setup:
 - Create file `.devcontainer/devcontainer.json` with content:
 ```json
 {
-    "image": "devkitpro/devkitarm:20241104", 
+    "image": "skylyrac/blocksds:slim-latest", 
     "customizations": {
         "vscode": {
             "extensions": ["ms-vscode.cpptools"]
@@ -80,16 +80,15 @@ Here is an example VS Code setup:
         {
             "name": "devkitARM-Internal",
             "includePath": [
-                "${workspaceFolder}/arm9/build",
+                "${workspaceFolder}/build/arm9_default/arm9/data",
                 "${workspaceFolder}/arm9/source",
                 "${workspaceFolder}/arm9/source/font",
                 "${workspaceFolder}/arm9/source/launcher",
                 "${workspaceFolder}/arm9/source/saves",
                 "${workspaceFolder}/arm9/source/ui",
                 "${workspaceFolder}/share",
-                "/opt/devkitpro/devkitARM/arm-none-eabi/include/**",
-                "/opt/devkitpro/libgba/include/**",
-                "/opt/devkitpro/libnds/include/**"
+                "${env:WONDERFUL_TOOLCHAIN}/toolchain/gcc-arm-none-eabi/arm-none-eabi/include/**",
+                "${env:BLOCKSDS}/libs/libnds/include/**"
             ],
             "defines": [
                 "__arm__",
@@ -97,7 +96,7 @@ Here is an example VS Code setup:
                 "ARM11",
                 "_GNU_SOURCE"
             ],
-            "compilerPath": "/opt/devkitpro/devkitARM/bin/arm-none-eabi-g++",
+            "compilerPath": "${env:WONDERFUL_TOOLCHAIN}/toolchain/gcc-arm-none-eabi/bin/arm-none-eabi-g++",
             "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "linux-gcc-arm"

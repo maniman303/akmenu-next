@@ -2,11 +2,11 @@
 #include "smallclock.h"
 #include "globalsettings.h"
 #include "cachedinifile.h"
-#include "fontfactory.h"
 #include "stringtool.h"
 #include "systemfilenames.h"
 #include "unicode.h"
-#include "windowmanager.h"
+#include "font/fontfactory.h"
+#include "ui/windowmanager.h"
 
 cSmallClock::cSmallClock() : cWindow(NULL, "SmallClock") {
     _textColor = 0;

@@ -1,6 +1,6 @@
 STARTFONT 2.1
 COMMENT
-COMMENT Converted from OpenType font "verdana.ttf" by "C:\Programs\Develop\nds_ak_rpg\devkitARM\bin\otf2bdf.exe 3.0".
+COMMENT Converted from OpenType font "verdana.ttf" by "otf2bdf.exe 3.0".
 COMMENT
 FONT -FreeType-Verdana-Medium-R-Normal--10-100-72-72-P-56-ISO10646-1
 SIZE 10 72 72
@@ -22,7 +22,7 @@ CHARSET_REGISTRY "ISO10646"
 CHARSET_ENCODING "1"
 FONT_ASCENT 10
 FONT_DESCENT 2
-COPYRIGHT "Typeface and data © 1996 Microsoft Corporation. All Rights Reserved"
+COPYRIGHT "Typeface and data ï¿½ 1996 Microsoft Corporation. All Rights Reserved"
 _OTF_FONTFILE "verdana.ttf"
 _OTF_PSNAME "Verdana"
 ENDPROPERTIES

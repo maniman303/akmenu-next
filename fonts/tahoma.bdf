@@ -1,6 +1,6 @@
 STARTFONT 2.1
 COMMENT
-COMMENT Converted from OpenType font "tahoma.ttf" by "C:\Programs\Develop\nds_ak_rpg\devkitARM\bin\otf2bdf.exe 3.0".
+COMMENT Converted from OpenType font "tahoma.ttf" by "otf2bdf.exe 3.0".
 COMMENT
 FONT -FreeType-Tahoma-Medium-R-Normal--10-100-72-72-P-55-ISO10646-1
 SIZE 10 72 72
@@ -22,7 +22,7 @@ CHARSET_REGISTRY "ISO10646"
 CHARSET_ENCODING "1"
 FONT_ASCENT 10
 FONT_DESCENT 2
-COPYRIGHT "© 2004 Microsoft Corporation. All rights reserved."
+COPYRIGHT "ï¿½ 2004 Microsoft Corporation. All rights reserved."
 _OTF_FONTFILE "tahoma.ttf"
 _OTF_PSNAME "Tahoma"
 ENDPROPERTIES

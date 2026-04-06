@@ -1,10 +1,10 @@
 #pragma once
 
+#include "singleton.h"
 #include "bmp15.h"
 #include "datetime.h"
-#include "point.h"
-#include "singleton.h"
-#include "window.h"
+#include "ui/point.h"
+#include "ui/window.h"
 
 using namespace akui;
 

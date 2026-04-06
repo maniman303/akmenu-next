@@ -1,11 +1,11 @@
 #pragma once
+
 #include <nds.h>
 #include <nds/arm9/dldi.h>
 #include <fat.h>
 #include <string>
 #include <vector>
 #include "singleton.h"
-
 
 class cFSManager {
 public:

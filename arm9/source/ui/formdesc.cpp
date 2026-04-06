@@ -8,8 +8,8 @@
 */
 
 #include "formdesc.h"
-#include "fontfactory.h"
 #include "ui.h"
+#include "../font/fontfactory.h"
 
 //#include "globalsettings.h"
 

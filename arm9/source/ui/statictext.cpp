@@ -9,7 +9,7 @@
 
 #include "statictext.h"
 #include "ui.h"
-#include "fontfactory.h"
+#include "../font/fontfactory.h"
 //#include "gdi.h"
 
 namespace akui {
