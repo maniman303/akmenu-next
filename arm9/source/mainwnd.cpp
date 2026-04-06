@@ -584,13 +584,6 @@ void cMainWnd::showSettings(void) {
     _values.push_back(LANG("switches", "Enable"));
     settingWnd->addSettingItem(LANG("nds bootstrap", "auto run"), _values, gs().autorunWithLastRom);
 
-#ifdef __KERNEL_LAUNCHER_SUPPORT__
-    _values.clear();
-    _values.push_back("Kernel");
-    _values.push_back("nds-bootstrap");
-    settingWnd->addSettingItem(LANG("loader", "text"), _values, gs().romLauncher);
-#endif
-
     // page 5: other
     settingWnd->addSettingTab(LANG("gba settings", "title"));
     _values.clear();

@@ -73,9 +73,9 @@ ROM_PICO	:= $(NAME)_pico.nds
 # Targets
 # -------
 
-.PHONY: all clean arm9 arm7 dldipatch sdimage
+.PHONY: all clean arm9 arm7 blocksds-bootloader dldipatch sdimage
 
-all: $(ROM) $(ROM_PICO) $(ROM_DSI) make_cia
+all: blocksds-bootloader $(ROM) $(ROM_PICO) $(ROM_DSI) make_cia
 
 clean:
 	@echo "  CLEAN"
@@ -100,6 +100,9 @@ arm9_pico:
 
 arm7:
 	$(V)+$(MAKE) -f Makefile.arm7 --no-print-directory
+
+blocksds-bootloader:
+	$(MAKE) -C blocksds-bootloader
 
 ifneq ($(strip $(NITROFSDIR)),)
 # Additional arguments for ndstool
@@ -152,15 +155,6 @@ dldipatch: $(ROM)
 	@echo "  DLDIPATCH $(ROM)"
 	$(V)$(BLOCKSDS)/tools/dldipatch/dldipatch patch \
 		$(BLOCKSDS)/sys/dldi_r4/r4tf.dldi $(ROM)
-
-organize_files:
-	@mv -f $(NAME).nds $(NAME).dsi package/
-	cp package/$(NAME).dsi package/title/00030004/4e455854/content/00000000.app
-	cp package/$(NAME).nds package/boot.nds
-	cp package/$(NAME).dsi package/boot.dsi
-	@$(MAKE) make_cia
-	rm -f package/$(NAME).nds package/$(NAME).dsi
-	cp -r language package/_nds/akmenunext/
 
 make_cia:
 	$(MAKE_CIA) --srl=$(CURDIR)/$(NAME).dsi -o $(CURDIR)/$(NAME).cia

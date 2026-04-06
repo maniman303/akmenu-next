@@ -1,3 +1,5 @@
 [submodule "nds-bootloader"]
 	path = nds-bootloader
 	url = https://github.com/coderkei/nds-bootloader
+[submodule "blocksds-bootloader"]
+	path = blocksds-bootloader

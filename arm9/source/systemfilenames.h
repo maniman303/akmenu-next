@@ -10,6 +10,7 @@
 #pragma once
 #include "fsmngr.h"
 
+#define SFN_NDS_DIR fsManager().resolveSystemPath("_nds/")
 #define SFN_SYSTEM_DIR fsManager().resolveSystemPath("_nds/akmenunext/")
 #define SFN_OFFICIAL_SAVELIST SFN_SYSTEM_DIR + "savelist.bin"
 #define SFN_CUSTOM_SAVELIST SFN_SYSTEM_DIR + "gamedata.bin"
@@ -70,3 +71,9 @@
 #define SFN_CHEATS SFN_SYSTEM_DIR + "cheats/usrcheat.dat"
 
 #define SFN_BOOTLIB SFN_SYSTEM_DIR + "load.bin"
+
+#define SFN_NDS_BOOTSTRAP_DIR SFN_NDS_DIR + "nds-bootstrap/"
+#define SFN_NDS_BOOTSTRAP_CHEATDATA SFN_NDS_BOOTSTRAP_DIR + "cheatData.bin"
+#define SFN_NDS_BOOTSTRAP_INI SFN_NDS_DIR + "nds-bootstrap.ini"
+#define SFN_NDS_BOOTSTRAP_EXEC SFN_NDS_DIR + "nds-bootstrap-release.nds"
+#define SFN_NDS_BOOTSTRAP_EXEC_NIGHTLY SFN_NDS_DIR + "nds-bootstrap-nightly.nds"

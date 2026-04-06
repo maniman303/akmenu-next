@@ -32,16 +32,18 @@
 #include <string>
 
 /* LHS CHANGE START - load bootlib from disk */
-//#include "load_bin.h"
+// #include "load_bin.h"
 #include <systemfilenames.h>
 /* LHS CHANGE END - load bootlib from disk */
+
+#include "nds_loader_arm9.h"
+#include "../logger.h"
 
 #ifndef _NO_BOOTSTUB_
 #include "bootstub_bin.h"
 #include "exceptionstub_bin.h"
 #endif
 
-#include "nds_loader_arm9.h"
 #define LCDC_BANK_C (u16*)0x06840000
 #define STORED_FILE_CLUSTER (*(((u32*)LCDC_BANK_C) + 1))
 #define INIT_DISC (*(((u32*)LCDC_BANK_C) + 2))
@@ -165,7 +167,7 @@ static const data_t dldiMagicLoaderString[] = "\xEE\xA5\x8D\xBF Chishm";	// Diff
 
 #define DEVICE_TYPE_DLDI 0x49444C44
 
-static bool dldiPatchLoader (data_t *binData, u32 binSize, bool clearBSS)
+static bool dldiPatchLoader(data_t *binData, u32 binSize, bool clearBSS)
 {
 	addr_t memOffset;			// Offset of DLDI after the file is loaded into memory
 	addr_t patchOffset;			// Position of patch destination in the file
@@ -183,7 +185,7 @@ static bool dldiPatchLoader (data_t *binData, u32 binSize, bool clearBSS)
 	size_t dldiFileSize = 0;
 	
 	// Find the DLDI reserved space in the file
-	patchOffset = quickFind (binData, dldiMagicLoaderString, binSize, sizeof(dldiMagicLoaderString));
+	patchOffset = quickFind(binData, dldiMagicLoaderString, binSize, sizeof(dldiMagicLoaderString));
 
 	if (patchOffset < 0) {
 		// does not have a DLDI section
@@ -274,13 +276,15 @@ static bool dldiPatchLoader (data_t *binData, u32 binSize, bool clearBSS)
 	return true;
 }
 
-eRunNdsRetCode runNds (const void* loader, u32 loaderSize, u32 cluster, bool initDisc, bool dldiPatchNds, int argc, const char** argv)
+eRunNdsRetCode runNds(const void* loader, u32 loaderSize, u32 cluster, bool initDisc, bool dldiPatchNds, int argc, const char** argv)
 {
 	char* argStart;
 	u16* argData;
 	u16 argTempVal = 0;
 	int argSize;
 	const char* argChar;
+
+	logger().info("Disabling irq.");
 
 	irqDisable(IRQ_ALL);
 
@@ -292,6 +296,7 @@ eRunNdsRetCode runNds (const void* loader, u32 loaderSize, u32 cluster, bool ini
 	if (!isDSiMode()){
 		memset (LCDC_BANK_C, 0x00, 128 * 1024);
 	}
+
 	// Load the loader/patcher into the correct address
 	vramcpy (LCDC_BANK_C, loader, loaderSize);
 
@@ -343,10 +348,10 @@ eRunNdsRetCode runNds (const void* loader, u32 loaderSize, u32 cluster, bool ini
 	writeAddr ((data_t*) LCDC_BANK_C, ARG_START_OFFSET, (addr_t)argStart - (addr_t)LCDC_BANK_C);
 	writeAddr ((data_t*) LCDC_BANK_C, ARG_SIZE_OFFSET, argSize);
 
-		
-	if(dldiPatchNds) {
+	if (dldiPatchNds) {
 		// Patch the loader with a DLDI for the card
-		if (!dldiPatchLoader ((data_t*)LCDC_BANK_C, loaderSize, initDisc)) {
+		if (!dldiPatchLoader((data_t*)LCDC_BANK_C, loaderSize, initDisc)) {
+			logger().info("Dldi patching failed.");
 			return RUN_NDS_PATCH_DLDI_FAILED;
 		}
 	}
@@ -367,7 +372,7 @@ eRunNdsRetCode runNds (const void* loader, u32 loaderSize, u32 cluster, bool ini
 	return RUN_NDS_OK;
 }
 
-eRunNdsRetCode runNdsFile (const char* filename, int argc, const char** argv)  {
+eRunNdsRetCode runNdsFile(const char* filename, int argc, const char** argv)  {
 	struct stat st;
 	char filePath[PATH_MAX];
 	int pathLen;
@@ -379,8 +384,10 @@ eRunNdsRetCode runNdsFile (const char* filename, int argc, const char** argv)  {
 
 	std::string bootlib = SFN_BOOTLIB;
 	FILE* loadBinaryFile = fopen(bootlib.c_str(), "rb");
-	if (!loadBinaryFile)
+	if (!loadBinaryFile) {
 		return RUN_NDS_LOADER_MISSING;
+	}
+		
 	fseek(loadBinaryFile, 0, SEEK_END);
 	load_bin_size = ftell(loadBinaryFile);
 	fseek(loadBinaryFile, 0, SEEK_SET);
@@ -389,7 +396,7 @@ eRunNdsRetCode runNdsFile (const char* filename, int argc, const char** argv)  {
 	fclose(loadBinaryFile);
 	/* LHS CHANGE END - load bootlib from disk */
 
-	if (stat (filename, &st) < 0) {
+	if (stat(filename, &st) < 0) {
 		return RUN_NDS_STAT_FAILED;
 	}
 
@@ -398,19 +405,23 @@ eRunNdsRetCode runNdsFile (const char* filename, int argc, const char** argv)  {
 		if (!getcwd (filePath, PATH_MAX)) {
 			return RUN_NDS_GETCWD_FAILED;
 		}
-		pathLen = strlen (filePath);
+
+		pathLen = strlen(filePath);
 		strcpy (filePath + pathLen, filename);
 		args[0] = filePath;
 		argv = args;
 	}
 
 	bool havedsiSD = false;
-
-	if(argv[0][0]=='s' && argv[0][1]=='d') havedsiSD = true;
+	if(argv[0][0]=='s' && argv[0][1]=='d') {
+		havedsiSD = true;
+	}
 	
-	installBootStub(havedsiSD);
+	if (!installBootStub(havedsiSD)) {
+		return RUN_NDS_STUB_FAILED;
+	}
 
-	return runNds (load_bin, load_bin_size, st.st_ino, true, true, argc, argv);
+	return runNds(load_bin, load_bin_size, st.st_ino, true, true, argc, argv);
 }
 
 /*

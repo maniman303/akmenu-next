@@ -136,8 +136,7 @@ typedef struct SAVE_INFO_EX_T {
         return getState(SAVE_INFO_EX_SD_SAVE, SAVE_INFO_EX_GLOBAL_SD_SAVE, gs().sdsave, true);
     };
     bool isNdsBootstrap(void) {
-        return getState(SAVE_INFO_EX_LOADER, SAVE_INFO_EX_GLOBAL_LOADER,
-                        gs().romLauncher, true);
+        return getState(SAVE_INFO_EX_LOADER, SAVE_INFO_EX_GLOBAL_LOADER, true, true);
     };
     void setFlags(u8 rumble, u8 downloadplay, u8 reset, u8 cheat, u8 slot, u8 dma, u8 protection,
                   u8 linkage, u8 icon, u8 sdsave, u8 language, u8 ndsbootstrap, u8 nightly) {
