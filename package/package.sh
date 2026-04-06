@@ -17,7 +17,6 @@ cp -r _pico flashcart
 cp -r ../language flashcart/_nds/akmenunext/language
 cp ../akmenu-next.nds flashcart/boot.nds
 cp ../akmenu-next.nds flashcart/_nds/akmenunext/launcher.nds
-cp ../blocksds-bootloader/blocksds-bootloader.bin flashcart/_nds/akmenunext/load.bin
 cd flashcart
 7z a ../akmenu-next-flashcart.zip *
 cd ..
@@ -30,7 +29,6 @@ cp -r ../language pico/_nds/akmenunext/language
 cp ../akmenu-next_pico.nds pico/boot.nds
 cp ../akmenu-next_pico.nds pico/_picoboot.nds
 cp ../akmenu-next_pico.nds pico/_nds/akmenunext/launcher.nds
-cp ../blocksds-bootloader/blocksds-bootloader.bin pico/_nds/akmenunext/load.bin
 cd pico
 7z a ../akmenu-next-pico.zip *
 cd ..
@@ -43,7 +41,6 @@ cp -r ../language dsi/_nds/akmenunext/language
 cp ../akmenu-next.dsi dsi/boot.nds
 cp ../akmenu-next.dsi dsi/akmenu-next.dsi
 cp ../akmenu-next.dsi dsi/_nds/akmenunext/launcher.nds
-cp ../blocksds-bootloader/blocksds-bootloader.bin dsi/_nds/akmenunext/load.bin
 rm -f dsi/_nds/akmenunext/PassMeLoader.nds
 cd dsi
 7z a ../akmenu-next-dsi.zip *
@@ -56,7 +53,6 @@ cp -r ../language 3ds/_nds/akmenunext/language
 cp ../akmenu-next.dsi 3ds/boot.nds
 cp ../akmenu-next.cia 3ds/akmenu-next.cia
 cp ../akmenu-next.dsi 3ds/_nds/akmenunext/launcher.nds
-cp ../blocksds-bootloader/blocksds-bootloader.bin 3ds/_nds/akmenunext/load.bin
 rm -f 3ds/_nds/akmenunext/PassMeLoader.nds
 cd 3ds
 7z a ../akmenu-next-3ds.zip *

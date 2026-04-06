@@ -10,8 +10,8 @@
 #pragma once
 #include "fsmngr.h"
 
-#define SFN_NDS_DIR fsManager().resolveSystemPath("_nds/")
-#define SFN_SYSTEM_DIR fsManager().resolveSystemPath("_nds/akmenunext/")
+#define SFN_NDS_DIR fsManager().resolveSystemPath("/_nds/")
+#define SFN_SYSTEM_DIR fsManager().resolveSystemPath("/_nds/akmenunext/")
 #define SFN_OFFICIAL_SAVELIST SFN_SYSTEM_DIR + "savelist.bin"
 #define SFN_CUSTOM_SAVELIST SFN_SYSTEM_DIR + "gamedata.bin"
 #define SFN_LAST_SAVEINFO SFN_SYSTEM_DIR + "lastsave.ini"

@@ -31,6 +31,8 @@ bool cIRQ::_vblankStarted(false);
 bool cIRQ::_control(false);
 
 void cIRQ::init() {
+    irqEnable(IRQ_VBLANK);
+    irqEnable(IRQ_CARD_LINE);
     irqSet(IRQ_VBLANK, vBlank);
     irqSet(IRQ_CARD_LINE, cardMC);
 }

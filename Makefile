@@ -73,9 +73,9 @@ ROM_PICO	:= $(NAME)_pico.nds
 # Targets
 # -------
 
-.PHONY: all clean arm9 arm7 blocksds-bootloader dldipatch sdimage
+.PHONY: all clean arm9 arm7 dldipatch sdimage
 
-all: blocksds-bootloader $(ROM) $(ROM_PICO) $(ROM_DSI) make_cia
+all: $(ROM) $(ROM_PICO) $(ROM_DSI) make_cia
 
 clean:
 	@echo "  CLEAN"
@@ -100,9 +100,6 @@ arm9_pico:
 
 arm7:
 	$(V)+$(MAKE) -f Makefile.arm7 --no-print-directory
-
-blocksds-bootloader:
-	$(MAKE) -C blocksds-bootloader
 
 ifneq ($(strip $(NITROFSDIR)),)
 # Additional arguments for ndstool

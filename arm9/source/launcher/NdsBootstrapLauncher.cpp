@@ -93,6 +93,7 @@ cheat_failed:
 
 bool NdsBootstrapLauncher::prepareIni(const std::string& mRomPath, const std::string& mSavePath, bool hb) {
     CIniFile ini;
+    std::string iniPath = SFN_NDS_BOOTSTRAP_INI;
     bool hotkeyCheck = false;
 
     ini.SetString("NDS-BOOTSTRAP", "NDS_PATH", mRomPath);
@@ -100,7 +101,7 @@ bool NdsBootstrapLauncher::prepareIni(const std::string& mRomPath, const std::st
     if (hb == true)
     {
         ini.SetString("NDS-BOOTSTRAP", "DSI_MODE", 0);
-        ini.SaveIniFile("/_nds/nds-bootstrap.ini");
+        ini.SaveIniFile(iniPath.c_str());
         return true;
     }
 
@@ -212,7 +213,6 @@ bool NdsBootstrapLauncher::prepareIni(const std::string& mRomPath, const std::st
         ini.SetString("NDS-BOOTSTRAP", "DEBUG", "1");
     }
 
-    std::string iniPath = SFN_NDS_BOOTSTRAP_INI;
     ini.SaveIniFile(iniPath.c_str());
     return true;
 }
