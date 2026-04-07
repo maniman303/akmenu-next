@@ -29,15 +29,9 @@
 #include <unistd.h>
 #include <fat.h>
 
-#include <string>
-
-/* LHS CHANGE START - load bootlib from disk */
-// #include "load_bin.h"
-#include <systemfilenames.h>
-/* LHS CHANGE END - load bootlib from disk */
+#include "load_bin.h"
 
 #include "nds_loader_arm9.h"
-#include "../logger.h"
 
 #include "../../share/calico/env.h"
 #include "../../share/calico/pxi.h"
@@ -47,18 +41,6 @@
 #include "bootstub_bin.h"
 #include "exceptionstub_bin.h"
 #endif
-
-#define LCDC_BANK_C (u16*)0x06840000
-#define STORED_FILE_CLUSTER_OFFSET  4
-#define WANT_TO_PATCH_DLDI_OFFSET   8   // was 12
-#define ARG_START_OFFSET            12  // was 16
-#define ARG_SIZE_OFFSET             16  // was 20
-#define DLDI_OFFSET_OFFSET 			20
-#define HAVE_DSISD_OFFSET           24  // was 28
-#define DSIMODE_OFFSET              28  // was 32
-
-typedef signed int addr_t;
-typedef unsigned char data_t;
 
 static bool dldiPatchLoader(BootLdrHeader* loader)
 {
@@ -83,8 +65,17 @@ eRunNdsRetCode runNds(const void* loader, u32 loaderSize, u32 cluster, int argc,
 	int argSize;
 	const char* argChar;
 
+	fprintf(stderr, "Run NDS...\n");
+
 	// Direct CPU access to VRAM bank C
 	VRAM_C_CR = VRAM_ENABLE | VRAM_C_LCD;
+
+	//Fix VRAM because for some reason some homebrew screws up without it
+	//breaks on DSi/3DS mode
+	if (!isDSiMode()) {
+		memset (VRAM_C, 0x00, 128 * 1024);
+	}
+
 	// Load the loader/patcher into the correct address
 	memcpy(VRAM_C, loader, loaderSize);
 
@@ -94,7 +85,7 @@ eRunNdsRetCode runNds(const void* loader, u32 loaderSize, u32 cluster, int argc,
 	hdr->storedFileCluster = cluster;
 	hdr->isDsiMode = isDSiMode();
 
-	if(argv[0][0]=='s' && argv[0][1]=='d') {
+	if (argv[0][0]=='s' && argv[0][1]=='d') {
 		hdr->wantToPatchDldi = 0;
 		hdr->hasTwlSd = 1;
 	} else {
@@ -135,46 +126,28 @@ eRunNdsRetCode runNds(const void* loader, u32 loaderSize, u32 cluster, int argc,
 	hdr->argStart = (uptr)argStart - MM_VRAM_C;
 	hdr->argSize = argSize;
 
-	if(hdr->wantToPatchDldi) {
-		logger().info("Patching dldi.");
+	if (hdr->wantToPatchDldi) {
 		// Patch the loader with a DLDI for the card
 		if (!dldiPatchLoader((BootLdrHeader*)VRAM_C)) {
+			// logger().info("Failed to patch dldi.");
 			return RUN_NDS_PATCH_DLDI_FAILED;
 		}
 	}
 
-	// Give the VRAM to the ARM7
-	VRAM_C_CR = VRAM_ENABLE | VRAM_C_ARM7_0x06000000;
+	// logger().info("Start launch mechanism.");
 
-	// Reset into a passme loop
-	*((vu32*)0x02FFFFFC) = 0;
-	*(u32*)&g_envAppNdsHeader->title[4] = 0xE59FF018;
-	g_envAppNdsHeader->arm9_entrypoint = (u32)&g_envAppNdsHeader->title[4];
-	g_envAppNdsHeader->arm7_entrypoint = 0x06000000;
-	g_envAppTwlHeader->arm7_mbk_map_settings[0] = mbkMakeMapping(MM_TWLWRAM_MAP, MM_TWLWRAM_MAP+MM_TWLWRAM_BANK_SZ, MbkMapSize_256K);
-	g_envExtraInfo->pm_chainload_flag = 1;
+	// Give VRAM to ARM7
+    VRAM_C_CR = VRAM_ENABLE | VRAM_C_ARM7_0x06000000;
 
-	// Provide all needed hardware to the ARM7
-    // VRAM to ARM7 execution mode
-    vramSetPrimaryBanks(VRAM_A_LCD, VRAM_B_LCD, VRAM_C_ARM7, VRAM_D_ARM7);
-    // Slot 1 and Slot 2
-    sysSetBusOwners(BUS_OWNER_ARM7, BUS_OWNER_ARM7);
+    // Set up passme
+    *((vu32*)0x02FFFFFC) = 0;
+    *(u32*)&g_envAppNdsHeader->title[4] = 0xE59FF018;
+    g_envAppNdsHeader->arm9_entrypoint = (u32)&g_envAppNdsHeader->title[4];
+    g_envAppNdsHeader->arm7_entrypoint = 0x06000000;
+    g_envAppTwlHeader->arm7_mbk_map_settings[0] = mbkMakeMapping(MM_TWLWRAM_MAP, MM_TWLWRAM_MAP + MM_TWLWRAM_BANK_SZ, MbkMapSize_256K);
+    g_envExtraInfo->pm_chainload_flag = 1;
 
-    // Flush cache
-    CP15_CleanAndFlushDCache();
-    CP15_FlushICache();
-
-	fifoSendValue32(FIFO_USER_01, MENU_MSG_ARM7_REBOOT_NDS);
-
-	swiDelay(40);
-
-    // // Disable all IRQs
-    // irqDisable(IRQ_ALL);
-    // REG_IME = IME_DISABLE;
-    // REG_IE = 0;
-    // REG_IF = ~0;
-
-	((void(*)(void))g_envAppNdsHeader->arm9_entrypoint)();
+    exit(303);
 
 	return RUN_NDS_OK;
 }
@@ -185,25 +158,9 @@ eRunNdsRetCode runNdsFile(const char* filename, int argc, const char** argv)  {
 	int pathLen;
 	const char* args[1];
 
-	/* LHS CHANGE START - load bootlib from disk */
-	u8 *load_bin;
-	u32 load_bin_size;
+	fprintf(stderr, "Run NDS file...\n");
 
-	std::string bootlib = SFN_BOOTLIB;
-	FILE* loadBinaryFile = fopen(bootlib.c_str(), "rb");
-	if (!loadBinaryFile) {
-		return RUN_NDS_LOADER_MISSING;
-	}
-		
-	fseek(loadBinaryFile, 0, SEEK_END);
-	load_bin_size = ftell(loadBinaryFile);
-	fseek(loadBinaryFile, 0, SEEK_SET);
-	load_bin = (u8*)malloc(load_bin_size);
-	fread(load_bin, 1, load_bin_size, loadBinaryFile);
-	fclose(loadBinaryFile);
-	/* LHS CHANGE END - load bootlib from disk */
-
-	if (stat(filename, &st) < 0) {
+	if (stat (filename, &st) < 0) {
 		return RUN_NDS_STAT_FAILED;
 	}
 
@@ -212,8 +169,7 @@ eRunNdsRetCode runNdsFile(const char* filename, int argc, const char** argv)  {
 		if (!getcwd (filePath, PATH_MAX)) {
 			return RUN_NDS_GETCWD_FAILED;
 		}
-
-		pathLen = strlen(filePath);
+		pathLen = strlen (filePath);
 		strcpy (filePath + pathLen, filename);
 		args[0] = filePath;
 		argv = args;
@@ -223,14 +179,10 @@ eRunNdsRetCode runNdsFile(const char* filename, int argc, const char** argv)  {
 	if(argv[0][0]=='s' && argv[0][1]=='d') {
 		havedsiSD = true;
 	}
-	
-	if (!installBootStub(havedsiSD)) {
-		return RUN_NDS_STUB_FAILED;
-	}
 
-	// logger().info("Argv[0]: " + std::string(argv[0]));
+	installBootStub(havedsiSD);
 
-	return runNds(load_bin, load_bin_size, st.st_ino, argc, argv);
+	return runNds (load_bin, load_bin_size, st.st_ino, argc, argv);
 }
 
 bool installBootStub(bool havedsiSD) {

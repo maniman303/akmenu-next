@@ -248,6 +248,7 @@ bool NdsBootstrapLauncher::process() {
 
         if (access(_ndsBootstrapPath.c_str(), F_OK) != 0) {
             progressWnd().hide();
+            fprintf(stderr, "No access to the '%s' file.", _ndsBootstrapPath.c_str());
             showModalOk(LOADER_NOT_FOUND_TITLE, formatString(LOADER_NOT_FOUND_MESSAGE.c_str(), _ndsBootstrapPath.c_str()));
             return true;
         }

@@ -58,6 +58,8 @@
 #include "userwnd.h"
 #include "fsmngr.h"
 
+#include "../../share/calico/pm.h"
+
 using namespace akui;
 
 static bool runAutoLoop = false;
@@ -134,6 +136,8 @@ int main(int argc, char* argv[]) {
     fsManager().init(argc, argv);
 
     logger().init();
+
+    consoleDebugInit(DebugDevice_NOCASH);
 
     // setting scripts
     gs().loadSettings();
@@ -230,7 +234,7 @@ int main(int argc, char* argv[]) {
         swiDelay(100);
     }
 
-    while (true) {
+    while (pmMainLoop()) {
         timer().updateFps();
         tickSound().play();
 

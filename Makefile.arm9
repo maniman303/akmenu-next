@@ -11,7 +11,7 @@ ARM_NONE_EABI_PATH	?= $(WONDERFUL_TOOLCHAIN)/toolchain/gcc-arm-none-eabi/bin/
 # Source code paths
 # -----------------
 
-SOURCEDIRS	:= arm9/source
+SOURCEDIRS	:= arm9/source share
 INCLUDEDIRS	:= arm9/include arm9/source share
 GFXDIRS		:=
 BINDIRS		:= arm9/data
@@ -39,7 +39,7 @@ endif
 # Libraries
 # ---------
 
-LIBS		:= -lnds9
+LIBS		:= -lnds9d
 LIBDIRS		:= $(BLOCKSDS)/libs/libnds
 
 # Build artifacts

@@ -7,3 +7,13 @@
 #define CP15_CR_DCACHE_ENABLE (1<<2)    //!< Enable data cache
 #define CP15_CR_ICACHE_ENABLE (1<<12)   //!< Enable instruction cache
 #define CP15_CR_ROUND_ROBIN   (1<<14)   //!< If set, use a round-robin cache replacement algo, otherwise it is pseudo-random
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+__attribute__((target("arm"))) void disableCachesAndPU(void);
+
+#ifdef __cplusplus
+}
+#endif
