@@ -39,6 +39,10 @@
 #include "nds_loader_arm9.h"
 #include "../logger.h"
 
+#include "../../share/calico/env.h"
+#include "../../share/calico/pxi.h"
+#include "../../share/fifotool.h"
+
 #ifndef _NO_BOOTSTUB_
 #include "bootstub_bin.h"
 #include "exceptionstub_bin.h"
@@ -56,63 +60,22 @@
 typedef signed int addr_t;
 typedef unsigned char data_t;
 
-static addr_t readAddr (data_t *mem, addr_t offset) {
-	return ((addr_t*)mem)[offset/sizeof(addr_t)];
-}
-
-static void writeAddr (data_t *mem, addr_t offset, addr_t value) {
-	((addr_t*)mem)[offset/sizeof(addr_t)] = value;
-}
-
-static void vramcpy (void* dst, const void* src, int len)
+static bool dldiPatchLoader(BootLdrHeader* loader)
 {
-	u16* dst16 = (u16*)dst;
-	u16* src16 = (u16*)src;
-	
-	//dmaCopy(src, dst, len);
+	const DLDI_INTERFACE* io = io_dldi_data;
 
-	for ( ; len > 0; len -= 2) {
-		*dst16++ = *src16++;
+	if (!dldiIsValid(io)) {
+		// No DLDI patch
+		return false;
 	}
+
+	void* area = (void*)((u8*)loader + loader->dldiOffset);
+	dldiRelocate((DLDI_INTERFACE*)io, area);
+
+	return true;
 }
 
-static bool dldiPatchLoader(data_t* binData, u32 binSize)
-{
-    // dldiOffset is at byte offset 20 in the header
-    u32 dldiOff = ((u32*)binData)[DLDI_OFFSET_OFFSET / 4];
-    if (dldiOff == 0 || dldiOff >= binSize) {
-		// logger().info("DLDI fail: bad offset " + std::to_string(dldiOff));
-        return false;
-    }
-
-	// logger().info("DldiOff: " + std::to_string(dldiOff));
-
-    DLDI_INTERFACE* target = (DLDI_INTERFACE*)(binData + dldiOff);
-
-    // Bootloader uses 0xBF8DA5EE, not 0xBF8DA5ED, to avoid normal DLDI patchers
-    if (target->magicNumber != 0xBF8DA5EE) {
-        // logger().info("DLDI fail: wrong magic " + std::to_string(target->magicNumber));
-        return false;
-    }
-
-    // Check our internal driver fits in the allocated space
-    if (io_dldi_data->driverSize > target->allocatedSize) {
-		// logger().info("DLDI fail: driver too big, driverSize=" + std::to_string(io_dldi_data->driverSize) + " allocatedSize=" + std::to_string(target->allocatedSize));
-        return false;
-    }
-
-    // Copy internal driver into the slot and relocate it in place
-    u32 copySize = 1 << io_dldi_data->driverSize;
-    memcpy(target, io_dldi_data, copySize);
-
-	// Fix all pointers
-	void* runtimeAddress = (void*)(0x06000000 + dldiOff);
-	dldiRelocate(target, runtimeAddress);
-
-    return true;
-}
-
-eRunNdsRetCode runNds(const void* loader, u32 loaderSize, u32 cluster, bool dldiPatchNds, int argc, const char** argv)
+eRunNdsRetCode runNds(const void* loader, u32 loaderSize, u32 cluster, int argc, const char** argv)
 {
 	char* argStart;
 	u16* argData;
@@ -120,50 +83,41 @@ eRunNdsRetCode runNds(const void* loader, u32 loaderSize, u32 cluster, bool dldi
 	int argSize;
 	const char* argChar;
 
-	// logger().info("LoaderSize: " + std::to_string(loaderSize));
-
-	irqDisable(IRQ_ALL);
-
 	// Direct CPU access to VRAM bank C
 	VRAM_C_CR = VRAM_ENABLE | VRAM_C_LCD;
-
-	//Fix VRAM because for some reason some homebrew screws up without it
-	//breaks on DSi/3DS mode
-	if (!isDSiMode()){
-		memset (LCDC_BANK_C, 0x00, 128 * 1024);
-	}
-
 	// Load the loader/patcher into the correct address
-	vramcpy (LCDC_BANK_C, loader, loaderSize);
+	memcpy(VRAM_C, loader, loaderSize);
+
+	BootLdrHeader* hdr = (BootLdrHeader*)MM_VRAM_C;
 
 	// Set the parameters for the loader
-	writeAddr ((data_t*) LCDC_BANK_C, STORED_FILE_CLUSTER_OFFSET, cluster);
+	hdr->storedFileCluster = cluster;
+	hdr->isDsiMode = isDSiMode();
 
-	writeAddr ((data_t*) LCDC_BANK_C, DSIMODE_OFFSET, isDSiMode());
 	if(argv[0][0]=='s' && argv[0][1]=='d') {
-		dldiPatchNds = false;
-		writeAddr ((data_t*) LCDC_BANK_C, HAVE_DSISD_OFFSET, 1);
+		hdr->wantToPatchDldi = 0;
+		hdr->hasTwlSd = 1;
+	} else {
+		hdr->hasTwlSd = 0;
 	}
 
-	// WANT_TO_PATCH_DLDI = dldiPatchNds;
-	writeAddr ((data_t*) LCDC_BANK_C, WANT_TO_PATCH_DLDI_OFFSET, dldiPatchNds);
 	// Give arguments to loader
-	argStart = (char*)LCDC_BANK_C + readAddr((data_t*)LCDC_BANK_C, ARG_START_OFFSET);
+	argStart = (char*)MM_VRAM_C + hdr->argStart;
 	argStart = (char*)(((int)argStart + 3) & ~3);	// Align to word
 	argData = (u16*)argStart;
 	argSize = 0;
-	
-	for (; argc > 0 && *argv; ++argv, --argc) 
+
+	for (; argc > 0 && *argv; ++argv, --argc)
 	{
-		for (argChar = *argv; *argChar != 0; ++argChar, ++argSize) 
+		for (argChar = *argv; *argChar != 0; ++argChar, ++argSize)
 		{
-			if (argSize & 1) 
+			if (argSize & 1)
 			{
 				argTempVal |= (*argChar) << 8;
 				*argData = argTempVal;
 				++argData;
-			} 
-			else 
+			}
+			else
 			{
 				argTempVal = *argChar;
 			}
@@ -178,42 +132,49 @@ eRunNdsRetCode runNds(const void* loader, u32 loaderSize, u32 cluster, bool dldi
 	}
 	*argData = argTempVal;
 
-	// logger().info("ArgSize: " + std::to_string(argSize));
-	
-	writeAddr ((data_t*) LCDC_BANK_C, ARG_START_OFFSET, (addr_t)argStart - (addr_t)LCDC_BANK_C);
-	// writeAddr((data_t*) LCDC_BANK_C, ARG_START_OFFSET, (addr_t)argStart - (addr_t)0x06000000);
-	writeAddr((data_t*) LCDC_BANK_C, ARG_SIZE_OFFSET, argSize);
+	hdr->argStart = (uptr)argStart - MM_VRAM_C;
+	hdr->argSize = argSize;
 
-	if (dldiPatchNds) {
+	if(hdr->wantToPatchDldi) {
+		logger().info("Patching dldi.");
 		// Patch the loader with a DLDI for the card
-		if (!dldiPatchLoader((data_t*)LCDC_BANK_C, loaderSize)) {
-			// logger().info("Dldi patching failed.");
+		if (!dldiPatchLoader((BootLdrHeader*)VRAM_C)) {
 			return RUN_NDS_PATCH_DLDI_FAILED;
 		}
 	}
-
-	// logger().info("About to hand off.");
-
-	irqDisable(IRQ_ALL);
 
 	// Give the VRAM to the ARM7
 	VRAM_C_CR = VRAM_ENABLE | VRAM_C_ARM7_0x06000000;
 
 	// Reset into a passme loop
-	REG_EXMEMCNT |= ARM7_OWNS_ROM | ARM7_OWNS_CARD;
 	*((vu32*)0x02FFFFFC) = 0;
-	*((vu32*)0x02FFFE04) = (u32)0xE59FF018;
-	*((vu32*)0x02FFFE24) = (u32)0x02FFFE04;
+	*(u32*)&g_envAppNdsHeader->title[4] = 0xE59FF018;
+	g_envAppNdsHeader->arm9_entrypoint = (u32)&g_envAppNdsHeader->title[4];
+	g_envAppNdsHeader->arm7_entrypoint = 0x06000000;
+	g_envAppTwlHeader->arm7_mbk_map_settings[0] = mbkMakeMapping(MM_TWLWRAM_MAP, MM_TWLWRAM_MAP+MM_TWLWRAM_BANK_SZ, MbkMapSize_256K);
+	g_envExtraInfo->pm_chainload_flag = 1;
 
-	DC_FlushAll();
-	IC_InvalidateAll();
+	// Provide all needed hardware to the ARM7
+    // VRAM to ARM7 execution mode
+    vramSetPrimaryBanks(VRAM_A_LCD, VRAM_B_LCD, VRAM_C_ARM7, VRAM_D_ARM7);
+    // Slot 1 and Slot 2
+    sysSetBusOwners(BUS_OWNER_ARM7, BUS_OWNER_ARM7);
 
-	resetARM7(0x06000000);
+    // Flush cache
+    CP15_CleanAndFlushDCache();
+    CP15_FlushICache();
 
-	// Jump ARM9 directly into the passme loop
-	// The bootloader ARM7 will update 0x02FFFE24 to redirect us
-	asm volatile("bx %0" : : "r"(0x02FFFE04));
-	while(1);
+	fifoSendValue32(FIFO_USER_01, MENU_MSG_ARM7_REBOOT_NDS);
+
+	swiDelay(40);
+
+    // // Disable all IRQs
+    // irqDisable(IRQ_ALL);
+    // REG_IME = IME_DISABLE;
+    // REG_IE = 0;
+    // REG_IF = ~0;
+
+	((void(*)(void))g_envAppNdsHeader->arm9_entrypoint)();
 
 	return RUN_NDS_OK;
 }
@@ -269,56 +230,30 @@ eRunNdsRetCode runNdsFile(const char* filename, int argc, const char** argv)  {
 
 	// logger().info("Argv[0]: " + std::string(argv[0]));
 
-	return runNds(load_bin, load_bin_size, st.st_ino, true, argc, argv);
+	return runNds(load_bin, load_bin_size, st.st_ino, argc, argv);
 }
-
-/*
-	b	startUp
-	
-storedFileCluster:
-	.word	0x0FFFFFFF		@ default BOOT.NDS
-initDisc:
-	.word	0x00000001		@ init the disc by default
-wantToPatchDLDI:
-	.word	0x00000001		@ by default patch the DLDI section of the loaded NDS
-@ Used for passing arguments to the loaded app
-argStart:
-	.word	_end - _start
-argSize:
-	.word	0x00000000
-dldiOffset:
-	.word	_dldi_start - _start
-dsiSD:
-	.word	0
-*/
-
-void(*exceptionstub)(void) = (void(*)(void))0x2ffa000;
 
 bool installBootStub(bool havedsiSD) {
 #ifndef _NO_BOOTSTUB_
-	extern char *fake_heap_end;
-	struct __bootstub *bootstub = (struct __bootstub *)fake_heap_end;
-	u32 *bootloader = (u32*)(fake_heap_end+bootstub_bin_size);
+	void* bootstub = g_envNdsBootstub;
+	BootLdrHeader *bootloader = (BootLdrHeader*)((u8*)bootstub+bootstub_bin_size);
 
-	memcpy(bootstub,bootstub_bin,bootstub_bin_size);
-	memcpy(bootloader,load_bin,load_bin_size);
+	armCopyMem32(bootstub,bootstub_bin,bootstub_bin_size);
+	armCopyMem32(bootloader,load_bin,load_bin_size);
 	bool ret = false;
 
-	bootloader[8] = isDSiMode();
+	bootloader->isDsiMode = isDSiMode();
 	if( havedsiSD) {
 		ret = true;
-		bootloader[3] = 0; // don't dldi patch
-		bootloader[7] = 1; // use internal dsi SD code
+		bootloader->wantToPatchDldi = 0;
+		bootloader->hasTwlSd = 1;
 	} else {
-		ret = dldiPatchLoader((data_t*)bootloader, load_bin_size,false);
+		ret = dldiPatchLoader(bootloader);
 	}
-	bootstub->arm9reboot = (VoidFn)(((u32)bootstub->arm9reboot)+fake_heap_end);
-	bootstub->arm7reboot = (VoidFn)(((u32)bootstub->arm7reboot)+fake_heap_end);
-	bootstub->bootsize = load_bin_size;
 
-	memcpy(exceptionstub,exceptionstub_bin,exceptionstub_bin_size);
-
-	exceptionstub();
+	g_envNdsBootstub->arm9_entrypoint = (void*)((u32)bootstub+(u32)g_envNdsBootstub->arm9_entrypoint);
+	g_envNdsBootstub->arm7_entrypoint = (void*)((u32)bootstub+(u32)g_envNdsBootstub->arm7_entrypoint);
+	*(u32*)(g_envNdsBootstub+1) = load_bin_size;
 
 	DC_FlushAll();
 

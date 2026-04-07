@@ -10,6 +10,8 @@
 #include <nds/system.h>
 #include <nds/arm7/sdmmc.h>
 #include <string.h>
+#include "../../share/calico/env.h"
+#include "../../share/calico/common.h"
 #include "../../share/fifotool.h"
 #include "../../share/memtool.h"
 #include "picoLoader7.h"
@@ -133,6 +135,43 @@ static void picoLoaderStart() {
     ((pico_loader_7_func_t)header7->entryPoint)();
 }
 
+static void ndsBootloaderStart() {
+    if (g_envExtraInfo->pm_chainload_flag != 1) {
+        return;
+    }
+
+    bool isDsi = isDSiMode();
+	armCompilerBarrier();
+
+    // Copy new ARM7 binary to WRAM if needed
+	if (g_envAppNdsHeader->arm7_ram_address >= MM_A7WRAM && g_envAppNdsHeader->arm7_ram_address < MM_IO) {
+		vu32* dst = (vu32*)g_envAppNdsHeader->arm7_ram_address; // volatile to avoid memcpy optimization
+		u32* src = (u32*)(MM_MAINRAM + MM_MAINRAM_SZ_NTR - 512*1024);
+		u32 count = (g_envAppNdsHeader->arm7_size + 3) / 4;
+		do {
+			*dst++ = *src++;
+		} while (count--);
+	}
+
+	// Set up MBK regs if needed
+	if (isDsi) {
+		REG_MBK_SLOTWRPROT = g_envAppTwlHeader->mbk_slotwrprot_setting;
+		REG_MBK_MAP_A = g_envAppTwlHeader->arm7_mbk_map_settings[0];
+		REG_MBK_MAP_B = g_envAppTwlHeader->arm7_mbk_map_settings[1];
+		REG_MBK_MAP_C = g_envAppTwlHeader->arm7_mbk_map_settings[2];
+	}
+
+    // // Disable all IRQs
+    // irqDisable(IRQ_ALL);
+    // REG_IME = IME_DISABLE;
+    // REG_IE = 0;
+    // REG_IF = ~0;
+
+	// Jump to ARM7 entrypoint
+	((void(*)(void))g_envAppNdsHeader->arm7_entrypoint)();
+	// for (;;); // just in case
+}
+
 static void menuValue32Handler(u32 value, void* data) {
     switch (value) {
         case MENU_MSG_GBA: {
@@ -153,6 +192,9 @@ static void menuValue32Handler(u32 value, void* data) {
             break;
         case MENU_MSG_ARM7_REBOOT_PICOLOADER:
             picoLoaderStart();
+            break;
+        case MENU_MSG_ARM7_REBOOT_NDS:
+            ndsBootloaderStart();
             break;
         case MENU_MSG_BRIGHTNESS_NEXT:
             brightnessNext();
