@@ -141,6 +141,8 @@ int main(int argc, char* argv[]) {
 
     logger().init();
 
+    consoleDebugInit(DebugDevice_NOCASH);
+
     // setting scripts
     gs().loadSettings();
 

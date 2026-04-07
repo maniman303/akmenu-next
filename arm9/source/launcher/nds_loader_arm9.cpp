@@ -20,16 +20,18 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 ------------------------------------------------------------------*/
-#include <string.h>
+#include <string>
 #include <nds.h>
 #include <nds/arm9/dldi.h>
 #include <sys/stat.h>
 #include <limits.h>
+#include <stdio.h>
 
 #include <unistd.h>
 #include <fat.h>
 
 #include "load_bin.h"
+#include "../logger.h"
 
 #ifndef _NO_BOOTSTUB_
 #include "bootstub_bin.h"
@@ -390,6 +392,8 @@ eRunNdsRetCode runNdsFile (const char* filename, int argc, const char** argv)  {
 	if(argv[0][0]=='s' && argv[0][1]=='d') havedsiSD = true;
 	
 	installBootStub(havedsiSD);
+
+	logger().info("Cluster: " + std::to_string(st.st_ino));
 
 	return runNds (load_bin, load_bin_size, st.st_ino, true, true, argc, argv);
 }
