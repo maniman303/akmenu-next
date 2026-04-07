@@ -37,6 +37,30 @@ std::unique_ptr<TaskWorker> NdsBootstrapLauncher::task() const {
     return std::make_unique<NdsBootstrapLauncher>(*this);
 }
 
+void slot2RamAccess(){
+    // if running from NDS slot
+    if (io_dldi_data->ioInterface.features & FEATURE_SLOT_NDS) {
+        sysSetCartOwner(BUS_OWNER_ARM9);
+
+        *(vu16*)0x08000000 = 0x1111;    // write data to GBA ROM area
+        // if data wasn't written, try enabling RAM access for various slot 2 carts and write again
+        if (*(vu16*)0x08000000 != 0x1111) {
+            _SC_changeMode(SC_MODE_RAM);
+            *(vu16*)0x08000000 = 0x1111;
+        }
+        if (*(vu16*)0x08000000 != 0x1111) {
+            _G6_SelectOperation(G6_MODE_RAM);
+            *(vu16*)0x08000000 = 0x1111;
+        }
+        if (*(vu16*)0x08000000 != 0x1111) {
+            _M3_changeMode(M3_MODE_RAM);
+            *(vu16*)0x08000000 = 0x1111;
+        }
+
+        sysSetCartOwner(BUS_OWNER_ARM7);
+    }
+}
+
 bool NdsBootstrapLauncher::is3DS() {
     if (!isDSiMode()) {
         return false;
@@ -295,6 +319,11 @@ bool NdsBootstrapLauncher::process() {
         progressWnd().setPercent(100);
 
         logger().info("Running nds bootstrap.");
+
+        // Enable slot2 ram access if available
+        if(!isDSiMode()){
+            slot2RamAccess();
+        }
 
         // Launch
         eRunNdsRetCode rc = runNdsFile(_argv[0], _argv.size(), &_argv[0]);

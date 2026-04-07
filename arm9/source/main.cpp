@@ -58,8 +58,6 @@
 #include "userwnd.h"
 #include "fsmngr.h"
 
-#include "../../share/calico/pm.h"
-
 using namespace akui;
 
 static bool runAutoLoop = false;
@@ -234,7 +232,7 @@ int main(int argc, char* argv[]) {
         swiDelay(100);
     }
 
-    while (pmMainLoop()) {
+    while (true) {
         timer().updateFps();
         tickSound().play();
 

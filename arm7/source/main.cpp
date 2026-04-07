@@ -10,9 +10,6 @@
 #include <nds/system.h>
 #include <nds/arm7/sdmmc.h>
 #include <string.h>
-#include "../../share/calico/env.h"
-#include "../../share/calico/common.h"
-#include "../../share/calico/pm.h"
 #include "../../share/fifotool.h"
 #include "../../share/memtool.h"
 #include "picoLoader7.h"
@@ -160,7 +157,6 @@ static void menuValue32Handler(u32 value, void* data) {
             picoLoaderStart();
             break;
         case MENU_MSG_ARM7_STOP:
-            fprintf(stderr, "Shutting down ARM7 loop.");
             running = false;
             fifoSendValue32(FIFO_USER_07, running);
             break;
@@ -255,9 +251,6 @@ int main() {
 
         ticks = (ticks + 1) % 40;
     }
-
-    fprintf(stderr, "Loop of ARM7 completed.");
-    flushConsole();
 
     return 0;
 }

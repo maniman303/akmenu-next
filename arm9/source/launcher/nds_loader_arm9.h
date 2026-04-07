@@ -33,24 +33,12 @@ typedef enum {
     RUN_NDS_STAT_FAILED,
     RUN_NDS_GETCWD_FAILED,
     RUN_NDS_PATCH_DLDI_FAILED,
-    RUN_NDS_LOADER_MISSING,
-    RUN_NDS_STUB_FAILED
 } eRunNdsRetCode;
-
-typedef struct BootLdrHeader {
-	u32 entrypoint;
-	u32 storedFileCluster;
-	u32 wantToPatchDldi;
-	u32 argStart;
-	u32 argSize;
-	u32 dldiOffset;
-	u32 hasTwlSd;
-	u32 isDsiMode;
-} BootLdrHeader;
 
 #define LOAD_DEFAULT_NDS 0
 
-eRunNdsRetCode runNds(const void* loader, u32 loaderSize, u32 cluster, int argc, const char** argv);
+eRunNdsRetCode runNds(const void* loader, u32 loaderSize, u32 cluster, bool initDisc,
+                      bool dldiPatchNds, int argc, const char** argv);
 
 eRunNdsRetCode runNdsFile(const char* filename, int argc, const char** argv);
 
