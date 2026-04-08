@@ -106,21 +106,18 @@ bool NdsBootstrapLauncher::prepareIni(const std::string& mRomPath, const std::st
 
     ini.SetString("NDS-BOOTSTRAP", "NDS_PATH", mRomPath);
 
-    if(hb == true)
-    {
-        ini.SetString("NDS-BOOTSTRAP", "DSI_MODE", 0);
+    if (hb) {
+        ini.SetString("NDS-BOOTSTRAP", "DSI_MODE", "0");
+        ini.SetString("NDS-BOOTSTRAP", "QUIT_PATH", fsManager().resolveSystemPath("/_nds/akmenunext/launcher.nds"));
         ini.SaveIniFile("/_nds/nds-bootstrap.ini");
         return true;
     }
 
     ini.SetString("NDS-BOOTSTRAP", "SAV_PATH", mSavePath);
-
     ini.SetString("NDS-BOOTSTRAP", "QUIT_PATH", fsManager().resolveSystemPath("/_nds/akmenunext/launcher.nds"));
-
     ini.SetString("NDS-BOOTSTRAP", "CONSOLE_MODEL", is3DS() ? "2" : "0");
 
     std::string custIniPath = fsManager().resolveSystemPath("/_nds/akmenunext/ndsbs.ini");
-
     if (access(custIniPath.c_str(), F_OK) != 0) {
         akui::cMessageBox::showModal(LANG("nds bootstrap", "inimissingtitle"), LANG("nds bootstrap", "inimissing"), MB_OK);
         return false;
@@ -264,26 +261,18 @@ bool NdsBootstrapLauncher::process() {
 
     bool isDsiWare = false;
 
-    // logger().info("Starting nds-bootstrap with iter: " + std::to_string(_iter) + ".");
-
     switch (_iter) {
       case 0:
         _messageBlock = false;
         _useNightly = false;
         _argv.clear();
 
-        // logger().info("Nds-bootstrap case 0.");
-
         if (access(ndsBootstrapCheck.c_str(), F_OK) != 0) {
-            // logger().info("Nds-bootstrap case 0 no access.");
-
             _messageBlock = true;
             akui::cMessageBox::showModal(LANG("nds bootstrap", "firsttimetitle"), LANG("nds bootstrap", "firsttime"), MB_OK, [this](){
                 _messageBlock = false;
             });
         }
-
-        // logger().info("Nds-bootstrap case 0 completed.");
 
         _iter++;
         return false;
@@ -299,50 +288,47 @@ bool NdsBootstrapLauncher::process() {
                 showModalOk(LOADER_NOT_FOUND_TITLE, formatString(LOADER_NOT_FOUND_MESSAGE.c_str(), ndsHbBootstrapPath.c_str()));
                 return true;
             }
+        } else {
+            _romInfo.MayBeDSRom(_romPath);
+            isDsiWare = _romInfo.isDSiWare();
 
-            progressWnd().setTipText("Initializing nds-bootstrap...");
-            progressWnd().show();
-
-            //Clean up old INI
-            if (access("/_nds/nds-bootstrap/nds-bootstrap.ini", F_OK) == 0) {
-                remove("/_nds/nds-bootstrap/nds-bootstrap.ini");
-            }
-
-            // Setup nds-bootstrap INI parameters
-            if (!prepareIni(_romPath, _savePath, false)) {
+            // check for DSiWare
+            if (isDsiWare) {
                 progressWnd().hide();
+                akui::cMessageBox::showModal(LANG("loader", "error"), LANG("loader", "dsi pico"), MB_OK);
                 return true;
             }
-
-            progressWnd().setPercent(25);
-        }
-
-        _iter++;
-        return false;
-      case 2:
-        if (_hb) {
-            launchHbStrap(_romPath);
-
-            return true;
-        }
-
-        _romInfo.MayBeDSRom(_romPath);
-        isDsiWare = _romInfo.isDSiWare();
-
-        // check for DSiWare
-        if (isDsiWare) {
-            progressWnd().hide();
-            akui::cMessageBox::showModal(LANG("loader", "error"), LANG("loader", "dsi pico"), MB_OK);
-            return true;
         }
 
         progressWnd().setTipText(LANG("loader", "nds init"));
         progressWnd().show();
-        progressWnd().setPercent(0);
+        progressWnd().setPercent(20);
+
+        _iter++;
+        return false;
+      case 2:
+        //Clean up old INI
+        if (access("/_nds/nds-bootstrap/nds-bootstrap.ini", F_OK) == 0) {
+            remove("/_nds/nds-bootstrap/nds-bootstrap.ini");
+        }
+
+        // Setup nds-bootstrap INI parameters
+        if (!prepareIni(_romPath, _savePath, _hb)) {
+            progressWnd().hide();
+            return true;
+        }
+
+        progressWnd().setPercent(40);
 
         _iter++;
         return false;
       case 3:
+        if (_hb) {
+            launchHbStrap(_romPath);
+            progressWnd().hide();
+            return true;
+        }
+
         //Check which nds-bootstrap version has been selected
         if ((gs().nightly && _romInfo.saveInfo().getNightly() == 2) || _romInfo.saveInfo().getNightly() == 1) {
             if (access(ndsBootstrapPathNightly.c_str(), F_OK) != 0){
@@ -366,7 +352,7 @@ bool NdsBootstrapLauncher::process() {
             mkdir("/_nds/nds-bootstrap/", 0777);
         }
 
-        progressWnd().setPercent(25);
+        progressWnd().setPercent(60);
 
         _iter++;
         return false;
@@ -378,27 +364,11 @@ bool NdsBootstrapLauncher::process() {
             _argv.push_back(ndsBootstrapPathNightly.c_str());
         }
 
-        progressWnd().setPercent(50);
-
-        _iter++;
-        return false;
-      case 5:
-        //Clean up old INI
-        if (access("/_nds/nds-bootstrap/nds-bootstrap.ini", F_OK) == 0) {
-            remove("/_nds/nds-bootstrap/nds-bootstrap.ini");
-        }
-
-        // Setup nds-bootstrap INI parameters
-        if (!prepareIni(_romPath, _savePath, false)) {
-            progressWnd().hide();
-            return true;
-        }
-
         progressWnd().setPercent(75);
 
         _iter++;
         return false;
-      case 6:
+      case 5:
         // Prepare cheat codes if enabled
         // Remove cheat bin if exists to start clean
         if (access("/_nds/nds-bootstrap/cheatData.bin", F_OK) == 0) {
@@ -410,7 +380,7 @@ bool NdsBootstrapLauncher::process() {
             return false;
         }
 
-        progressWnd().setTipText("Loading usrcheat.dat...");
+        progressWnd().setTipText(LANG("loader", "cheats"));
         progressWnd().setPercent(90);
         if (_flags & PATCH_CHEATS && !prepareCheats(_romPath)) {
             progressWnd().hide();
@@ -419,13 +389,13 @@ bool NdsBootstrapLauncher::process() {
 
         _iter++;
         return false;
-      case 7:
-        progressWnd().setTipText("Booting game...");
+      case 6:
+        progressWnd().setTipText(LANG("loader", "boots"));
         progressWnd().setPercent(100);
 
         _iter++;
         return false;
-      case 8:
+      case 7:
         // enable slot2 ram access if available
         if(!isDSiMode()){
             slot2RamAccess();
@@ -433,7 +403,10 @@ bool NdsBootstrapLauncher::process() {
 
         // Launch
         eRunNdsRetCode rc = runNdsFile(_argv[0], _argv.size(), &_argv[0]);
-        if (rc == RUN_NDS_OK) return true;
+        if (rc == RUN_NDS_OK) {
+            return true;
+        }
+
         return true;
     }
 

@@ -58,6 +58,7 @@ Build the repository with `make`, then run `package.cmd/sh` depending on your OS
 ### Local setup
 
 Here is an example VS Code setup:
+- Run `git submodule update --init` to install all submodules.
 - In VS Code install extensions for `C++` and `Dev Containers`.
 - Pull the docker imager from [docker hub](https://hub.docker.com/layers/devkitpro/devkitarm/20241104).
 - Clone repo.
