@@ -423,26 +423,54 @@ void cGdi::fillRect(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS
         }
 }
 
+u16 cGdi::blendColors(u16 color, u16 dest, u16 src, u16 opacity) {
+    if (opacity >= 100) {
+        return color;
+    }
+
+    if ((dest & 0x8000) != 0) {
+        src = dest;
+    }
+
+    if (opacity <= 0) {
+        return src;
+    }
+
+    const u32 alpha  = (static_cast<u32>(opacity) * 655u) >> 11u;
+    const u32 invAlpha = 32u - alpha;
+
+    const u32 rb = ((static_cast<u32>(color) & 0x7c1fu) * alpha
+                  + (static_cast<u32>(src)   & 0x7c1fu) * invAlpha) & 0xf83e0u;
+    const u32 g  = ((static_cast<u32>(color) & 0x3e0u)  * alpha
+                  + (static_cast<u32>(src)   & 0x3e0u)  * invAlpha) & 0x7c00u;
+
+    return static_cast<u16>(((rb | g) >> 5u) | BIT(15));
+}
+
 void cGdi::fillRectBlend(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine,
                          u16 opacity) {
-    if (opacity <= 0) return;
+    if (opacity <= 0) {
+        return;
+    }
+
     if (opacity >= 100) {
         fillRect(color1, color2, x, y, w, h, engine);
         return;
     }
+
     u16* pSrc = ((GE_MAIN == engine) ? (u16*)_background.buffer() : _bufferSub2) + (y << 8) + x;
     u16* pDest = ((GE_MAIN == engine) ? (_bufferMain2 + _layerPitch) : _bufferSub2) + (y << 8) + x;
     u32 alpha = (opacity * 32) / 100;
     u32 destInc = 256 - w;
     for (u32 ii = 0; ii < h; ++ii) {
         for (u32 jj = 0; jj < w; ++jj) {
-            u32 buff = *pDest & 0xffff;
-            u32 original = (buff & 0x8000) == 0 ? *pSrc++ & 0x7fff : buff;
-            u32 color = (jj & 1) ? color2 : color1;
-            u32 rb = ((color & 0x7c1f) * alpha + (original & 0x7c1f) * (32 - alpha)) & 0xf83e0;
-            u32 g = ((color & 0x3e0) * alpha + (original & 0x3e0) * (32 - alpha)) & 0x7c00;
-            *pDest++ = ((rb | g) >> 5) | BIT(15);
+            u16 color = (jj & 1) ? color2 : color1;
+            *pDest = blendColors(color, *pDest, *pSrc, opacity);
+
+            pDest++;
+            pSrc++;
         }
+
         pDest += destInc;
         pSrc += destInc;
     }
