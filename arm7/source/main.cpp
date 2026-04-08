@@ -222,6 +222,8 @@ int main() {
     fifoInit();
 	touchInit();
 
+    defaultExceptionHandler();
+
     initClockIRQTimer(LIBNDS_DEFAULT_TIMER_RTC);
 
     installSystemFIFO();

@@ -124,7 +124,7 @@ int main(int argc, char* argv[]) {
     // turn led on
     ledBlink(LED_ALWAYS_ON);
 
-    // soundEnable();
+    defaultExceptionHandler();
 
     // init graphics
     gdi().init();
