@@ -129,7 +129,7 @@ bool PicoLoaderLauncher::setParameters(void) {
 
     // TODO: add support for API v2 and add a return path
 
-    if (_flags & PATCH_CHEATS) {
+    if (!_hb && _flags & PATCH_CHEATS) {
         prepareCheats();
         picoLoaderHeader7->v3.cheats = mCheats;
     }
