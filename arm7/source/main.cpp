@@ -45,13 +45,9 @@ static u32 getSystem(void) {
     return dsGen;
 }
 
-static void prepairResetTT() {
-    memcpy(__NDSHeader->arm7destination, *(void* volatile*)0x02FFFE00, __NDSHeader->arm7binarySize);
-}
-
 typedef void (*pico_loader_7_func_t)(void);
 
-static void prepairReset() {
+static void prepareReset() {
     // disble rtc irq, on some games enabled rtc irq caused tearing.
     uint8 command[2];
     command[0] = WRITE_STATUS_REG2;
@@ -144,10 +140,8 @@ static void menuValue32Handler(u32 value, void* data) {
             swiChangeSoundBias(0, 0x400);
             swiSwitchToGBAModeFixed();
         } break;
-        case MENU_MSG_ARM7_REBOOT_TT:
-            prepairResetTT();
         case MENU_MSG_ARM7_REBOOT:
-            prepairReset();
+            prepareReset();
             swiSoftReset();
             break;
         case MENU_MSG_ARM7_REBOOT_PICOLOADER:

@@ -227,8 +227,11 @@ int main(int argc, char* argv[]) {
     irq().vblankStart();
 
     dbg_printf("lastDirectory '%s'\n", lastDirectory.c_str());
-    if (!wnd->_mainList->enterDir("..." != lastDirectory ? lastDirectory : gs().startupFolder))
+    if (!wnd->_mainList->enterDir("..." != lastDirectory ? lastDirectory : gs().startupFolder)) {
         wnd->_mainList->enterDir("...");
+    } else {
+        wnd->_mainList->selectRom(lastFile);
+    }
 
     u16 ticks = 0;
     bool isBgInit = false;

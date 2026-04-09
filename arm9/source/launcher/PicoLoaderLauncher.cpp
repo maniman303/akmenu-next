@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <cstdio>
 #include <string>
+#include <cstring>
 #include <nds/arm9/dldi.h>
 #include <nds/arm9/video.h>
 #include <nds/bios.h>
@@ -128,9 +129,9 @@ bool PicoLoaderLauncher::setParameters(void) {
     memcpy(&(picoLoaderHeader7->loadParams), picoLoaderParams, sizeof(pload_params_t));
     free(picoLoaderParams);
 
-    // TODO: add support for API v2 and add a return path
+    std::strcpy(picoLoaderHeader7->v2.launcherPath, "/_nds/akmenunext/launcher.nds");
 
-    if (_flags & PATCH_CHEATS) {
+    if (!_hb && _flags & PATCH_CHEATS) {
         prepareCheats();
         picoLoaderHeader7->v3.cheats = mCheats;
     }

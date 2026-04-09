@@ -774,6 +774,15 @@ void cMainList::setRomInfo(u32 rowIndex, const DSRomInfo& info) {
     }
 }
 
+void cMainList::selectRom(const std::string& romPath){
+    for (size_t row = 0; row < _rows.size(); row++) {
+        if (romPath == _rows[row][REALNAME_COLUMN].text()) {
+            selectRow(row);
+            break;
+        }
+    }
+}
+
 void cMainList::draw() {
     updateInternalNames();
     drawItemBackgrounds();
