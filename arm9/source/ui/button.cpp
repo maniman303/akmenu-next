@@ -121,8 +121,9 @@ void cButtonDesc::draw(const cRect& area, GRAPHICS_ENGINE engine) const {
         height = _background.height();
         if (_button->style() != cButton::single) {
             height /= 2;
-            if (cButton::down == _button->state())
-                pBuffer += _background.width() * _background.height() / 4;
+            if (_button->state() == cButton::down) {
+                pBuffer += (_background.pitch() * _background.height() / 8);
+            }
         }
     }
 
