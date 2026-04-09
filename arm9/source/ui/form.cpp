@@ -72,78 +72,35 @@ namespace akui {
         }
     }
 
-    bool cForm::process(const cMessage& msg) {
-        dbg_printf("cForm::process\n");
+    bool cForm::processKeyMessage(cKeyMessage message) {
+        if (!isVisible()) {
+            return false;
+        }
+
         bool ret = false;
-        if (isVisible()) {
-            if (msg.id() > cMessage::touchMessageStart && msg.id() < cMessage::touchMessageEnd) {
-                std::list<cWindow*>::iterator it;
-                for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
-                    cWindow* window = *it;
-                    ret = window->process(msg);
-                    if (ret) {
-                        dbg_printf("(%s) processed\n", window->text().c_str());
-                        break;
-                    }
-                }
-            }
-        }
 
-        // NOTE: cForm does not translate key messages to children in this case
-
-        // if( !ret ) {
-        //     dbg_printf("change child focus\n");
-        //     if( msg.id() > cMessage::keyMessageStart && msg.id() < cMessage::keyMessageEnd ) {
-        //         ret = processKeyMessage( (cKeyMessage &)msg );
-        //     }
-        // }
-
-        if (!ret) {
-            ret = cWindow::process(msg);
-        }
+        // TODO: Run input on visited children, if returns false visit another children
 
         return ret;
     }
 
-    bool cForm::processKeyMessage(const cKeyMessage& msg) {
+    bool cForm::processTouchMessage(cTouchMessage message) {
+        if (!isVisible()) {
+            return false;
+        }
+
         bool ret = false;
-        if (msg.id() == cMessage::keyDown) {
-            if (msg.keyCode() >= 5 && msg.keyCode() <= 8) {
-                std::list<cWindow*>::iterator it = _childWindows.begin();
-                for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
-                    cWindow* window = *it;
-                    if (window->isFocused()) {
-                        if (msg.keyCode() == cKeyMessage::UI_KEY_DOWN ||
-                            msg.keyCode() == cKeyMessage::UI_KEY_RIGHT) {
-                            ++it;
-                            if (it == _childWindows.end()) it = _childWindows.begin();
-                            if ((*it)->isVisible()) {
-                                windowManager().setFocusedWindow((*it));
-                                ret = true;
-                                break;
-                            }
-                        } else if (msg.keyCode() == cKeyMessage::UI_KEY_UP ||
-                                msg.keyCode() == cKeyMessage::UI_KEY_LEFT) {
-                            if (it == _childWindows.begin()) {
-                                it = _childWindows.end();
-                            }
-                            --it;
-                            if ((*it)->isVisible()) {
-                                windowManager().setFocusedWindow((*it));
-                                ret = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (_childWindows.end() == it) {
-                    if (_childWindows.front()->isVisible()) {
-                        windowManager().setFocusedWindow(_childWindows.front());
-                        ret = true;
-                    }
-                }
+
+        std::list<cWindow*>::iterator it;
+        for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
+            cWindow* window = *it;
+            ret = window->processTouchMessage(message);
+            if (ret) {
+                nocashMessage(formatString("(%s) processed touch message.", window->text().c_str()).c_str());
+                break;
             }
         }
+
         return ret;
     }
 

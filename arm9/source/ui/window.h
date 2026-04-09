@@ -12,10 +12,10 @@
 #include <string>
 #include "dbgtool.h"
 #include "gdi.h"
-#include "keymessage.h"
 #include "point.h"
 #include "rectangle.h"
 #include "sigslot.h"
+#include "keymessage.h"
 #include "touchmessage.h"
 #include "userinput.h"
 
@@ -101,7 +101,9 @@ class cWindow : public SlotHolder {
 
     virtual void update() {}
 
-    virtual bool process(const cMessage& msg);
+    virtual bool processKeyMessage(cKeyMessage message);
+
+    virtual bool processTouchMessage(cTouchMessage message);
 
     bool isFocusable() { return _isFocusable; }
 

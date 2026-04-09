@@ -13,7 +13,6 @@
 #include <functional>
 #include "form.h"
 #include "formdesc.h"
-#include "message.h"
 #include "spinbox.h"
 #include "statictext.h"
 
@@ -28,7 +27,7 @@ class cSettingWnd : public akui::cForm {
     std::function<void(cSettingWnd*)> onSaved;
 
     void draw(void);
-    bool process(const akui::cMessage& msg);
+    bool processKeyMessage(cKeyMessage message) override;
     cWindow& loadAppearance(const std::string& aFileName);
     void addSettingTab(const std::string& text);
     void addSettingItem(const std::string& text, const std::vector<std::string>& itemTexts,
@@ -59,7 +58,6 @@ class cSettingWnd : public akui::cForm {
     void onUIKeyRIGHT(void);
     void onUIKeyL(void);
     void onUIKeyR(void);
-    bool processKeyMessage(const akui::cKeyMessage& msg);
     void onItemChanged(akui::cSpinBox* item);
     ssize_t focusedItemId(void);
     akui::cSpinBox* focusedItem(void);

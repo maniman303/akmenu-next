@@ -97,19 +97,49 @@ void cSettingWnd::draw(void) {
     cForm::draw();
 }
 
-bool cSettingWnd::process(const akui::cMessage& msg) {
-    bool ret = false;
-    ret = cForm::process(msg);
-    if (!ret) {
-        if (msg.id() > cMessage::keyMessageStart && msg.id() < cMessage::keyMessageEnd) {
-            ret = processKeyMessage((cKeyMessage&)msg);
-        }
-        // if(msg.id()>cMessage::touchMessageStart&&msg.id()<cMessage::touchMessageEnd)
-        //{
-        //   ret=processTouchMessage((cTouchMessage&)msg);
-        // }
+bool cSettingWnd::processKeyMessage(cKeyMessage message) {
+    // TODO: Use scrolling speed with isKeyHeld
+    if (message.isKeyDown(KEY_R)) {
+        onUIKeyR();
+        return true;
     }
-    return ret;
+
+    if (message.isKeyDown(KEY_L)) {
+        onUIKeyL();
+        return true;
+    }
+
+    if (message.isKeyUp(KEY_A)) {
+        onOK();
+        return true;
+    }
+
+    if (message.isKeyUp(KEY_B)) {
+        onCancel();
+        return true;
+    }
+
+    if (message.isKeyDown(KEY_DOWN)) {
+        onUIKeyDOWN();
+        return true;
+    }
+
+    if (message.isKeyDown(KEY_UP)) {
+        onUIKeyUP();
+        return true;
+    }
+
+    if (message.isKeyDown(KEY_LEFT)) {
+        onUIKeyLEFT();
+        return true;
+    }
+
+    if (message.isKeyDown(KEY_RIGHT)) {
+        onUIKeyRIGHT();
+        return true;
+    }
+    
+    return false;
 }
 
 void cSettingWnd::onOK(void) {
@@ -125,49 +155,6 @@ void cSettingWnd::onOK(void) {
 
 void cSettingWnd::onCancel(void) {
     cForm::onCancel();
-}
-
-bool cSettingWnd::processKeyMessage(const cKeyMessage& msg) {
-    bool ret = false;
-    if (msg.id() == cMessage::keyDown) {
-        switch (msg.keyCode()) {
-            case cKeyMessage::UI_KEY_DOWN:
-                onUIKeyDOWN();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_UP:
-                onUIKeyUP();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_LEFT:
-                onUIKeyLEFT();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_RIGHT:
-                onUIKeyRIGHT();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_A:
-                onOK();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_B:
-                onCancel();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_L:
-                onUIKeyL();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_R:
-                onUIKeyR();
-                ret = true;
-                break;
-            default:
-                break;
-        }
-    }
-    return ret;
 }
 
 cWindow& cSettingWnd::loadAppearance(const std::string& aFileName) {

@@ -89,8 +89,11 @@ cWindow* cWindow::topLevelWindow() const {
     return ret;
 }
 
-bool cWindow::process(const cMessage& msg) {
-    // dbg_printf("%08x call default process()\n", this );
+bool cWindow::processKeyMessage(cKeyMessage message) {
+    return false;
+}
+
+bool cWindow::processTouchMessage(cTouchMessage message) {
     return false;
 }
 

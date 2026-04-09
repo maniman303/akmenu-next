@@ -11,6 +11,7 @@
 #include <cstring>
 #include "dbgtool.h"
 #include "keymessage.h"
+#include "touchmessage.h"
 #include "timer.h"
 #include "windowmanager.h"
 
@@ -88,41 +89,8 @@ bool processInput(INPUT& inputs) {
     bool ret = false;
     unsigned char shift = 0;
 
-    if (inputs.keysHeld & KEY_L) shift |= cKeyMessage::UI_SHIFT_L;
-
-    if (inputs.keysDown & KEY_A)
-        ret = ret || windowManager().onKeyDown(cKeyMessage::UI_KEY_A, shift);
-    if (inputs.keysDown & KEY_B)
-        ret = ret || windowManager().onKeyDown(cKeyMessage::UI_KEY_B, shift);
-    if (inputs.keysDown & KEY_X)
-        ret = ret || windowManager().onKeyDown(cKeyMessage::UI_KEY_X, shift);
-    if (inputs.keysDown & KEY_Y)
-        ret = ret || windowManager().onKeyDown(cKeyMessage::UI_KEY_Y, shift);
-    if (inputs.keysDown & KEY_R)
-        ret = ret || windowManager().onKeyDown(cKeyMessage::UI_KEY_R, shift);
-    if (inputs.keysDown & KEY_L)
-        ret = ret || windowManager().onKeyDown(cKeyMessage::UI_KEY_L, shift);
-    if (inputs.keysDown & KEY_START || inputs.keysDownRepeat & KEY_START)
-        ret = ret || windowManager().onKeyDown(cKeyMessage::UI_KEY_START, shift);
-    if (inputs.keysDown & KEY_SELECT)
-        ret = ret || windowManager().onKeyDown(cKeyMessage::UI_KEY_SELECT, shift);
-    if (inputs.keysDown & KEY_LEFT || inputs.keysDownRepeat & KEY_LEFT)
-        ret = ret || windowManager().onKeyDown(cKeyMessage::UI_KEY_LEFT, shift);
-    if (inputs.keysDown & KEY_RIGHT || inputs.keysDownRepeat & KEY_RIGHT)
-        ret = ret || windowManager().onKeyDown(cKeyMessage::UI_KEY_RIGHT, shift);
-    if (inputs.keysDown & KEY_UP || inputs.keysDownRepeat & KEY_UP)
-        ret = ret || windowManager().onKeyDown(cKeyMessage::UI_KEY_UP, shift);
-    if (inputs.keysDown & KEY_DOWN || inputs.keysDownRepeat & KEY_DOWN)
-        ret = ret || windowManager().onKeyDown(cKeyMessage::UI_KEY_DOWN, shift);
-
-    if (inputs.keysUp & KEY_L) ret = ret || windowManager().onKeyUp(cKeyMessage::UI_KEY_L, shift);
-
-    if (inputs.touchDown)
-        ret = ret || windowManager().onTouchDown(inputs.touchPt.px, inputs.touchPt.py);
-    if (inputs.touchUp)
-        ret = ret || windowManager().onTouchUp(inputs.touchPt.px, inputs.touchPt.py);
-    if (inputs.touchMoved)
-        ret = ret || windowManager().onTouchMove(inputs.movedPt.px, inputs.movedPt.py);
+    ret = ret || windowManager().processKeyMessage(cKeyMessage(inputs.keysHeld, inputs.keysUp, inputs.keysDown, inputs.keysDownRepeat));
+    ret = ret || windowManager().processTouchMessage(cTouchMessage(inputs.touchPt.px, inputs.touchPt.py, inputs.touchDown, inputs.touchUp, inputs.touchMoved));
 
     if (inputs.keysDown & KEY_LID) {
         dbg_printf("lid closed\n");

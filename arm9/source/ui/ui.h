@@ -25,7 +25,6 @@
 #include "windowmanager.h"
 
 #include "keymessage.h"
-#include "message.h"
 #include "touchmessage.h"
 
 #include "bitmapdesc.h"

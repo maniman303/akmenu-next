@@ -13,6 +13,8 @@
 #include <string>
 #include "userinput.h"
 #include "window.h"
+#include "keymessage.h"
+#include "touchmessage.h"
 
 namespace akui {
 class cWindowManager {
@@ -32,11 +34,7 @@ class cWindowManager {
     cWindow* _windowBelowPen;
     cWindow* _capturedWindow;  // process touch for non-focusable window
   protected:
-    cWindowManager& checkForWindowBelowPen(const cPoint& touchPoint);
     cWindow* windowBelowPen(void) const { return _windowBelowPen; }
-    void updateFocusIfNecessary(const cPoint& touchPoint);
-    bool process(cMessage& message) const;
-    bool processTouchMessage(cTouchMessage& message);
     const cWindowManager& updateBackground(void);
 
   public:
@@ -49,11 +47,8 @@ class cWindowManager {
     cWindow* currentWindow(void) const { return _currentWindow.window(); }
     bool containsWindow(cWindow* aWindow);
     const cWindowManager& update(void);
-    bool onKeyDown(unsigned char keyCode, unsigned char shift);
-    bool onKeyUp(unsigned char keyCode, unsigned char shift);
-    bool onTouchDown(int x, int y);
-    bool onTouchUp(int x, int y);
-    bool onTouchMove(int x, int y);
+    bool processKeyMessage(cKeyMessage message);
+    bool processTouchMessage(cTouchMessage message);
 };
 
 typedef t_singleton<cWindowManager> cWindowManager_s;

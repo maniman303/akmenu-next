@@ -32,9 +32,9 @@ class cForm : public cWindow {
 
     void draw();
 
-    // cWindow& loadAppearance(const std::string& aFileName );
+    bool processKeyMessage(cKeyMessage message) override;
 
-    bool process(const cMessage& msg);
+    bool processTouchMessage(cTouchMessage message) override;
 
     cWindow* windowBelow(const cPoint& p);
 
@@ -61,8 +61,6 @@ class cForm : public cWindow {
     virtual void onOK();
 
     virtual void onCancel();
-
-    bool processKeyMessage(const cKeyMessage& msg);
 
     std::list<cWindow*> _childWindows;
 
