@@ -14,5 +14,5 @@
 class AcekardLauncher : public Launcher {
   public:
     std::unique_ptr<TaskWorker> task() const override;
-    bool process() override;
+    s16 process(s16 iter) override;
 };

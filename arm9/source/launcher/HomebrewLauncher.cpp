@@ -16,10 +16,10 @@ std::unique_ptr<TaskWorker> HomebrewLauncher::task() const {
     return std::make_unique<HomebrewLauncher>(*this);
 }
 
-bool HomebrewLauncher::process() {
+s16 HomebrewLauncher::process(s16 iter) {
     std::vector<const char*> argv;
     argv.push_back(_romPath.c_str());
     runNdsFile(argv[0], argv.size(), &argv[0]);
 
-    return true;
+    return -1;
 }

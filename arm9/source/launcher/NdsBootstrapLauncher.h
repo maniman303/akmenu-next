@@ -14,7 +14,7 @@
 class NdsBootstrapLauncher : public Launcher {
   public:
     std::unique_ptr<TaskWorker> task() const override;
-    bool process() override;
+    s16 process(s16 iter) override;
 
   private:
     bool prepareCheats(const std::string& mRomPath);

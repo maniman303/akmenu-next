@@ -163,7 +163,7 @@ bool TopToyLauncher::prepareTTSYS(void) {
     return true;
 }
 
-bool TopToyLauncher::process() {
+s16 TopToyLauncher::process(s16 iter) {
     std::string loaderPath =
 #ifdef __TTLAUNCHER_M3__
             "fat:/TTMenu/m3patch.dat"
@@ -174,7 +174,7 @@ bool TopToyLauncher::process() {
 
     if (access(loaderPath.c_str(), F_OK) != 0) {
         showModalOk(LOADER_NOT_FOUND_TITLE, formatString(LOADER_NOT_FOUND_MESSAGE.c_str(), loaderPath.c_str()));
-        return true;
+        return -1;
     }
 
     mRomPath = _romPath;
@@ -186,7 +186,7 @@ bool TopToyLauncher::process() {
         FILE* TTSYSFile = fopen("fat:/TTMENU.SYS", "wb");
         if (TTSYSFile == NULL) {
             showModalOk(LANG("loader", "error"), LANG("loader", "ttmenu"));
-            return true;
+            return -1;
         }
 
         fseek(TTSYSFile, 0, SEEK_SET);
@@ -198,12 +198,12 @@ bool TopToyLauncher::process() {
 
     // Prepare cheat codes if enabled
     if ((mFlags & PATCH_CHEATS) && !prepareCheats()) {
-        return true;
+        return -1;
     }
 
     // Setup TTMenu system parameters
     if (!prepareTTSYS()) {
-        return true;
+        return -1;
     }
 
     FILE* loader = fopen(loaderPath.c_str(), "rb");
@@ -246,5 +246,5 @@ bool TopToyLauncher::process() {
 
     free(loader_arm7);
 
-    return true;
+    return -1;
 }

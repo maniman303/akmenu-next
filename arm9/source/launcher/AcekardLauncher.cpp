@@ -44,7 +44,7 @@ std::unique_ptr<TaskWorker> AcekardLauncher::task() const {
     return std::make_unique<AcekardLauncher>(*this);
 }
 
-bool AcekardLauncher::process() {
+s16 AcekardLauncher::process(s16 iter) {
     tNDSHeader header;
 
     dbg_printf("load %s\n", _romPath.c_str());
@@ -53,7 +53,7 @@ bool AcekardLauncher::process() {
 
     if (access(acekardLoaderPath.c_str(), F_OK) != 0) {
         showModalOk(LOADER_NOT_FOUND_TITLE, formatString(LOADER_NOT_FOUND_MESSAGE.c_str(), acekardLoaderPath.c_str()));
-        return true;
+        return -1;
     }
 
     // akloaders are very old and expect the old-style libfat mount points
@@ -79,7 +79,7 @@ bool AcekardLauncher::process() {
 
     FILE* loader = fopen(acekardLoaderPath.c_str(), "rb");
     if (loader == NULL) {
-        return true;
+        return -1;
     }
 
     fseek(loader, 0, SEEK_SET);
@@ -106,5 +106,5 @@ bool AcekardLauncher::process() {
     dbg_printf("load done\n");
 
     resetAndLoop();
-    return true;
+    return -1;
 }

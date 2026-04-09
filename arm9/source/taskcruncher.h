@@ -15,7 +15,15 @@ class TaskCruncher {
     void process();
 
   private:
-    std::deque<std::unique_ptr<TaskWorker>> _deque;
+    struct TaskEntry {
+      std::unique_ptr<TaskWorker> task;
+      s16 iter;
+
+      TaskEntry(std::unique_ptr<TaskWorker> t, s16 i)
+          : task(std::move(t)), iter(i) {}
+    };
+
+    std::deque<TaskEntry> _deque;
 };
 
 typedef t_singleton<TaskCruncher> TaskCruncher_s;

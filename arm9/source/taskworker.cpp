@@ -11,7 +11,7 @@ void TaskWorker::setOnCompleted(std::function<void()> onCompleted) {
     _onCompleted = onCompleted;        
 }
 
-bool TaskWorker::process() {
+s16 TaskWorker::process(s16 iter) {
     logger().info("Task worker default process.");
-    return true;
+    return -1;
 }

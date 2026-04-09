@@ -29,7 +29,6 @@ class Launcher : public TaskWorker {
   protected:
     void showModalOk(const std::string& title, const std::string& content);
 
-    u16 _iter;
     std::string _romPath;
     std::string _savePath;
     u32 _flags;

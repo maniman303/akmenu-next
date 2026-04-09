@@ -138,17 +138,17 @@ bool PicoLoaderLauncher::setParameters(void) {
     return true;
 }
 
-bool PicoLoaderLauncher::process() {
+s16 PicoLoaderLauncher::process(s16 iter) {
     static const char picoLoaderPath7[] = "fat:/_pico/picoLoader7.bin";
     static const char picoLoaderPath9[] = "fat:/_pico/picoLoader9.bin";
 
     if (access(picoLoaderPath7, F_OK) != 0) {
         showModalOk(LOADER_NOT_FOUND_TITLE, formatString(LOADER_NOT_FOUND_MESSAGE.c_str(), picoLoaderPath7));
-        return true;
+        return -1;
     }
     if (access(picoLoaderPath9, F_OK) != 0) {
         showModalOk(LOADER_NOT_FOUND_TITLE, formatString(LOADER_NOT_FOUND_MESSAGE.c_str(), picoLoaderPath9));
-        return true;
+        return -1;
     }
 
     // POINT OF NO RETURN = start overwriting VRAM
@@ -198,5 +198,5 @@ bool PicoLoaderLauncher::process() {
     ((pico_loader_9_func_t)0x06800000)();
 
     // If we landed here this is a big problem
-    return true;
+    return -1;
 }

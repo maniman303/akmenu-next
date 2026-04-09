@@ -3,7 +3,6 @@
 #include "../ui/msgbox.h"
 
 Launcher::Launcher() {
-    _iter = 0;
     _romPath = "";
     _savePath = "";
     _flags = 0;
@@ -13,7 +12,6 @@ Launcher::Launcher() {
 }
 
 void Launcher::launchRom(std::string romPath, std::string savePath, u32 flags, u32 cheatOffset, u32 cheatSize, bool hb) {
-    _iter = 0;
     _romPath = romPath;
     _savePath = savePath;
     _flags = flags;

@@ -2,11 +2,11 @@
 #include "logger.h"
 
 TaskCruncher::TaskCruncher() {
-    _deque = std::deque<std::unique_ptr<TaskWorker>>();
+    _deque = std::deque<TaskEntry>();
 }
 
 void TaskCruncher::push(std::unique_ptr<TaskWorker> task) {
-    _deque.push_front(std::move(task));
+    _deque.push_front(TaskEntry(std::move(task), 0));
 }
 
 void TaskCruncher::process() {
@@ -14,11 +14,12 @@ void TaskCruncher::process() {
         return;
     }
 
-    std::unique_ptr<TaskWorker>& task = _deque.front();
-    if (!task->process()) {
+    TaskEntry& entry = _deque.front();
+    entry.iter = entry.task->process(entry.iter);
+    if (entry.iter >= 0) {
         return;
     }
 
-    task->onCompleted();
+    entry.task->onCompleted();
     _deque.pop_front();
 }
