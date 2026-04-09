@@ -832,8 +832,6 @@ void cMainList::setViewMode(VIEW_MODE mode) {
     if (!_columns.size()) return;
     _viewMode = mode;
 
-    // TODO: Load new ini setting and update column offset
-
     switch (_viewMode) {
         case VM_LIST:
             _columns[ICON_COLUMN].width = 0;
