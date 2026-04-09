@@ -90,7 +90,7 @@ bool processInput(INPUT& inputs) {
     unsigned char shift = 0;
 
     ret = ret || windowManager().processKeyMessage(cKeyMessage(inputs.keysHeld, inputs.keysUp, inputs.keysDown, inputs.keysDownRepeat));
-    ret = ret || windowManager().processTouchMessage(cTouchMessage(inputs.touchPt.px, inputs.touchPt.py, inputs.touchDown, inputs.touchUp, inputs.touchMoved));
+    ret = ret || windowManager().processTouchMessage(cTouchMessage(inputs.touchPt.px, inputs.touchPt.py, inputs.movedPt.px, inputs.movedPt.py, inputs.touchDown, inputs.touchUp, inputs.touchMoved));
 
     if (inputs.keysDown & KEY_LID) {
         dbg_printf("lid closed\n");
