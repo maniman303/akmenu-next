@@ -460,7 +460,6 @@ void cGdi::fillRectBlend(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRA
 
     u16* pSrc = ((GE_MAIN == engine) ? (u16*)_background.buffer() : _bufferSub2) + (y << 8) + x;
     u16* pDest = ((GE_MAIN == engine) ? (_bufferMain2 + _layerPitch) : _bufferSub2) + (y << 8) + x;
-    u32 alpha = (opacity * 32) / 100;
     u32 destInc = 256 - w;
     for (u32 ii = 0; ii < h; ++ii) {
         for (u32 jj = 0; jj < w; ++jj) {

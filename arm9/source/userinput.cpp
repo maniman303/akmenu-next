@@ -87,7 +87,6 @@ void resetInputIdle(void) {
 
 bool processInput(INPUT& inputs) {
     bool ret = false;
-    unsigned char shift = 0;
 
     ret = ret || windowManager().processKeyMessage(cKeyMessage(inputs.keysHeld, inputs.keysUp, inputs.keysDown, inputs.keysDownRepeat));
     ret = ret || windowManager().processTouchMessage(cTouchMessage(inputs.touchPt.px, inputs.touchPt.py, inputs.movedPt.px, inputs.movedPt.py, inputs.touchDown, inputs.touchUp, inputs.touchMoved));

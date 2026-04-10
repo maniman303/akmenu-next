@@ -26,7 +26,9 @@ class cMainWnd : public akui::cForm {
     ~cMainWnd();
 
   public:
-    bool process(const akui::cMessage& msg);
+    bool processKeyMessage(cKeyMessage message) override;
+
+    bool processTouchMessage(cTouchMessage message) override;
 
     cWindow& loadAppearance(const std::string& aFileName);
 
@@ -59,10 +61,6 @@ class cMainWnd : public akui::cForm {
 
     void brightnessButtonClicked();
 
-    bool processKeyMessage(const akui::cKeyMessage& msg);
-
-    bool processTouchMessage(const akui::cTouchMessage& msg);
-
     void showSettings(void);
 
     void saveSettings(cSettingWnd* settingWnd);
@@ -86,6 +84,4 @@ class cMainWnd : public akui::cForm {
     akui::cButton* _folderUpButton;
 
     akui::cStaticText* _folderText;
-
-    bool _processL;
 };

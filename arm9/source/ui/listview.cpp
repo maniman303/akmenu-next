@@ -252,7 +252,7 @@ namespace akui {
     s32 cListView::rowBelowPoint(const cPoint& pt) {
         if (windowRectangle().surrounds(pt)) {
             s32 row = _firstVisibleRowId + (pt.y - position().y) / _rowHeight;
-            if (row >= _rows.size()) row = -1;
+            if (static_cast<size_t>(row) >= _rows.size()) row = -1;
             return row;
         }
         return -1;
@@ -267,7 +267,7 @@ namespace akui {
         if (message.down()) {
             _touchMovedAfterTouchDown = false;
             s32 rbp = rowBelowPoint(message.position());
-            if (rbp != (u32)-1) {
+            if (rbp != -1) {
                 selectRow(rbp);
             }
 
@@ -283,7 +283,7 @@ namespace akui {
 
             _touchMovedAfterTouchDown = false;
             s32 rbp = rowBelowPoint(message.position());
-            if (rbp != -1 && selectedRowId() == rbp) {
+            if (rbp != -1 && static_cast<s32>(selectedRowId()) == rbp) {
                 onSelectedRowClicked(rbp);
                 selectedRowClicked(rbp);
             }

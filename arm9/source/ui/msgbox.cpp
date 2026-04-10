@@ -165,43 +165,21 @@ namespace akui {
         cForm::onCancel();
     }
 
-    bool cMessageBox::process(const cMessage& msg) {
-        bool ret = false;
-        if (isVisible()) {
-            ret = cForm::process(msg);
-            if (!ret) {
-                if (msg.id() > cMessage::keyMessageStart && msg.id() < cMessage::keyMessageEnd) {
-                    ret = processKeyMessage((cKeyMessage&)msg);
-                } else if (msg.id() > cMessage::touchMessageStart &&
-                        msg.id() < cMessage::touchMessageEnd) {
-                    ret = processTouchMessage((cTouchMessage&)msg);
-                }
-            }
+    bool cMessageBox::processKeyMessage(cKeyMessage message) {
+        if (message.isKeyUp(KEY_A)) {
+            onOK();
+            return true;
         }
 
-        return ret;
-    }
-
-    bool cMessageBox::processKeyMessage(const cKeyMessage& msg) {
-        bool ret = false;
-        if (msg.id() == cMessage::keyDown) {
-            switch (msg.keyCode()) {
-                case cKeyMessage::UI_KEY_A:
-                    onOK();
-                    ret = true;
-                    return true;
-                    break;
-                case cKeyMessage::UI_KEY_B:
-                    onCancel();
-                    ret = true;
-                    return true;
-                    break;
-            }
+        if (message.isKeyUp(KEY_B)) {
+            onCancel();
+            return true;
         }
-        return ret;
+
+        return false;
     }
 
-    bool cMessageBox::processTouchMessage(const cTouchMessage& msg) {
+    bool cMessageBox::processTouchMessage(cTouchMessage message) {
         return false;
     }
 

@@ -697,13 +697,6 @@ void cMainList::onSelectChanged(u32 index) {
     dbg_printf("%s\n", _rows[index][REALNAME_COLUMN].text().c_str());
 }
 
-void cMainList::onSelectedRowClicked(u32 index) {
-    const INPUT& input = getInput();
-    if (input.touchPt.px > position().x && input.touchPt.px < position().x + 32) {
-        selectedRowHeadClicked(index);
-    }
-}
-
 void cMainList::onScrolled(u32 index) {
     _activeIconScale = 1;
     // updateActiveIcon( CONTENT );

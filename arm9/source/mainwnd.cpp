@@ -46,8 +46,7 @@ cMainWnd::cMainWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::strin
       _startButton(NULL),
       _brightnessButton(NULL),
       _folderUpButton(NULL),
-      _folderText(NULL),
-      _processL(false) {}
+      _folderText(NULL) {}
 
 cMainWnd::~cMainWnd() {
     if (_folderText != NULL) {
@@ -248,129 +247,113 @@ cWindow& cMainWnd::loadAppearance(const std::string& aFileName) {
     return *this;
 }
 
-bool cMainWnd::process(const cMessage& msg) {
-    if (_startMenu->isVisible()) return _startMenu->process(msg);
-
-    bool ret = false;
-
-    ret = cForm::process(msg);
-
-    if (!ret) {
-        if (msg.id() > cMessage::keyMessageStart && msg.id() < cMessage::keyMessageEnd) {
-            ret = processKeyMessage((cKeyMessage&)msg);
-        }
-
-        if (msg.id() > cMessage::touchMessageStart && msg.id() < cMessage::touchMessageEnd) {
-            ret = processTouchMessage((cTouchMessage&)msg);
-        }
+bool cMainWnd::processKeyMessage(cKeyMessage message) {
+    if (_startMenu->isVisible()) {
+        return _startMenu->processKeyMessage(message);
     }
-    return ret;
-}
 
-bool cMainWnd::processKeyMessage(const cKeyMessage& msg) {
-    bool ret = false, isL = msg.shift() & cKeyMessage::UI_SHIFT_L;
+    bool isL = message.isKeyShift(KEY_L);
     bool allow = !gs().safeMode;
-    if (msg.id() == cMessage::keyDown) {
-        switch (msg.keyCode()) {
-            case cKeyMessage::UI_KEY_DOWN:
-                _mainList->selectNext();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_UP:
-                _mainList->selectPrev();
-                ret = true;
-                break;
-
-            case cKeyMessage::UI_KEY_LEFT:
-                _mainList->selectRow(_mainList->selectedRowId() - _mainList->visibleRowCount());
-                ret = true;
-                break;
-
-            case cKeyMessage::UI_KEY_RIGHT:
-                _mainList->selectRow(_mainList->selectedRowId() + _mainList->visibleRowCount());
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_A:
-                onKeyAPressed();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_B:
-                onKeyBPressed();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_Y:
-                if (isL) {
-                    showSettings();
-                    _processL = false;
-                } else {
-                    onKeyYPressed();
-                }
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_X: {
-                if (isL) {
-                    if (allow) {
-                        DSRomInfo rominfo;
-                        if (_mainList->getRomInfo(_mainList->selectedRowId(), rominfo) &&
-                            rominfo.isDSRom() && !rominfo.isHomebrew()) {
-                            cRomInfoWnd::showCheats(_mainList->getSelectedFullPath());
-                        }
-                    }
-                    _processL = false;
-                } else {
-                    _mainList->enterDir("favorites:/");
-                    _mainList->selectRow(0);
-                }
-                ret = true;
-                break;
-            }
-            case cKeyMessage::UI_KEY_START:
-                startButtonClicked();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_SELECT:
-                if (isL) {
-                    if (allow) _mainList->SwitchShowAllFiles();
-                    _processL = false;
-                } else {
-                    if (allow)
-                        _mainList->setViewMode(
-                                (cMainList::VIEW_MODE)((_mainList->getViewMode() + 1) % 4));
-                }
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_L:
-                _processL = true;
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_R:
-                if (isL) {
-                    brightnessButtonClicked();
-                }
-                ret = true;
-                break;
-            default: {
-            }
-        };
+    // TODO: Move list walking to list view with scrolling speed
+    if (message.isKeyDown(KEY_DOWN)) {
+        _mainList->selectNext();
+        return true;
     }
-    if (msg.id() == cMessage::keyUp) {
-        switch (msg.keyCode()) {
-            case cKeyMessage::UI_KEY_L:
-                if (_processL) {
-                    _mainList->backParentDir();
-                    _processL = false;
-                }
-                ret = true;
-                break;
+
+    if (message.isKeyDown(KEY_UP)) {
+        _mainList->selectPrev();
+        return true;
+    }
+
+    if (message.isKeyDown(KEY_LEFT)) {
+        _mainList->selectRow(_mainList->selectedRowId() - _mainList->visibleRowCount());
+        return true;
+    }
+
+    if (message.isKeyDown(KEY_RIGHT)) {
+        _mainList->selectRow(_mainList->selectedRowId() + _mainList->visibleRowCount());
+        return true;
+    }
+
+    if (message.isKeyUp(KEY_A)) {
+        onKeyAPressed();
+        return true;
+    }
+
+    if (message.isKeyUp(KEY_B)) {
+        onKeyBPressed();
+        return true;
+    }
+
+    if (message.isKeyUp(KEY_Y)) {
+        if (isL) {
+            showSettings();
+        } else {
+            onKeyYPressed();
         }
+
+        return true;
     }
-    return ret;
+
+    if (message.isKeyUp(KEY_X)) {
+        if (isL) {
+            if (allow) {
+                DSRomInfo rominfo;
+                if (_mainList->getRomInfo(_mainList->selectedRowId(), rominfo) &&
+                    rominfo.isDSRom() && !rominfo.isHomebrew()) {
+                    cRomInfoWnd::showCheats(_mainList->getSelectedFullPath());
+                }
+            }
+        } else {
+            _mainList->enterDir("favorites:/");
+            _mainList->selectRow(0);
+        }
+
+        return true;
+    }
+
+    if (message.isKeyUp(KEY_START)) {
+        startButtonClicked();
+        return true;
+    }
+
+    if (message.isKeyUp(KEY_SELECT)) {
+        if (!allow) {
+            return true;
+        }
+
+        if (isL) {
+            _mainList->SwitchShowAllFiles();
+        } else {
+            _mainList->setViewMode((cMainList::VIEW_MODE)((_mainList->getViewMode() + 1) % 4));
+        }
+
+        return true;
+    }
+
+    if (message.isKeyUp(KEY_R)) {
+        if (isL) {
+            brightnessButtonClicked();
+        }
+
+        return true;
+    }
+
+    if (message.isKeyUp(KEY_L)) {
+        _mainList->backParentDir();
+
+        return true;
+    }
+
+    return false;
 }
 
-bool cMainWnd::processTouchMessage(const cTouchMessage& msg) {
-    bool ret = false;
+bool cMainWnd::processTouchMessage(cTouchMessage message) {
+    if (_startMenu->isVisible()) {
+        return _startMenu->processTouchMessage(message);
+    }
 
-    return ret;
+    return cForm::processTouchMessage(message);
 }
 
 void cMainWnd::onKeyYPressed() {

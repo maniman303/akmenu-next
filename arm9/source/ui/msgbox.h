@@ -53,7 +53,9 @@ namespace akui {
 
       void draw();
 
-      bool process(const cMessage& msg);
+      bool processKeyMessage(cKeyMessage message) override;
+
+      bool processTouchMessage(cTouchMessage message) override;
 
       cWindow& loadAppearance(const std::string& aFileName);
 
@@ -61,10 +63,6 @@ namespace akui {
       void onOK() override;
 
       void onCancel() override;
-
-      bool processKeyMessage(const cKeyMessage& msg);
-
-      bool processTouchMessage(const cTouchMessage& msg);
 
       std::string _msg;
 

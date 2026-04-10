@@ -55,7 +55,6 @@ bool cButton::valid() const {
 }
 
 bool cButton::processTouchMessage(cTouchMessage message) {
-    bool ret = false;
     cRect myRect(position().x, position().y, position().x + size().x, position().y + size().y);
     if (message.up()) {
         if (!_captured) {
