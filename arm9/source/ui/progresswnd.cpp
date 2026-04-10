@@ -42,9 +42,8 @@ namespace akui {
         cForm::draw();
     }
 
-    bool cProgressWnd::process(const cMessage& msg) {
-        bool ret = false;
-        return ret;
+    bool cProgressWnd::processKeyMessage(cKeyMessage message) {
+        return false;
     }
 
     cWindow& cProgressWnd::loadAppearance(const std::string& aFileName) {

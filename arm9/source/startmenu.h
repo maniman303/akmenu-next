@@ -26,7 +26,7 @@ class cStartMenu : public akui::cPopMenu {
 
     void init();
 
-    bool process(const akui::cMessage& msg);
+    bool processKeyMessage(cKeyMessage message) override;
 
     cWindow& loadAppearance(const std::string& aFileName);
 

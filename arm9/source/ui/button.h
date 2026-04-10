@@ -37,7 +37,7 @@ class cButton : public cWindow {
 
     bool valid() const;
 
-    bool process(const cMessage& msg);
+    bool processTouchMessage(cTouchMessage message) override;
 
     State state() { return _state; }
 
@@ -64,8 +64,6 @@ class cButton : public cWindow {
     Signal0 pressed;
 
   protected:
-    bool processTouchMessage(const akui::cTouchMessage& msg);
-
     bool _captured;
 
     State _state;

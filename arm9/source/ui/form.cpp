@@ -106,21 +106,21 @@ namespace akui {
 
     cWindow* cForm::windowBelow(const cPoint& p) {
         cWindow* ret = cWindow::windowBelow(p);  // 先看自己在不在点下面
+        if (ret == NULL) {
+            return NULL;
+        }
 
-        if (ret != 0) {
-            std::list<cWindow*>::reverse_iterator it;
-            for (it = _childWindows.rbegin(); it != _childWindows.rend(); ++it) {
-                cWindow* window = *it;
-                cWindow* cw = window->windowBelow(p);
-                // dbg_printf( "check child (%s)\n", window->text().c_str() );
-                if (cw != 0) {
-                    ret = cw;
-                    break;
-                }
+        std::list<cWindow*>::reverse_iterator it;
+        for (it = _childWindows.rbegin(); it != _childWindows.rend(); ++it) {
+            cWindow* window = *it;
+            cWindow* cw = window->windowBelow(p);
+            // dbg_printf( "check child (%s)\n", window->text().c_str() );
+            if (cw != NULL) {
+                return cw;
             }
         }
 
-        return ret;
+        return NULL;
     }
 
     u32 cForm::modalRet() {

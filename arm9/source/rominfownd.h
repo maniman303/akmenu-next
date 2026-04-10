@@ -13,7 +13,6 @@
 #include "dsrom.h"
 #include "form.h"
 #include "formdesc.h"
-#include "message.h"
 #include "settingwnd.h"
 #include "spinbox.h"
 #include "statictext.h"
@@ -31,7 +30,7 @@ class cRomInfoWnd : public akui::cForm {
 
     void draw();
 
-    bool process(const akui::cMessage& msg);
+    bool processKeyMessage(cKeyMessage message) override;
 
     cWindow& loadAppearance(const std::string& aFileName);
 
@@ -57,8 +56,6 @@ class cRomInfoWnd : public akui::cForm {
     void pressCopy(void);
 
     void pressCheats(void);
-
-    bool processKeyMessage(const akui::cKeyMessage& msg);
 
     void onOK() override;
 

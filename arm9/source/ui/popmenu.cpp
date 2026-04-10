@@ -90,86 +90,79 @@ s16 cPopMenu::barWidth(void) {
     return _itemWidth ? _itemWidth : (_size.x - 2 * _barLeft);
 }
 
-bool cPopMenu::process(const cMessage& msg) {
-    bool ret = false;
-    if (isVisible()) {
-        // ret = cForm::process( msg );
-        if (msg.id() > cMessage::keyMessageStart && msg.id() < cMessage::keyMessageEnd) {
-            ret = processKeyMessage((cKeyMessage&)msg);
-        } else if (msg.id() > cMessage::touchMessageStart && msg.id() < cMessage::touchMessageEnd) {
-            ret = processTouchMessage((cTouchMessage&)msg);
+bool cPopMenu::processKeyMessage(cKeyMessage message) {
+    if (message.isKeyUp(KEY_A)) {
+        hide();
+        itemClicked(_selectedItemIndex);
+        return true;
+    }
+
+    if (message.isKeyUp(KEY_B)) {
+        hide();
+        return true;
+    }
+
+    if (message.isKeyDown(KEY_DOWN)) {
+        _selectedItemIndex += 1;
+        if (_selectedItemIndex > (s16)_items.size() - 1) _selectedItemIndex = 0;
+        return true;
+    }
+
+    if (message.isKeyDown(KEY_UP)) {
+        _selectedItemIndex -= 1;
+        if (_selectedItemIndex < 0) _selectedItemIndex = (s16)_items.size() - 1;
+        return true;
+    }
+
+    return false;
+}
+
+bool cPopMenu::processTouchMessage(cTouchMessage message) {
+    cPoint pos = message.position();
+    if (message.up()) {
+        if (!windowBelow(pos)) {
+            hide();
+            _skipTouch = false;
+            return true;
         }
-    }
 
-    // cPopMenu process all KEY messages while it is showing
-    // derived classes can override this feature
-    return ret;
-}
-
-bool cPopMenu::processKeyMessage(const cKeyMessage& msg) {
-    bool ret = false;
-    switch (msg.keyCode()) {
-        case cKeyMessage::UI_KEY_DOWN:
-            _selectedItemIndex += 1;
-            if (_selectedItemIndex > (s16)_items.size() - 1) _selectedItemIndex = 0;
-            ret = true;
-            break;
-        case cKeyMessage::UI_KEY_UP:
-            _selectedItemIndex -= 1;
-            if (_selectedItemIndex < 0) _selectedItemIndex = (s16)_items.size() - 1;
-            ret = true;
-            break;
-        case cKeyMessage::UI_KEY_A:
-            // do something by ( _selectedItemIndex )
+        if (!_skipTouch) {
             hide();
             itemClicked(_selectedItemIndex);
-            ret = true;
-            break;
-        case cKeyMessage::UI_KEY_B:
-            hide();
-            ret = true;
-            break;
-    };
+        }
 
-    return ret;
-}
-
-bool cPopMenu::processTouchMessage(const cTouchMessage& msg) {
-    bool ret = false;
-    if (msg.id() == cMessage::touchUp) {
-        if (windowBelow(cPoint(msg.position().x, msg.position().y)) && !_skipTouch) {
-            hide();
-            itemClicked(_selectedItemIndex);
-        } else
-            hide();
-
-        _skipTouch = false;
-        ret = true;
+        return true;
     }
-    if (msg.id() == cMessage::touchMove || msg.id() == cMessage::touchDown) {
-        const INPUT& input = getInput();
-        size_t item = itemBelowPoint(cPoint(input.touchPt.px, input.touchPt.py));
-        if ((size_t)-1 == item)
+
+    if (message.down() || message.move()) {
+        s32 item = itemBelowPoint(pos);
+        if (item == -1) {
             _skipTouch = true;
-        else
+        } else {
             _selectedItemIndex = item;
-        ret = true;
+        }
+
+        return true;
     }
 
-    return ret;
+    return false;
 }
 
-size_t cPopMenu::itemBelowPoint(const cPoint& pt) {
+s32 cPopMenu::itemBelowPoint(const cPoint& pt) {
     cPoint menuPos(position().x + _barLeft, position().y + _itemTopLeftPoint.y - 2);
     cSize menuSize(barWidth(), _itemHeight * _items.size());
     cRect rect(menuPos, menuPos + menuSize);
 
     if (rect.surrounds(pt)) {
-        u32 item = (pt.y - menuPos.y) / _itemHeight;
-        if (item > _items.size() - 1) item = _items.size() - 1;
+        s32 item = (pt.y - menuPos.y) / _itemHeight;
+        if (item >= (s32)_items.size()) {
+            item = _items.size() - 1;
+        }
+
         return item;
     }
-    return (u32)-1;
+
+    return -1;
 }
 
 void cPopMenu::onShow() {

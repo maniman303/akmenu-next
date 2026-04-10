@@ -432,7 +432,7 @@ u16 cGdi::blendColors(u16 color, u16 dest, u16 src, u16 opacity) {
         src = dest;
     }
 
-    if (opacity <= 0) {
+    if (color == 0 || opacity <= 0) {
         return src;
     }
 

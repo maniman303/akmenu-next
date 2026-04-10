@@ -24,12 +24,11 @@ class cCheatWnd : public akui::cForm, public cCheat {
 
   protected:
     void draw();
-    bool process(const akui::cMessage& msg);
+    bool processKeyMessage(cKeyMessage message) override;
     cWindow& loadAppearance(const std::string& aFileName);
 
   protected:
     bool parse(const std::string& aFileName);
-    bool processKeyMessage(const akui::cKeyMessage& msg);
     void onItemClicked(u32 index);
     void onSelect(void);
     void onDeselectAll(void);

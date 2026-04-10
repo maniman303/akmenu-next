@@ -27,9 +27,10 @@ class cPopMenu : public cWindow {
   public:
     void draw();
 
-    bool process(const cMessage& msg);
+    bool processKeyMessage(cKeyMessage message) override;
 
-    // 返回选中的项
+    bool processTouchMessage(cTouchMessage message) override;
+
     void popup();
 
     void addItem(size_t index, const std::string& itemText);
@@ -45,11 +46,7 @@ class cPopMenu : public cWindow {
   protected:
     void onShow();
 
-    bool processKeyMessage(const cKeyMessage& msg);
-
-    bool processTouchMessage(const cTouchMessage& msg);
-
-    size_t itemBelowPoint(const cPoint& pt);
+    s32 itemBelowPoint(const cPoint& pt);
 
     void drawItems();
 

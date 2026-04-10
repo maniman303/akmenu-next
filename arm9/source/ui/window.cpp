@@ -55,7 +55,7 @@ cWindow& cWindow::disableFocused() {
 }
 
 cWindow* cWindow::windowBelow(const cPoint& p) {
-    cWindow* ret = 0;
+    cWindow* ret = NULL;
     if (isVisible()) {
         if (windowRectangle().surrounds(p)) ret = this;
     }

@@ -27,15 +27,13 @@ void cStartMenu::init() {
     dbg_printf("startmenu ok\n");
 }
 
-bool cStartMenu::process(const cMessage& msg) {
-    if (msg.id() == cMessage::keyDown) {
-        cKeyMessage& kmsg = (cKeyMessage&)msg;
-        if (kmsg.keyCode() == cKeyMessage::UI_KEY_START) {
-            hide();
-            return false;
-        }
+bool cStartMenu::processKeyMessage(cKeyMessage message) {
+    if (message.isKeyUp(KEY_START)) {
+        hide();
+        return true;
     }
-    return cPopMenu::process(msg);
+
+    return cPopMenu::processKeyMessage(message);
 }
 
 cWindow& cStartMenu::loadAppearance(const std::string& aFileName) {

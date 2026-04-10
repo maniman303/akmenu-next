@@ -13,7 +13,6 @@
 #include "dsrom.h"
 #include "form.h"
 #include "formdesc.h"
-#include "message.h"
 #include "spinbox.h"
 #include "statictext.h"
 
@@ -25,11 +24,10 @@ class cExpWnd : public akui::cForm {
   public:
     static void showModal(cWindow* parent);
     void draw();
-    bool process(const akui::cMessage& msg);
+    bool processKeyMessage(cKeyMessage message) override;
     cWindow& loadAppearance(const std::string& aFileName);
 
   protected:
-    bool processKeyMessage(const akui::cKeyMessage& msg);
     void onOK() override;
     void onCancel() override;
     void onRAM();

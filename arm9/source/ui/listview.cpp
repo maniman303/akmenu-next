@@ -16,312 +16,301 @@
 //#include "dbgtool.h"
 
 namespace akui {
-
-void cListItem::setText(const std::string& text) {
-    _text = text;
-    _lines = 1;
-    size_t pos = _text.find('\n');
-    while (_text.npos != pos) {
-        ++_lines;
-        pos = _text.find('\n', pos + 1);
+    void cListItem::setText(const std::string& text) {
+        _text = text;
+        _lines = 1;
+        size_t pos = _text.find('\n');
+        while (_text.npos != pos) {
+            ++_lines;
+            pos = _text.find('\n', pos + 1);
+        }
     }
-}
 
-cListView::cListView(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
-    : cWindow(parent, text) {
-    setSize(cSize(w, h));
-    setRelativePosition(cPoint(x, y));
-    _rowHeight = 12;
-    _selectedRowId = 0;
-    _firstVisibleRowId = 0;
-    _visibleRowCount = 0;
-    _rowsPerpage = 0;
-    _textColor = uiSettings().listTextColor;                         // RGB15(24,24,24);
-    _textColorHilight = uiSettings().listTextHighLightColor;         // RGB15(31,31,31);
-    _selectionBarColor1 = BIT(15) | uiSettings().listViewBarColor1;  // RGB15(0,0,31);
-    _selectionBarColor2 = BIT(15) | uiSettings().listViewBarColor2;  // RGB15(0,0,31);
-    _selectionBarOpacity = 100;
-    _engine = GE_MAIN;
-    _touchMovedAfterTouchDown = false;
-}
-
-void cListView::arangeColumnsSize() {
-    u16 offset = 0;
-    for (size_t i = 0; i < _columns.size(); ++i) {
-        _columns[i].offset = offset;
-        offset += _columns[i].width;
-    }
-}
-
-bool cListView::insertColumn(size_t index, const std::string& text, u8 width) {
-    return insertColumn(index, text, width, false);
-}
-
-bool cListView::insertColumn(size_t index, const std::string& text, u8 width, bool center) {
-    if (index > _columns.size()) return false;
-
-    cListColumn aColumn;
-    aColumn.center = center;
-    aColumn.width = width;
-    if (index > 0)
-        aColumn.offset = _columns[index - 1].offset + _columns[index - 1].width;
-    else
-        aColumn.offset = 0;
-
-    _columns.insert(_columns.begin() + index, aColumn);
-    return true;
-}
-
-std::string cListView::processItemText(std::string text, int column) {
-    return text;
-}
-
-bool cListView::insertRow(size_t index, const std::vector<std::string>& texts) {
-    size_t columnCount = _columns.size();
-    if (0 == columnCount || index > _rows.size()) return false;
-    if (0 == texts.size()) return false;
-
-    _rows.insert(_rows.begin() + index, itemVector());
-    for (size_t col = 0; col < columnCount; ++col) {
-        std::string itemText;
-        if (col >= texts.size())
-            itemText = "Empty";  // 默认字符串
-        else
-            itemText = texts[col];
-
-        cListItem aItem;
-
-        itemText = processItemText(itemText, col);
-        aItem.setText(itemText);
-
-        _rows[index].insert(_rows[index].begin() + col, aItem);
-    }
-    // if( _visibleRowCount > _rows.size() ) _visibleRowCount = _rows.size();
-
-    return true;
-}
-
-void cListView::removeRow(size_t index) {
-    if (index >= _rows.size()) return;
-    _rows.erase(_rows.begin() + index);
-}
-
-void cListView::removeAllRows() {
-    _rows.clear();
-    _selectedRowId = 0;
-    _firstVisibleRowId = 0;
-    //_visibleRowCount = 0;
-}
-
-u32 cListView::getRowCount() {
-    return _rows.size();
-}
-
-void cListView::setRowHeight(u16 height) {
-    _rowHeight = height;
-    onResize();
-}
-
-void cListView::onResize() {
-    if (_rowHeight == 0) {
+    cListView::cListView(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
+        : cWindow(parent, text) {
+        setSize(cSize(w, h));
+        setRelativePosition(cPoint(x, y));
+        _rowHeight = 12;
+        _selectedRowId = 0;
+        _firstVisibleRowId = 0;
         _visibleRowCount = 0;
-        return;
+        _rowsPerpage = 0;
+        _textColor = uiSettings().listTextColor;                         // RGB15(24,24,24);
+        _textColorHilight = uiSettings().listTextHighLightColor;         // RGB15(31,31,31);
+        _selectionBarColor1 = BIT(15) | uiSettings().listViewBarColor1;  // RGB15(0,0,31);
+        _selectionBarColor2 = BIT(15) | uiSettings().listViewBarColor2;  // RGB15(0,0,31);
+        _selectionBarOpacity = 100;
+        _engine = GE_MAIN;
+        _touchMovedAfterTouchDown = false;
+        _sumOfMoveY = 0;
     }
 
-    _visibleRowCount = size().y / _rowHeight;
-}
+    void cListView::arangeColumnsSize() {
+        u16 offset = 0;
+        for (size_t i = 0; i < _columns.size(); ++i) {
+            _columns[i].offset = offset;
+            offset += _columns[i].width;
+        }
+    }
 
-void cListView::draw() {
-    // dbg_printf( "cListView::draw %08x\n", this );
-    // draw_frame();
-    drawSelectionBar();
-    drawText();
-}
+    bool cListView::insertColumn(size_t index, const std::string& text, u8 width) {
+        return insertColumn(index, text, width, false);
+    }
 
-void cListView::drawSelectionBar() {
-    // if( _touchMovedAfterTouchDown )
-    //     return;
+    bool cListView::insertColumn(size_t index, const std::string& text, u8 width, bool center) {
+        if (index > _columns.size()) return false;
 
-    s16 x = position().x - 2;
-    s16 y = position().y + (_selectedRowId - _firstVisibleRowId) * _rowHeight - 1;
-    s16 w = _size.x + 4;
-    s16 h = _rowHeight;
-
-    // gdi().setPenColor( _selectionBarColor );
-    for (u8 i = 0; i < h; ++i) {
-        if (i & 1)
-            gdi().fillRectBlend(_selectionBarColor1, _selectionBarColor2, x, y + i, w, 1, _engine,
-                                _selectionBarOpacity);
+        cListColumn aColumn;
+        aColumn.center = center;
+        aColumn.width = width;
+        if (index > 0)
+            aColumn.offset = _columns[index - 1].offset + _columns[index - 1].width;
         else
-            gdi().fillRectBlend(_selectionBarColor2, _selectionBarColor1, x, y + i, w, 1, _engine,
-                                _selectionBarOpacity);
+            aColumn.offset = 0;
+
+        _columns.insert(_columns.begin() + index, aColumn);
+        return true;
     }
-}
 
-void cListView::drawText() {
-    size_t columnCount = _columns.size();
-    size_t total = _visibleRowCount;
-    if (total > _rows.size() - _firstVisibleRowId) total = _rows.size() - _firstVisibleRowId;
+    std::string cListView::processItemText(std::string text, int column) {
+        return text;
+    }
 
-    for (size_t i = 0; i < total; ++i) {
-        for (size_t j = 0; j < columnCount; ++j) {
-            bool columnCenter = _columns[j].center;
-            s32 columnWidth = _columns[j].width;
-            s32 height = (_rows[_firstVisibleRowId + i][j].lines() * (font().GetHeight() + font().GetDescend())) - font().GetDescend();
-            s32 itemX = position().x + _columns[j].offset;
-            s32 itemY = position().y + i * _rowHeight;
-            s32 textY = itemY + ((_rowHeight - height - 1) >> 1);
-            if (textY + height > (s32)(position().y + _size.y)) break;
-            if (_selectedRowId == _firstVisibleRowId + i /* && !_touchMovedAfterTouchDown */)
-                gdi().setPenColor(_textColorHilight, _engine);
+    bool cListView::insertRow(size_t index, const std::vector<std::string>& texts) {
+        size_t columnCount = _columns.size();
+        if (0 == columnCount || index > _rows.size()) return false;
+        if (0 == texts.size()) return false;
+
+        _rows.insert(_rows.begin() + index, itemVector());
+        for (size_t col = 0; col < columnCount; ++col) {
+            std::string itemText;
+            if (col >= texts.size())
+                itemText = "Empty";  // 默认字符串
             else
-                gdi().setPenColor(_textColor, _engine);
-            if (ownerDraw.size()) {
-                ownerDraw(cOwnerDraw(_firstVisibleRowId + i, j, cPoint(itemX, itemY - 1),
-                                     cSize(columnWidth, _rowHeight), textY, height,
-                                     _rows[_firstVisibleRowId + i][j].text().c_str(), _engine));
-            } else if (!columnCenter && columnWidth > 0) {
-                gdi().textOutRect(itemX, textY, columnWidth, height,
-                                  _rows[_firstVisibleRowId + i][j].text().c_str(), _engine);
-            } else if (columnWidth > 0) {
-                std::vector<std::string> lines = splitLines(_rows[_firstVisibleRowId + i][j].text());
-                for (size_t k = 0; k < lines.size(); k++) {
-                    std::string line = lines[k];
-                    s32 lineWidth = font().TextWidth(line);
-                    s32 lineX = itemX + ((columnWidth - lineWidth) / 2);
-                    s32 lineY = textY + 1 + k * (font().GetHeight() + font().GetDescend());
-                    gdi().textOutRect(lineX, lineY, lineWidth, height, line.c_str(), _engine);
+                itemText = texts[col];
+
+            cListItem aItem;
+
+            itemText = processItemText(itemText, col);
+            aItem.setText(itemText);
+
+            _rows[index].insert(_rows[index].begin() + col, aItem);
+        }
+        // if( _visibleRowCount > _rows.size() ) _visibleRowCount = _rows.size();
+
+        return true;
+    }
+
+    void cListView::removeRow(size_t index) {
+        if (index >= _rows.size()) return;
+        _rows.erase(_rows.begin() + index);
+    }
+
+    void cListView::removeAllRows() {
+        _rows.clear();
+        _selectedRowId = 0;
+        _firstVisibleRowId = 0;
+        //_visibleRowCount = 0;
+    }
+
+    u32 cListView::getRowCount() {
+        return _rows.size();
+    }
+
+    void cListView::setRowHeight(u16 height) {
+        _rowHeight = height;
+        onResize();
+    }
+
+    void cListView::onResize() {
+        if (_rowHeight == 0) {
+            _visibleRowCount = 0;
+            return;
+        }
+
+        _visibleRowCount = size().y / _rowHeight;
+    }
+
+    void cListView::draw() {
+        // dbg_printf( "cListView::draw %08x\n", this );
+        // draw_frame();
+        drawSelectionBar();
+        drawText();
+    }
+
+    void cListView::drawSelectionBar() {
+        // if( _touchMovedAfterTouchDown )
+        //     return;
+
+        s16 x = position().x - 2;
+        s16 y = position().y + (_selectedRowId - _firstVisibleRowId) * _rowHeight - 1;
+        s16 w = _size.x + 4;
+        s16 h = _rowHeight;
+
+        // gdi().setPenColor( _selectionBarColor );
+        for (u8 i = 0; i < h; ++i) {
+            if (i & 1)
+                gdi().fillRectBlend(_selectionBarColor1, _selectionBarColor2, x, y + i, w, 1, _engine,
+                                    _selectionBarOpacity);
+            else
+                gdi().fillRectBlend(_selectionBarColor2, _selectionBarColor1, x, y + i, w, 1, _engine,
+                                    _selectionBarOpacity);
+        }
+    }
+
+    void cListView::drawText() {
+        size_t columnCount = _columns.size();
+        size_t total = _visibleRowCount;
+        if (total > _rows.size() - _firstVisibleRowId) total = _rows.size() - _firstVisibleRowId;
+
+        for (size_t i = 0; i < total; ++i) {
+            for (size_t j = 0; j < columnCount; ++j) {
+                bool columnCenter = _columns[j].center;
+                s32 columnWidth = _columns[j].width;
+                s32 height = (_rows[_firstVisibleRowId + i][j].lines() * (font().GetHeight() + font().GetDescend())) - font().GetDescend();
+                s32 itemX = position().x + _columns[j].offset;
+                s32 itemY = position().y + i * _rowHeight;
+                s32 textY = itemY + ((_rowHeight - height - 1) >> 1);
+                if (textY + height > (s32)(position().y + _size.y)) break;
+                if (_selectedRowId == _firstVisibleRowId + i /* && !_touchMovedAfterTouchDown */)
+                    gdi().setPenColor(_textColorHilight, _engine);
+                else
+                    gdi().setPenColor(_textColor, _engine);
+                if (ownerDraw.size()) {
+                    ownerDraw(cOwnerDraw(_firstVisibleRowId + i, j, cPoint(itemX, itemY - 1),
+                                        cSize(columnWidth, _rowHeight), textY, height,
+                                        _rows[_firstVisibleRowId + i][j].text().c_str(), _engine));
+                } else if (!columnCenter && columnWidth > 0) {
+                    gdi().textOutRect(itemX, textY, columnWidth, height,
+                                    _rows[_firstVisibleRowId + i][j].text().c_str(), _engine);
+                } else if (columnWidth > 0) {
+                    std::vector<std::string> lines = splitLines(_rows[_firstVisibleRowId + i][j].text());
+                    for (size_t k = 0; k < lines.size(); k++) {
+                        std::string line = lines[k];
+                        s32 lineWidth = font().TextWidth(line);
+                        s32 lineX = itemX + ((columnWidth - lineWidth) / 2);
+                        s32 lineY = textY + 1 + k * (font().GetHeight() + font().GetDescend());
+                        gdi().textOutRect(lineX, lineY, lineWidth, height, line.c_str(), _engine);
+                    }
                 }
             }
         }
+        // dbg_printf( "total %d _visible_row_count %d\n", total, _visible_row_count );
     }
-    // dbg_printf( "total %d _visible_row_count %d\n", total, _visible_row_count );
-}
 
-void cListView::selectRow(int id) {
-    if (0 == _rows.size()) return;
+    void cListView::selectRow(int id) {
+        if (0 == _rows.size()) return;
 
-    if (id > (int)_rows.size() - 1) id = (int)_rows.size() - 1;
-    if (id < 0) id = 0;
+        if (id > (int)_rows.size() - 1) id = (int)_rows.size() - 1;
+        if (id < 0) id = 0;
 
-    // if( (int)_selectedRowId == id ) return;
+        // if( (int)_selectedRowId == id ) return;
 
-    size_t lastVisibleRowId = _firstVisibleRowId + _visibleRowCount - 1;
-    if (lastVisibleRowId > _rows.size() - 1) lastVisibleRowId = _rows.size() - 1;
-    if (id < (int)_firstVisibleRowId) {
-        int offset = _selectedRowId - _firstVisibleRowId;
-        scrollTo(id - offset);
-    }
-    if (id > (int)lastVisibleRowId) {
-        int offset = _selectedRowId - _firstVisibleRowId;
-        scrollTo(id - offset);
-    }
-    if (_selectedRowId != (u32)id) {
-        _selectedRowId = id;
-        onSelectChanged(_selectedRowId);
-        selectChanged(_selectedRowId);
-    }
-}
-
-void cListView::setFirstVisibleIdAndSelectRow(u32 first, u32 row) {
-    if (0 == _rows.size()) return;
-    if (first >= _rows.size()) return;
-    _firstVisibleRowId = first;
-    selectRow(row);
-}
-
-void cListView::scrollTo(int id) {
-    if (0 == _rows.size()) return;
-    // if( _rows.size() < _visibleRowCount ) return;
-    // dbg_printf("rows size %d, visibleRowCount %d\n", _rows.size(), _visibleRowCount );
-
-    if (id > (int)_rows.size() - 1) id = (int)_rows.size() - 1;
-    if (id > (int)_rows.size() - (int)_visibleRowCount)
-        id = (int)_rows.size() - (int)_visibleRowCount;
-    if (id < 0) id = 0;
-    _firstVisibleRowId = id;
-    onScrolled(id);
-    scrolled(id);
-    // dbg_printf("fvri %d, scroll_to %d\n", _first_visible_row_id, id );
-}
-
-cWindow& cListView::loadAppearance(const std::string& aFileName) {
-    return *this;
-}
-
-u32 cListView::rowBelowPoint(const cPoint& pt) {
-    if (windowRectangle().surrounds(pt)) {
-        u32 row = _firstVisibleRowId + (pt.y - position().y) / _rowHeight;
-        if (row > _rows.size() - 1) row = (u32)-1;
-        return row;
-    }
-    return (u32)-1;
-}
-
-bool cListView::process(const cMessage& msg) {
-    bool ret = false;
-    if (isVisible()) {
-        // if( msg.id() > cMessage::keyMessageStart
-        //     && msg.id() < cMessage::keyMessageEnd )
-        //{
-        //     ret = processKeyMessage( (cKeyMessage &)msg );
-        // }
-        if (msg.id() > cMessage::touchMessageStart && msg.id() < cMessage::touchMessageEnd) {
-            ret = processTouchMessage((cTouchMessage&)msg);
+        size_t lastVisibleRowId = _firstVisibleRowId + _visibleRowCount - 1;
+        if (lastVisibleRowId > _rows.size() - 1) lastVisibleRowId = _rows.size() - 1;
+        if (id < (int)_firstVisibleRowId) {
+            int offset = _selectedRowId - _firstVisibleRowId;
+            scrollTo(id - offset);
+        }
+        if (id > (int)lastVisibleRowId) {
+            int offset = _selectedRowId - _firstVisibleRowId;
+            scrollTo(id - offset);
+        }
+        if (_selectedRowId != (u32)id) {
+            _selectedRowId = id;
+            onSelectChanged(_selectedRowId);
+            selectChanged(_selectedRowId);
         }
     }
 
-    return ret;
-}
-
-bool cListView::processTouchMessage(const cTouchMessage& msg) {
-    bool ret = false;
-
-    static int sumOfMoveY = 0;
-
-    if (msg.id() == cMessage::touchMove && isFocused()) {
-        if (abs(msg.position().y) > 0) {
-            sumOfMoveY += msg.position().y;
-        }
-        if (sumOfMoveY > gs().scrollSpeed) {
-            selectNext();
-            scrollTo(_firstVisibleRowId + 1);
-            sumOfMoveY = 0;
-            _touchMovedAfterTouchDown = true;
-        } else if (sumOfMoveY < -gs().scrollSpeed) {
-            selectPrev();
-            scrollTo(_firstVisibleRowId - 1);
-            sumOfMoveY = 0;
-            _touchMovedAfterTouchDown = true;
-        }
-        ret = true;
+    void cListView::setFirstVisibleIdAndSelectRow(u32 first, u32 row) {
+        if (0 == _rows.size()) return;
+        if (first >= _rows.size()) return;
+        _firstVisibleRowId = first;
+        selectRow(row);
     }
 
-    if (msg.id() == cMessage::touchUp) {
-        sumOfMoveY = 0;
-        if (!_touchMovedAfterTouchDown) {
-            u32 rbp = rowBelowPoint(cPoint(msg.position().x, msg.position().y));
+    void cListView::scrollTo(int id) {
+        if (0 == _rows.size()) return;
+        // if( _rows.size() < _visibleRowCount ) return;
+        // dbg_printf("rows size %d, visibleRowCount %d\n", _rows.size(), _visibleRowCount );
+
+        if (id > (int)_rows.size() - 1) id = (int)_rows.size() - 1;
+        if (id > (int)_rows.size() - (int)_visibleRowCount)
+            id = (int)_rows.size() - (int)_visibleRowCount;
+        if (id < 0) id = 0;
+        _firstVisibleRowId = id;
+        onScrolled(id);
+        scrolled(id);
+        // dbg_printf("fvri %d, scroll_to %d\n", _first_visible_row_id, id );
+    }
+
+    cWindow& cListView::loadAppearance(const std::string& aFileName) {
+        return *this;
+    }
+
+    s32 cListView::rowBelowPoint(const cPoint& pt) {
+        if (windowRectangle().surrounds(pt)) {
+            s32 row = _firstVisibleRowId + (pt.y - position().y) / _rowHeight;
+            if (row >= _rows.size()) row = -1;
+            return row;
+        }
+        return -1;
+    }
+
+    bool cListView::processKeyMessage(cKeyMessage message) {
+        // TODO: implement arrow navigation and row selection with key A
+        return false;
+    }
+
+    bool cListView::processTouchMessage(cTouchMessage message) {
+        if (message.down()) {
+            _touchMovedAfterTouchDown = false;
+            s32 rbp = rowBelowPoint(message.position());
             if (rbp != (u32)-1) {
-                if (selectedRowId() == rbp) {
-                    onSelectedRowClicked(rbp);
-                    selectedRowClicked(rbp);
-                }
+                selectRow(rbp);
             }
+
+            return true;
         }
-        _touchMovedAfterTouchDown = false;
-        ret = true;
-    }
 
-    if (msg.id() == cMessage::touchDown) {
-        _touchMovedAfterTouchDown = false;
-        u32 rbp = rowBelowPoint(cPoint(msg.position().x, msg.position().y));
-        if (rbp != (u32)-1) {
-            selectRow(rbp);
+        if (message.up()) {
+            _sumOfMoveY = 0;
+            if (_touchMovedAfterTouchDown) {
+                _touchMovedAfterTouchDown = false;
+                return true;
+            }
+
+            _touchMovedAfterTouchDown = false;
+            s32 rbp = rowBelowPoint(message.position());
+            if (rbp != -1 && selectedRowId() == rbp) {
+                onSelectedRowClicked(rbp);
+                selectedRowClicked(rbp);
+            }
+
+            return true;
         }
-        ret = true;
+
+        if (message.move()) {
+            _sumOfMoveY += message.movement().y;
+            if (abs(_sumOfMoveY) <= gs().scrollSpeed) {
+                return true;
+            }
+
+            if (_sumOfMoveY > 0) {
+                selectNext();
+                scrollTo(_firstVisibleRowId + 1);
+            } else {
+                selectPrev();
+                scrollTo(_firstVisibleRowId - 1);
+            }
+
+            _sumOfMoveY = 0;
+            _touchMovedAfterTouchDown = true;
+
+            return true;
+        }
+        
+        return false;
     }
-
-    return ret;
-}
-
 }  // namespace akui

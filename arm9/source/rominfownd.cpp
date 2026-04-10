@@ -137,50 +137,32 @@ void cRomInfoWnd::draw() {
     cForm::draw();
 }
 
-bool cRomInfoWnd::process(const akui::cMessage& msg) {
-    bool ret = false;
+bool cRomInfoWnd::processKeyMessage(cKeyMessage message) {
+    if (message.isKeyUp(KEY_A) || message.isKeyUp(KEY_B)) {
+        onOK();
+        return true;
+    }
 
-    ret = cForm::process(msg);
+    if (message.isKeyUp(KEY_Y)) {
+        pressSaveType();
+        return true;
+    }
 
-    if (!ret) {
-        if (msg.id() > cMessage::keyMessageStart && msg.id() < cMessage::keyMessageEnd) {
-            ret = processKeyMessage((cKeyMessage&)msg);
+    if (message.isKeyUp(KEY_X)) {
+        if (_buttonCheats.isVisible()) {
+            pressCheats();
+        } else if (_buttonFlash.isVisible()) {
+            pressFlash();
         }
-    }
-    return ret;
-}
-
-bool cRomInfoWnd::processKeyMessage(const cKeyMessage& msg) {
-    bool ret = false;
-    if (msg.id() == cMessage::keyDown) {
-        switch (msg.keyCode()) {
-            case cKeyMessage::UI_KEY_A:
-            case cKeyMessage::UI_KEY_B:
-                onOK();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_Y:
-                pressSaveType();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_X:
-                if (_buttonCheats.isVisible()) {
-                    pressCheats();
-                } else if (_buttonFlash.isVisible()) {
-                    pressFlash();
-                }
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_L:
-                pressCopy();
-                ret = true;
-                break;
-            default: {
-            }
-        };
+        return true;
     }
 
-    return ret;
+    if (message.isKeyUp(KEY_L)) {
+        pressCopy();
+        return true;
+    }
+
+    return false;
 }
 
 cWindow& cRomInfoWnd::loadAppearance(const std::string& aFileName) {

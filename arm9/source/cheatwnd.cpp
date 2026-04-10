@@ -113,72 +113,62 @@ void cCheatWnd::draw() {
     cForm::draw();
 }
 
-bool cCheatWnd::process(const akui::cMessage& msg) {
-    bool ret = false;
-    ret = cForm::process(msg);
-    if (!ret) {
-        if (msg.id() > cMessage::keyMessageStart && msg.id() < cMessage::keyMessageEnd) {
-            ret = processKeyMessage((cKeyMessage&)msg);
-        }
+bool cCheatWnd::processKeyMessage(cKeyMessage message) {
+    // TODO: Implement scrolling speed
+    if (message.isKeyDown(KEY_DOWN)) {
+        _List.selectNext();
+        return true;
     }
-    return ret;
-}
 
-bool cCheatWnd::processKeyMessage(const cKeyMessage& msg) {
-    bool ret = false;
-    if (msg.id() == cMessage::keyDown) {
-        switch (msg.keyCode()) {
-            case cKeyMessage::UI_KEY_DOWN:
-                _List.selectNext();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_UP:
-                _List.selectPrev();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_LEFT: {
-                size_t ii = _List.selectedRowId();
-                while (--ii > 0) {
-                    if (_data[_indexes[ii]]._flags & cCheatDatItem::EFolder) break;
-                }
-                _List.selectRow(ii);
-            }
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_RIGHT: {
-                size_t ii = _List.selectedRowId(), top = _List.getRowCount();
-                while (++ii < top) {
-                    if (_data[_indexes[ii]]._flags & cCheatDatItem::EFolder) break;
-                }
-                _List.selectRow(ii);
-            }
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_A:
-                onSelect();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_B:
-                onCancel();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_X:
-                onGenerate();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_Y:
-                onInfo();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_L:
-                onDeselectAll();
-                ret = true;
-                break;
-            default:
-                break;
-        }
+    if (message.isKeyDown(KEY_UP)) {
+        _List.selectPrev();
+        return true;
     }
-    return ret;
+
+    if (message.isKeyUp(KEY_LEFT)) {
+        size_t ii = _List.selectedRowId();
+        while (--ii > 0) {
+            if (_data[_indexes[ii]]._flags & cCheatDatItem::EFolder) break;
+        }
+        _List.selectRow(ii);
+        return true;
+    }
+
+    if (message.isKeyUp(KEY_RIGHT)) {
+        size_t ii = _List.selectedRowId(), top = _List.getRowCount();
+        while (++ii < top) {
+            if (_data[_indexes[ii]]._flags & cCheatDatItem::EFolder) break;
+        }
+        _List.selectRow(ii);
+        return true;
+    }
+
+    if (message.isKeyUp(KEY_A)) {
+        onSelect();
+        return true;
+    }
+
+    if (message.isKeyUp(KEY_B)) {
+        onCancel();
+        return true;
+    }
+
+    if (message.isKeyUp(KEY_X)) {
+        onGenerate();
+        return true;
+    }
+
+    if (message.isKeyUp(KEY_Y)) {
+        onInfo();
+        return true;
+    }
+
+    if (message.isKeyUp(KEY_L)) {
+        onDeselectAll();
+        return true;
+    }
+
+    return false;
 }
 
 cWindow& cCheatWnd::loadAppearance(const std::string& aFileName) {

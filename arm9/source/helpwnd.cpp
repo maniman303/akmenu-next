@@ -94,33 +94,13 @@ void cHelpWnd::draw() {
     cForm::draw();
 }
 
-bool cHelpWnd::process(const akui::cMessage& msg) {
-    bool ret = false;
-
-    ret = cForm::process(msg);
-
-    if (!ret) {
-        if (msg.id() > cMessage::keyMessageStart && msg.id() < cMessage::keyMessageEnd) {
-            ret = processKeyMessage((cKeyMessage&)msg);
-        }
+bool cHelpWnd::processKeyMessage(cKeyMessage message) {
+    if (message.isKeyUp(KEY_A) || message.isKeyUp(KEY_B)) {
+        onOK();
+        return true;
     }
-    return ret;
-}
 
-bool cHelpWnd::processKeyMessage(const cKeyMessage& msg) {
-    bool ret = false;
-    if (msg.id() == cMessage::keyDown) {
-        switch (msg.keyCode()) {
-            case cKeyMessage::UI_KEY_A:
-            case cKeyMessage::UI_KEY_B:
-                onOK();
-                ret = true;
-                break;
-            default: {
-            }
-        };
-    }
-    return ret;
+    return false;
 }
 
 cWindow& cHelpWnd::loadAppearance(const std::string& aFileName) {

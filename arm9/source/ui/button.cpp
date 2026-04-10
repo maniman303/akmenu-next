@@ -54,46 +54,34 @@ bool cButton::valid() const {
     return _renderDesc->valid();
 }
 
-bool cButton::process(const cMessage& msg) {
-    // dbg_printf("cButton::process %s\n", _text.c_str() );
-    bool ret = false;
-    if (isVisible()) {
-        if (msg.id() > cMessage::touchMessageStart && msg.id() < cMessage::touchMessageEnd) {
-            ret = processTouchMessage((cTouchMessage&)msg);
-        }
-    }
-    return ret;
-}
-
-bool cButton::processTouchMessage(const cTouchMessage& msg) {
+bool cButton::processTouchMessage(cTouchMessage message) {
     bool ret = false;
     cRect myRect(position().x, position().y, position().x + size().x, position().y + size().y);
-    if (msg.id() == cMessage::touchUp) {
-        // cPoint clickedPt( msg.touchPt.x, inputs.touchPt.y );
-        
-        if (_captured) {
-            if (myRect.surrounds(msg.position())) {
-                onClicked();
-                clicked();
-            } else {
-                onReleased();
-            }
-            _captured = false;
-            ret = true;
+    if (message.up()) {
+        if (!_captured) {
+            return false;
         }
-        _state = up;
-    } else if (msg.id() == cMessage::touchDown) {
-        // cPoint clickedPt( inputs.touchPt.x, inputs.touchPt.y );
-        if (myRect.surrounds(msg.position())) {
-            onPressed();
-            pressed();
-            _captured = true;
-            _state = down;
-            ret = true;
+
+        if (myRect.surrounds(message.position())) {
+            onClicked();
+            clicked();
+        } else {
+            onReleased();
         }
+        _captured = false;
+        return true;
     }
 
-    return ret;
+    if (message.down() && myRect.surrounds(message.position())) {
+        onPressed();
+        pressed();
+        _captured = true;
+        _state = down;
+        
+        return true;
+    }
+
+    return false;
 }
 
 void cButton::onPressed() {}

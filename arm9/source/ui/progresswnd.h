@@ -26,7 +26,7 @@ class cProgressWnd : public cForm {
 
     void draw();
 
-    bool process(const cMessage& msg);
+    bool processKeyMessage(cKeyMessage message) override;
 
     cWindow& loadAppearance(const std::string& aFileName);
 

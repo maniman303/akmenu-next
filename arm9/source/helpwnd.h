@@ -13,7 +13,6 @@
 #include "dsrom.h"
 #include "form.h"
 #include "formdesc.h"
-#include "message.h"
 #include "spinbox.h"
 #include "statictext.h"
 
@@ -28,13 +27,11 @@ class cHelpWnd : public akui::cForm {
 
     void draw();
 
-    bool process(const akui::cMessage& msg);
+    bool processKeyMessage(cKeyMessage message);
 
     cWindow& loadAppearance(const std::string& aFileName);
 
   protected:
-    bool processKeyMessage(const akui::cKeyMessage& msg);
-
     void onOK() override;
 
     void onShow() override;

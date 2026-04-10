@@ -101,7 +101,7 @@ class cListView : public cWindow {
 
     void selectPrev() { selectRow(_selectedRowId - 1); }
 
-    u32 rowBelowPoint(const cPoint& pt);
+    s32 rowBelowPoint(const cPoint& pt);
 
     void scrollTo(int id);
 
@@ -109,7 +109,9 @@ class cListView : public cWindow {
 
     cWindow& loadAppearance(const std::string& aFileName);
 
-    bool process(const akui::cMessage& msg);
+    bool processKeyMessage(cKeyMessage message) override;
+
+    bool processTouchMessage(cTouchMessage message) override;
 
     inline void setColors(u16 textColor, u16 textColorHilight, u16 selectionBarColor1,
                           u16 selectionBarColor2) {
@@ -140,8 +142,6 @@ class cListView : public cWindow {
 
     virtual std::string processItemText(std::string text, int column);
 
-    bool processTouchMessage(const akui::cTouchMessage& msg);
-
   protected:
     void drawSelectionBar();
 
@@ -160,6 +160,7 @@ class cListView : public cWindow {
     u32 _firstVisibleRowId;
     u32 _visibleRowCount;
     u16 _rowsPerpage;
+    s32 _sumOfMoveY;
     bool _touchMovedAfterTouchDown;
 
     std::vector<cListColumn> _columns;

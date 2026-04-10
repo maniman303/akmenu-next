@@ -125,52 +125,38 @@ void cExpWnd::draw() {
     cForm::draw();
 }
 
-bool cExpWnd::process(const akui::cMessage& msg) {
-    bool ret = false;
-
-    ret = cForm::process(msg);
-
-    if (!ret) {
-        if (msg.id() > cMessage::keyMessageStart && msg.id() < cMessage::keyMessageEnd) {
-            ret = processKeyMessage((cKeyMessage&)msg);
-        }
+bool cExpWnd::processKeyMessage(cKeyMessage message) {
+    if (message.isKeyUp(KEY_A)) {
+        onOK();
+        return true;
     }
-    return ret;
-}
 
-bool cExpWnd::processKeyMessage(const cKeyMessage& msg) {
-    bool ret = false;
-    if (msg.id() == cMessage::keyDown) {
-        switch (msg.keyCode()) {
-            case cKeyMessage::UI_KEY_A:
-                onOK();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_B:
-                onCancel();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_X:
-                onRAM();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_Y:
-                onSRAM();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_LEFT:
-                _Rumble.selectPrev();
-                ret = true;
-                break;
-            case cKeyMessage::UI_KEY_RIGHT:
-                _Rumble.selectNext();
-                ret = true;
-                break;
-            default: {
-            }
-        };
+    if (message.isKeyUp(KEY_B)) {
+        onCancel();
+        return true;
     }
-    return ret;
+
+    if (message.isKeyUp(KEY_X)) {
+        onRAM();
+        return true;
+    }
+
+    if (message.isKeyUp(KEY_Y)) {
+        onSRAM();
+        return true;
+    }
+
+    if (message.isKeyUp(KEY_LEFT)) {
+        _Rumble.selectPrev();
+        return true;
+    }
+
+    if (message.isKeyUp(KEY_RIGHT)) {
+        _Rumble.selectNext();
+        return true;
+    }
+
+    return false;
 }
 
 cWindow& cExpWnd::loadAppearance(const std::string& aFileName) {
