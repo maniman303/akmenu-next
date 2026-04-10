@@ -49,6 +49,7 @@ class cSettingWnd : public akui::cForm {
     };
 
   protected:
+    void onGainedFocus() override;
     void onOK(void) override;
     void onCancel(void) override;
     void onShow() override;

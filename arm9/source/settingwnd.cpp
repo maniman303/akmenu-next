@@ -243,6 +243,10 @@ void cSettingWnd::onShow() {
     ShowTab(_currentTab);
 }
 
+void cSettingWnd::onGainedFocus() {
+    ShowTab(_currentTab);
+}
+
 void cSettingWnd::onUIKeyUP(void) {
     ssize_t focusItem = focusedItemId();
     if (--focusItem < 0) focusItem = items(_currentTab).size() - 1;
@@ -324,6 +328,8 @@ void cSettingWnd::ShowTab(size_t index) {
     if (index >= _tabs.size()) {
         return;
     }
+
+    logger().info(formatString("Showing tab %d.", index));
 
     for (size_t ii = 0; ii < items(index).size(); ++ii) {
         items(index)[ii]._label->show();

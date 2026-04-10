@@ -35,10 +35,10 @@ namespace akui {
         _itemText.setTextColor(uiSettings().spinBoxTextColor);
         _itemText.setFont(false);
 
+        _isFocusable = !namedAppearance;
+
         _prevButton.pressed.connect(this, &cSpinBox::selectPrev);
-        _prevButton.pressed.connect(this, &cSpinBox::onCmponentClicked);
         _nextButton.pressed.connect(this, &cSpinBox::selectNext);
-        _nextButton.pressed.connect(this, &cSpinBox::onCmponentClicked);
 
         addChildWindow(&_itemText);
         addChildWindow(&_prevButton);
@@ -233,9 +233,5 @@ namespace akui {
 
         x = size().x - _nextButton.size().x;
         _nextButton.setRelativePosition(cPoint(x, (_size.y - _nextButton.size().y)));
-    }
-
-    void cSpinBox::onCmponentClicked() {
-        componentClicked(this);
     }
 }  // namespace akui

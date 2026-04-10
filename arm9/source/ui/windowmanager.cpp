@@ -20,10 +20,17 @@ namespace akui {
     cWindowManager::~cWindowManager() {}
 
     void cWindowManager::setFocusedWindow(cWindow* aWindow) {
-        if (aWindow != focusedWindow() && (!aWindow || aWindow->isFocusable())) {
-            if (focusedWindow()) focusedWindow()->disableFocused();
-            _focusedWindow = aWindow;
-            if (aWindow) aWindow->enableFocused();
+        if (aWindow == NULL || aWindow == focusedWindow() || !aWindow->isFocusable()) {
+            return;
+        }
+
+        if (focusedWindow() != NULL) {
+            focusedWindow()->disableFocused();
+        }
+        
+        _focusedWindow = aWindow;
+        if (aWindow) {
+            aWindow->enableFocused();
         }
     }
 

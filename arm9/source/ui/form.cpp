@@ -89,19 +89,18 @@ namespace akui {
             return false;
         }
 
-        bool ret = false;
-
         std::list<cWindow*>::iterator it;
         for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
             cWindow* window = *it;
-            ret = window->processTouchMessage(message);
-            if (ret) {
+            if (window->processTouchMessage(message)) {
+                windowManager().setFocusedWindow(window);
+
                 nocashMessage(formatString("(%s) processed touch message.", window->text().c_str()).c_str());
-                break;
+                return true;
             }
         }
 
-        return ret;
+        return false;
     }
 
     cWindow* cForm::windowBelow(const cPoint& p) {
@@ -162,10 +161,14 @@ namespace akui {
 
     bool cForm::isActive(void) const {
         bool result = isFocused();
-        for (std::list<cWindow*>::const_iterator it = _childWindows.begin();
-            !result && it != _childWindows.end(); ++it) {
+        for (std::list<cWindow*>::const_iterator it = _childWindows.begin(); it != _childWindows.end(); it++) {
+            if (result) {
+                break;
+            }
+
             result = result || (*it)->isFocused();
         }
+        
         return result;
     }
 

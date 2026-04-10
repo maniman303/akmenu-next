@@ -43,8 +43,6 @@ class cSpinBox : public cForm {
 
     void setPrefixIcon(const std::string& filename);
 
-    void onCmponentClicked();
-    Signal1<cSpinBox*> componentClicked;
     Signal1<cSpinBox*> changed;
 
   protected:
