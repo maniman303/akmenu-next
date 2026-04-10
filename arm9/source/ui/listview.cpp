@@ -264,6 +264,10 @@ namespace akui {
     }
 
     bool cListView::processTouchMessage(cTouchMessage message) {
+        if (!windowRectangle().surrounds(message.position())) {
+            return false;
+        }
+
         if (message.down()) {
             _touchMovedAfterTouchDown = false;
             s32 rbp = rowBelowPoint(message.position());
@@ -294,15 +298,23 @@ namespace akui {
         if (message.move()) {
             _sumOfMoveY += message.movement().y;
             if (abs(_sumOfMoveY) <= gs().scrollSpeed) {
+                s32 rbp = rowBelowPoint(message.position());
+                if (rbp != -1) {
+                    selectRow(rbp);
+                }
+
                 return true;
             }
 
-            if (_sumOfMoveY > 0) {
-                selectNext();
+            if (_sumOfMoveY < 0) {
                 scrollTo(_firstVisibleRowId + 1);
             } else {
-                selectPrev();
                 scrollTo(_firstVisibleRowId - 1);
+            }
+
+            s32 rbp = rowBelowPoint(message.position());
+            if (rbp != -1) {
+                selectRow(rbp);
             }
 
             _sumOfMoveY = 0;

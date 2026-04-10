@@ -119,6 +119,7 @@ bool cPopMenu::processKeyMessage(cKeyMessage message) {
 
 bool cPopMenu::processTouchMessage(cTouchMessage message) {
     cPoint pos = message.position();
+    // TODO: Fix it
     if (message.up()) {
         if (!windowBelow(pos)) {
             hide();

@@ -361,7 +361,9 @@ void cMainWnd::onKeyYPressed() {
     showFileInfo();
 }
 
-void cMainWnd::onMainListSelItemClicked(u32 index) {}
+void cMainWnd::onMainListSelItemClicked(u32 index) {
+    launchSelected();
+}
 
 void cMainWnd::onMainListSelItemHeadClicked(u32 index) {
     onKeyAPressed();

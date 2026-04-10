@@ -115,12 +115,11 @@ int cMainList::init() {
 
     s32 w = _parent->size().x - (2 * x);
     s32 h = ini.GetInt("main list", "h", 152);
+    h = (h / _tallRowHeight) * _tallRowHeight;
     setSize(cSize(w, h));
 
     _itemBg = new akui::cImage(this);
     _itemBg->loadAppearance(SFN_MAIN_LIST_ITEM_BG);
-
-    // selectedRowClicked.connect(this,&cMainList::executeSelected);
 
     insertColumn(ICON_COLUMN, "icon", 0);
     insertColumn(SHOWNAME_COLUMN, "showName", 0);
