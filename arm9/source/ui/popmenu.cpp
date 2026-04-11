@@ -132,14 +132,11 @@ bool cPopMenu::processTouchMessage(cTouchMessage message) {
     if (message.up()) {
         if (windowBelow(pos) == NULL) {
             hide();
-            _skipTouch = false;
-            return true;
-        }
-
-        if (!_skipTouch) {
-            hide();
+        } else if (!_skipTouch) {
             itemClicked(_selectedItemIndex);
         }
+
+         _skipTouch = false;
 
         return true;
     }
@@ -149,6 +146,7 @@ bool cPopMenu::processTouchMessage(cTouchMessage message) {
         if (item == -1) {
             _skipTouch = true;
         } else {
+            _skipTouch = false;
             _selectedItemIndex = item;
         }
 
