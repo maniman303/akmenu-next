@@ -99,7 +99,7 @@ cCheatWnd::cCheatWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::str
     _List.insertColumn(1, "showName", _List.size().x + 2 - EIconWidth);
     _List.arangeColumnsSize();
     _List.setRowHeight(ERowHeight);
-    _List.selectedRowClicked.connect(this, &cCheatWnd::onItemClicked);
+    _List.rowClicked.connect(this, &cCheatWnd::onItemClicked);
     _List.ownerDraw.connect(this, &cCheatWnd::onDraw);
     addChildWindow(&_List);
 

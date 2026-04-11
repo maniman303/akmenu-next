@@ -12,6 +12,8 @@
 #include "listview.h"
 #include "ui.h"
 #include "fontfactory.h"
+#include "timer.h"
+#include "logger.h"
 //#include "gdi.h"
 //#include "dbgtool.h"
 
@@ -43,6 +45,7 @@ namespace akui {
         _engine = GE_MAIN;
         _touchMovedAfterTouchDown = false;
         _sumOfMoveY = 0;
+        _scrollTick = 0;
     }
 
     void cListView::arangeColumnsSize() {
@@ -259,7 +262,39 @@ namespace akui {
     }
 
     bool cListView::processKeyMessage(cKeyMessage message) {
-        // TODO: implement arrow navigation and row selection with key A
+        logger().info("List key processing.");
+
+        if (message.isKeyUp(KEY_A)) {
+            onRowClicked(_selectedRowId);
+            rowClicked(_selectedRowId);
+            return true;
+        }
+
+        if (message.isKeyDown(KEY_LEFT)) {
+            selectRow(selectedRowId() - visibleRowCount());
+            return true;
+        }
+
+        if (message.isKeyDown(KEY_RIGHT)) {
+            selectRow(selectedRowId() + visibleRowCount());
+            return true;
+        }
+
+        if (message.isKeyDown(KEY_DOWN) || message.isKeyDown(KEY_UP)) {
+            _scrollTick = timer().getTick();
+        }
+
+        u32 tickDiff = timer().getTick() - _scrollTick;
+        if (message.isKeyDown(KEY_DOWN) || (message.isKeyHeld(KEY_DOWN) && tickDiff > gs().scrollWait && tickDiff % gs().scrollSpeed == 0)) {
+            selectNext();
+            return true;
+        }
+
+        if (message.isKeyDown(KEY_UP) || (message.isKeyHeld(KEY_UP) && tickDiff > gs().scrollWait && tickDiff % gs().scrollSpeed == 0)) {
+            selectPrev();
+            return true;
+        }
+
         return false;
     }
 
@@ -288,8 +323,8 @@ namespace akui {
             _touchMovedAfterTouchDown = false;
             s32 rbp = rowBelowPoint(message.position());
             if (rbp != -1 && static_cast<s32>(selectedRowId()) == rbp) {
-                onSelectedRowClicked(rbp);
-                selectedRowClicked(rbp);
+                onRowClicked(rbp);
+                rowClicked(rbp);
             }
 
             return true;

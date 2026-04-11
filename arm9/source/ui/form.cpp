@@ -83,11 +83,16 @@ namespace akui {
             return false;
         }
 
-        bool ret = false;
-
         // TODO: Run input on visited children, if returns false visit another children
+        std::list<cWindow*>::iterator it;
+        for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
+            cWindow* window = *it;
+            if (window->processKeyMessage(message)) {
+                return true;
+            }
+        }
 
-        return ret;
+        return false;
     }
 
     bool cForm::processTouchMessage(cTouchMessage message) {

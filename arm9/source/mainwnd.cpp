@@ -97,8 +97,7 @@ void cMainWnd::init() {
     _mainList = new cMainList(this, "main list");
     _mainList->init();
     _mainList->selectChanged.connect(this, &cMainWnd::listSelChange);
-    _mainList->selectedRowClicked.connect(this, &cMainWnd::onMainListSelItemClicked);
-    _mainList->selectedRowHeadClicked.connect(this, &cMainWnd::onMainListSelItemHeadClicked);
+    _mainList->rowClicked.connect(this, &cMainWnd::onMainListSelItemClicked);
     _mainList->directoryChanged.connect(this, &cMainWnd::onFolderChanged);
     _mainList->animateIcons.connect(this, &cMainWnd::onAnimation);
     //_mainList->enterDir( "fat:/" );
@@ -253,39 +252,10 @@ bool cMainWnd::processKeyMessage(cKeyMessage message) {
         return _startMenu->processKeyMessage(message);
     }
 
+    logger().info("Main wnd key processing.");
+
     bool isL = message.isKeyShift(KEY_L);
     bool allow = !gs().safeMode;
-    // TODO: Move list walking to list view with scrolling speed
-    if (message.isKeyDown(KEY_DOWN)) {
-        _mainList->selectNext();
-        return true;
-    }
-
-    if (message.isKeyDown(KEY_UP)) {
-        _mainList->selectPrev();
-        return true;
-    }
-
-    if (message.isKeyDown(KEY_LEFT)) {
-        _mainList->selectRow(_mainList->selectedRowId() - _mainList->visibleRowCount());
-        return true;
-    }
-
-    if (message.isKeyDown(KEY_RIGHT)) {
-        _mainList->selectRow(_mainList->selectedRowId() + _mainList->visibleRowCount());
-        return true;
-    }
-
-    if (message.isKeyUp(KEY_A)) {
-        onKeyAPressed();
-        return true;
-    }
-
-    if (message.isKeyUp(KEY_B)) {
-        onKeyBPressed();
-        return true;
-    }
-
     if (message.isKeyUp(KEY_Y)) {
         if (isL) {
             showSettings();
@@ -340,13 +310,7 @@ bool cMainWnd::processKeyMessage(cKeyMessage message) {
         return true;
     }
 
-    if (message.isKeyUp(KEY_L)) {
-        _mainList->backParentDir();
-
-        return true;
-    }
-
-    return false;
+    return cForm::processKeyMessage(message);
 }
 
 bool cMainWnd::processTouchMessage(cTouchMessage message) {
@@ -363,14 +327,6 @@ void cMainWnd::onKeyYPressed() {
 }
 
 void cMainWnd::onMainListSelItemClicked(u32 index) {
-    launchSelected();
-}
-
-void cMainWnd::onMainListSelItemHeadClicked(u32 index) {
-    onKeyAPressed();
-}
-
-void cMainWnd::onKeyAPressed() {
     launchSelected();
 }
 
@@ -410,10 +366,6 @@ void cMainWnd::launchSelected() {
     }
 
     cMessageBox::showModal(LANG("no free space", "title"), LANG("no free space", "text"), MB_OK);
-}
-
-void cMainWnd::onKeyBPressed() {
-    _mainList->backParentDir();
 }
 
 void cMainWnd::showSettings(void) {

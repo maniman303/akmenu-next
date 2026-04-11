@@ -123,7 +123,7 @@ class cListView : public cWindow {
 
     void setFirstVisibleIdAndSelectRow(u32 first, u32 row);
 
-    Signal1<u32> selectedRowClicked;
+    Signal1<u32> rowClicked;
 
     Signal1<u32> selectChanged;
 
@@ -134,7 +134,7 @@ class cListView : public cWindow {
   protected:
     virtual void onSelectChanged(u32 index) {}
 
-    virtual void onSelectedRowClicked(u32 index) {}
+    virtual void onRowClicked(u32 index) {}
 
     virtual void onScrolled(u32 index) {}
 
@@ -162,6 +162,7 @@ class cListView : public cWindow {
     u16 _rowsPerpage;
     s32 _sumOfMoveY;
     bool _touchMovedAfterTouchDown;
+    u32 _scrollTick;
 
     std::vector<cListColumn> _columns;
     std::vector<itemVector> _rows;

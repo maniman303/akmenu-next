@@ -43,12 +43,6 @@ class cMainWnd : public akui::cForm {
   protected:
     void onMainListSelItemClicked(u32 index);
 
-    void onMainListSelItemHeadClicked(u32 index);
-
-    void onKeyAPressed();
-
-    void onKeyBPressed();
-
     void onKeyXPressed();
 
     void onKeyYPressed();

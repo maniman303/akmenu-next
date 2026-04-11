@@ -46,7 +46,7 @@ class cMainList : public akui::cListView {
 
     void backParentDir();
 
-    void refresh();
+    bool processKeyMessage(cKeyMessage message) override;
 
     std::string getCurrentDir();
 
@@ -67,8 +67,6 @@ class cMainList : public akui::cListView {
     VIEW_MODE getViewMode() { return _viewMode; }
 
     void arrangeIcons();
-
-    akui::Signal1<u32> selectedRowHeadClicked;
 
     akui::Signal0 directoryChanged;
 

@@ -732,6 +732,17 @@ void cMainList::backParentDir() {
     }
 }
 
+bool cMainList::processKeyMessage(cKeyMessage message) {
+    logger().info("Main list key processing.");
+
+    if (message.isKeyUp(KEY_B)) {
+        backParentDir();
+        return true;
+    }
+
+    return cListView::processKeyMessage(message);
+}
+
 std::string cMainList::getSelectedFullPath() {
     if (!_rows.size()) return std::string("");
     return _rows[_selectedRowId][REALNAME_COLUMN].text();
