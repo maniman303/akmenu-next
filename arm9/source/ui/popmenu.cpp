@@ -131,7 +131,7 @@ bool cPopMenu::processTouchMessage(cTouchMessage message) {
     cPoint pos = message.position();
     // TODO: Fix it
     if (message.up()) {
-        if (!windowBelow(pos)) {
+        if (windowBelow(pos) == NULL) {
             hide();
             _skipTouch = false;
             return true;
@@ -161,7 +161,7 @@ bool cPopMenu::processTouchMessage(cTouchMessage message) {
 
 s32 cPopMenu::itemBelowPoint(const cPoint& pt) {
     cPoint menuPos(position().x + _barLeft, position().y + _itemTopLeftPoint.y - 2);
-    cSize menuSize(barWidth(), _itemHeight * _items.size());
+    cSize menuSize(size().x - _barLeft, _itemHeight * _items.size());
     cRect rect(menuPos, menuPos + menuSize);
 
     if (rect.surrounds(pt)) {
