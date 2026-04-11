@@ -20,29 +20,29 @@ Frontend for [nds-bootstrap](https://github.com/DS-Homebrew/nds-bootstrap/) and 
 This fork is a work in progress to rewrite the UI part of **akmenu-next**. Currently it includes following changes:
 
 - Rendering went through overhaul with bugfixes, new features, and code duplication removal.
-- Font rendering was significantly enhanced, secondary small font added.
+- Font rendering was significantly enhanced, secondary small font was added.
 - Modal dialogs were rewritten from scratch to unblock main loop.
 - Rom launchers were rewritten froms scratch with a brand new system of splitting tasks per frames.
-- Many new UI elements were added like battery meter, boot icon, small date, small clock.
-- Some UI elements enhanced, enriched, like settings tab with proper theme.
-- First sound effects were created, like clock ticking sound.
-- Improved visuals of auto booting last played games.
-- New ways to display games.
+- Input system was rewritten for simplicity and flexibility.
+- Many new UI elements were added like battery meter, boot icon, small date, small clock, analogue clock.
+- Some UI elements were enhanced, enriched, eg. settings section header can be separately themed.
+- First sound effects were created: clock ticking.
+- Added new settings for minimalistic rom list, auto rom launching.
+- Improved visuals of auto launching last played games.
 - Many bug fixes.
 
 The end goal is to recreate (with proper theme that's not included yet) the aesthetic and feel of original Nintendo DS bios.
 
 Here are planned features:
-- Analog clock.
-- Tab icons in settings.
-- Rewrite of input processing.
 - Animated focus border in main list.
-- Redesigned help menu.
+- New info box.
 - Button bar used in settings, modal dialogs, help menu.
 - Top screen header used in settings, file manager, help menu.
+- Redesigned rom info menu, help menu, cheat window menu.
 - Navigation sounds.
 - Animations.
 - Redesigned start menu inspired by bios settings.
+- Optional vertical rom list, similar to DSi and 3ds menu.
 
 ## Installing
 
