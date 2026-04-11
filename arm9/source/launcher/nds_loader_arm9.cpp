@@ -393,7 +393,7 @@ eRunNdsRetCode runNdsFile (const char* filename, int argc, const char** argv)  {
 	
 	installBootStub(havedsiSD);
 
-	logger().info("Cluster: " + std::to_string(st.st_ino));
+	// logger().info("Cluster: " + std::to_string(st.st_ino));
 
 	return runNds (load_bin, load_bin_size, st.st_ino, true, true, argc, argv);
 }
