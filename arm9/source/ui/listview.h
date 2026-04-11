@@ -103,7 +103,7 @@ class cListView : public cWindow {
 
     s32 rowBelowPoint(const cPoint& pt);
 
-    void scrollTo(int id);
+    bool scrollTo(int id);
 
     u32 visibleRowCount() { return _visibleRowCount; }
 
@@ -160,7 +160,6 @@ class cListView : public cWindow {
     u32 _firstVisibleRowId;
     u32 _visibleRowCount;
     u16 _rowsPerpage;
-    s32 _sumOfMoveY;
     s32 _absSumOfMoveY;
     u32 _scrollTick;
 

@@ -42,7 +42,6 @@ namespace akui {
         _selectionBarOpacity = 100;
         _engine = GE_MAIN;
         _absSumOfMoveY = 0;
-        _sumOfMoveY = 0;
         _scrollTick = 0;
     }
 
@@ -248,19 +247,32 @@ namespace akui {
         selectRow(row);
     }
 
-    void cListView::scrollTo(int id) {
-        if (0 == _rows.size()) return;
-        // if( _rows.size() < _visibleRowCount ) return;
-        // dbg_printf("rows size %d, visibleRowCount %d\n", _rows.size(), _visibleRowCount );
+    bool cListView::scrollTo(int id) {
+        if (0 == _rows.size()) {
+            return false;
+        }
 
-        if (id > (int)_rows.size() - 1) id = (int)_rows.size() - 1;
-        if (id > (int)_rows.size() - (int)_visibleRowCount)
+        if (id > (int)_rows.size() - 1) {
+            id = (int)_rows.size() - 1;
+        }
+
+        if (id > (int)_rows.size() - (int)_visibleRowCount) {
             id = (int)_rows.size() - (int)_visibleRowCount;
-        if (id < 0) id = 0;
+        }
+            
+        if (id < 0) {
+            id = 0;
+        }
+
+        if (id == (int)_firstVisibleRowId) {
+            return false;
+        }
+
         _firstVisibleRowId = id;
         onScrolled(id);
         scrolled(id);
-        // dbg_printf("fvri %d, scroll_to %d\n", _first_visible_row_id, id );
+        
+        return true;
     }
 
     cWindow& cListView::loadAppearance(const std::string& aFileName) {
@@ -321,7 +333,6 @@ namespace akui {
     bool cListView::processTouchMessage(cTouchMessage message) {
         if (!windowRectangle().surrounds(message.position())) {
             if (message.down() || message.up()) {
-                _sumOfMoveY = -1;
                 _absSumOfMoveY = -1;
                 return false;
             }
@@ -332,7 +343,6 @@ namespace akui {
         }
 
         if (message.down()) {
-            _sumOfMoveY = 0;
             _absSumOfMoveY = 0;
             s32 rbp = rowBelowPoint(message.position());
             if (rbp != -1) {
@@ -358,30 +368,21 @@ namespace akui {
 
         if (message.move()) {
             s32 movementY = message.movement().y;
-            _sumOfMoveY += movementY;
             _absSumOfMoveY += abs(movementY);
 
-            if (abs(_sumOfMoveY) < _rowHeight) {
-                s32 rbp = rowBelowPoint(message.position());
-                if (rbp != -1) {
+            s32 selectedRowId = (s32)_selectedRowId;
+            s32 rbp = rowBelowPoint(cPoint(position().x + (size().x / 2), message.position().y));
+            if (rbp == -1) {
+                return true;
+            } else if (rbp == selectedRowId - 1) {
+                if (!scrollTo(_firstVisibleRowId + 1)) {
                     selectRow(rbp);
                 }
-
-                return true;
+            } else if (rbp == selectedRowId + 1) {
+                if (!scrollTo(_firstVisibleRowId - 1)) {
+                    selectRow(rbp);
+                }
             }
-
-            if (_sumOfMoveY < 0) {
-                scrollTo(_firstVisibleRowId + 1);
-            } else {
-                scrollTo(_firstVisibleRowId - 1);
-            }
-
-            s32 rbp = rowBelowPoint(message.position());
-            if (rbp != -1) {
-                selectRow(rbp);
-            }
-
-            _sumOfMoveY = 0;
 
             return true;
         }
