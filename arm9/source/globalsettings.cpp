@@ -29,6 +29,7 @@ cGlobalSettings::cGlobalSettings() {
     minimalModeRomsCount = 20;
     enterLastDirWhenBoot = true;
     scrollSpeed = EScrollFast;
+    scrollWait = 16;
     showGbaRoms = true;
     viewMode = EViewInternal;
     gbaSleepHack = false;

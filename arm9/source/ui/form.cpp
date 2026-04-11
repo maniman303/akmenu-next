@@ -18,25 +18,31 @@ namespace akui {
     std::vector<cForm*> cForm::_modals;
 
     void cForm::cleanModals(cForm* current) {
-        std::vector<cForm*> modalsToRemove;
+        auto it = _modals.begin();
 
-        for (size_t i = 0; i < _modals.size(); i++) {
-            cForm* modal = _modals[i];
+        // logger().info("Start modal cleanup.");
+
+        while (it != _modals.end()) {
+            cForm* modal = *it;
+
             if (modal == current || windowManager().containsWindow(modal)) {
+                ++it;
                 continue;
             }
 
-            modalsToRemove.push_back(modal);
-        }
+            if (modal->isActive()) {
+                logger().error("Modal is active.");
+                windowManager().setFocusedWindow(windowManager().currentWindow());
+            }
 
-        for (size_t i = 0; i < modalsToRemove.size(); i++) {
-            cForm* modal = modalsToRemove[i];
-            _modals.erase(std::remove(_modals.begin(), _modals.end(), modal), _modals.end());
+            it = _modals.erase(it); // remove safely
 
             if (modal != NULL && modal->isDynamic()) {
                 delete modal;
             }
         }
+
+        // logger().info("Finished modal cleanup.");
     }
 
     cForm::cForm(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
@@ -128,31 +134,29 @@ namespace akui {
 
     void cForm::doModal() {
         cleanModals(this);
-        show();
         windowManager().addWindow(this);
+        show();
         // logger().info("Do modal.");
     }
 
     void cForm::onOK() {
         _modalRet = 1;
+        windowManager().removeWindow(this);
         hide();
 
         if (onAccepted) {
             onAccepted();
         }
-
-        windowManager().removeWindow(this);
     }
 
     void cForm::onCancel() {
         _modalRet = 0;
+        windowManager().removeWindow(this);
         hide();
 
         if (onRejected) {
             onRejected();
         }
-
-        windowManager().removeWindow(this);
     }
 
     void cForm::centerScreen() {

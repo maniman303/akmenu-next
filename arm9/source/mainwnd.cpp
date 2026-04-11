@@ -18,6 +18,7 @@
 #include "diskicon.h"
 
 #include "datetime.h"
+#include "logger.h"
 
 #include "expwnd.h"
 #include "favorites.h"
@@ -416,6 +417,8 @@ void cMainWnd::onKeyBPressed() {
 }
 
 void cMainWnd::showSettings(void) {
+    // logger().info("Start prepping settings.");
+
     if (gs().safeMode) {
         return;
     }
@@ -591,7 +594,11 @@ void cMainWnd::showSettings(void) {
         settingWnd->addSettingItem(LANG("patches", "hbstrap"), _values, gs().hbStrap);
     }
 
+    // logger().info("Start showing settings.");
+
     settingWnd->doModal();
+
+    // logger().info("Finish showing settings.");
 }
 
 void cMainWnd::saveSettings(cSettingWnd* settingWnd) {

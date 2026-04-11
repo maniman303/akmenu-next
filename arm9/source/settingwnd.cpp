@@ -329,7 +329,7 @@ void cSettingWnd::ShowTab(size_t index) {
         return;
     }
 
-    logger().info(formatString("Showing tab %d.", index));
+    // logger().info(formatString("Showing tab %d.", index));
 
     for (size_t ii = 0; ii < items(index).size(); ++ii) {
         items(index)[ii]._label->show();

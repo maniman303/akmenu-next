@@ -59,15 +59,22 @@ class cPopMenu : public cWindow {
     s16 _selectedItemIndex;
 
     s16 _itemHeight;
+
     s16 _itemWidth;
+    
     s16 _barLeft;
 
     COLOR _textColor;
+    
     COLOR _textHighLightColor;
+    
     COLOR _barColor;
 
     cBitmapDesc* _renderDesc;
+    
     bool _skipTouch;
+    
+    u32 _scrollTick;
 };
 
 }  // namespace akui

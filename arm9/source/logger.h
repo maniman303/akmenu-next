@@ -8,6 +8,7 @@ class cLogger {
     void init();
 
     void info(std::string message);
+    void error(std::string message);
 };
 
 typedef t_singleton<cLogger> logger_s;

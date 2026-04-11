@@ -114,6 +114,8 @@ void saveSram() {
 }
 
 int main(int argc, char* argv[]) {
+    consoleDebugInit(DebugDevice_NOCASH);
+
     irq().init();
 
     windowManager();
@@ -129,8 +131,6 @@ int main(int argc, char* argv[]) {
 
     // turn led on
     ledBlink(PM_LED_ON);
-
-    // soundEnable();
 
     // init graphics
     gdi().init();

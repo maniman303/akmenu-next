@@ -31,6 +31,11 @@ void cTimer::initTimer() {
 }
 
 double cTimer::updateTimer() {
+    _ticks++;
+    if (_ticks == UINT32_MAX) {
+        _ticks = 0;
+    }
+
     _currentTime = (_overFlow + TIMER0_DATA) * _factor;
     return _currentTime;
 }
@@ -50,19 +55,7 @@ double cTimer::getTime() {
 }
 
 vu64 cTimer::getTick() {
-    irqDisable(IRQ_TIMER0);
-    DC_FlushAll();
-    static vu64 lastTick = 0;
-    vu64 tick = _overFlow + TIMER0_DATA;
-    if (tick < lastTick)
-        tick += 65536;  // 有时候 TIMER0_DATA 已经归0，但overflow 还没有加上，这个时候需要加上65536
-    lastTick = tick;
-    irqEnable(IRQ_TIMER0);
-    return tick;
-}
-
-double cTimer::tickToUs(u64 tick) {
-    return tick * 1.f / (33.514 * 1000000.f) * 1000 * 1000;
+    return _ticks;
 }
 
 double cTimer::getFps() {

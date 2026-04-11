@@ -31,8 +31,6 @@ class cTimer {
 
     vu64 getTick();
 
-    double tickToUs(u64 tick);
-
   private:
     static void timerInterruptHandler();
     double _lastTime;
@@ -41,6 +39,7 @@ class cTimer {
     const double _factor = 1.f / (33.514 * 1000000.f);
     double _fps;
     u32 _fpsCounter;
+    u32 _ticks;
 };
 
 typedef t_singleton<cTimer> timer_s;

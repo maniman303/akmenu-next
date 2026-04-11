@@ -9,6 +9,7 @@
 
 #include "windowmanager.h"
 #include "ui.h"
+#include "logger.h"
 
 namespace akui {
     cWindowManager::cWindowManager()
@@ -64,6 +65,7 @@ namespace akui {
             }
         }
         if (focusedWindow() && aWindow->doesHierarchyContain(focusedWindow())) {
+            logger().info("Hierarchy includes focused window.");
             _focusedWindow = _currentWindow.window();
         }
         updateBackground();

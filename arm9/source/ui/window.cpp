@@ -75,7 +75,15 @@ cWindow& cWindow::hide() {
 }
 
 bool cWindow::doesHierarchyContain(cWindow* aWindow) const {
-    return (aWindow == this);
+    while (aWindow != NULL) {
+        if (aWindow == this) {
+            return true;
+        }
+
+        aWindow = aWindow->parent();
+    }
+
+    return false;
 }
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 

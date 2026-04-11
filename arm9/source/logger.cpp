@@ -25,3 +25,16 @@ void cLogger::info(std::string message) {
         fclose(file);
     }
 }
+
+void cLogger::error(std::string message) {
+    if (!isInit) {
+        return;
+    }
+
+    FILE* file = fopen("flashcart.log", "a");
+    if (file) {
+        std::string content = formatString("[error] %s\n", message.c_str());
+        fwrite(content.c_str(), content.length(), 1, file);
+        fclose(file);
+    }
+}

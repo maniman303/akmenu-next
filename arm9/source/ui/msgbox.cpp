@@ -180,7 +180,7 @@ namespace akui {
     }
 
     bool cMessageBox::processTouchMessage(cTouchMessage message) {
-        return false;
+        return cForm::processTouchMessage(message);
     }
 
     void cMessageBox::draw() {

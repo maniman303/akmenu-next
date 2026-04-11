@@ -21,7 +21,7 @@ class cForm : public cWindow {
   public:
     cForm(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text);
 
-    ~cForm();
+    ~cForm() override;
 
   public:
     void doModal();
