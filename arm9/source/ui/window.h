@@ -105,6 +105,8 @@ class cWindow : public SlotHolder {
 
     virtual bool processTouchMessage(cTouchMessage message);
 
+    virtual bool isTouchFocusable() { return _isFocusable; }
+
     bool isFocusable() { return _isFocusable; }
 
     virtual cWindow& disableFocus(void) {

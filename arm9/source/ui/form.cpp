@@ -83,11 +83,11 @@ namespace akui {
             return false;
         }
 
-        // TODO: Run input on visited children, if returns false visit another children
+        // TODO: Run input on focused children, if returns false visit another children
         std::list<cWindow*>::iterator it;
         for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
             cWindow* window = *it;
-            if (window->processKeyMessage(message)) {
+            if (window->isVisible() && window->processKeyMessage(message)) {
                 return true;
             }
         }
@@ -103,8 +103,8 @@ namespace akui {
         std::list<cWindow*>::iterator it;
         for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
             cWindow* window = *it;
-            if (window->processTouchMessage(message)) {
-                windowManager().setFocusedWindow(window);
+            if (window->isVisible() && window->processTouchMessage(message)) {
+                windowManager().setFocusedWindow(window, true);
 
                 nocashMessage(formatString("(%s) processed touch message.", window->text().c_str()).c_str());
                 return true;

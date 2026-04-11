@@ -145,6 +145,10 @@ namespace akui {
         // if( _touchMovedAfterTouchDown )
         //     return;
 
+        if (!isFocused()) {
+            return;
+        }
+
         s16 x = position().x - 2;
         s16 y = position().y + (_selectedRowId - _firstVisibleRowId) * _rowHeight - 1;
         s16 w = _size.x + 4;
@@ -175,7 +179,7 @@ namespace akui {
                 s32 itemY = position().y + i * _rowHeight;
                 s32 textY = itemY + ((_rowHeight - height - 1) >> 1);
                 if (textY + height > (s32)(position().y + _size.y)) break;
-                if (_selectedRowId == _firstVisibleRowId + i /* && !_touchMovedAfterTouchDown */)
+                if (_selectedRowId == _firstVisibleRowId + i && isFocused())
                     gdi().setPenColor(_textColorHilight, _engine);
                 else
                     gdi().setPenColor(_textColor, _engine);
@@ -201,11 +205,18 @@ namespace akui {
         // dbg_printf( "total %d _visible_row_count %d\n", total, _visible_row_count );
     }
 
-    void cListView::selectRow(int id) {
-        if (0 == _rows.size()) return;
+    bool cListView::selectRow(int id) {
+        if (_rows.size() == 0) {
+            return false;
+        }
 
-        if (id > (int)_rows.size() - 1) id = (int)_rows.size() - 1;
-        if (id < 0) id = 0;
+        if (id + 1 > (int)_rows.size()) {
+            id = (int)_rows.size() - 1;
+        }
+
+        if (id < 0) {
+            id = 0;
+        }
 
         // if( (int)_selectedRowId == id ) return;
 
@@ -215,15 +226,21 @@ namespace akui {
             int offset = _selectedRowId - _firstVisibleRowId;
             scrollTo(id - offset);
         }
+
         if (id > (int)lastVisibleRowId) {
             int offset = _selectedRowId - _firstVisibleRowId;
             scrollTo(id - offset);
         }
-        if (_selectedRowId != (u32)id) {
-            _selectedRowId = id;
-            onSelectChanged(_selectedRowId);
-            selectChanged(_selectedRowId);
+
+        if (_selectedRowId == (u32)id) {
+            return false;
         }
+
+        _selectedRowId = id;
+        onSelectChanged(_selectedRowId);
+        selectChanged(_selectedRowId);
+
+        return true;
     }
 
     void cListView::setFirstVisibleIdAndSelectRow(u32 first, u32 row) {
@@ -269,12 +286,12 @@ namespace akui {
             return true;
         }
 
-        if (message.isKeyDown(KEY_LEFT)) {
+        if (message.isKeyUp(KEY_LEFT)) {
             selectRow(selectedRowId() - visibleRowCount());
             return true;
         }
 
-        if (message.isKeyDown(KEY_RIGHT)) {
+        if (message.isKeyUp(KEY_RIGHT)) {
             selectRow(selectedRowId() + visibleRowCount());
             return true;
         }
@@ -284,14 +301,20 @@ namespace akui {
         }
 
         u32 tickDiff = timer().getTick() - _scrollTick;
-        if (message.isKeyDown(KEY_DOWN) || (message.isKeyHeld(KEY_DOWN) && tickDiff > gs().scrollWait && tickDiff % gs().scrollSpeed == 0)) {
-            selectNext();
-            return true;
+        if (message.isKeyDown(KEY_DOWN) || message.isKeyHeld(KEY_DOWN)) {
+            if (!message.isKeyDown(KEY_DOWN) && (tickDiff <= gs().scrollWait || tickDiff % gs().scrollSpeed == 0)) {
+                return true;
+            }
+            
+            return selectNext();
         }
 
-        if (message.isKeyDown(KEY_UP) || (message.isKeyHeld(KEY_UP) && tickDiff > gs().scrollWait && tickDiff % gs().scrollSpeed == 0)) {
-            selectPrev();
-            return true;
+        if (message.isKeyDown(KEY_UP) || message.isKeyHeld(KEY_UP)) {
+            if (!message.isKeyDown(KEY_UP) && (tickDiff <= gs().scrollWait || tickDiff % gs().scrollSpeed == 0)) {
+                return true;
+            }
+
+            return selectPrev();
         }
 
         return false;

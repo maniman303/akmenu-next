@@ -102,6 +102,7 @@ void cMainWnd::init() {
     _mainList->animateIcons.connect(this, &cMainWnd::onAnimation);
     //_mainList->enterDir( "fat:/" );
     addChildWindow(_mainList);
+    windowManager().setFocusedWindow(_mainList);
     dbg_printf("mainlist %08x\n", _mainList);
 
     // waitMs( 1000 );
@@ -247,12 +248,16 @@ cWindow& cMainWnd::loadAppearance(const std::string& aFileName) {
     return *this;
 }
 
+void cMainWnd::onGainedFocus() {
+    windowManager().setFocusedWindow(_mainList);
+}
+
 bool cMainWnd::processKeyMessage(cKeyMessage message) {
     if (_startMenu->isVisible()) {
         return _startMenu->processKeyMessage(message);
     }
 
-    logger().info("Main wnd key processing.");
+    // logger().info("Main wnd key processing.");
 
     bool isL = message.isKeyShift(KEY_L);
     bool allow = !gs().safeMode;

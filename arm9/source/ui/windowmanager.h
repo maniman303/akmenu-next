@@ -42,6 +42,7 @@ class cWindowManager {
     ~cWindowManager();
     cWindow* focusedWindow(void) const { return _focusedWindow; }
     void setFocusedWindow(cWindow* aWindow);
+    void setFocusedWindow(cWindow* aWindow, bool isTouch);
     cWindowManager& addWindow(cWindow* aWindow);
     cWindowManager& removeWindow(cWindow* aWindow);
     cWindow* currentWindow(void) const { return _currentWindow.window(); }

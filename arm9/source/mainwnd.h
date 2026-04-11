@@ -41,6 +41,8 @@ class cMainWnd : public akui::cForm {
     cMainList* _mainList;
 
   protected:
+    void onGainedFocus() override;
+
     void onMainListSelItemClicked(u32 index);
 
     void onKeyXPressed();

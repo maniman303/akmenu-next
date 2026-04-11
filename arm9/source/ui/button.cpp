@@ -23,6 +23,7 @@ cButton::cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string&
     _textColor = uiSettings().buttonTextColor;  // RGB15(0,0,0) | BIT(15);
     _style = single;
     _alignment = center;
+    _isFocusable = false;
 }
 
 cButton::~cButton() {
@@ -52,6 +53,14 @@ bool cButton::valid() const {
     }
 
     return _renderDesc->valid();
+}
+
+bool cButton::isTouchFocusable() {
+    return false;
+}
+
+void cButton::setIsFocusable(bool isFocusable) {
+    _isFocusable = isFocusable;
 }
 
 bool cButton::processTouchMessage(cTouchMessage message) {

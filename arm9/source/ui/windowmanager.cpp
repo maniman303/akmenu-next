@@ -21,7 +21,15 @@ namespace akui {
     cWindowManager::~cWindowManager() {}
 
     void cWindowManager::setFocusedWindow(cWindow* aWindow) {
+        setFocusedWindow(aWindow, false);
+    }
+
+    void cWindowManager::setFocusedWindow(cWindow* aWindow, bool isTouch) {
         if (aWindow == NULL || aWindow == focusedWindow() || !aWindow->isFocusable()) {
+            return;
+        }
+
+        if (isTouch && !aWindow->isTouchFocusable()) {
             return;
         }
 
@@ -64,10 +72,12 @@ namespace akui {
                 }
             }
         }
+        
         if (focusedWindow() && aWindow->doesHierarchyContain(focusedWindow())) {
-            logger().info("Hierarchy includes focused window.");
+            // logger().info("Hierarchy includes focused window.");
             _focusedWindow = _currentWindow.window();
         }
+        
         updateBackground();
         return *this;
     }

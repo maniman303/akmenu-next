@@ -116,6 +116,10 @@ void cCheatWnd::draw() {
     cForm::draw();
 }
 
+void cCheatWnd::onGainedFocus() {
+    windowManager().setFocusedWindow(&_list);
+}
+
 bool cCheatWnd::processKeyMessage(cKeyMessage message) {
     if (message.isKeyUp(KEY_A)) {
         onSelect();

@@ -37,6 +37,10 @@ class cButton : public cWindow {
 
     bool valid() const;
 
+    bool isTouchFocusable() override;
+
+    void setIsFocusable(bool isFocusable);
+
     bool processTouchMessage(cTouchMessage message) override;
 
     State state() { return _state; }

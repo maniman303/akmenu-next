@@ -91,15 +91,15 @@ class cListView : public cWindow {
 
     void arangeColumnsSize();
 
-    void selectRow(int id);
+    bool selectRow(int id);
 
     u32 firstVisibleRowId(void) { return _firstVisibleRowId; }
 
     u32 selectedRowId(void) { return _selectedRowId; }
 
-    void selectNext() { selectRow(_selectedRowId + 1); }
+    bool selectNext() { return selectRow(_selectedRowId + 1); }
 
-    void selectPrev() { selectRow(_selectedRowId - 1); }
+    bool selectPrev() { return selectRow(_selectedRowId - 1); }
 
     s32 rowBelowPoint(const cPoint& pt);
 
