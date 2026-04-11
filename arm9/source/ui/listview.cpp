@@ -296,8 +296,13 @@ namespace akui {
         }
 
         if (message.move()) {
-            _sumOfMoveY += message.movement().y;
-            if (abs(_sumOfMoveY) <= gs().scrollSpeed) {
+            s32 movementY = message.movement().y;;
+            if ((_sumOfMoveY > 0 && movementY < 0) || (_sumOfMoveY < 0 && movementY > 0)) {
+                _sumOfMoveY = 0;
+            }
+
+            _sumOfMoveY += movementY;
+            if (abs(_sumOfMoveY) < _rowHeight) {
                 s32 rbp = rowBelowPoint(message.position());
                 if (rbp != -1) {
                     selectRow(rbp);
