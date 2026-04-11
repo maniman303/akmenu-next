@@ -81,6 +81,7 @@ class cSettingWnd : public akui::cForm {
     size_t _maxTabSize;
     std::string _confirmMessage;
     std::string _id;
+    u32 _scrollTick;
 
     akui::cSpinBox _tabSwitcher;
     akui::cButton _buttonOK;

@@ -43,7 +43,7 @@ class cCheatWnd : public akui::cForm, public cCheat {
     akui::cButton _buttonGenerate;
     akui::cButton _buttonCancel;
     akui::cFormDesc _renderDesc;
-    akui::cListView _List;
+    akui::cListView _list;
 
   private:
     enum {
@@ -58,4 +58,5 @@ class cCheatWnd : public akui::cForm, public cCheat {
 
   private:
     std::vector<size_t> _indexes;
+    u32 _scrollTick;
 };

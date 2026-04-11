@@ -16,6 +16,7 @@
 #include "uisettings.h"
 #include "windowmanager.h"
 #include "fontfactory.h"
+#include "timer.h"
 #include "logger.h"
 #define TOP_MARGIN 4
 
@@ -70,6 +71,7 @@ cSettingWnd::cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     _maxLabelLength = 0;
     _titleOffset = 0;
     _maxTabSize = 0;
+    _scrollTick = 0;
     _confirmMessage = LANG("setting window", "confirm text");
     _id = id;
     CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
@@ -98,7 +100,6 @@ void cSettingWnd::draw(void) {
 }
 
 bool cSettingWnd::processKeyMessage(cKeyMessage message) {
-    // TODO: Use scrolling speed with isKeyHeld
     if (message.isKeyDown(KEY_R)) {
         onUIKeyR();
         return true;
@@ -119,16 +120,6 @@ bool cSettingWnd::processKeyMessage(cKeyMessage message) {
         return true;
     }
 
-    if (message.isKeyDown(KEY_DOWN)) {
-        onUIKeyDOWN();
-        return true;
-    }
-
-    if (message.isKeyDown(KEY_UP)) {
-        onUIKeyUP();
-        return true;
-    }
-
     if (message.isKeyDown(KEY_LEFT)) {
         onUIKeyLEFT();
         return true;
@@ -136,6 +127,21 @@ bool cSettingWnd::processKeyMessage(cKeyMessage message) {
 
     if (message.isKeyDown(KEY_RIGHT)) {
         onUIKeyRIGHT();
+        return true;
+    }
+
+    if (message.isKeyDown(KEY_DOWN) || message.isKeyDown(KEY_UP)) {
+        _scrollTick = timer().getTick();
+    }
+
+    u32 tickDiff = timer().getTick() - _scrollTick;
+    if (message.isKeyDown(KEY_DOWN) || (message.isKeyHeld(KEY_DOWN) && tickDiff > gs().scrollWait && tickDiff % gs().scrollSpeed == 0)) {
+        onUIKeyDOWN();
+        return true;
+    }
+
+    if (message.isKeyDown(KEY_UP) || (message.isKeyHeld(KEY_UP) && tickDiff > gs().scrollWait && tickDiff % gs().scrollSpeed == 0)) {
+        onUIKeyUP();
         return true;
     }
     
