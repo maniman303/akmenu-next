@@ -6,7 +6,6 @@
     SPDX-License-Identifier: GPL-3.0-or-later
 */
 
-#include "gbaloader.h"
 #include <fat.h>
 #include <fcntl.h>
 #include <malloc.h>
@@ -15,12 +14,14 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include "../../share/fifotool.h"
+#include "gbaloader.h"
 #include "exptools.h"
 #include "gbapatcher.h"
 #include "language.h"
 #include "progresswnd.h"
 #include "sram.h"
+#include "ui/msgbox.h"
+#include "../../share/fifotool.h"
 
 #define LEN 0x100000
 #define LEN_NOR 0x8000

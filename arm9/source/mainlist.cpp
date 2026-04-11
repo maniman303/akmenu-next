@@ -15,7 +15,6 @@
 #include <unordered_set>
 #include <queue>
 #include <algorithm>
-#include "../../share/memtool.h"
 #include "dbgtool.h"
 #include "gbaloader.h"
 #include "folder_banner_bin.h"
@@ -35,6 +34,8 @@
 #include "fsmngr.h"
 #include "savemngr.h"
 #include "logger.h"
+#include "ui/msgbox.h"
+#include "../../share/memtool.h"
 
 using namespace akui;
 

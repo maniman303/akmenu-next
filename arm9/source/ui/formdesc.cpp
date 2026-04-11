@@ -9,7 +9,7 @@
 
 #include "formdesc.h"
 #include "fontfactory.h"
-#include "ui.h"
+#include "uisettings.h"
 
 //#include "globalsettings.h"
 

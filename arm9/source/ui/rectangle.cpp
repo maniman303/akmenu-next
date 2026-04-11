@@ -8,7 +8,6 @@
 */
 
 #include "rectangle.h"
-#include "ui.h"
 
 namespace akui {
 

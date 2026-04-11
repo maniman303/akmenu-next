@@ -8,6 +8,9 @@
 */
 
 #include "progresswnd.h"
+#include "uisettings.h"
+#include "windowmanager.h"
+#include "../systemfilenames.h"
 
 namespace akui {
     cProgressWnd::cProgressWnd()  // s32 x, s32 y, u32 w, u32 h, cWindow * parent, const std::string &

@@ -8,8 +8,8 @@
 */
 
 #include "statictext.h"
-#include "ui.h"
 #include "fontfactory.h"
+#include "uisettings.h"
 //#include "gdi.h"
 
 namespace akui {

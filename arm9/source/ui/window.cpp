@@ -8,7 +8,6 @@
 */
 
 #include "window.h"
-#include "ui.h"
 #include "windowmanager.h"
 
 namespace akui {

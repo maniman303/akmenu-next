@@ -10,11 +10,11 @@
 //�
 
 #include "popmenu.h"
-#include "ui.h"
 #include "fontfactory.h"
 #include "timer.h"
 #include "logger.h"
-//#include "windowmanager.h"
+#include "uisettings.h"
+#include "../globalsettings.h"
 
 namespace akui {
 

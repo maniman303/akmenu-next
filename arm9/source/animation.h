@@ -9,7 +9,9 @@
 
 #pragma once
 
-#include "ui.h"
+#include <list>
+#include "singleton.h"
+#include "ui/point.h"
 
 class cAnimation {
   public:

@@ -9,7 +9,7 @@
 
 #include "button.h"
 #include "fontfactory.h"
-#include "ui.h"
+#include "uisettings.h"
 #include "window.h"
 
 namespace akui {

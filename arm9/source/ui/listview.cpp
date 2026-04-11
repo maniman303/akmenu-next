@@ -7,15 +7,13 @@
     SPDX-License-Identifier: GPL-3.0-or-later
 */
 
-//�
-
 #include "listview.h"
-#include "ui.h"
 #include "fontfactory.h"
 #include "timer.h"
 #include "logger.h"
-//#include "gdi.h"
-//#include "dbgtool.h"
+#include "uisettings.h"
+#include "../stringtool.h"
+#include "../globalsettings.h"
 
 namespace akui {
     void cListItem::setText(const std::string& text) {
@@ -43,7 +41,7 @@ namespace akui {
         _selectionBarColor2 = BIT(15) | uiSettings().listViewBarColor2;  // RGB15(0,0,31);
         _selectionBarOpacity = 100;
         _engine = GE_MAIN;
-        _touchMovedAfterTouchDown = false;
+        _absSumOfMoveY = 0;
         _sumOfMoveY = 0;
         _scrollTick = 0;
     }
@@ -322,11 +320,20 @@ namespace akui {
 
     bool cListView::processTouchMessage(cTouchMessage message) {
         if (!windowRectangle().surrounds(message.position())) {
-            return false;
+            if (message.down() || message.up()) {
+                _sumOfMoveY = -1;
+                _absSumOfMoveY = -1;
+                return false;
+            }
+
+            if (message.move() && _absSumOfMoveY < 0) {
+                return false;
+            }
         }
 
         if (message.down()) {
-            _touchMovedAfterTouchDown = false;
+            _sumOfMoveY = 0;
+            _absSumOfMoveY = 0;
             s32 rbp = rowBelowPoint(message.position());
             if (rbp != -1) {
                 selectRow(rbp);
@@ -336,13 +343,10 @@ namespace akui {
         }
 
         if (message.up()) {
-            _sumOfMoveY = 0;
-            if (_touchMovedAfterTouchDown) {
-                _touchMovedAfterTouchDown = false;
+            if (_absSumOfMoveY > 4) {
                 return true;
             }
 
-            _touchMovedAfterTouchDown = false;
             s32 rbp = rowBelowPoint(message.position());
             if (rbp != -1 && static_cast<s32>(selectedRowId()) == rbp) {
                 onRowClicked(rbp);
@@ -353,12 +357,10 @@ namespace akui {
         }
 
         if (message.move()) {
-            s32 movementY = message.movement().y;;
-            if ((_sumOfMoveY > 0 && movementY < 0) || (_sumOfMoveY < 0 && movementY > 0)) {
-                _sumOfMoveY = 0;
-            }
-
+            s32 movementY = message.movement().y;
             _sumOfMoveY += movementY;
+            _absSumOfMoveY += abs(movementY);
+
             if (abs(_sumOfMoveY) < _rowHeight) {
                 s32 rbp = rowBelowPoint(message.position());
                 if (rbp != -1) {
@@ -380,7 +382,6 @@ namespace akui {
             }
 
             _sumOfMoveY = 0;
-            _touchMovedAfterTouchDown = true;
 
             return true;
         }

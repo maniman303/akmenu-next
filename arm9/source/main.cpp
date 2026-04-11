@@ -18,7 +18,6 @@
 
 #include "dbgtool.h"
 #include "gdi.h"
-#include "ui.h"
 #include "logger.h"
 
 #include "mainlist.h"
@@ -55,6 +54,9 @@
 #include "sram.h"
 #include "userwnd.h"
 #include "fsmngr.h"
+
+#include "ui/windowmanager.h"
+#include "ui/uisettings.h"
 
 using namespace akui;
 

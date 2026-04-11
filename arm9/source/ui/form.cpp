@@ -9,10 +9,9 @@
 
 #include "form.h"
 #include "timer.h"
-#include "ui.h"
 #include "logger.h"
-//#include "dbgtool.h"
-//#include "windowmanager.h"
+#include "windowmanager.h"
+#include "../stringtool.h"
 
 namespace akui {
     std::vector<cForm*> cForm::_modals;

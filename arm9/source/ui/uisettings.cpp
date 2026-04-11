@@ -9,7 +9,7 @@
 
 #include "uisettings.h"
 #include "cachedinifile.h"
-#include "ui.h"
+#include "../systemfilenames.h"
 
 cUISettings::cUISettings() {
     showCalendar = true;

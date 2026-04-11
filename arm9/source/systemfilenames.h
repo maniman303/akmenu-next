@@ -9,6 +9,7 @@
 
 #pragma once
 #include "fsmngr.h"
+#include "globalsettings.h"
 
 #define SFN_SYSTEM_DIR fsManager().resolveSystemPath("_nds/akmenunext/")
 #define SFN_OFFICIAL_SAVELIST SFN_SYSTEM_DIR + "savelist.bin"

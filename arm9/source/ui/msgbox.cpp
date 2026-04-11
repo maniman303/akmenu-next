@@ -10,7 +10,7 @@
 #include "msgbox.h"
 #include "fontfactory.h"
 #include "language.h"
-#include "ui.h"
+#include "uisettings.h"
 
 namespace akui {
     void cMessageBox::showModal(const std::string& title, const std::string& msg, u32 style) {

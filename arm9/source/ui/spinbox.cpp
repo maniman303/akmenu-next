@@ -11,8 +11,9 @@
 #include <string>
 #include "spinbox.h"
 #include "fontfactory.h"
-#include "ui.h"
 #include "logger.h"
+#include "uisettings.h"
+#include "../systemfilenames.h"
 
 //#include "windowmanager.h"
 

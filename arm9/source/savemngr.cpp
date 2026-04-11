@@ -20,7 +20,6 @@
 #include "language.h"
 #include "progresswnd.h"
 #include "systemfilenames.h"
-#include "ui.h"
 
 #include "saves/ROMList.h"
 

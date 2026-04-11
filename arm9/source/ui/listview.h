@@ -161,7 +161,7 @@ class cListView : public cWindow {
     u32 _visibleRowCount;
     u16 _rowsPerpage;
     s32 _sumOfMoveY;
-    bool _touchMovedAfterTouchDown;
+    s32 _absSumOfMoveY;
     u32 _scrollTick;
 
     std::vector<cListColumn> _columns;
