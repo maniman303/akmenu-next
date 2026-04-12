@@ -137,7 +137,7 @@ int main(int argc, char* argv[]) {
     // init graphics
     gdi().init();
 
-    // sd().initArm7RegStatuses();
+    sd().initArm7RegStatuses();
 
     fsManager().init(argc, argv);
 
