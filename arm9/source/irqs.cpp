@@ -22,6 +22,7 @@
 #include "timer.h"
 #include "userinput.h"
 #include "userwnd.h"
+#include "logger.h"
 #include "windowmanager.h"
 
 using namespace akui;

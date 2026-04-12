@@ -734,8 +734,6 @@ void cMainList::backParentDir() {
 }
 
 bool cMainList::processKeyMessage(cKeyMessage message) {
-    logger().info("Main list key processing.");
-
     if (message.isKeyUp(KEY_B)) {
         backParentDir();
         return true;

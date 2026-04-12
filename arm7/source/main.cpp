@@ -179,16 +179,16 @@ static void menuValue32Handler(u32 value, void* data) {
     }
 }
 
-static void probeBatteryStatus() {
-    u32 ime = REG_IME;
-    REG_IME = 0;
+// static void probeBatteryStatus() {
+//     u32 ime = REG_IME;
+//     REG_IME = 0;
 
-    u32 batteryStatus = readPowerManagement(PM_BATTERY_REG) & 0x1;
+//     u32 batteryStatus = readPowerManagement(PM_BATTERY_REG) & 0x1;
 
-    REG_IME = ime;
+//     REG_IME = ime;
 
-    fifoSendValue32(FIFO_USER_03, batteryStatus | (MENU_MSG_BATTERY_STATE << 16));
-}
+//     fifoSendValue32(FIFO_USER_03, batteryStatus | (MENU_MSG_BATTERY_STATE << 16));
+// }
 
 int main() {
     // clear sound registers
@@ -227,7 +227,7 @@ int main() {
 		i2cWriteRegister(0x4A, 0x70, 0x01);	// Bootflag = Warmboot/SkipHealthSafety
 	}
 
-    u32 ticks = 0;
+    // u32 ticks = 0;
        
     while (true) {
         if (*(u32*)(0x2FFFD0C) == 0x454D4D43) {
@@ -235,13 +235,13 @@ int main() {
             *(u32*)(0x2FFFD0C) = 0;
         }
 
-        if (ticks == 0) {
-            probeBatteryStatus();
-        }
+        // if (ticks == 0) {
+        //     probeBatteryStatus();
+        // }
 
-        swiWaitForVBlank();
+        // swiWaitForVBlank();
 
-        ticks = (ticks + 1) % 40;
+        // ticks = (ticks + 1) % 60;
     }
 }
 

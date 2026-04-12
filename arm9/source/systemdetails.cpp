@@ -48,13 +48,6 @@ void cSystemDetails::initArm7RegStatuses() {
 void cSystemDetails::update() {
 	u32 level = getBatteryLevel();
 	_chargingStatus = (level & 0x80) != 0;
-	
-	// FILE* f = fopen("battery.txt", "a");
-	// if (f != NULL) {
-	// 	fprintf(f, "Battery=%d, charging=%ld\n", _batteryStatus, level);
-	// }
-
-	// fclose(f);
 
 	if (_chargingStatus) {
 		_batteryStatus = 0;

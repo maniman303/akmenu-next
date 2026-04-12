@@ -25,11 +25,15 @@ class cTimer {
 
     double updateFps();
 
+    u32 updateFrame();
+
     double getFps();
 
     double getTime();
 
-    vu64 getTick();
+    u32 getTick();
+
+    u32 getFrame();
 
   private:
     static void timerInterruptHandler();
@@ -40,6 +44,7 @@ class cTimer {
     double _fps;
     u32 _fpsCounter;
     u32 _ticks;
+    u32 _frames;
 };
 
 typedef t_singleton<cTimer> timer_s;

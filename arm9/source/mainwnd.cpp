@@ -651,7 +651,7 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
                 HomebrewLauncher().launchRom(launcherPath, "", 0, 0, 0, 0);
             },
             {});
-    }else if (langIndex != langIndexAfter) {
+    } else if (langIndex != langIndexAfter) {
         cMessageBox::showModal(LANG("language changed", "title"), LANG("language changed", "text"), MB_YES | MB_NO,
             [this, langNames, langIndexAfter]() {
                 gs().langDirectory = langNames[langIndexAfter];

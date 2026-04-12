@@ -72,10 +72,10 @@ cWindow& cCalendar::loadAppearance(const std::string& aFileName) {
     return *this;
 }
 
-void cCalendar::drawDayNumber(u8 day) {
+void cCalendar::drawDayNumber(u8 day, u8 weekdDayOfMonthFirstDay, u8 today) {
     if (day > 31) return;
 
-    u8 weekdDayOfMonthFirstDay = datetime().weekDayOfMonthFirstDay();
+    
     u8 weekDayOfDay = (((day - 1) % 7) + weekdDayOfMonthFirstDay) % 7;
     u8 x = weekDayOfDay * _daySize.x + _dayPosition.x;
     u8 y = ((day - 1 + weekdDayOfMonthFirstDay) / 7 * _daySize.y) + _dayPosition.y;
@@ -85,7 +85,7 @@ void cCalendar::drawDayNumber(u8 day) {
     u8 firstNumber = day / 10;
     u8 secondNumber = day % 10;
 
-    bool isToday = day == datetime().day();
+    bool isToday = day == today;
 
     u16 dayColor = 0;
     if (isToday) {
@@ -150,8 +150,11 @@ void cCalendar::drawText(const akui::cPoint& position, u32 value, u32 factor) {
 
 void cCalendar::draw() {
     if (_showDay) {
+        u8 weekdDayOfMonthFirstDay = datetime().weekDayOfMonthFirstDay();
+        u8 today = datetime().day();
+
         for (u8 i = 1; i <= datetime().daysOfMonth(); ++i) {
-            drawDayNumber(i);
+            drawDayNumber(i, weekdDayOfMonthFirstDay, today);
         }
     }
 

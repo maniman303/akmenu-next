@@ -137,7 +137,7 @@ int main(int argc, char* argv[]) {
     // init graphics
     gdi().init();
 
-    sd().initArm7RegStatuses();
+    // sd().initArm7RegStatuses();
 
     fsManager().init(argc, argv);
 
@@ -245,18 +245,21 @@ int main(int argc, char* argv[]) {
 
     while (true) {
         timer().updateFps();
+        timer().updateFrame();
         tickSound().play();
 
         if (ticks == 0) {
             sd().update();
         }
 
-        swiWaitForVBlank();
+        // logger().info("Ticks 1: " + std::to_string(timer().getTick()));
+
+        // swiWaitForVBlank();
 
         INPUT& inputs = updateInput();
         processInput(inputs);
 
-        if (ticks >= 29) {
+        if (ticks >= 14) {
             ticks = 0;
         } else {
             ticks++;
@@ -271,6 +274,8 @@ int main(int argc, char* argv[]) {
             gdi().initBg(SFN_LOWER_SCREEN_BG, false);
             isBgInit = true;
         }
+
+        // logger().info("Ticks 2: " + std::to_string(timer().getTick()));
 
         gdi().present(GE_SUB);
         gdi().present(GE_MAIN);

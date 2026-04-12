@@ -29,7 +29,7 @@ class cCalendar : public akui::cWindow {
     akui::cWindow& loadAppearance(const std::string& aFileName);
 
   protected:
-    void drawDayNumber(u8 day);
+    void drawDayNumber(u8 day, u8 weekdDayOfMonthFirstDay, u8 today);
     void drawText(const akui::cPoint& position, u32 value, u32 factor);
     void drawNumber(const akui::cPoint& position, u32 index, u32 value);
 

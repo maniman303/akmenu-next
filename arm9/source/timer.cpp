@@ -19,6 +19,8 @@ void cTimer::timerInterruptHandler() {
 }
 
 void cTimer::initTimer() {
+    _ticks = 0;
+    _frames = 0;
     _lastTime = 0;
     _currentTime = 0;
     _overFlow = 0;
@@ -50,12 +52,22 @@ double cTimer::updateFps() {
     return _fps;
 }
 
+u32 cTimer::updateFrame() {
+    _frames++;
+
+    return _frames;
+}
+
 double cTimer::getTime() {
     return _currentTime;
 }
 
-vu64 cTimer::getTick() {
+u32 cTimer::getTick() {
     return _ticks;
+}
+
+u32 cTimer::getFrame() {
+    return _frames;
 }
 
 double cTimer::getFps() {
