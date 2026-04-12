@@ -59,5 +59,4 @@ class cCheatWnd : public akui::cForm, public cCheat {
 
   private:
     std::vector<size_t> _indexes;
-    u32 _scrollTick;
 };

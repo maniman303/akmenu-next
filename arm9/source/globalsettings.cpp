@@ -30,6 +30,7 @@ cGlobalSettings::cGlobalSettings() {
     enterLastDirWhenBoot = true;
     scrollSpeed = EScrollFast;
     scrollWait = 16;
+    scrollTick = 0;
     showGbaRoms = true;
     viewMode = EViewInternal;
     gbaSleepHack = false;

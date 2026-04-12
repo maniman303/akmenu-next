@@ -73,8 +73,6 @@ class cPopMenu : public cWindow {
     cBitmapDesc* _renderDesc;
     
     bool _skipTouch;
-    
-    u32 _scrollTick;
 };
 
 }  // namespace akui

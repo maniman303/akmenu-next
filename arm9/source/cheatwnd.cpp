@@ -104,8 +104,6 @@ cCheatWnd::cCheatWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::str
     _list.ownerDraw.connect(this, &cCheatWnd::onDraw);
     addChildWindow(&_list);
 
-    _scrollTick = 0;
-
     loadAppearance("");
 }
 
@@ -165,10 +163,10 @@ bool cCheatWnd::processKeyMessage(cKeyMessage message) {
     }
 
     if (message.isKeyDown(KEY_DOWN) || message.isKeyDown(KEY_UP)) {
-        _scrollTick = timer().getTick();
+        gs().scrollTick = timer().getTick();
     }
 
-    u32 tickDiff = timer().getTick() - _scrollTick;
+    u32 tickDiff = timer().getTick() - gs().scrollTick;
     if (message.isKeyDown(KEY_DOWN) || (message.isKeyHeld(KEY_DOWN) && tickDiff > gs().scrollWait && tickDiff % gs().scrollSpeed == 0)) {
         _list.selectNext();
         return true;

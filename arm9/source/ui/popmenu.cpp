@@ -36,7 +36,6 @@ cPopMenu::cPopMenu(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::strin
     _renderDesc->setBltMode(BM_MASKBLT);
 
     _skipTouch = false;
-    _scrollTick = 0;
 }
 
 cPopMenu::~cPopMenu() {
@@ -107,11 +106,11 @@ bool cPopMenu::processKeyMessage(cKeyMessage message) {
     }
 
     if (message.isKeyDown(KEY_DOWN) || message.isKeyDown(KEY_UP)) {
-        _scrollTick = timer().getTick();
-        // logger().info("Scroll setup: " + std::to_string(_scrollTick));
+        gs().scrollTick = timer().getTick();
+        // logger().info("Scroll setup: " + std::to_string(gs().scrollTick));
     }
 
-    u32 tickDiff = timer().getTick() - _scrollTick;
+    u32 tickDiff = timer().getTick() - gs().scrollTick;
     if (message.isKeyDown(KEY_DOWN) || (message.isKeyHeld(KEY_DOWN) && tickDiff > gs().scrollWait && tickDiff % gs().scrollSpeed == 0)) {
         _selectedItemIndex += 1;
         if (_selectedItemIndex > (s16)_items.size() - 1) _selectedItemIndex = 0;

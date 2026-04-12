@@ -160,8 +160,8 @@ class cListView : public cWindow {
     u32 _firstVisibleRowId;
     u32 _visibleRowCount;
     u16 _rowsPerpage;
-    s32 _absSumOfMoveY;
-    u32 _scrollTick;
+    s32 _sumOfMoveY;
+    s32 _sumOfMoveX;
 
     std::vector<cListColumn> _columns;
     std::vector<itemVector> _rows;

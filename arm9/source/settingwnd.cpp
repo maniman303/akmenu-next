@@ -71,7 +71,6 @@ cSettingWnd::cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     _maxLabelLength = 0;
     _titleOffset = 0;
     _maxTabSize = 0;
-    _scrollTick = 0;
     _confirmMessage = LANG("setting window", "confirm text");
     _id = id;
     CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
@@ -131,10 +130,10 @@ bool cSettingWnd::processKeyMessage(cKeyMessage message) {
     }
 
     if (message.isKeyDown(KEY_DOWN) || message.isKeyDown(KEY_UP)) {
-        _scrollTick = timer().getTick();
+        gs().scrollTick = timer().getTick();
     }
 
-    u32 tickDiff = timer().getTick() - _scrollTick;
+    u32 tickDiff = timer().getTick() - gs().scrollTick;
     if (message.isKeyDown(KEY_DOWN) || (message.isKeyHeld(KEY_DOWN) && tickDiff > gs().scrollWait && tickDiff % gs().scrollSpeed == 0)) {
         onUIKeyDOWN();
         return true;

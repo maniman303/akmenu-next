@@ -41,8 +41,8 @@ namespace akui {
         _selectionBarColor2 = BIT(15) | uiSettings().listViewBarColor2;  // RGB15(0,0,31);
         _selectionBarOpacity = 100;
         _engine = GE_MAIN;
-        _absSumOfMoveY = 0;
-        _scrollTick = 0;
+        _sumOfMoveY = 0;
+        _sumOfMoveX = 0;
     }
 
     void cListView::arangeColumnsSize() {
@@ -307,12 +307,12 @@ namespace akui {
         }
 
         if (message.isKeyDown(KEY_DOWN) || message.isKeyDown(KEY_UP)) {
-            _scrollTick = timer().getTick();
+            gs().scrollTick = timer().getTick();
         }
 
-        u32 tickDiff = timer().getTick() - _scrollTick;
+        u32 tickDiff = timer().getTick() - gs().scrollTick;
         if (message.isKeyDown(KEY_DOWN) || message.isKeyHeld(KEY_DOWN)) {
-            if (!message.isKeyDown(KEY_DOWN) && (tickDiff <= gs().scrollWait || tickDiff % gs().scrollSpeed == 0)) {
+            if (message.isKeyHeld(KEY_DOWN) && (tickDiff <= gs().scrollWait || tickDiff % gs().scrollSpeed != 0)) {
                 return true;
             }
             
@@ -320,7 +320,7 @@ namespace akui {
         }
 
         if (message.isKeyDown(KEY_UP) || message.isKeyHeld(KEY_UP)) {
-            if (!message.isKeyDown(KEY_UP) && (tickDiff <= gs().scrollWait || tickDiff % gs().scrollSpeed == 0)) {
+            if (message.isKeyHeld(KEY_UP) && (tickDiff <= gs().scrollWait || tickDiff % gs().scrollSpeed != 0)) {
                 return true;
             }
 
@@ -333,17 +333,19 @@ namespace akui {
     bool cListView::processTouchMessage(cTouchMessage message) {
         if (!windowRectangle().surrounds(message.position())) {
             if (message.down() || message.up()) {
-                _absSumOfMoveY = -1;
+                _sumOfMoveY = -1;
+                _sumOfMoveX = -1;
                 return false;
             }
 
-            if (message.move() && _absSumOfMoveY < 0) {
+            if (message.move() && (_sumOfMoveY < 0 || _sumOfMoveX < 0)) {
                 return false;
             }
         }
 
         if (message.down()) {
-            _absSumOfMoveY = 0;
+            _sumOfMoveY = 0;
+            _sumOfMoveX = 0;
             s32 rbp = rowBelowPoint(message.position());
             if (rbp != -1) {
                 selectRow(rbp);
@@ -353,7 +355,7 @@ namespace akui {
         }
 
         if (message.up()) {
-            if (_absSumOfMoveY > 4) {
+            if (_sumOfMoveY > 4 || _sumOfMoveX > 4) {
                 return true;
             }
 
@@ -367,8 +369,8 @@ namespace akui {
         }
 
         if (message.move()) {
-            s32 movementY = message.movement().y;
-            _absSumOfMoveY += abs(movementY);
+            _sumOfMoveY += abs(message.movement().y);
+            _sumOfMoveX += abs(message.movement().x);
 
             s32 selectedRowId = (s32)_selectedRowId;
             s32 rbp = rowBelowPoint(cPoint(position().x + (size().x / 2), message.position().y));
