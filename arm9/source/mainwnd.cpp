@@ -100,7 +100,6 @@ void cMainWnd::init() {
     _mainList->rowClicked.connect(this, &cMainWnd::onMainListSelItemClicked);
     _mainList->directoryChanged.connect(this, &cMainWnd::onFolderChanged);
     _mainList->animateIcons.connect(this, &cMainWnd::onAnimation);
-    //_mainList->enterDir( "fat:/" );
     addChildWindow(_mainList);
     windowManager().setFocusedWindow(_mainList);
     dbg_printf("mainlist %08x\n", _mainList);

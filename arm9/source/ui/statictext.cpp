@@ -27,6 +27,10 @@ cStaticText::cStaticText(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
 cStaticText::~cStaticText() {}
 
 void cStaticText::draw() {
+    if (_text.empty()) {
+        return;
+    }
+
     gdi().setPenColor(_textColor, _engine);
     gdi().textOutRect(position().x, position().y, size().x, size().y, _text.c_str(), selectedEngine(), _primaryFont ? font() : fontSecondary());
 }

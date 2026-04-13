@@ -114,6 +114,10 @@ cButtonDesc::~cButtonDesc() {
 }
 
 void cButtonDesc::draw(const cRect& area, GRAPHICS_ENGINE engine) const {
+    if (_button == NULL) {
+        return;
+    }
+
     const u32* pBuffer = NULL;
     u32 height = 0;
     if (_background.valid()) {
@@ -132,7 +136,10 @@ void cButtonDesc::draw(const cRect& area, GRAPHICS_ENGINE engine) const {
                       _button->selectedEngine());
     }
 
-    // 按半角字来算
+    if (_button->text().empty()) {
+        return;
+    }
+
     u32 textPixels = font().TextWidth(_button->text());
     u32 textX = 0, textY = area.position().y + ((area.size().y - SYSTEM_FONT_HEIGHT) >> 1) + 1;
     switch (_button->alignment()) {
@@ -162,17 +169,15 @@ void cButtonDesc::loadData(const std::string& filename) {
         height = _button->size().y;
     }
 
-    if (!_background.valid()) {
-        _background = createBMP15FromFile(filename);
-        if (_background.valid()) {
-            if (_button->style() == cButton::single) {
-                height = _background.height();
-            } else {
-                height = _background.height() / 2;
-            }
-                
-            _button->setSize(cSize(_background.width(), height));
+    _background = createBMP15FromFile(filename);
+    if (_background.valid()) {
+        if (_button->style() == cButton::single) {
+            height = _background.height();
+        } else {
+            height = _background.height() / 2;
         }
+            
+        _button->setSize(cSize(_background.width(), height));
     }
 }
 
