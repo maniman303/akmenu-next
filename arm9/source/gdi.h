@@ -35,12 +35,7 @@ class cGdi {
   public:
     void init();
 
-    void drawPixel(u8 x, u8 y, GRAPHICS_ENGINE engine) {
-        if (GE_MAIN == engine)
-            *(_bufferMain2 + ((u32)y << 8) + x + _layerPitch) = _penColor;
-        else
-            _bufferSub2[((u32)y << 8) + x] = _penColor;
-    }
+    void drawPixel(u8 x, u8 y, GRAPHICS_ENGINE engine);
 
     void drawLine(s16 x1, s16 y1, s16 x2, s16 y2, GRAPHICS_ENGINE engine);
 
@@ -69,10 +64,10 @@ class cGdi {
     void maskBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH,
                  GRAPHICS_ENGINE engine, u16 color);
 
-    void bitBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH,
+    void bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH,
                 GRAPHICS_ENGINE engine);
 
-    void bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH,
+    void bitBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH,
                 GRAPHICS_ENGINE engine);
 
     u16 getPenColor(GRAPHICS_ENGINE engine) {

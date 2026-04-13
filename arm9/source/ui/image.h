@@ -1,24 +1,27 @@
 #pragma once
 
 #include "window.h"
-#include "bitmapdesc.h"
+#include "bmp15.h"
 
 namespace akui {
     class cImage : public cWindow {
       public:
         cImage(cWindow* parent);
 
-        ~cImage();
+        cImage(cWindow* parent, cSize size, u16 color);
 
-        cWindow& loadAppearance(const std::string& aFileName);
+        ~cImage() override;
+
+        cWindow& loadAppearance(const std::string& aFileName) override;
 
         bool valid();
 
         void draw(s32 x, s32 y);
 
-        void draw();
+        void draw() override;
 
       protected:
-        cBitmapDesc _bitmapDesc;
+        u16 _color;
+        cBMP15 _background;
     };
 }

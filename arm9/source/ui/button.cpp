@@ -128,7 +128,7 @@ void cButtonDesc::draw(const cRect& area, GRAPHICS_ENGINE engine) const {
     }
 
     if (NULL != pBuffer) {
-        gdi().maskBlt(pBuffer, area.position().x, area.position().y, _background.width(), height,
+        gdi().bitBlt(pBuffer, area.position().x, area.position().y, _background.width(), height,
                       _button->selectedEngine());
     }
 

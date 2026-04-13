@@ -15,7 +15,7 @@
 
 class cBMP15 {
     friend cBMP15 createBMP15(u32 width, u32 height);
-    friend cBMP15 createBMP15(u32 width, u32 height, u32 color);
+    friend cBMP15 createBMP15(u32 width, u32 height, u16 color);
     friend cBMP15 createBMP15FromFile(const std::string& filename);
     friend void destroyBMP15(cBMP15& bmp);
 
@@ -56,7 +56,7 @@ class cBMP15 {
 };
 
 cBMP15 createBMP15(u32 width, u32 height);
-cBMP15 createBMP15(u32 width, u32 height, u32 color);
+cBMP15 createBMP15(u32 width, u32 height, u16 color);
 cBMP15 createBMP15FromFile(const std::string& filename);
 cBMP15 createBMP15FromMem(void* mem);
 // void destroyBMP15( cBMP15 * bmp );

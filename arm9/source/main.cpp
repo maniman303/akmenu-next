@@ -34,7 +34,7 @@
 #include "datetime.h"
 #include "batterymeter.h"
 #include "booticon.h"
-#include "screenoverlay.h"
+#include "image.h"
 
 #include "ticksound.h"
 #include "taskcruncher.h"
@@ -184,7 +184,9 @@ int main(int argc, char* argv[]) {
 
     progressWnd().init();
 
-    windowManager().addWindow(&screenOverlay());
+    cImage* background = new cImage(NULL, cSize(SCREEN_WIDTH, SCREEN_HEIGHT), 0xffff);
+
+    windowManager().addWindow(background);
 
     if (!fsManager().isRebooted() && gs().autorunWithLastRom && lastFile != "..." && !lastFile.empty()) {
         INPUT& inputs = updateInput();
@@ -208,7 +210,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    screenOverlay().loadAppearance(SFN_LOWER_SCREEN_BG);
+    background->loadAppearance(SFN_LOWER_SCREEN_BG);
 
     calendarWnd().init();
     calendar().init();
@@ -266,7 +268,7 @@ int main(int argc, char* argv[]) {
 
         irq().drawTop();
 
-        // logger().info("Ticks 2: " + std::to_string(timer().getTick()));
+        logger().info("Ticks: " + std::to_string(timer().getTick()));
 
         swiWaitForVBlank();
 

@@ -57,9 +57,10 @@ cBMP15 createBMP15(u32 width, u32 height) {
     return bmp;
 }
 
-cBMP15 createBMP15(u32 width, u32 height, u32 color) {
+cBMP15 createBMP15(u32 width, u32 height, u16 color) {
     cBMP15 bmp = createBMP15(width, height);
-    swiFastCopy((void*)(&color), bmp.buffer(), ((bmp.height() * bmp.pitch()) >> 2) | COPY_MODE_WORD | COPY_MODE_FILL);
+    u32 wideColor = color | (color << 16);
+    swiFastCopy((void*)(&wideColor), bmp.buffer(), ((bmp.height() * bmp.pitch()) >> 2) | COPY_MODE_WORD | COPY_MODE_FILL);
 
     return bmp;
 }

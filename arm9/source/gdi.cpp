@@ -67,6 +67,8 @@ static void MyInitConsole(u16* aBufferSub1, u16* aBufferSub2) {
 }
 #endif
 
+//TODO: compile as arm, not thumb
+
 cGdi::cGdi() {
     _transColor = 0;
     _mainEngineLayer = MEL_UP;
@@ -162,8 +164,26 @@ void cGdi::activeFbSub(void) {
     videoSetModeSub(MODE_5_2D | DISPLAY_BG2_ACTIVE);
 }
 
+static inline void putScreenPixel(u16* buffer, s16 x, s16 y, u16 color) {
+    if (x < 0 || x >= SCREEN_WIDTH || y < 0 || y >= SCREEN_HEIGHT) {
+        return;
+    }
+
+    buffer[y * 256 + x] = color;
+}
+
+void cGdi::drawPixel(u8 x, u8 y, GRAPHICS_ENGINE engine) {
+    u16* buffer = engine == GE_MAIN ? _bufferMain2 + _layerPitch : _bufferSub2;
+    u16 color = engine == GE_MAIN ? _penColor : _penColorSub;
+
+    putScreenPixel(buffer, x, y, color);
+}
+
 void cGdi::drawLine(s16 x1, s16 y1, s16 x2, s16 y2, GRAPHICS_ENGINE engine) {
     if ((x1 == x2) && (y1 == y2)) return;
+
+    u16* buffer = engine == GE_MAIN ? _bufferMain2 + _layerPitch : _bufferSub2;
+    u16 color = engine == GE_MAIN ? _penColor : _penColorSub;
 
     if (x1 == x2) {
         int ys, ye;
@@ -175,7 +195,7 @@ void cGdi::drawLine(s16 x1, s16 y1, s16 x2, s16 y2, GRAPHICS_ENGINE engine) {
             ye = y1;
         }
         for (int py = ys; py <= ye; py++) {
-            drawPixel(x1, py, engine);
+            putScreenPixel(buffer, x1, py, color);
         }
         return;
     }
@@ -212,7 +232,7 @@ void cGdi::drawLine(s16 x1, s16 y1, s16 x2, s16 y2, GRAPHICS_ENGINE engine) {
         yv = ye / abs(xe);
 
         while (px != xe) {
-            drawPixel(x1 + px, y1 + (int)py, engine);
+            putScreenPixel(buffer, x1 + px, y1 + (int)py, color);
             px += xv;
             py += yv;
         }
@@ -233,20 +253,12 @@ void cGdi::drawLine(s16 x1, s16 y1, s16 x2, s16 y2, GRAPHICS_ENGINE engine) {
         }
 
         while (py != ye) {
-            drawPixel(x1 + (int)px, y1 + py, engine);
+            putScreenPixel(buffer, x1 + (int)px, y1 + py, color);
             px += xv;
             py += yv;
         }
         return;
     }
-}
-
-static inline void putScreenPixel(u16* buffer, int x, int y, u16 color) {
-    if (x < 0 || x >= SCREEN_WIDTH || y < 0 || y >= SCREEN_HEIGHT) {
-        return;
-    }
-
-    buffer[y * 256 + x] = color;
 }
 
 void cGdi::drawRadiusLine(s16 sx, s16 sy, u16 width, u16 length, s16 degrees, u16 color, GRAPHICS_ENGINE engine) {
@@ -280,14 +292,10 @@ void cGdi::drawRadiusLine(s16 sx, s16 sy, u16 width, u16 length, s16 degrees, u1
     int yDir = -1;
 
     if (dx > sx || (dx >= sx && dy < sy)) {
-        // sy -= (width - 1);
-        // dy -= (width - 1);
         xDir = 1;
     }
 
     if (dy > sy || (dy >= sy && dx < sx)) {
-        // sx -= (width - 1);
-        // dx -= (width - 1);
         yDir = 1;
     }
 
@@ -336,16 +344,13 @@ void cGdi::frameRect(s16 x, s16 y, u16 w, u16 h, u16 thickness, GRAPHICS_ENGINE 
 }
 
 void cGdi::fillRect(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine) {
-    ALIGN(4) u16 color[2] = { (u16)(BIT(15) | color1), (u16)(BIT(15) | color2) };
-    ALIGN(4) u16 altColor[2] = { (u16)(BIT(15) | color2), (u16)(BIT(15) | color1) };
+    color1 = (u16)BIT(15) | color1;
+    color2 = (u16)BIT(15) | color2;
+    ALIGN(4) u16 color[2] = { color1, color2 };
+    ALIGN(4) u16 altColor[2] = { color2, color1 };
     u16* pSrc = (u16*)color;
     u16* pAltSrc = (u16*)altColor;
-    u16* pDest = NULL;
-
-    if (GE_MAIN == engine)
-        pDest = _bufferMain2 + (y << 8) + x + _layerPitch;
-    else
-        pDest = _bufferSub2 + (y << 8) + x;
+    u16* pDest = GE_MAIN == engine ? _bufferMain2 + (y << 8) + x + _layerPitch : _bufferSub2 + (y << 8) + x;
 
     bool destAligned = !(x & 1);
 
@@ -353,7 +358,7 @@ void cGdi::fillRect(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS
     u16 halfWidth = w >> 1;
     u16 remain = w & 1;
 
-    if (destAligned)
+    if (destAligned) {
         for (u32 i = 0; i < h; ++i) {
             u16* source = (i & 1) ? pSrc : pAltSrc;
             swiFastCopy(source, pDest, COPY_MODE_WORD | COPY_MODE_FILL | halfWidth);
@@ -364,13 +369,24 @@ void cGdi::fillRect(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS
 
             pDest += destInc;
         }
-    else
+    } else {
+        // logger().info("Slow fillRect.");
+
         for (u32 i = 0; i < h; ++i) {
+            u32 newColor = i & 1 ? ((u32)color1 << 16 | color2) : ((u32)color2 << 16 | color1);
+
             for (u32 j = 0; j < w; ++j) {
-                *pDest++ = pSrc[(j ^ i) & 1];
+                *(u32*)pDest = newColor;
+                pDest++;
             }
+
+            if (remain) {
+                *pDest++ = i & 1 ? color1 : color2;
+            }
+
             pDest += destInc;
         }
+    }
 }
 
 u16 cGdi::blendColors(u16 color, u16 dest, u16 src, u16 opacity) {
@@ -378,21 +394,21 @@ u16 cGdi::blendColors(u16 color, u16 dest, u16 src, u16 opacity) {
         return color;
     }
 
-    if ((dest & 0x8000) != 0) {
-        src = dest;
+    if ((dest & 0x8000) == 0) {
+        dest = src;
     }
 
     if (color == 0 || opacity <= 0) {
-        return src;
+        return dest;
     }
 
     const u32 alpha  = (static_cast<u32>(opacity) * 655u) >> 11u;
     const u32 invAlpha = 32u - alpha;
 
     const u32 rb = ((static_cast<u32>(color) & 0x7c1fu) * alpha
-                  + (static_cast<u32>(src)   & 0x7c1fu) * invAlpha) & 0xf83e0u;
+                  + (static_cast<u32>(dest)   & 0x7c1fu) * invAlpha) & 0xf83e0u;
     const u32 g  = ((static_cast<u32>(color) & 0x3e0u)  * alpha
-                  + (static_cast<u32>(src)   & 0x3e0u)  * invAlpha) & 0x7c00u;
+                  + (static_cast<u32>(dest)   & 0x3e0u)  * invAlpha) & 0x7c00u;
 
     return static_cast<u16>(((rb | g) >> 5u) | BIT(15));
 }
@@ -411,6 +427,8 @@ void cGdi::fillRectBlend(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRA
         return;
     }
 
+    // logger().info("Slow fillRectBlend.");
+
     u16* pSrc = ((GE_MAIN == engine) ? _bufferMain3 : _bufferSub2) + (y << 8) + x;
     u16* pDest = ((GE_MAIN == engine) ? (_bufferMain2 + _layerPitch) : _bufferSub2) + (y << 8) + x;
     u32 destInc = 256 - w;
@@ -428,69 +446,43 @@ void cGdi::fillRectBlend(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRA
     }
 }
 
-void cGdi::bitBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH,
-                  GRAPHICS_ENGINE engine) {
-    if (destW <= 0) return;
-
-    u16* pSrc = (u16*)src;
-    u16* pDest = NULL;
-
-    if (GE_MAIN == engine)
-        pDest = _bufferMain2 + (destY)*256 + destX + _layerPitch;
-    else
-        pDest = _bufferSub2 + (destY)*256 + destX;
-
-    bool destAligned = !(destX & 1);
-
-    if (destW > srcW) destW = srcW;
-    if (destH > srcH) destH = srcH;
-
-    u16 srcInc = srcW - destW;
-    u16 destInc = 256 - destW;
-    u16 destHalfWidth = destW >> 1;
-    u16 lineSize = destW << 1;
-    u16 remain = destW & 1;
-
-    if (destAligned) {
-        for (u32 i = 0; i < destH; ++i) {
-            dmaCopyWordsGdi(3, pSrc, pDest, lineSize);
-            pDest += destHalfWidth << 1;
-            pSrc += destHalfWidth << 1;
-            if (remain) *pDest++ = *pSrc++;
-            pDest += destInc;
-            pSrc += srcInc;
-        }
-    }
+void cGdi::bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH, GRAPHICS_ENGINE engine) {
+    bitBlt(src, destW, destH, destX, destY, destW, destH, engine);
 }
 
-void cGdi::bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH, GRAPHICS_ENGINE engine) {
+void cGdi::bitBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH, GRAPHICS_ENGINE engine) {
     u16* pSrc = (u16*)src;
     u16* pDest = (engine == GE_MAIN) ? 
                     (_bufferMain2 + (destY * 256) + destX + _layerPitch) : 
                     (_bufferSub2 + (destY * 256) + destX);
+
+    if (destW > srcW) destW = srcW;
+    if (destH > srcH) destH = srcH;
 
     u16 pitchPixel = (destW + (destW & 1));
     u16 destInc = 256 - pitchPixel;
     u16 halfPitch = pitchPixel >> 1;
 
     bool destAligned = !(destX & 1);
-    if (!destAligned) {
+    if (destAligned) {
         for (u16 i = 0; i < destH; ++i) {
-            swiCopy(pSrc, pDest, COPY_MODE_COPY | pitchPixel);
+            swiFastCopy(pSrc, pDest, COPY_MODE_WORD | COPY_MODE_COPY | halfPitch);
 
-            pDest += pitchPixel;
-            pSrc += pitchPixel;
+            pDest += halfPitch << 1;
+            pSrc += halfPitch << 1;
             pDest += destInc;
         }
 
         return;
     }
 
-    for (u16 i = 0; i < destH; ++i) {
-        swiFastCopy(pSrc, pDest, COPY_MODE_WORD | COPY_MODE_COPY | halfPitch);
+    // logger().info("Slow bitBlt.");
 
-        pDest += halfPitch << 1;
-        pSrc += halfPitch << 1;
+    for (u16 i = 0; i < destH; ++i) {
+        swiCopy(pSrc, pDest, COPY_MODE_COPY | pitchPixel);
+
+        pDest += pitchPixel;
+        pSrc += pitchPixel;
         pDest += destInc;
     }
 }
@@ -519,46 +511,23 @@ void cGdi::maskBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u1
     }
 
     u16* pSrc = (u16*)src;
-    u16* pDest = NULL;
-    
-    if (GE_MAIN == engine) {
-        pDest = _bufferMain2 + (destY)*256 + destX + _layerPitch;
-    } else {
-        pDest = _bufferSub2 + (destY)*256 + destX;
-    }
+    u16* pDest = GE_MAIN == engine ? _bufferMain2 + (destY)*256 + destX + _layerPitch : _bufferSub2 + (destY)*256 + destX;
 
     if (destW > srcW) destW = srcW;
     if (destH > srcH) destH = srcH;
 
-    u16 srcInc = srcW - destW;
-    u16 pitch = (destW + (destW & 1));
-    u16 destInc = 256 - pitch;
-    u16 halfPitch = pitch >> 1;
-    bool destAligned = !(destX & 1);
+    u16 srcInc = srcW & 1;
+    u16 destInc = 256 - destW;
+    u16 halfWidth = destW >> 1;
+    bool aligned = !(destX & 1);
+    bool remains = srcW & 1;
 
-    if (destAligned) {
-        for (u32 i = 0; i < destH; ++i) {
-            for (u32 j = 0; j < halfPitch; ++j) {
-                if (((*(u32*)pSrc) & 0x80008000) == 0x80008000) {
-                    u32 newValue = (color == 0 ? *(u32*)pSrc : (((u32)color << 16) | color));
-                    *(u32*)pDest = newValue;
-                    pSrc += 2;
-                    pDest += 2;
-                } else {
-                    if (*pSrc & 0x8000) *pDest = (color == 0 ? *pSrc : color);
-                    pSrc++;
-                    pDest++;
-                    if (*pSrc & 0x8000) *pDest = (color == 0 ? *pSrc : color);
-                    pSrc++;
-                    pDest++;
-                }
-            }
-            pDest += destInc;
-            pSrc += srcInc;
-        }
-    } else {
+    if (!aligned) {
+        // TODO: Fix performance here
+        logger().info("Slow maskBlt.");
+
         for (u16 i = 0; i < destH; ++i) {
-            for (u16 j = 0; j < pitch; ++j) {
+            for (u16 j = 0; j < destW; ++j) {
                 if (*pSrc & 0x8000) *pDest = color == 0 ? *pSrc : color;
                 pDest++;
                 pSrc++;
@@ -566,6 +535,35 @@ void cGdi::maskBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u1
             pDest += destInc;
             pSrc += srcInc;
         }
+
+        return;
+    }
+
+    for (u32 i = 0; i < destH; ++i) {
+        for (u32 j = 0; j < halfWidth; ++j) {
+            if (((*(u32*)pSrc) & 0x80008000) == 0x80008000) {
+                u32 newValue = (color == 0 ? *(u32*)pSrc : (((u32)color << 16) | color));
+                *(u32*)pDest = newValue;
+                pSrc += 2;
+                pDest += 2;
+            } else {
+                if (*pSrc & 0x8000) *pDest = (color == 0 ? *pSrc : color);
+                pSrc++;
+                pDest++;
+                if (*pSrc & 0x8000) *pDest = (color == 0 ? *pSrc : color);
+                pSrc++;
+                pDest++;
+            }
+        }
+
+        if (remains) {
+            if (*pSrc & 0x8000) *pDest = (color == 0 ? *pSrc : color);
+            pSrc++;
+            pDest++;
+        }
+
+        pSrc += srcInc;
+        pDest += destInc;
     }
 }
 
