@@ -369,23 +369,32 @@ void cGdi::fillRect(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS
 
             pDest += destInc;
         }
-    } else {
-        // logger().info("Slow fillRect.");
 
-        for (u32 i = 0; i < h; ++i) {
-            u32 newColor = i & 1 ? ((u32)color1 << 16 | color2) : ((u32)color2 << 16 | color1);
+        return;
+    }
 
-            for (u32 j = 0; j < w; ++j) {
-                *(u32*)pDest = newColor;
-                pDest++;
-            }
+    // logger().info("Slow fillRect.");
+    
+    remain = !remain;
+    if (remain) {
+        halfWidth--;
+    }
 
-            if (remain) {
-                *pDest++ = i & 1 ? color1 : color2;
-            }
+    for (u32 i = 0; i < h; i++) {
+        u32 newColor = i & 1 ? ((u32)color1 << 16 | color2) : ((u32)color2 << 16 | color1);
 
-            pDest += destInc;
+        *pDest++ = i & 1 ? color1 : color2;
+
+        for (u32 j = 0; j < halfWidth; ++j) {
+            *(u32*)pDest = newColor;
+            pDest += 2;
         }
+
+        if (remain) {
+            *pDest++ = i & 1 ? color1 : color2;
+        }
+
+        pDest += destInc;
     }
 }
 
@@ -524,7 +533,7 @@ void cGdi::maskBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u1
 
     if (!aligned) {
         // TODO: Fix performance here
-        logger().info("Slow maskBlt.");
+        // logger().info("Slow maskBlt.");
 
         for (u16 i = 0; i < destH; ++i) {
             for (u16 j = 0; j < destW; ++j) {
@@ -623,7 +632,7 @@ void cGdi::present(GRAPHICS_ENGINE engine) {
     } else if (GE_SUB == engine) {
         if (SEM_GRAPHICS == _subEngineMode)
             dmaCopyWordsGdi(3, (void*)_bufferSub2, (void*)_bufferSub1, 256 * 192 * 2);
-        fillMemory((void*)_bufferSub2, 0x18000, 0xffffffff);
+        // fillMemory((void*)_bufferSub2, 0x18000, 0xffffffff);
     }
 }
 
