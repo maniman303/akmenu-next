@@ -701,7 +701,6 @@ void cMainWnd::saveFileInfo(cRomInfoWnd* romInfoWnd) {
 }
 
 void cMainWnd::onFolderChanged() {
-    resetInputIdle();
     std::string dirShowName = _mainList->getCurrentDir();
     if (dirShowName == "favorites:/") {
         _folderText->setText(dirShowName);

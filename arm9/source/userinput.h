@@ -38,6 +38,4 @@ typedef struct T_INPUT {
 void initInput();
 INPUT& updateInput();
 INPUT& getInput();
-u32 getInputIdleMs();
-void resetInputIdle(void);
 bool processInput(INPUT& inputs);

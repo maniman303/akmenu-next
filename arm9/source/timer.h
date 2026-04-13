@@ -21,26 +21,15 @@ class cTimer {
   public:
     void initTimer();
 
-    double updateTimer();
-
-    double updateFps();
+    u32 updateTimer();
 
     u32 updateFrame();
-
-    double getFps();
-
-    double getTime();
 
     u32 getTick();
 
     u32 getFrame();
 
   private:
-    static void timerInterruptHandler();
-    double _lastTime;
-    double _currentTime;
-    static vu64 _overFlow;
-    const double _factor = 1.f / (33.514 * 1000000.f);
     double _fps;
     u32 _fpsCounter;
     u32 _ticks;

@@ -19,12 +19,8 @@ using namespace akui;
 
 static INPUT inputs;
 static INPUT lastInputs;
-static double lastInputTime;
-static u32 idleMs;
 
 void initInput() {
-    lastInputTime = 0;
-    idleMs = 0;
     keysSetRepeat(30, 1);
 }
 
@@ -61,12 +57,6 @@ INPUT& updateInput() {
     inputs.keysUp = keysUp();
     inputs.keysHeld = keysHeld();
     inputs.keysDownRepeat = keysDownRepeat();
-    if (lastInputs == inputs) {
-        idleMs = (u32)((timer().getTime() - lastInputTime) * 1000);
-    } else {
-        // dbg_printf( "input idled %d\n", idleMs );
-        resetInputIdle();
-    }
     lastInputs = inputs;
 
     return inputs;
@@ -74,15 +64,6 @@ INPUT& updateInput() {
 
 INPUT& getInput() {
     return inputs;
-}
-
-u32 getInputIdleMs() {
-    return idleMs;
-}
-
-void resetInputIdle(void) {
-    lastInputTime = timer().getTime();
-    idleMs = 0;
 }
 
 bool processInput(INPUT& inputs) {

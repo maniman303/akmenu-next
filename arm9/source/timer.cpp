@@ -9,47 +9,24 @@
 
 #include "timer.h"
 
-vu64 cTimer::_overFlow = 0;
 cTimer::cTimer() {
     // initTimer();
-}
-
-void cTimer::timerInterruptHandler() {
-    _overFlow += 65536;
 }
 
 void cTimer::initTimer() {
     _ticks = 0;
     _frames = 0;
-    _lastTime = 0;
-    _currentTime = 0;
-    _overFlow = 0;
     _fps = 0.f;
     _fpsCounter = 0;
-    irqEnable(IRQ_TIMER0);
-    irqSet(IRQ_TIMER0, cTimer::timerInterruptHandler);
-    TIMER0_DATA = 0;  // set reload value
-    TIMER0_CR = TIMER_ENABLE | TIMER_DIV_1 | TIMER_IRQ_REQ;
 }
 
-double cTimer::updateTimer() {
+u32 cTimer::updateTimer() {
     _ticks++;
     if (_ticks == UINT32_MAX) {
         _ticks = 0;
     }
 
-    _currentTime = (_overFlow + TIMER0_DATA) * _factor;
-    return _currentTime;
-}
-
-double cTimer::updateFps() {
-    if (_fpsCounter++ > 60) {
-        double elapsedTime = _currentTime - _lastTime;
-        _fps = _fpsCounter / elapsedTime;
-        _fpsCounter = 0;
-        _lastTime = _currentTime;
-    }
-    return _fps;
+    return _ticks;
 }
 
 u32 cTimer::updateFrame() {
@@ -58,18 +35,10 @@ u32 cTimer::updateFrame() {
     return _frames;
 }
 
-double cTimer::getTime() {
-    return _currentTime;
-}
-
 u32 cTimer::getTick() {
     return _ticks;
 }
 
 u32 cTimer::getFrame() {
     return _frames;
-}
-
-double cTimer::getFps() {
-    return _fps;
 }

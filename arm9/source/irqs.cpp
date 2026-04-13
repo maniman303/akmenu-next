@@ -82,12 +82,7 @@ void cIRQ::vBlank() {
         bigClock().blinkColon();
         smallClock().flipColon();
         batteryMeter().flipIcon();
-#if 0
-        char fpsText[16];
-        sprintf( fpsText, "fps %.2f\n", timer().getFps() );
-        gdi().setPenColor( 1, GE_SUB );
-        gdi().textOut( 40, 178, fpsText, GE_SUB );
-#endif
+
         if (_control) {
             drawTop();
 

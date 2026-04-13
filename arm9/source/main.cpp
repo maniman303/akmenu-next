@@ -225,8 +225,6 @@ int main(int argc, char* argv[]) {
     cMainWnd* wnd = new cMainWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, "main window");
     wnd->init();
 
-    timer().updateFps();
-
     irq().vblankStart();
 
     dbg_printf("lastDirectory '%s'\n", lastDirectory.c_str());
@@ -244,18 +242,27 @@ int main(int argc, char* argv[]) {
     }
 
     while (true) {
-        timer().updateFps();
+        nocashMessage(formatString("Ticks 1: %d.", timer().getTick()).c_str());
+
         timer().updateFrame();
+
+        nocashMessage(formatString("Ticks 2: %d.", timer().getTick()).c_str());
+
         tickSound().play();
 
         if (ticks == 0) {
             sd().update();
         }
 
-        // logger().info("Ticks 1: " + std::to_string(timer().getTick()));
+        nocashMessage(formatString("Ticks 3: %d.", timer().getTick()).c_str());
 
         INPUT& inputs = updateInput();
+
+        nocashMessage(formatString("Ticks 4: %d.", timer().getTick()).c_str());
+
         processInput(inputs);
+
+        nocashMessage(formatString("Ticks 5: %d.", timer().getTick()).c_str());
 
         if (ticks >= 14) {
             ticks = 0;
@@ -264,11 +271,16 @@ int main(int argc, char* argv[]) {
         }
         
         taskCruncher().process();
+
+        nocashMessage(formatString("Ticks 6: %d.", timer().getTick()).c_str());
+
         windowManager().update();
+
+        nocashMessage(formatString("Ticks 7: %d.", timer().getTick()).c_str());
 
         irq().drawTop();
 
-        logger().info("Ticks: " + std::to_string(timer().getTick()));
+        nocashMessage(formatString("Ticks 8: %d.", timer().getTick()).c_str());
 
         swiWaitForVBlank();
 

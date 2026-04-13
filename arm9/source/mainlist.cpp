@@ -876,7 +876,7 @@ void cMainList::updateActiveIcon(bool updateContent) {
 
     // do not show active icon when hold key to list files. Otherwise the icon will not show
     // correctly.
-    if (getInputIdleMs() > 1000 && VM_LIST != _viewMode && VM_LIST_ICON != _viewMode && allowAnimation &&
+    if (VM_LIST != _viewMode && VM_LIST_ICON != _viewMode && allowAnimation &&
         _romInfoList.size() && 0 == temp.keysHeld && gs().Animation) {
         if (!_activeIcon.visible()) {
             u8 backBuffer[32 * 32 * 2];
