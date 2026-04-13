@@ -108,7 +108,7 @@ class cGdi {
 
     void present(GRAPHICS_ENGINE engine);
 
-    void present(void);
+    void scheduleDrop();
 
 #ifdef DEBUG
     void switchSubEngineMode();
@@ -137,6 +137,7 @@ class cGdi {
 #endif
     cSprite* _sprites;
     cBMP15 _background;
+    bool _scheduleDrop;
 };
 
 typedef t_singleton<cGdi> cGdi_s;

@@ -123,8 +123,7 @@ namespace akui {
             (*it).window()->render();
         }
         gdi().setMainEngineLayer(MEL_UP);
-        update();
-        gdi().present();
+        gdi().scheduleDrop();
         return *this;
     }
 

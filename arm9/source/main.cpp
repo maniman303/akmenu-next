@@ -254,8 +254,6 @@ int main(int argc, char* argv[]) {
 
         // logger().info("Ticks 1: " + std::to_string(timer().getTick()));
 
-        // swiWaitForVBlank();
-
         INPUT& inputs = updateInput();
         processInput(inputs);
 
@@ -276,6 +274,8 @@ int main(int argc, char* argv[]) {
         }
 
         // logger().info("Ticks 2: " + std::to_string(timer().getTick()));
+
+        swiWaitForVBlank();
 
         gdi().present(GE_SUB);
         gdi().present(GE_MAIN);

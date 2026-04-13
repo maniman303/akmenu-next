@@ -77,6 +77,7 @@ cGdi::cGdi() {
     _bufferSub3 = NULL;
 #endif
     _sprites = NULL;
+    _scheduleDrop = false;
 }
 
 cGdi::~cGdi() {
@@ -156,7 +157,7 @@ void cGdi::activeFbMain(void) {
     REG_BG3X = 0;
 
     _bufferMain1 = (u16*)0x06000000;
-    _bufferMain2 = (u16*)new u32[256 * 192];
+    _bufferMain2 = (u16*)new u16[256 * 192 * 2];
     _bufferMain3 = (u16*)0x06020000;
 
     setMainEngineLayer(MEL_UP);
@@ -164,8 +165,8 @@ void cGdi::activeFbMain(void) {
     zeroMemory(_bufferMain1, 0x20000);
     fillMemory(_bufferMain3, 0x20000, 0xffffffff);
 
-    REG_BLDCNT = BLEND_ALPHA | BLEND_DST_BG2 | BLEND_DST_BG3;
-    REG_BLDALPHA = (4 << 8) | 7;
+    // REG_BLDCNT = BLEND_ALPHA | BLEND_DST_BG2 | BLEND_DST_BG3;
+    // REG_BLDALPHA = (4 << 8) | 7;
 
     swiWaitForVBlank();  // remove tearing at bottop screen
     videoSetMode(MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE |
@@ -655,47 +656,27 @@ s16 cGdi::textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENG
 }
 
 void cGdi::present(GRAPHICS_ENGINE engine) {
-    if (GE_MAIN == engine) {  // 翻转主引擎
-
-        dmaCopyWordsGdi(3, _bufferMain2 + _layerPitch, _bufferMain1 + (_mainEngineLayer << 16),
-                        256 * 192 * 2);
-
-        fillMemory((void*)(_bufferMain2 + _layerPitch), 256 * 192 * 2, 0);
+    if (GE_MAIN == engine) {
+        if (_scheduleDrop) {
+            dmaCopyWordsGdi(3, _bufferMain2 + (256 * 192), _bufferMain3, 256 * 192 * 2);
+            swiWaitForVBlank();
+            dmaCopyWordsGdi(3, _bufferMain2, _bufferMain1, 256 * 192 * 2);
+            fillMemory((void*)_bufferMain2, 256 * 192 * 4, 0);
+            _scheduleDrop = false;
+        } else {
+            dmaCopyWordsGdi(3, _bufferMain2 + _layerPitch, _mainEngineLayer == 0 ? _bufferMain1 : _bufferMain3, 256 * 192 * 2);
+            fillMemory((void*)(_bufferMain2 + _layerPitch), 256 * 192 * 2, 0);
+        }     
 
         oamUpdate(&oamMain);
 
-    } else if (GE_SUB == engine) {  // 翻转副引擎
+    } else if (GE_SUB == engine) {
         if (SEM_GRAPHICS == _subEngineMode)
             dmaCopyWordsGdi(3, (void*)_bufferSub2, (void*)_bufferSub1, 256 * 192 * 2);
         fillMemory((void*)_bufferSub2, 0x18000, 0xffffffff);
     }
 }
 
-// special version for window switching
-void cGdi::present(void) {
-    swiWaitForVBlank();
-    dmaCopyWordsGdi(3, _bufferMain2, _bufferMain1, 256 * 192 * 2);
-    dmaCopyWordsGdi(3, _bufferMain2 + (256 * 192), _bufferMain1 + (1 << 16), 256 * 192 * 2);
-    fillMemory((void*)_bufferMain2, 256 * 192 * 4, 0);
+void cGdi::scheduleDrop() {
+    _scheduleDrop = true;
 }
-
-#ifdef DEBUG
-void cGdi::switchSubEngineMode() {
-    // 需要保存和恢复文本模式的现场
-    switch (_subEngineMode) {
-        case SEM_GRAPHICS:  // 当前是图形模式的话，就恢复刚才的text现场
-            videoSetModeSub(MODE_5_2D | DISPLAY_BG0_ACTIVE);
-            custom_console.fontBgMap = (u16*)0x6204000;
-            custom_console.fontBgGfx = (u16*)0x6200000;
-            dmaCopyWordsGdi(3, (void*)_bufferSub3, (void*)_bufferSub1, 0x4800);
-            break;
-        case SEM_TEXT:  // 当前是文字模式的话，保存现场，切到图形模式
-            videoSetModeSub(MODE_5_2D | DISPLAY_BG2_ACTIVE);
-            custom_console.fontBgMap = _bufferSub3 + 0x2000;
-            custom_console.fontBgGfx = _bufferSub3;
-            dmaCopyWordsGdi(3, (void*)_bufferSub1, (void*)_bufferSub3, 0x4800);
-            break;
-    };
-    _subEngineMode = (SUB_ENGINE_MODE)(_subEngineMode ^ 1);
-}
-#endif
