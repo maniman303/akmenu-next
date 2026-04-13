@@ -23,14 +23,16 @@ class cTimer {
 
     u32 updateTimer();
 
-    u32 updateFrame();
+    u32 updateFrames();
 
     u32 getTick();
 
     u32 getFrame();
 
+    u32 getFps();
+
   private:
-    double _fps;
+    u16 _fps;
     u32 _fpsCounter;
     u32 _ticks;
     u32 _frames;

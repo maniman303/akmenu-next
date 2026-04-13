@@ -34,6 +34,7 @@
 #include "datetime.h"
 #include "batterymeter.h"
 #include "booticon.h"
+#include "fpscounter.h"
 #include "image.h"
 
 #include "ticksound.h"
@@ -222,6 +223,8 @@ int main(int argc, char* argv[]) {
     smallDate().init();
     smallClock().init();
 
+    fpsCounter().init();
+
     cMainWnd* wnd = new cMainWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, "main window");
     wnd->init();
 
@@ -234,8 +237,6 @@ int main(int argc, char* argv[]) {
         wnd->_mainList->selectRom(lastFile);
     }
 
-    u16 ticks = 0;
-
     *(u32*)(0xCFFFD0C) = 0x454D4D43;
     while (*(u32*)(0xCFFFD0C) != 0) {
         swiDelay(100);
@@ -244,13 +245,13 @@ int main(int argc, char* argv[]) {
     while (true) {
         nocashMessage(formatString("Ticks 1: %d.", timer().getTick()).c_str());
 
-        timer().updateFrame();
+        timer().updateFrames();
 
         nocashMessage(formatString("Ticks 2: %d.", timer().getTick()).c_str());
 
         tickSound().play();
 
-        if (ticks == 0) {
+        if (timer().getFrame() % 15 == 0) {
             sd().update();
         }
 
@@ -263,12 +264,6 @@ int main(int argc, char* argv[]) {
         processInput(inputs);
 
         nocashMessage(formatString("Ticks 5: %d.", timer().getTick()).c_str());
-
-        if (ticks >= 14) {
-            ticks = 0;
-        } else {
-            ticks++;
-        }
         
         taskCruncher().process();
 
@@ -282,7 +277,7 @@ int main(int argc, char* argv[]) {
 
         nocashMessage(formatString("Ticks 8: %d.", timer().getTick()).c_str());
 
-        swiWaitForVBlank();
+        // swiWaitForVBlank();
 
         gdi().present(GE_SUB);
         gdi().present(GE_MAIN);

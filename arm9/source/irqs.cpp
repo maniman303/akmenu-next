@@ -22,6 +22,7 @@
 #include "timer.h"
 #include "userinput.h"
 #include "userwnd.h"
+#include "fpscounter.h"
 #include "logger.h"
 #include "windowmanager.h"
 
@@ -68,6 +69,7 @@ void cIRQ::drawTop() {
     smallDate().draw();
     smallClock().draw();
     userWindow().draw();
+    fpsCounter().draw();
 }
 
 void cIRQ::vBlank() {

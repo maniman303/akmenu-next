@@ -617,6 +617,7 @@ s16 cGdi::textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENG
 void cGdi::present(GRAPHICS_ENGINE engine) {
     if (GE_MAIN == engine) {
         if (_scheduleDrop) {
+            nocashMessage("Dropping background");
             dmaCopyWordsGdi(3, _bufferMain2, _bufferMain1, 256 * 192 * 2);
             swiWaitForVBlank();
             dmaCopyWordsGdi(3, _bufferMain2 + (256 * 192), _bufferMain3, 256 * 192 * 2);

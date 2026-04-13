@@ -10,14 +10,14 @@
 #include "timer.h"
 
 cTimer::cTimer() {
-    // initTimer();
+    initTimer();
 }
 
 void cTimer::initTimer() {
     _ticks = 0;
     _frames = 0;
-    _fps = 0.f;
     _fpsCounter = 0;
+    _fps = 0;
 }
 
 u32 cTimer::updateTimer() {
@@ -29,8 +29,16 @@ u32 cTimer::updateTimer() {
     return _ticks;
 }
 
-u32 cTimer::updateFrame() {
+u32 cTimer::updateFrames() {
     _frames++;
+    if (_fpsCounter == 0) {
+        _fpsCounter = _ticks;
+        return _frames;
+    }
+
+    u32 diff = _ticks - _fpsCounter;
+    _fps = 60 / diff;
+    _fpsCounter = _ticks;
 
     return _frames;
 }
@@ -41,4 +49,8 @@ u32 cTimer::getTick() {
 
 u32 cTimer::getFrame() {
     return _frames;
+}
+
+u32 cTimer::getFps() {
+    return _fps;
 }

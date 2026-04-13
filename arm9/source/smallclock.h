@@ -1,7 +1,5 @@
 #pragma once
 
-#include <chrono>
-#include "bmp15.h"
 #include "datetime.h"
 #include "point.h"
 #include "singleton.h"
@@ -9,7 +7,7 @@
 
 using namespace akui;
 
-class cSmallClock : public akui::cWindow {
+class cSmallClock : public cWindow {
   public:
     cSmallClock();
 
@@ -22,7 +20,7 @@ class cSmallClock : public akui::cWindow {
 
     void flipColon();
 
-    akui::cWindow& loadAppearance(const std::string& aFileName) { return *this; }
+    cWindow& loadAppearance(const std::string& aFileName) { return *this; }
 
   protected:
     u16 _textColor;
