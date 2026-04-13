@@ -35,8 +35,6 @@ class cGdi {
   public:
     void init();
 
-    void initBg(const std::string& aFileName, bool refresh);
-
     void drawPixel(u8 x, u8 y, GRAPHICS_ENGINE engine) {
         if (GE_MAIN == engine)
             *(_bufferMain2 + ((u32)y << 8) + x + _layerPitch) = _penColor;
@@ -109,7 +107,6 @@ class cGdi {
     void present(GRAPHICS_ENGINE engine);
 
     void scheduleDrop();
-
 #ifdef DEBUG
     void switchSubEngineMode();
 #endif
@@ -136,7 +133,6 @@ class cGdi {
     u16* _bufferSub3;
 #endif
     cSprite* _sprites;
-    cBMP15 _background;
     bool _scheduleDrop;
 };
 

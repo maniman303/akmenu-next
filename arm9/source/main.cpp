@@ -182,8 +182,9 @@ int main(int argc, char* argv[]) {
         saveSram();
     }
 
-    gdi().initBg("", true);
     progressWnd().init();
+
+    windowManager().addWindow(&screenOverlay());
 
     if (!fsManager().isRebooted() && gs().autorunWithLastRom && lastFile != "..." && !lastFile.empty()) {
         INPUT& inputs = updateInput();
@@ -192,8 +193,6 @@ int main(int argc, char* argv[]) {
             autoLaunchRom(lastFile, []() {
                 runAutoLoop = false;
             });
-
-            windowManager().addWindow(&screenOverlay());
 
             while (runAutoLoop) {
                 swiWaitForVBlank();
@@ -209,7 +208,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    windowManager().removeWindow(&screenOverlay());
+    screenOverlay().loadAppearance(SFN_LOWER_SCREEN_BG);
 
     calendarWnd().init();
     calendar().init();
@@ -236,7 +235,6 @@ int main(int argc, char* argv[]) {
     }
 
     u16 ticks = 0;
-    bool isBgInit = false;
 
     *(u32*)(0xCFFFD0C) = 0x454D4D43;
     while (*(u32*)(0xCFFFD0C) != 0) {
@@ -267,11 +265,6 @@ int main(int argc, char* argv[]) {
         windowManager().update();
 
         irq().drawTop();
-
-        if (!isBgInit) {
-            gdi().initBg(SFN_LOWER_SCREEN_BG, false);
-            isBgInit = true;
-        }
 
         // logger().info("Ticks 2: " + std::to_string(timer().getTick()));
 

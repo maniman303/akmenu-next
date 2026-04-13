@@ -10,7 +10,7 @@ class cScreenOverlay : public akui::cWindow {
   public:
     void draw() override;
 
-    akui::cWindow& loadAppearance(const std::string& aFileName) override { return *this; }
+    akui::cWindow& loadAppearance(const std::string& aFileName) override;
 
   protected:
     cBMP15 _background;

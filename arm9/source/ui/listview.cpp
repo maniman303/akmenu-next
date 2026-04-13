@@ -151,15 +151,7 @@ namespace akui {
         s16 w = _size.x + 4;
         s16 h = _rowHeight;
 
-        // gdi().setPenColor( _selectionBarColor );
-        for (u8 i = 0; i < h; ++i) {
-            if (i & 1)
-                gdi().fillRectBlend(_selectionBarColor1, _selectionBarColor2, x, y + i, w, 1, _engine,
-                                    _selectionBarOpacity);
-            else
-                gdi().fillRectBlend(_selectionBarColor2, _selectionBarColor1, x, y + i, w, 1, _engine,
-                                    _selectionBarOpacity);
-        }
+        gdi().fillRectBlend(_selectionBarColor1, _selectionBarColor2, x, y, w, h, _engine, _selectionBarOpacity);
     }
 
     void cListView::drawText() {

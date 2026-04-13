@@ -96,40 +96,6 @@ void cGdi::init() {
     cSprite::sysinit();
 }
 
-void cGdi::initBg(const std::string& aFileName, bool refresh) {
-    if (_sprites != NULL) {
-        delete[] _sprites;
-    }
-
-    _sprites = new cSprite[12];
-    _background = createBMP15FromFile(aFileName);
-    if (!_background.valid() || (_background.width() < SCREEN_WIDTH && _background.height() < SCREEN_WIDTH)) {
-        _background = createBMP15(SCREEN_WIDTH, SCREEN_HEIGHT, 0xffffffff);
-    }
-    u32 pitch = _background.pitch() >> 1;
-    for (size_t ii = 0; ii < 3; ++ii) {
-        for (size_t jj = 0; jj < 4; ++jj) {
-            size_t index = ii * 4 + jj;
-            _sprites[index].init(2 + index);
-            _sprites[index].setSize(SS_SIZE_64);
-            _sprites[index].setPriority(3);
-            _sprites[index].setBufferOffset(32 + index * 64);
-            _sprites[index].setPosition(jj * 64, ii * 64);
-            for (size_t kk = 0; kk < 64; ++kk) {
-                for (size_t ll = 0; ll < 64; ++ll) {
-                    ((u16*)_sprites[index].buffer())[kk * 64 + ll] =
-                            ((u16*)_background.buffer())[(kk + ii * 64) * pitch + (ll + jj * 64)];
-                }
-            }
-            _sprites[index].show();
-        }
-    }
-
-    if (refresh) {
-        oamUpdate(&oamMain);
-    }
-}
-
 void cGdi::swapLCD(void) {
     lcdSwap();
 }
@@ -174,15 +140,7 @@ void cGdi::activeFbMain(void) {
 }
 
 void cGdi::activeFbSub(void) {
-#ifdef DEBUG
-    _bufferSub3 = (u16*)new u32[0x1200];
-    MyInitConsole(_bufferSub3 + 0x2000, _bufferSub3);
-#endif
-
-    // 分配显存存， 128k
     vramSetBankC(VRAM_C_SUB_BG_0x06200000);  // 128k
-
-    // 初始化为文字模式
     _subEngineMode = SEM_GRAPHICS;
 
     // BMP bg 的参数设置，从 VRAM地址 0x06200000 开始，优先级3
@@ -200,19 +158,7 @@ void cGdi::activeFbSub(void) {
     fillMemory(_bufferSub2, 0x18000, 0xffffffff);
     fillMemory(_bufferSub1, 0x18000, 0xffffffff);
 
-    // text BG
-    // text bg 的字模占用 32(字节/字模) * 256(个ascii字) = 8192 字节显存，
-    // 文字显示占用 32 x 32 * 2 = 2048 字节显存
-    // 字模从 block 8 开始 = 0x06200000 + 8 * 0x4000      = 0x06220000
-    // 文字信息从 block 72 开始 = 0x06200000 + 72 * 0x800 = 0x06224000
-    // 优先级 2
-#ifdef DEBUG
-    BG_PALETTE_SUB[255] = RGB15(31, 31, 31);  // by default font will be rendered with color 255
-    REG_BG0CNT_SUB = BG_TILE_BASE(0) | BG_MAP_BASE(8) | BG_PRIORITY_2;
-#endif
-
-    swiWaitForVBlank();  // remove tearing at top screen
-    // 模式5，开两层BG，一层BMP，一层文字(用于调试)，bmp层现在默认关闭
+    swiWaitForVBlank();
     videoSetModeSub(MODE_5_2D | DISPLAY_BG2_ACTIVE);
 }
 
@@ -412,7 +358,10 @@ void cGdi::fillRect(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS
             u16* source = (i & 1) ? pSrc : pAltSrc;
             swiFastCopy(source, pDest, COPY_MODE_WORD | COPY_MODE_FILL | halfWidth);
             pDest += halfWidth << 1;
-            if (remain) *pDest++ = *source;
+            if (remain) {
+                *pDest++ = *source;
+            }
+
             pDest += destInc;
         }
     else
@@ -448,8 +397,7 @@ u16 cGdi::blendColors(u16 color, u16 dest, u16 src, u16 opacity) {
     return static_cast<u16>(((rb | g) >> 5u) | BIT(15));
 }
 
-void cGdi::fillRectBlend(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine,
-                         u16 opacity) {
+void cGdi::fillRectBlend(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine, u16 opacity) {
     if (opacity <= 0) {
         return;
     }
@@ -459,7 +407,11 @@ void cGdi::fillRectBlend(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRA
         return;
     }
 
-    u16* pSrc = ((GE_MAIN == engine) ? (u16*)_background.buffer() : _bufferSub2) + (y << 8) + x;
+    if (color1 == 0 || color2 == 0) {
+        return;
+    }
+
+    u16* pSrc = ((GE_MAIN == engine) ? _bufferMain3 : _bufferSub2) + (y << 8) + x;
     u16* pDest = ((GE_MAIN == engine) ? (_bufferMain2 + _layerPitch) : _bufferSub2) + (y << 8) + x;
     u32 destInc = 256 - w;
     for (u32 ii = 0; ii < h; ++ii) {
@@ -658,9 +610,9 @@ s16 cGdi::textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENG
 void cGdi::present(GRAPHICS_ENGINE engine) {
     if (GE_MAIN == engine) {
         if (_scheduleDrop) {
-            dmaCopyWordsGdi(3, _bufferMain2 + (256 * 192), _bufferMain3, 256 * 192 * 2);
-            swiWaitForVBlank();
             dmaCopyWordsGdi(3, _bufferMain2, _bufferMain1, 256 * 192 * 2);
+            swiWaitForVBlank();
+            dmaCopyWordsGdi(3, _bufferMain2 + (256 * 192), _bufferMain3, 256 * 192 * 2);
             fillMemory((void*)_bufferMain2, 256 * 192 * 4, 0);
             _scheduleDrop = false;
         } else {
