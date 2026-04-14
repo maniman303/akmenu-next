@@ -575,8 +575,6 @@ void ITCM_FUNC(cGdi::bitBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s16
                 *(pDest + 1 + (2 * j)) = temp2;
             } else if (aligned && even && (destW != 0)) {
                 swiFastCopy(pSrc, pDest + (j * destW), COPY_MODE_WORD | COPY_MODE_COPY | halfPitch);
-            // } else if (destW <= 8) {
-            //     memcpy(pDest + (j * destW), pSrc, destW * sizeof(u16));
             } else {
                 swiCopy(pSrc, pDest + (j * destW), COPY_MODE_COPY | destW);
             }
@@ -681,12 +679,6 @@ void ITCM_FUNC(cGdi::maskBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s1
                 continue;
             }
             
-            // if (length <= 8) {
-            //     memcpy(destOffset + start, srcOffset + start, length * sizeof(u16));
-            //     length = 0;
-            //     continue;
-            // }
-            
             if ((((u32)srcOffset + start) & 1) || (((u32)destOffset + start) & 1) || (length & 1)) {
                 swiCopy(srcOffset + start, destOffset + start, COPY_MODE_COPY | length);
                 length = 0;
@@ -712,11 +704,6 @@ void ITCM_FUNC(cGdi::maskBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s1
             *(destOffset + start) = *(srcOffset + start);
             continue;
         }
-        
-        // if (length <= 8) {
-        //     memcpy(destOffset + start, srcOffset + start, length * sizeof(u16));
-        //     continue;
-        // }
         
         if ((((u32)srcOffset + start) & 1) || (((u32)destOffset + start) & 1) || (length & 1)) {
             swiCopy(srcOffset + start, destOffset + start, COPY_MODE_COPY | length);
