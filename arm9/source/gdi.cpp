@@ -647,11 +647,7 @@ void ITCM_FUNC(cGdi::maskBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s1
 
     if (hasColorOverride) {
         u32 color32 = ((u32)color << 16) | color;
-        for (u16 i = srcOffsetY; i < destH; ++i) {
-            asm volatile("pld [%0]"       :: "r"(pSrc + srcW));
-            asm volatile("pld [%0, #32]"  :: "r"(pSrc + srcW));
-            asm volatile("pld [%0]"       :: "r"(pDest + 256));
-            
+        for (u16 i = srcOffsetY; i < destH; ++i) {            
             pSrc += srcOffsetX;
 
             if (!aligned) {
@@ -697,11 +693,8 @@ void ITCM_FUNC(cGdi::maskBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s1
             pSrc += srcInc;
         }
     } else {
+        // TODO: Try implement space scanning
         for (u16 i = srcOffsetY; i < destH; ++i) {
-            asm volatile("pld [%0]"       :: "r"(pSrc + srcW));
-            asm volatile("pld [%0, #32]"  :: "r"(pSrc + srcW));
-            asm volatile("pld [%0]"       :: "r"(pDest + 256));
-            
             pSrc += srcOffsetX;
 
             if (!aligned) {
