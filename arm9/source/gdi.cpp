@@ -492,7 +492,7 @@ void ITCM_FUNC(cGdi::fillRectBlend)(u16 color1, u16 color2, s16 x, s16 y, u16 w,
 }
 
 void cGdi::bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH, GRAPHICS_ENGINE engine) {
-    bitBlt(src, destW, destH, destX, destY, destW, destH, engine);
+    bitBlt(src, destX, destY, destW, destH, 1, engine);
 }
 
 void cGdi::bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH, u16 repeats, GRAPHICS_ENGINE engine) {
@@ -507,20 +507,20 @@ ARM_CODE LIBNDS_NOINLINE
 void ITCM_FUNC(cGdi::bitBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH, u16 repeats, GRAPHICS_ENGINE engine) {
     u16* pSrc = (u16*)src;
     u16* pDest = (engine == GE_MAIN) ? 
-                    (_bufferMain2 + (destY * 256) + destX + _layerPitch) : 
-                    (_bufferSub2 + (destY * 256) + destX);
+                    (_bufferMain2 + _layerPitch) : 
+                    _bufferSub2;
 
     if (destW > srcW) destW = srcW;
     if (destH > srcH) destH = srcH;
 
     if (destX + destW >= SCREEN_WIDTH) {
-        s16 diff = destX + destW - SCREEN_WIDTH;
-        destW -= diff;
+        s16 diff = destX + (u16)destW - SCREEN_WIDTH;
+        destW -= (u16)diff;
     }
 
     if (destY + destH >= SCREEN_HEIGHT) {
-        s16 diff = destY + destH - SCREEN_HEIGHT;
-        destH -= diff;
+        s16 diff = destY + (u16)destH - SCREEN_HEIGHT;
+        destH -= (u16)diff;
     }
 
     u16 srcOffsetX = 0;
@@ -545,16 +545,16 @@ void ITCM_FUNC(cGdi::bitBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s16
 
     u16 pitchPixel = (destW + (destW & 1));
     u16 halfPitch = pitchPixel >> 1;
-    u16 destInc = 256 - pitchPixel;
     bool aligned = !(destX & 1) && !(srcOffsetX & 1);
     bool even = !(destW & 1);
 
     u16 temp1 = 0;
     u16 temp2 = 0;
 
-    for (u16 i = srcOffsetY; i < destH; ++i) {
-        pSrc += srcOffsetX;
+    pDest += (destY * SCREEN_WIDTH) + destX;
+    pSrc += srcOffsetX + (pitchPixel * srcOffsetY);
 
+    for (u16 i = 0; i < destH; i++) {
         switch (destW) {
           case 1:
             temp1 = *pSrc;
@@ -562,6 +562,8 @@ void ITCM_FUNC(cGdi::bitBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s16
           case 2:
             temp1 = *pSrc;
             temp2 = *(pSrc + 1);
+            break;
+          default:
             break;
         }
 
@@ -571,17 +573,17 @@ void ITCM_FUNC(cGdi::bitBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s16
             } else if (destW == 2) {
                 *(pDest + (2 * j)) = temp1;
                 *(pDest + 1 + (2 * j)) = temp2;
-            } else if (aligned && even) {
+            } else if (aligned && even && (destW != 0)) {
                 swiFastCopy(pSrc, pDest + (j * destW), COPY_MODE_WORD | COPY_MODE_COPY | halfPitch);
+            } else if (destW <= 8) {
+                memcpy(pDest + (j * destW), pSrc, destW * sizeof(u16));
             } else {
-                //memcpy(pDest + (j * destW), pSrc, destW * sizeof(u16));
                 swiCopy(pSrc, pDest + (j * destW), COPY_MODE_COPY | destW);
             }
         }
         
-        pDest += pitchPixel;
         pSrc += pitchPixel;
-        pDest += destInc;
+        pDest += SCREEN_WIDTH;
     }
 }
 
@@ -603,8 +605,8 @@ void ITCM_FUNC(cGdi::maskBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s1
                    GRAPHICS_ENGINE engine, u16 color) {
     u16* pSrc = (u16*)src;
     u16* pDest = GE_MAIN == engine ?
-        _bufferMain2 + (destY)*256 + destX + _layerPitch :
-        _bufferSub2 + (destY)*256 + destX;
+        _bufferMain2 + _layerPitch :
+        _bufferSub2;
 
     if (destW > srcW) destW = srcW;
     if (destH > srcH) destH = srcH;
@@ -637,108 +639,60 @@ void ITCM_FUNC(cGdi::maskBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s1
         return;
     }
 
-    bool aligned = !(destX & 1);
-    bool remains = (destX ^ srcW) & 1;
-    u16 srcInc = srcW & 1;
-    u16 destInc = 256 - destW;
-    u16 halfWidth = (destW - (aligned ? 0 : 1)) >> 1;
+    u16 pitch = srcW + (srcW & 1);
+    bool colorOverride = color != 0;
 
-    bool hasColorOverride = color != 0;
-
-    if (hasColorOverride) {
-        u32 color32 = ((u32)color << 16) | color;
-        for (u16 i = srcOffsetY; i < destH; ++i) {            
-            pSrc += srcOffsetX;
-
-            if (!aligned) {
-                if (*pSrc & 0x8000) *pDest = color;
-                pDest++;
-                pSrc++;
-            }
-
-            for (u16 j = 0; j < halfWidth; ++j) {
-                if (aligned && ((*(u32*)pSrc) & 0x80008000) == 0x80008000) {
-                    u32 newValue = color32;
-                    *(u32*)pDest = newValue;
-                    pSrc += 2;
-                    pDest += 2;
-                    continue;
-                }
-                
-                u16 first = *pSrc;
-                u16 second = *(pSrc + 1);
-                if (!aligned && (first & 0x8000) && (second & 0x8000)) {
-                    u32 newValue = color32;
-                    *(u32*)pDest = newValue;
-                    pSrc += 2;
-                    pDest += 2;
-                    continue;
+    for (u16 i = 0; i < destH; i++) {
+        u16* srcOffset = pSrc + srcOffsetX + (i + srcOffsetY) * pitch;
+        u16* destOffset = pDest + destX + (i + destY) * SCREEN_WIDTH;
+        u16 start = 0;
+        u16 length = 0;
+        for (u16 k = 0; k < destW; k++) {
+            u16 srcPixel = *(srcOffset + k);
+            if (srcPixel & 0x8000) {
+                if (length == 0) {
+                    start = k;
                 }
 
-                if (first & 0x8000) *pDest = color;
-                pDest++;
-                pSrc++;
-                if (second & 0x8000) *pDest = color;
-                pDest++;
-                pSrc++;
+                length++;
+                continue;
             }
 
-            if (remains) {
-                if (*pSrc & 0x8000) *pDest = color;
-                pSrc++;
-                pDest++;
+            if (length == 0) {
+                continue;
+            } else if (colorOverride) {
+                for (u16 l = 0; l < length; l++) {
+                    *(destOffset + start + l) = color;
+                }
+            } else if (length == 1) {
+                *(destOffset + start) = *(srcOffset + start);
+                length = 0;
+                continue;
+            } else if (length <= 8) {
+                memcpy(destOffset + start, srcOffset + start, length * sizeof(u16));
+                length = 0;
+                continue;
             }
 
-            pDest += destInc;
-            pSrc += srcInc;
+            swiCopy(srcOffset + start, destOffset + start, COPY_MODE_COPY | length);
+            length = 0;
         }
-    } else {
-        // TODO: Try implement space scanning
-        for (u16 i = srcOffsetY; i < destH; ++i) {
-            pSrc += srcOffsetX;
 
-            if (!aligned) {
-                if (*pSrc & 0x8000) *pDest = *pSrc;
-                pDest++;
-                pSrc++;
+        if (length == 0) {
+            continue;
+        } else if (colorOverride) {
+            for (u16 l = 0; l < length; l++) {
+                *(destOffset + start + l) = color;
             }
-
-            for (u16 j = 0; j < halfWidth; ++j) {
-                if (aligned && ((*(u32*)pSrc) & 0x80008000) == 0x80008000) {
-                    u32 newValue = *(u32*)pSrc;
-                    *(u32*)pDest = newValue;
-                    pSrc += 2;
-                    pDest += 2;
-                    continue;
-                }
-                
-                u16 first = *pSrc;
-                u16 second = *(pSrc + 1);
-                if (!aligned && (first & 0x8000) && (second & 0x8000)) {
-                    u32 newValue = (((u32)second << 16) | first);
-                    *(u32*)pDest = newValue;
-                    pSrc += 2;
-                    pDest += 2;
-                    continue;
-                }
-
-                if (first & 0x8000) *pDest = first;
-                pDest++;
-                pSrc++;
-                if (second & 0x8000) *pDest = second;
-                pDest++;
-                pSrc++;
-            }
-
-            if (remains) {
-                if (*pSrc & 0x8000) *pDest = *pSrc;
-                pSrc++;
-                pDest++;
-            }
-
-            pDest += destInc;
-            pSrc += srcInc;
+        } else if (length == 1) {
+            *(destOffset + start) = *(srcOffset + start);
+            continue;
+        } else if (length <= 8) {
+            memcpy(destOffset + start, srcOffset + start, length * sizeof(u16));
+            continue;
         }
+
+        swiCopy(srcOffset + start, destOffset + start, COPY_MODE_COPY | length);
     }
 }
 
