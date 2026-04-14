@@ -574,6 +574,7 @@ void ITCM_FUNC(cGdi::bitBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s16
             } else if (aligned && even) {
                 swiFastCopy(pSrc, pDest + (j * destW), COPY_MODE_WORD | COPY_MODE_COPY | halfPitch);
             } else {
+                //memcpy(pDest + (j * destW), pSrc, destW * sizeof(u16));
                 swiCopy(pSrc, pDest + (j * destW), COPY_MODE_COPY | destW);
             }
         }
@@ -636,45 +637,58 @@ void ITCM_FUNC(cGdi::maskBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s1
         return;
     }
 
-    u32 color32 = ((u32)color << 16) | color;
-
     bool aligned = !(destX & 1);
     bool remains = (destX ^ srcW) & 1;
     u16 srcInc = srcW & 1;
     u16 destInc = 256 - destW;
-    u16 halfWidth = destW >> 1;
+    u16 halfWidth = (destW - (aligned ? 0 : 1)) >> 1;
 
-    if (!aligned) {
-        halfWidth = (destW - 1) >> 1;
+    bool hasColorOverride = color != 0;
 
+    if (hasColorOverride) {
+        u32 color32 = ((u32)color << 16) | color;
         for (u16 i = srcOffsetY; i < destH; ++i) {
+            asm volatile("pld [%0]"       :: "r"(pSrc + srcW));
+            asm volatile("pld [%0, #32]"  :: "r"(pSrc + srcW));
+            asm volatile("pld [%0]"       :: "r"(pDest + 256));
+            
             pSrc += srcOffsetX;
 
-            if (*pSrc & 0x8000) *pDest = color == 0 ? *pSrc : color;
-            pDest++;
-            pSrc++;
+            if (!aligned) {
+                if (*pSrc & 0x8000) *pDest = color;
+                pDest++;
+                pSrc++;
+            }
 
             for (u16 j = 0; j < halfWidth; ++j) {
+                if (aligned && ((*(u32*)pSrc) & 0x80008000) == 0x80008000) {
+                    u32 newValue = color32;
+                    *(u32*)pDest = newValue;
+                    pSrc += 2;
+                    pDest += 2;
+                    continue;
+                }
+                
                 u16 first = *pSrc;
                 u16 second = *(pSrc + 1);
-                if ((first & 0x8000) && (second & 0x8000)) {
-                    u32 newValue = color == 0 ? (((u32)second << 16) | first) : color32;
+                if (!aligned && (first & 0x8000) && (second & 0x8000)) {
+                    u32 newValue = color32;
                     *(u32*)pDest = newValue;
                     pSrc += 2;
                     pDest += 2;
                     continue;
                 }
 
-                if (first & 0x8000) *pDest = color == 0 ? first : color;
+                if (first & 0x8000) *pDest = color;
                 pDest++;
                 pSrc++;
-                if (second & 0x8000) *pDest = color == 0 ? second : color;
+                if (second & 0x8000) *pDest = color;
                 pDest++;
                 pSrc++;
             }
 
             if (remains) {
-                if (*pSrc & 0x8000) *pDest = (color == 0 ? *pSrc : color);
+                if (*pSrc & 0x8000) *pDest = color;
                 pSrc++;
                 pDest++;
             }
@@ -682,38 +696,56 @@ void ITCM_FUNC(cGdi::maskBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s1
             pDest += destInc;
             pSrc += srcInc;
         }
+    } else {
+        for (u16 i = srcOffsetY; i < destH; ++i) {
+            asm volatile("pld [%0]"       :: "r"(pSrc + srcW));
+            asm volatile("pld [%0, #32]"  :: "r"(pSrc + srcW));
+            asm volatile("pld [%0]"       :: "r"(pDest + 256));
+            
+            pSrc += srcOffsetX;
 
-        return;
-    }
-
-    for (u32 i = srcOffsetY; i < destH; ++i) {
-        pSrc += srcOffsetX;
-
-        for (u32 j = 0; j < halfWidth; ++j) {
-            if (((*(u32*)pSrc) & 0x80008000) == 0x80008000) {
-                u32 newValue = color == 0 ? *(u32*)pSrc : color32;
-                *(u32*)pDest = newValue;
-                pSrc += 2;
-                pDest += 2;
-                continue;
+            if (!aligned) {
+                if (*pSrc & 0x8000) *pDest = *pSrc;
+                pDest++;
+                pSrc++;
             }
 
-            if (*pSrc & 0x8000) *pDest = (color == 0 ? *pSrc : color);
-            pSrc++;
-            pDest++;
-            if (*pSrc & 0x8000) *pDest = (color == 0 ? *pSrc : color);
-            pSrc++;
-            pDest++;
-        }
+            for (u16 j = 0; j < halfWidth; ++j) {
+                if (aligned && ((*(u32*)pSrc) & 0x80008000) == 0x80008000) {
+                    u32 newValue = *(u32*)pSrc;
+                    *(u32*)pDest = newValue;
+                    pSrc += 2;
+                    pDest += 2;
+                    continue;
+                }
+                
+                u16 first = *pSrc;
+                u16 second = *(pSrc + 1);
+                if (!aligned && (first & 0x8000) && (second & 0x8000)) {
+                    u32 newValue = (((u32)second << 16) | first);
+                    *(u32*)pDest = newValue;
+                    pSrc += 2;
+                    pDest += 2;
+                    continue;
+                }
 
-        if (remains) {
-            if (*pSrc & 0x8000) *pDest = (color == 0 ? *pSrc : color);
-            pSrc++;
-            pDest++;
-        }
+                if (first & 0x8000) *pDest = first;
+                pDest++;
+                pSrc++;
+                if (second & 0x8000) *pDest = second;
+                pDest++;
+                pSrc++;
+            }
 
-        pSrc += srcInc;
-        pDest += destInc;
+            if (remains) {
+                if (*pSrc & 0x8000) *pDest = *pSrc;
+                pSrc++;
+                pDest++;
+            }
+
+            pDest += destInc;
+            pSrc += srcInc;
+        }
     }
 }
 
