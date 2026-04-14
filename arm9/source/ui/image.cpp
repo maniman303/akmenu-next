@@ -1,18 +1,20 @@
 #include "image.h"
 
 namespace akui {
-    cImage::cImage(cWindow* parent) : cWindow(parent, "") {
-        setEngine(GE_MAIN);
-        _color = 0;
-    }
+    cImage::cImage(cWindow* parent) : cImage(parent, cSize(0, 0), 0) {}
 
-    cImage::cImage(cWindow* parent, cSize size, u16 color) : cWindow(parent, "") {
+    cImage::cImage(cWindow* parent, cSize size, u16 color) : cImage(parent, size, color, false) {}
+
+    cImage::cImage(cWindow* parent, cSize size, u16 color, bool hasAlpha) : cWindow(parent, "") {
         setEngine(GE_MAIN);
         setSize(size);
+        _hasAlpha = hasAlpha;
 
         if (color != 0) {
             _color = BIT(15) | color;
             _background = createBMP15(size.x, size.y, _color);
+        } else {
+            _color = 0;
         }
     }
 
@@ -33,14 +35,26 @@ namespace akui {
         return _background.valid();
     }
 
+    void cImage::setAlpha(bool hasAlpha) {
+        _hasAlpha = hasAlpha;
+    }
+
     void cImage::draw(s32 x, s32 y) {
+        draw(x, y, 1);
+    }
+
+    void cImage::draw(s32 x, s32 y, u16 repeats) {
         if (!_background.valid()) {
             return;
         }
 
         const cPoint position = cPoint(x, y);
         cRect rect(position, position);
-        gdi().bitBlt(_background.buffer(), x, y, size().x, size().y, selectedEngine());
+        if (!_hasAlpha || repeats > 1) {
+            gdi().bitBlt(_background.buffer(), x, y, size().x, size().y, repeats, selectedEngine());
+        } else {
+            gdi().maskBlt(_background.buffer(), x, y, size().x, size().y, selectedEngine());
+        }
     }
 
     void cImage::draw() {

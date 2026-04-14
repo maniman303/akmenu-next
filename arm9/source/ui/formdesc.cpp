@@ -40,9 +40,7 @@ void cFormDesc::draw(const cRect& area, GRAPHICS_ENGINE engine) const {
         u32 middleWidth = area.size().x - _topleft.width() - _topright.width();
         u32 repeats = (middleWidth / _middle.width()) + 1;
 
-        for (u32 i = 0; i < repeats; i++) {
-            gdi().maskBlt(_middle.buffer(), middleX + (i * _middle.width()), middleY, _middle.width(), _middle.height(), engine);
-        }
+        gdi().bitBlt(_middle.buffer(), middleX, middleY, _middle.width(), _middle.height(), (u16)repeats, engine);
     }
 
     if (_topright.valid()) {

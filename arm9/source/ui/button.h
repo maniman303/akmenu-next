@@ -28,6 +28,8 @@ class cButton : public cWindow {
 
     cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text);
 
+    cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text, bool hasAlpha);
+
     ~cButton();
 
   public:
@@ -63,22 +65,20 @@ class cButton : public cWindow {
 
     void onClicked();
 
+    bool hasAlpha() { return _hasAlpha; }
+
     Signal0 clicked;
 
     Signal0 pressed;
 
   protected:
     bool _captured;
-
     State _state;
-
     COLOR _textColor;
-
     cButtonDesc* _renderDesc;
-
     Style _style;
-
     Alignment _alignment;
+    bool _hasAlpha;
 };
 
 // form desc，只负责画背景

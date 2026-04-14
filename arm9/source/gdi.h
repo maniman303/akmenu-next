@@ -47,12 +47,11 @@ class cGdi {
 
     void fillRect(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine);
 
-    u16 blendColors(u16 color, u16 dest, u16 src, u16 opacity);
+    inline u16 blendColors(u16 color, u16 dest, u16 src, u16 opacity);
 
-    u32 blendColors32(u32 color, u32 dest, u32 src, u16 opacity);
+    inline u32 blendColors32(u32 color, u32 dest, u32 src, u16 opacity);
 
-    void fillRectBlend(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine,
-                       u16 opacity);
+    void fillRectBlend(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine, u16 opacity);
 
     void maskBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH,
                  GRAPHICS_ENGINE engine);
@@ -69,8 +68,14 @@ class cGdi {
     void bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH,
                 GRAPHICS_ENGINE engine);
 
+    void bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH,
+                u16 repeats, GRAPHICS_ENGINE engine);
+
     void bitBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH,
                 GRAPHICS_ENGINE engine);
+
+    void bitBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH,
+                u16 repeats, GRAPHICS_ENGINE engine);
 
     u16 getPenColor(GRAPHICS_ENGINE engine) {
         if (GE_MAIN == engine)

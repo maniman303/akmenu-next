@@ -14,7 +14,9 @@
 
 namespace akui {
 
-cButton::cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
+cButton::cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text) : cButton(x, y, w, h, parent, text, true) {}
+
+cButton::cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text, bool hasAlpha)
     : cWindow(parent, text), _renderDesc(NULL) {
     _captured = false;
     _state = up;
@@ -24,6 +26,7 @@ cButton::cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string&
     _style = single;
     _alignment = center;
     _isFocusable = false;
+    _hasAlpha = hasAlpha;
 }
 
 cButton::~cButton() {
@@ -131,9 +134,12 @@ void cButtonDesc::draw(const cRect& area, GRAPHICS_ENGINE engine) const {
         }
     }
 
-    if (NULL != pBuffer) {
-        gdi().maskBlt(pBuffer, area.position().x, area.position().y, _background.width(), height,
-                      _button->selectedEngine());
+    if (pBuffer != NULL) {
+        if (_button->hasAlpha()) {
+            gdi().maskBlt(pBuffer, area.position().x, area.position().y, _background.width(), height, _button->selectedEngine());
+        } else {
+            gdi().bitBlt(pBuffer, area.position().x, area.position().y, _background.width(), height, _button->selectedEngine());
+        }
     }
 
     if (_button->text().empty()) {

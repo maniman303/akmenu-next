@@ -22,8 +22,8 @@ namespace akui {
 
     cSpinBox::cSpinBox(s32 x, s32 y, u32 w, u32 h, bool namedAppearance, cWindow* parent, const std::string& text)
         : cForm(x, y, w, h, parent, text),
-        _prevButton(0, 0, 0, 0, this, ""),
-        _nextButton(0, 0, 0, 0, this, ""),
+        _prevButton(0, 0, 0, 0, this, "", false),
+        _nextButton(0, 0, 0, 0, this, "", false),
         _leftBg(this),
         _middleBg(this),
         _rightBg(this),
@@ -140,9 +140,7 @@ namespace akui {
             if (middleWidth > 0) {
                 s32 titleWidth = _nextButton.position().x - x - _rightBg.size().x;
                 s32 repeats = (titleWidth / middleWidth) + 1;
-                for (s32 i = 0; i < repeats; i++) {
-                    _middleBg.draw(x + (i * middleWidth), y);
-                }
+                _middleBg.draw(x, y, (u16)repeats);
             }
 
             // logger().info("Right bg size x: " + std::to_string(_rightBg.size().x) + ".");

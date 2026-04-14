@@ -19,8 +19,10 @@
 #include "sprite.h"
 #include "userinput.h"
 #include "logger.h"
+#include "blockds/ndstypes.h"
 
-static inline void dmaCopyWordsGdi(uint8 channel, const void* src, void* dest, uint32 size) {
+ARM_CODE LIBNDS_NOINLINE
+static void ITCM_FUNC(dmaCopyWordsGdi)(uint8 channel, const void* src, void* dest, uint32 size) {
     DC_FlushRange(src, size);
     dmaCopyWords(channel, src, dest, size);
     DC_InvalidateRange(dest, size);
@@ -343,7 +345,8 @@ void cGdi::frameRect(s16 x, s16 y, u16 w, u16 h, u16 thickness, GRAPHICS_ENGINE 
     }
 }
 
-void cGdi::fillRect(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine) {
+ARM_CODE LIBNDS_NOINLINE
+void ITCM_FUNC(cGdi::fillRect)(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine) {
     color1 = (u16)BIT(15) | color1;
     color2 = (u16)BIT(15) | color2;
     ALIGN(4) u16 color[2] = { color1, color2 };
@@ -434,7 +437,8 @@ u32 cGdi::blendColors32(u32 color, u32 dest, u32 src, u16 opacity) {
     return p1_out | (p2_out << 16u);
 }
 
-void cGdi::fillRectBlend(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine, u16 opacity) {
+ARM_CODE LIBNDS_NOINLINE
+void ITCM_FUNC(cGdi::fillRectBlend)(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine, u16 opacity) {
     if (opacity <= 0) {
         return;
     }
@@ -491,50 +495,91 @@ void cGdi::bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH, G
     bitBlt(src, destW, destH, destX, destY, destW, destH, engine);
 }
 
+void cGdi::bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH, u16 repeats, GRAPHICS_ENGINE engine) {
+    bitBlt(src, destW, destH, destX, destY, destW, destH, repeats, engine);
+}
+
 void cGdi::bitBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH, GRAPHICS_ENGINE engine) {
+    bitBlt(src, srcW, srcH, destX, destY, destW, destH, 1, engine);
+}
+
+ARM_CODE LIBNDS_NOINLINE
+void ITCM_FUNC(cGdi::bitBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH, u16 repeats, GRAPHICS_ENGINE engine) {
     u16* pSrc = (u16*)src;
     u16* pDest = (engine == GE_MAIN) ? 
                     (_bufferMain2 + (destY * 256) + destX + _layerPitch) : 
                     (_bufferSub2 + (destY * 256) + destX);
 
-    u16 srcOffsetX = 0;
-    if (destX < 0) {
-        srcOffsetX = (u16)(-1 * destX);
-        if (srcOffsetX >= srcW) {
-            return;
-        }
-
-        srcW -= srcOffsetX;
-        destX = 0;
-    }
-
     if (destW > srcW) destW = srcW;
     if (destH > srcH) destH = srcH;
 
-    u16 pitchPixel = (destW + (destW & 1));
-    u16 destInc = 256 - pitchPixel;
-    u16 halfPitch = pitchPixel >> 1;
+    if (destX + destW >= SCREEN_WIDTH) {
+        s16 diff = destX + destW - SCREEN_WIDTH;
+        destW -= diff;
+    }
 
-    bool destAligned = !(destX & 1) && !(srcOffsetX & 1);
-    if (destAligned) {
-        for (u16 i = 0; i < destH; ++i) {
-            swiFastCopy(srcOffsetX + pSrc, pDest, COPY_MODE_WORD | COPY_MODE_COPY | halfPitch);
+    if (destY + destH >= SCREEN_HEIGHT) {
+        s16 diff = destY + destH - SCREEN_HEIGHT;
+        destH -= diff;
+    }
 
-            pDest += halfPitch << 1;
-            pSrc += srcOffsetX + (halfPitch << 1);
-            pDest += destInc;
-        }
+    u16 srcOffsetX = 0;
+    if (destX < 0) {
+        srcOffsetX = (u16)(-1 * destX);
+        destW -= srcOffsetX;
+        destX = 0;
+    }
 
+    u16 srcOffsetY = 0;
+    if (destY < 0) {
+        srcOffsetY = (u16)(-1 * destY);
+        destH -= srcOffsetY;
+        destY = 0;
+    }
+
+    if (destW <= 0 || destH <= 0) {
         return;
     }
 
-    // logger().info("Slow bitBlt.");
+    repeats = std::min(repeats, (u16)((SCREEN_WIDTH - destX) / destW));
 
-    for (u16 i = 0; i < destH; ++i) {
-        swiCopy(srcOffsetX + pSrc, pDest, COPY_MODE_COPY | pitchPixel);
+    u16 pitchPixel = (destW + (destW & 1));
+    u16 halfPitch = pitchPixel >> 1;
+    u16 destInc = 256 - pitchPixel;
+    bool aligned = !(destX & 1) && !(srcOffsetX & 1);
+    bool even = !(destW & 1);
 
+    u16 temp1 = 0;
+    u16 temp2 = 0;
+
+    for (u16 i = srcOffsetY; i < destH; ++i) {
+        pSrc += srcOffsetX;
+
+        switch (destW) {
+          case 1:
+            temp1 = *pSrc;
+            break;
+          case 2:
+            temp1 = *pSrc;
+            temp2 = *(pSrc + 1);
+            break;
+        }
+
+        for (u16 j = 0; j < repeats; j++) {
+            if (destW == 1) {
+                *(pDest + j) = temp1;
+            } else if (destW == 2) {
+                *(pDest + (2 * j)) = temp1;
+                *(pDest + 1 + (2 * j)) = temp2;
+            } else if (aligned && even) {
+                swiFastCopy(pSrc, pDest + (j * destW), COPY_MODE_WORD | COPY_MODE_COPY | halfPitch);
+            } else {
+                swiCopy(pSrc, pDest + (j * destW), COPY_MODE_COPY | destW);
+            }
+        }
+        
         pDest += pitchPixel;
-        pSrc += srcOffsetX + pitchPixel;
+        pSrc += pitchPixel;
         pDest += destInc;
     }
 }
@@ -550,21 +595,48 @@ void cGdi::maskBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH, 
 void cGdi::maskBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH,
                    GRAPHICS_ENGINE engine) {
     return maskBlt(src, srcW, srcH, destX, destY, destW, destH, engine, 0);
- }
+}
 
-void cGdi::maskBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH,
+ARM_CODE LIBNDS_NOINLINE
+void ITCM_FUNC(cGdi::maskBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH,
                    GRAPHICS_ENGINE engine, u16 color) {
-    if (destW <= 0) {
+    u16* pSrc = (u16*)src;
+    u16* pDest = GE_MAIN == engine ?
+        _bufferMain2 + (destY)*256 + destX + _layerPitch :
+        _bufferSub2 + (destY)*256 + destX;
+
+    if (destW > srcW) destW = srcW;
+    if (destH > srcH) destH = srcH;
+
+    if (destX + destW >= SCREEN_WIDTH) {
+        s16 diff = destX + destW - SCREEN_WIDTH;
+        destW -= diff;
+    }
+
+    if (destY + destH >= SCREEN_HEIGHT) {
+        s16 diff = destY + destH - SCREEN_HEIGHT;
+        destH -= diff;
+    }
+
+    u16 srcOffsetX = 0;
+    if (destX < 0) {
+        srcOffsetX = (u16)(-1 * destX);
+        destW -= srcOffsetX;
+        destX = 0;
+    }
+
+    u16 srcOffsetY = 0;
+    if (destY < 0) {
+        srcOffsetY = (u16)(-1 * destY);
+        destH -= srcOffsetY;
+        destY = 0;
+    }
+
+    if (destW <= 0 || destH <= 0) {
         return;
     }
 
     u32 color32 = ((u32)color << 16) | color;
-
-    u16* pSrc = (u16*)src;
-    u16* pDest = GE_MAIN == engine ? _bufferMain2 + (destY)*256 + destX + _layerPitch : _bufferSub2 + (destY)*256 + destX;
-
-    if (destW > srcW) destW = srcW;
-    if (destH > srcH) destH = srcH;
 
     bool aligned = !(destX & 1);
     bool remains = (destX ^ srcW) & 1;
@@ -575,7 +647,9 @@ void cGdi::maskBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u1
     if (!aligned) {
         halfWidth = (destW - 1) >> 1;
 
-        for (u16 i = 0; i < destH; ++i) {
+        for (u16 i = srcOffsetY; i < destH; ++i) {
+            pSrc += srcOffsetX;
+
             if (*pSrc & 0x8000) *pDest = color == 0 ? *pSrc : color;
             pDest++;
             pSrc++;
@@ -612,7 +686,9 @@ void cGdi::maskBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u1
         return;
     }
 
-    for (u32 i = 0; i < destH; ++i) {
+    for (u32 i = srcOffsetY; i < destH; ++i) {
+        pSrc += srcOffsetX;
+
         for (u32 j = 0; j < halfWidth; ++j) {
             if (((*(u32*)pSrc) & 0x80008000) == 0x80008000) {
                 u32 newValue = color == 0 ? *(u32*)pSrc : color32;
@@ -653,7 +729,8 @@ s16  cGdi::textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_EN
     return textOutRect(x, y, w, h, text, engine, font());
 }
 
-s16 cGdi::textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont) {
+ARM_CODE LIBNDS_NOINLINE
+s16 ITCM_FUNC(cGdi::textOutRect)(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont) {
     u8 fontHeight = textFont.GetHeight();
     u8 fontDescend = textFont.GetDescend();
 
@@ -679,7 +756,8 @@ s16 cGdi::textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENG
     return x;
 }
 
-void cGdi::present(GRAPHICS_ENGINE engine) {
+ARM_CODE LIBNDS_NOINLINE
+void ITCM_FUNC(cGdi::present)(GRAPHICS_ENGINE engine) {
     if (GE_MAIN == engine) {
         if (_scheduleDrop) {
             nocashMessage("Dropping background");
