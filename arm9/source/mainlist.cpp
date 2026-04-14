@@ -801,7 +801,7 @@ void cMainList::drawItemBackgrounds() {
     size_t total = std::min(_visibleRowCount, _rows.size() - _firstVisibleRowId);
 
     for (size_t i = 0; i < total; i++) {
-        s32 itemX = 0 - relativePosition().x;
+        s32 itemX = ((SCREEN_WIDTH - _itemBg->size().x) / 2) - relativePosition().x;
         s32 itemY = i * _rowHeight;
 
         _itemBg->setRelativePosition(cPoint(itemX, itemY));

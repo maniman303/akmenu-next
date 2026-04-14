@@ -8,6 +8,7 @@
 */
 
 #include "timer.h"
+#include "stringtool.h"
 
 cTimer::cTimer() {
     initTimer();
@@ -47,6 +48,8 @@ u32 cTimer::updateFrames() {
 
     _prevFps = _fps;
     _fps = fps;
+
+    // nocashMessage(formatString("FPS: %2d", _fps).c_str());
 
     return _frames;
 }

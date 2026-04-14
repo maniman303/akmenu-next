@@ -243,11 +243,11 @@ int main(int argc, char* argv[]) {
     }
 
     while (true) {
-        nocashMessage(formatString("Ticks 1: %d.", timer().getTick()).c_str());
+        // nocashMessage(formatString("Ticks 1: %d.", timer().getTick()).c_str());
 
         timer().updateFrames();
 
-        nocashMessage(formatString("Ticks 2: %d.", timer().getTick()).c_str());
+        // nocashMessage(formatString("Ticks 2: %d.", timer().getTick()).c_str());
 
         tickSound().play();
 
@@ -255,29 +255,29 @@ int main(int argc, char* argv[]) {
             sd().update();
         }
 
-        nocashMessage(formatString("Ticks 3: %d.", timer().getTick()).c_str());
+        // nocashMessage(formatString("Ticks 3: %d.", timer().getTick()).c_str());
 
         INPUT& inputs = updateInput();
 
-        nocashMessage(formatString("Ticks 4: %d.", timer().getTick()).c_str());
+        // nocashMessage(formatString("Ticks 4: %d.", timer().getTick()).c_str());
 
         processInput(inputs);
 
-        nocashMessage(formatString("Ticks 5: %d.", timer().getTick()).c_str());
+        // nocashMessage(formatString("Ticks 5: %d.", timer().getTick()).c_str());
         
         taskCruncher().process();
 
-        nocashMessage(formatString("Ticks 6: %d.", timer().getTick()).c_str());
+        // nocashMessage(formatString("Ticks 6: %d.", timer().getTick()).c_str());
 
         windowManager().update();
 
-        nocashMessage(formatString("Ticks 7: %d.", timer().getTick()).c_str());
+        // nocashMessage(formatString("Ticks 7: %d.", timer().getTick()).c_str());
 
         irq().drawTop();
 
-        nocashMessage(formatString("Ticks 8: %d.", timer().getTick()).c_str());
+        // nocashMessage(formatString("Ticks 8: %d.", timer().getTick()).c_str());
 
-        // swiWaitForVBlank();
+        swiWaitForVBlank();
 
         gdi().present(GE_SUB);
         gdi().present(GE_MAIN);

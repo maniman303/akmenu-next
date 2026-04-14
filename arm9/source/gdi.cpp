@@ -352,46 +352,23 @@ void cGdi::fillRect(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS
     u16* pAltSrc = (u16*)altColor;
     u16* pDest = GE_MAIN == engine ? _bufferMain2 + (y << 8) + x + _layerPitch : _bufferSub2 + (y << 8) + x;
 
-    bool destAligned = !(x & 1);
-
+    bool aligned = !(x & 1);
+    bool remains = (x ^ w) & 1;
     u16 destInc = 256 - w;
-    u16 halfWidth = w >> 1;
-    u16 remain = w & 1;
+    u16 halfWidth = (w - (aligned ? 0 : 1)) >> 1;
 
-    if (destAligned) {
-        for (u32 i = 0; i < h; ++i) {
-            u16* source = (i & 1) ? pSrc : pAltSrc;
-            swiFastCopy(source, pDest, COPY_MODE_WORD | COPY_MODE_FILL | halfWidth);
-            pDest += halfWidth << 1;
-            if (remain) {
-                *pDest++ = *source;
-            }
-
-            pDest += destInc;
+    for (u32 i = 0; i < h; ++i) {
+        u16* source = (i & 1) ? pSrc : pAltSrc;
+        if (!aligned) {
+            *pDest = source[1];
+            pDest++;
         }
+        
+        swiFastCopy(source, pDest, COPY_MODE_WORD | COPY_MODE_FILL | halfWidth);
+        pDest += halfWidth << 1;
 
-        return;
-    }
-
-    // logger().info("Slow fillRect.");
-    
-    remain = !remain;
-    if (remain) {
-        halfWidth--;
-    }
-
-    for (u32 i = 0; i < h; i++) {
-        u32 newColor = i & 1 ? ((u32)color1 << 16 | color2) : ((u32)color2 << 16 | color1);
-
-        *pDest++ = i & 1 ? color1 : color2;
-
-        for (u32 j = 0; j < halfWidth; ++j) {
-            *(u32*)pDest = newColor;
-            pDest += 2;
-        }
-
-        if (remain) {
-            *pDest++ = i & 1 ? color1 : color2;
+        if (remains) {
+            *pDest++ = *source;
         }
 
         pDest += destInc;
@@ -422,11 +399,9 @@ u16 cGdi::blendColors(u16 color, u16 dest, u16 src, u16 opacity) {
     return static_cast<u16>(((rb | g) >> 5u) | BIT(15));
 }
 
-u32 cGdi::blendColors32(u16 color, u32 dest, u32 src, u16 opacity) {
-    u32 color32 = ((u32)color << 16) | color;
-
+u32 cGdi::blendColors32(u32 color, u32 dest, u32 src, u16 opacity) {
     if (opacity >= 100) {
-        return color32;
+        return color;
     }
 
     if ((dest & 0x8000) == 0) {
@@ -450,8 +425,8 @@ u32 cGdi::blendColors32(u16 color, u32 dest, u32 src, u16 opacity) {
     const u32 d2 = dest >> 16u;
     const u32 d2_exp = (d2 | (d2 << 16u)) & 0x03E07C1Fu;
 
-    const u32 blend1 = (color32 * alpha + d1_exp * invAlpha) >> 5u;
-    const u32 blend2 = (color32 * alpha + d2_exp * invAlpha) >> 5u;
+    const u32 blend1 = (color * alpha + d1_exp * invAlpha) >> 5u;
+    const u32 blend2 = (color * alpha + d2_exp * invAlpha) >> 5u;
 
     const u32 p1_out = (blend1 & 0x7C1Fu) | ((blend1 >> 16u) & 0x03E0u) | 0x8000u;
     const u32 p2_out = (blend2 & 0x7C1Fu) | ((blend2 >> 16u) & 0x03E0u) | 0x8000u;
@@ -473,16 +448,36 @@ void cGdi::fillRectBlend(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRA
         return;
     }
 
+    return;
+
     // logger().info("Slow fillRectBlend.");
 
     u16* pSrc = ((GE_MAIN == engine) ? _bufferMain3 : _bufferSub2) + (y << 8) + x;
     u16* pDest = ((GE_MAIN == engine) ? (_bufferMain2 + _layerPitch) : _bufferSub2) + (y << 8) + x;
-    u32 destInc = 256 - w;
-    for (u32 ii = 0; ii < h; ++ii) {
-        for (u32 jj = 0; jj < w; ++jj) {
-            u16 color = (jj & 1) ? color2 : color1;
-            *pDest = blendColors(color, *pDest, *pSrc, opacity);
 
+    bool aligned = !(x & 1);
+    bool remains = (x ^ w) & 1;
+    u16 halfWidth = (w - (aligned ? 0 : 1)) >> 1;
+    u32 destInc = 256 - w;
+
+    for (u32 i = 0; i < h; i++) {
+        if (!aligned) {
+            u16 color = (i & 1) ? color2 : color1;
+            *pDest = blendColors(color, *pDest, *pSrc, opacity);
+            pDest++;
+            pSrc++;
+        }
+
+        u32 color32 = (i & 1) ? (((u32)color2 << 16) | color1) : (((u32)color1 << 16) | color2);
+        for (u16 j = 0; j < halfWidth; j++) {
+            *(u32*)pDest = blendColors32(color32, *(u32*)pDest, *(u32*)pSrc, opacity);
+            pDest+=2;
+            pSrc+=2;
+        }
+
+        if (remains) {
+            u16 color = (i & 1) ? color1 : color2;
+            *pDest = blendColors(color, *pDest, *pSrc, opacity);
             pDest++;
             pSrc++;
         }
@@ -502,6 +497,17 @@ void cGdi::bitBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16
                     (_bufferMain2 + (destY * 256) + destX + _layerPitch) : 
                     (_bufferSub2 + (destY * 256) + destX);
 
+    u16 srcOffsetX = 0;
+    if (destX < 0) {
+        srcOffsetX = (u16)(-1 * destX);
+        if (srcOffsetX >= srcW) {
+            return;
+        }
+
+        srcW -= srcOffsetX;
+        destX = 0;
+    }
+
     if (destW > srcW) destW = srcW;
     if (destH > srcH) destH = srcH;
 
@@ -509,13 +515,13 @@ void cGdi::bitBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16
     u16 destInc = 256 - pitchPixel;
     u16 halfPitch = pitchPixel >> 1;
 
-    bool destAligned = !(destX & 1);
+    bool destAligned = !(destX & 1) && !(srcOffsetX & 1);
     if (destAligned) {
         for (u16 i = 0; i < destH; ++i) {
-            swiFastCopy(pSrc, pDest, COPY_MODE_WORD | COPY_MODE_COPY | halfPitch);
+            swiFastCopy(srcOffsetX + pSrc, pDest, COPY_MODE_WORD | COPY_MODE_COPY | halfPitch);
 
             pDest += halfPitch << 1;
-            pSrc += halfPitch << 1;
+            pSrc += srcOffsetX + (halfPitch << 1);
             pDest += destInc;
         }
 
@@ -525,10 +531,10 @@ void cGdi::bitBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16
     // logger().info("Slow bitBlt.");
 
     for (u16 i = 0; i < destH; ++i) {
-        swiCopy(pSrc, pDest, COPY_MODE_COPY | pitchPixel);
+        swiCopy(srcOffsetX + pSrc, pDest, COPY_MODE_COPY | pitchPixel);
 
         pDest += pitchPixel;
-        pSrc += pitchPixel;
+        pSrc += srcOffsetX + pitchPixel;
         pDest += destInc;
     }
 }
@@ -677,9 +683,9 @@ void cGdi::present(GRAPHICS_ENGINE engine) {
     if (GE_MAIN == engine) {
         if (_scheduleDrop) {
             nocashMessage("Dropping background");
-            dmaCopyWordsGdi(3, _bufferMain2, _bufferMain1, 256 * 192 * 2);
-            swiWaitForVBlank();
             dmaCopyWordsGdi(3, _bufferMain2 + (256 * 192), _bufferMain3, 256 * 192 * 2);
+            swiWaitForVBlank();
+            dmaCopyWordsGdi(3, _bufferMain2, _bufferMain1, 256 * 192 * 2);
             fillMemory((void*)_bufferMain2, 256 * 192 * 4, 0);
             _scheduleDrop = false;
         } else {
