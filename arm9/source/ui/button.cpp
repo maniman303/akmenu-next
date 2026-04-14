@@ -77,13 +77,16 @@ bool cButton::processTouchMessage(cTouchMessage message) {
             return false;
         }
 
+        _captured = false;
+        _state = up;
+
         if (myRect.surrounds(message.position())) {
             onClicked();
             clicked();
         } else {
             onReleased();
         }
-        _captured = false;
+
         return true;
     }
 
