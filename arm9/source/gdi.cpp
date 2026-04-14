@@ -422,6 +422,43 @@ u16 cGdi::blendColors(u16 color, u16 dest, u16 src, u16 opacity) {
     return static_cast<u16>(((rb | g) >> 5u) | BIT(15));
 }
 
+u32 cGdi::blendColors32(u16 color, u32 dest, u32 src, u16 opacity) {
+    u32 color32 = ((u32)color << 16) | color;
+
+    if (opacity >= 100) {
+        return color32;
+    }
+
+    if ((dest & 0x8000) == 0) {
+        dest = (dest & 0xffff0000) | (src & 0xffff);
+    }
+
+    if ((dest & 0x80000000) == 0) {
+        dest = (dest & 0xffff) | (src & 0xffff0000);
+    }
+
+    if (color == 0 || opacity <= 0) {
+        return dest;
+    }
+
+    const u32 alpha = (static_cast<u32>(opacity) * 655u) >> 11u;
+    const u32 invAlpha = 32u - alpha;
+
+    const u32 d1 = dest & 0xFFFFu;
+    const u32 d1_exp = (d1 | (d1 << 16u)) & 0x03E07C1Fu;
+    
+    const u32 d2 = dest >> 16u;
+    const u32 d2_exp = (d2 | (d2 << 16u)) & 0x03E07C1Fu;
+
+    const u32 blend1 = (color32 * alpha + d1_exp * invAlpha) >> 5u;
+    const u32 blend2 = (color32 * alpha + d2_exp * invAlpha) >> 5u;
+
+    const u32 p1_out = (blend1 & 0x7C1Fu) | ((blend1 >> 16u) & 0x03E0u) | 0x8000u;
+    const u32 p2_out = (blend2 & 0x7C1Fu) | ((blend2 >> 16u) & 0x03E0u) | 0x8000u;
+
+    return p1_out | (p2_out << 16u);
+}
+
 void cGdi::fillRectBlend(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine, u16 opacity) {
     if (opacity <= 0) {
         return;
@@ -515,9 +552,7 @@ void cGdi::maskBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u1
         return;
     }
 
-    if (color != 0) {
-        color = BIT(15) | color;
-    }
+    u32 color32 = ((u32)color << 16) | color;
 
     u16* pSrc = (u16*)src;
     u16* pDest = GE_MAIN == engine ? _bufferMain2 + (destY)*256 + destX + _layerPitch : _bufferSub2 + (destY)*256 + destX;
@@ -525,22 +560,45 @@ void cGdi::maskBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u1
     if (destW > srcW) destW = srcW;
     if (destH > srcH) destH = srcH;
 
+    bool aligned = !(destX & 1);
+    bool remains = (destX ^ srcW) & 1;
     u16 srcInc = srcW & 1;
     u16 destInc = 256 - destW;
     u16 halfWidth = destW >> 1;
-    bool aligned = !(destX & 1);
-    bool remains = srcW & 1;
 
     if (!aligned) {
-        // TODO: Fix performance here
-        // logger().info("Slow maskBlt.");
+        halfWidth = (destW - 1) >> 1;
 
         for (u16 i = 0; i < destH; ++i) {
-            for (u16 j = 0; j < destW; ++j) {
-                if (*pSrc & 0x8000) *pDest = color == 0 ? *pSrc : color;
+            if (*pSrc & 0x8000) *pDest = color == 0 ? *pSrc : color;
+            pDest++;
+            pSrc++;
+
+            for (u16 j = 0; j < halfWidth; ++j) {
+                u16 first = *pSrc;
+                u16 second = *(pSrc + 1);
+                if ((first & 0x8000) && (second & 0x8000)) {
+                    u32 newValue = color == 0 ? (((u32)second << 16) | first) : color32;
+                    *(u32*)pDest = newValue;
+                    pSrc += 2;
+                    pDest += 2;
+                    continue;
+                }
+
+                if (first & 0x8000) *pDest = color == 0 ? first : color;
+                pDest++;
+                pSrc++;
+                if (second & 0x8000) *pDest = color == 0 ? second : color;
                 pDest++;
                 pSrc++;
             }
+
+            if (remains) {
+                if (*pSrc & 0x8000) *pDest = (color == 0 ? *pSrc : color);
+                pSrc++;
+                pDest++;
+            }
+
             pDest += destInc;
             pSrc += srcInc;
         }
@@ -551,18 +609,19 @@ void cGdi::maskBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u1
     for (u32 i = 0; i < destH; ++i) {
         for (u32 j = 0; j < halfWidth; ++j) {
             if (((*(u32*)pSrc) & 0x80008000) == 0x80008000) {
-                u32 newValue = (color == 0 ? *(u32*)pSrc : (((u32)color << 16) | color));
+                u32 newValue = color == 0 ? *(u32*)pSrc : color32;
                 *(u32*)pDest = newValue;
                 pSrc += 2;
                 pDest += 2;
-            } else {
-                if (*pSrc & 0x8000) *pDest = (color == 0 ? *pSrc : color);
-                pSrc++;
-                pDest++;
-                if (*pSrc & 0x8000) *pDest = (color == 0 ? *pSrc : color);
-                pSrc++;
-                pDest++;
+                continue;
             }
+
+            if (*pSrc & 0x8000) *pDest = (color == 0 ? *pSrc : color);
+            pSrc++;
+            pDest++;
+            if (*pSrc & 0x8000) *pDest = (color == 0 ? *pSrc : color);
+            pSrc++;
+            pDest++;
         }
 
         if (remains) {

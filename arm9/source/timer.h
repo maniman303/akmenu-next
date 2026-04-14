@@ -32,6 +32,7 @@ class cTimer {
     u32 getFps();
 
   private:
+    u16 _prevFps;
     u16 _fps;
     u32 _fpsCounter;
     u32 _ticks;

@@ -54,6 +54,10 @@ cWindow& cCalendar::loadAppearance(const std::string& aFileName) {
     _dayColorSunday = ini.GetInt("calendar day", "sundayColor", 0x0000);
     _dayColorSaturday = ini.GetInt("calendar day", "saturdayColor", 0x0000);
 
+    if (_dayHighlightColor != 0) _dayHighlightColor = _dayHighlightColor | BIT(15);
+    if (_dayColorSunday != 0) _dayColorSunday = _dayColorSunday | BIT(15);
+    if (_dayColorSaturday != 0) _dayColorSaturday = _dayColorSaturday | BIT(15);
+
     _showDay = ini.GetInt("calendar day", "show", _showDay);
     _fixOnes = ini.GetInt("calendar day", "fix ones", _fixOnes);
 
