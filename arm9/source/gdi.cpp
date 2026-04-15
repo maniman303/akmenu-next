@@ -75,8 +75,8 @@ cGdi::cGdi() {
     _transColor = 0;
     _mainEngineLayer = MEL_UP;
     _subEngineMode = SEM_TEXT;
-    _bufferMain2 = NULL;
-    _bufferSub2 = NULL;
+    _workMain = NULL;
+    _workSub = NULL;
 #ifdef DEBUG
     _bufferSub3 = NULL;
 #endif
@@ -85,8 +85,8 @@ cGdi::cGdi() {
 }
 
 cGdi::~cGdi() {
-    if (NULL != _bufferMain2) delete[] _bufferMain2;
-    if (NULL != _bufferSub2) delete[] _bufferSub2;
+    if (NULL != _workMain) delete[] _workMain;
+    if (NULL != _workSub) delete[] _workSub;
 #ifdef DEBUG
     if (NULL != _bufferSub3) delete[] _bufferSub3;
 #endif
@@ -105,8 +105,12 @@ void cGdi::swapLCD(void) {
 }
 
 void cGdi::activeFbMain(void) {
-    vramSetBankB(VRAM_B_MAIN_BG_0x06000000);
-    vramSetBankD(VRAM_D_MAIN_BG_0x06020000);
+    // vramSetBankB(VRAM_B_MAIN_BG_0x06000000);
+    vramSetBankE(VRAM_E_MAIN_BG);
+    vramSetBankF(VRAM_F_MAIN_BG_0x06010000);
+    vramSetBankG(VRAM_G_MAIN_BG_0x06014000);
+    // vramSetBankD(VRAM_D_MAIN_BG_0x06020000);
+    vramSetBankB(VRAM_B_MAIN_BG_0x06020000);
 
     vramSetBankA(VRAM_A_MAIN_SPRITE_0x06400000);
 
@@ -126,8 +130,8 @@ void cGdi::activeFbMain(void) {
     REG_BG3Y = 0;
     REG_BG3X = 0;
 
+    _workMain = (u16*)new u16[256 * 192 * 2];
     _bufferMain1 = (u16*)0x06000000;
-    _bufferMain2 = (u16*)new u16[256 * 192 * 2];
     _bufferMain3 = (u16*)0x06020000;
 
     setMainEngineLayer(MEL_UP);
@@ -157,9 +161,9 @@ void cGdi::activeFbSub(void) {
     REG_BG2X_SUB = 0;
 
     _bufferSub1 = (u16*)0x06200000;
-    _bufferSub2 = (u16*)new u32[256 * 192 / 2];
+    _workSub = (u16*)new u32[256 * 192 / 2];
 
-    fillMemory(_bufferSub2, 0x18000, 0xffffffff);
+    fillMemory(_workSub, 0x18000, 0xffffffff);
     fillMemory(_bufferSub1, 0x18000, 0xffffffff);
 
     swiWaitForVBlank();
@@ -175,7 +179,7 @@ static inline void putScreenPixel(u16* buffer, s16 x, s16 y, u16 color) {
 }
 
 void cGdi::drawPixel(u8 x, u8 y, GRAPHICS_ENGINE engine) {
-    u16* buffer = engine == GE_MAIN ? _bufferMain2 + _layerPitch : _bufferSub2;
+    u16* buffer = engine == GE_MAIN ? _workMain + _layerPitch : _workSub;
     u16 color = engine == GE_MAIN ? _penColor : _penColorSub;
 
     putScreenPixel(buffer, x, y, color);
@@ -184,7 +188,7 @@ void cGdi::drawPixel(u8 x, u8 y, GRAPHICS_ENGINE engine) {
 void cGdi::drawLine(s16 x1, s16 y1, s16 x2, s16 y2, GRAPHICS_ENGINE engine) {
     if ((x1 == x2) && (y1 == y2)) return;
 
-    u16* buffer = engine == GE_MAIN ? _bufferMain2 + _layerPitch : _bufferSub2;
+    u16* buffer = engine == GE_MAIN ? _workMain + _layerPitch : _workSub;
     u16 color = engine == GE_MAIN ? _penColor : _penColorSub;
 
     if (x1 == x2) {
@@ -274,7 +278,7 @@ void cGdi::drawRadiusLine(s16 sx, s16 sy, u16 width, u16 length, s16 degrees, u1
 
     color = color | BIT(15);
 
-    u16* buffer = engine == GE_MAIN ? _bufferMain2 + _layerPitch : _bufferSub2;
+    u16* buffer = engine == GE_MAIN ? _workMain + _layerPitch : _workSub;
 
     degrees = (90 - degrees) % 360;
     double radius = degrees * PI / 180.0;
@@ -351,7 +355,7 @@ void ITCM_FUNC(cGdi::fillRect)(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 
     // color2 = (u16)BIT(15) | color2;
     u32 color = ((u32)color1 << 16) | color2;
     u32 altColor = ((u32)color2 << 16) | color1;
-    u16* pDest = GE_MAIN == engine ? _bufferMain2 + (y << 8) + x + _layerPitch : _bufferSub2 + (y << 8) + x;
+    u16* pDest = GE_MAIN == engine ? _workMain + (y << 8) + x + _layerPitch : _workSub + (y << 8) + x;
 
     bool aligned = !(x & 1);
     bool remains = (x ^ w) & 1;
@@ -462,8 +466,8 @@ void ITCM_FUNC(cGdi::fillRectBlend)(u16 color1, u16 color2, s16 x, s16 y, u16 w,
 
     // logger().info("Slow fillRectBlend.");
 
-    u16* pSrc = ((GE_MAIN == engine) ? _bufferMain3 : _bufferSub2) + (y << 8) + x;
-    u16* pDest = ((GE_MAIN == engine) ? (_bufferMain2 + _layerPitch) : _bufferSub2) + (y << 8) + x;
+    u16* pSrc = ((GE_MAIN == engine) ? _bufferMain3 : _workSub) + (y << 8) + x;
+    u16* pDest = ((GE_MAIN == engine) ? (_workMain + _layerPitch) : _workSub) + (y << 8) + x;
 
     bool aligned = !(x & 1);
     bool remains = (x ^ w) & 1;
@@ -513,8 +517,8 @@ ARM_CODE LIBNDS_NOINLINE
 void ITCM_FUNC(cGdi::bitBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH, u16 repeats, GRAPHICS_ENGINE engine) {
     u16* pSrc = (u16*)src;
     u16* pDest = (engine == GE_MAIN) ? 
-                    (_bufferMain2 + _layerPitch) : 
-                    _bufferSub2;
+                    (_workMain + _layerPitch) : 
+                    _workSub;
 
     if (destW > srcW) destW = srcW;
     if (destH > srcH) destH = srcH;
@@ -616,8 +620,8 @@ void ITCM_FUNC(cGdi::maskBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s1
                    GRAPHICS_ENGINE engine, u16 color) {
     u16* pSrc = (u16*)src;
     u16* pDest = GE_MAIN == engine ?
-        _bufferMain2 + _layerPitch :
-        _bufferSub2;
+        _workMain + _layerPitch :
+        _workSub;
 
     if (destW > srcW) destW = srcW;
     if (destH > srcH) destH = srcH;
@@ -736,7 +740,7 @@ ARM_CODE LIBNDS_NOINLINE
 s16 ITCM_FUNC(cGdi::textOutRect)(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont) {
     u8 fontHeight = textFont.GetHeight();
     u8 fontDescend = textFont.GetDescend();
-    u16* pDest = GE_MAIN == engine ? _bufferMain2 + _layerPitch : _bufferSub2;
+    u16* pDest = GE_MAIN == engine ? _workMain + _layerPitch : _workSub;
     u16 color = GE_MAIN == engine ? _penColor : _penColorSub;
 
     const s16 originX = x, limitY = y + h - fontHeight;
@@ -766,21 +770,21 @@ void ITCM_FUNC(cGdi::present)(GRAPHICS_ENGINE engine) {
         if (_scheduleDrop) {
             // nocashMessage("Dropping background");
             swiWaitForVBlank();
-            dmaCopyWordsGdi(3, _bufferMain2, _bufferMain1, 256 * 192 * 2);
-            dmaCopyWordsGdi(3, _bufferMain2 + (256 * 192), _bufferMain3, 256 * 192 * 2);
-            fillMemory((void*)_bufferMain2, 256 * 192 * 4, 0);
+            dmaCopyWordsGdi(3, _workMain, _bufferMain1, 256 * 192 * 2);
+            dmaCopyWordsGdi(3, _workMain + (256 * 192), _bufferMain3, 256 * 192 * 2);
+            fillMemory((void*)_workMain, 256 * 192 * 4, 0);
             _scheduleDrop = false;
         } else {
-            dmaCopyWordsGdi(3, _bufferMain2 + _layerPitch, _mainEngineLayer == 0 ? _bufferMain1 : _bufferMain3, 256 * 192 * 2);
-            fillMemory((void*)(_bufferMain2 + _layerPitch), 256 * 192 * 2, 0);
+            dmaCopyWordsGdi(3, _workMain + _layerPitch, _mainEngineLayer == 0 ? _bufferMain1 : _bufferMain3, 256 * 192 * 2);
+            fillMemory((void*)(_workMain + _layerPitch), 256 * 192 * 2, 0);
         }     
 
         oamUpdate(&oamMain);
 
     } else if (GE_SUB == engine) {
         if (SEM_GRAPHICS == _subEngineMode)
-            dmaCopyWordsGdi(3, (void*)_bufferSub2, (void*)_bufferSub1, 256 * 192 * 2);
-        // fillMemory((void*)_bufferSub2, 0x18000, 0xffffffff);
+            dmaCopyWordsGdi(3, (void*)_workSub, (void*)_bufferSub1, 256 * 192 * 2);
+        // fillMemory((void*)_workSub, 0x18000, 0xffffffff);
     }
 }
 

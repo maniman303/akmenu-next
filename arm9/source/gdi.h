@@ -123,14 +123,14 @@ class cGdi {
     u16 _penColor;
     u16 _penColorSub;
     u16 _transColor;
+    u16* _workMain;
     u16* _bufferMain1;
-    u16* _bufferMain2;
     u16* _bufferMain3;
     MAIN_ENGINE_LAYER _mainEngineLayer;
     SUB_ENGINE_MODE _subEngineMode;
     u32 _layerPitch;
+    u16* _workSub;
     u16* _bufferSub1;
-    u16* _bufferSub2;
 #ifdef DEBUG
     u16* _bufferSub3;
 #endif
