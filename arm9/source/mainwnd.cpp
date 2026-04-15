@@ -173,7 +173,8 @@ void cMainWnd::init() {
     dbg_printf("startMenu %08x\n", _startMenu);
 
     diskIcon().loadAppearance(SFN_CARD_ICON_BLUE);
-    diskIcon().show();
+    diskIcon().setParent(this);
+    addChildWindow(&diskIcon());
 
     cFavorites::RemoveInvalidFavorites();
 }
@@ -379,7 +380,7 @@ void cMainWnd::showSettings(void) {
         return;
     }
 
-    cSettingWnd* settingWnd = cSettingWnd::createWindow(this, LANG("start menu", "Setting"), "main_settings", [this](cSettingWnd* wnd) { saveSettings(wnd); });
+    cSettingWnd* settingWnd = cSettingWnd::createWindow(LANG("start menu", "Setting"), "main_settings", [this](cSettingWnd* wnd) { saveSettings(wnd); });
     settingWnd->addSettingTab(LANG("system setting", "title"));
 
     // page 1: system
@@ -684,7 +685,7 @@ void cMainWnd::showFileInfo() {
 
     std::string showName = _mainList->getSelectedShowName();
     std::string fullPath = _mainList->getSelectedFullPath();
-    cRomInfoWnd* romInfoWnd = cRomInfoWnd::createWindow(this, LANG("rom info", "title"), [this](cRomInfoWnd* wnd) { saveFileInfo(wnd); });
+    cRomInfoWnd* romInfoWnd = cRomInfoWnd::createWindow(LANG("rom info", "title"), [this](cRomInfoWnd* wnd) { saveFileInfo(wnd); });
     romInfoWnd->setFileInfo(fullPath, showName);
     romInfoWnd->setRomInfo(rominfo);
     romInfoWnd->setSaves(_mainList->Saves());

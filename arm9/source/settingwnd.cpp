@@ -22,8 +22,8 @@
 
 using namespace akui;
 
-cSettingWnd* cSettingWnd::createWindow(cWindow* parent, const std::string& text, const std::string& id, std::function<void(cSettingWnd*)> onSaved) {
-    cSettingWnd* wnd = new cSettingWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, parent, text, id);
+cSettingWnd* cSettingWnd::createWindow(const std::string& text, const std::string& id, std::function<void(cSettingWnd*)> onSaved) {
+    cSettingWnd* wnd = new cSettingWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, text, id);
     wnd->setDynamic(true);
     wnd->onSaved = onSaved;
     _modals.push_back(wnd);

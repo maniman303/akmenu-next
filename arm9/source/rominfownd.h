@@ -23,7 +23,7 @@ class cRomInfoWnd : public akui::cForm {
 
     ~cRomInfoWnd();
 
-    static cRomInfoWnd* createWindow(cWindow* parent, const std::string& text, std::function<void(cRomInfoWnd*)> onSaved);
+    static cRomInfoWnd* createWindow(const std::string& text, std::function<void(cRomInfoWnd*)> onSaved);
 
   public:
     std::function<void(cRomInfoWnd*)> onSaved;

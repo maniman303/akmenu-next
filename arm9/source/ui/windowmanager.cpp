@@ -54,7 +54,8 @@ namespace akui {
     }
 
     cWindowManager& cWindowManager::removeWindow(cWindow* aWindow) {
-        if (aWindow == _currentWindow.window()) {
+        cWindow* current = _currentWindow.window();
+        if (current != NULL && current->doesHierarchyContain(aWindow)) {
             if (_backgroundWindows.empty()) {
                 _currentWindow = cWindowRec(NULL, NULL);
             } else {

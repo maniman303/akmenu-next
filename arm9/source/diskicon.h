@@ -10,8 +10,8 @@
 #pragma once
 
 #include <nds.h>
+#include "bmp15.h"
 #include "singleton.h"
-#include "sprite.h"
 #include "window.h"
 
 class cDiskIcon : public akui::cWindow {
@@ -33,10 +33,9 @@ class cDiskIcon : public akui::cWindow {
 
   protected:
     bool _show;
-
+    bool _blink;
     float _lightTime;
-
-    cSprite _icon;
+    cBMP15 _icon;
 };
 
 typedef t_singleton<cDiskIcon> diskIcon_s;

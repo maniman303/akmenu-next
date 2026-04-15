@@ -23,14 +23,14 @@
 
 using namespace akui;
 
-cRomInfoWnd* cRomInfoWnd::createWindow(cWindow* parent, const std::string& text, std::function<void(cRomInfoWnd*)> onSaved) {
+cRomInfoWnd* cRomInfoWnd::createWindow(const std::string& text, std::function<void(cRomInfoWnd*)> onSaved) {
     CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
     u32 w = 240;
     u32 h = 144;
     w = ini.GetInt("rom info window", "w", w);
     h = ini.GetInt("rom info window", "h", h);
 
-    cRomInfoWnd* wnd = new cRomInfoWnd((SCREEN_WIDTH - w) / 2, (SCREEN_HEIGHT - h) / 2, w, h, parent, text);
+    cRomInfoWnd* wnd = new cRomInfoWnd((SCREEN_WIDTH - w) / 2, (SCREEN_HEIGHT - h) / 2, w, h, NULL, text);
     wnd->setDynamic(true);
     wnd->onSaved = onSaved;
     _modals.push_back(wnd);
@@ -299,7 +299,7 @@ void cRomInfoWnd::onShow() {
 void cRomInfoWnd::pressSaveType(void) {
     if (!_romInfo.isDSRom() || _romInfo.isHomebrew()) return;
 
-    cSettingWnd* settingWnd = cSettingWnd::createWindow(NULL, LANG("game settings", "title"), "rom_info", [this](cSettingWnd* wnd) { saveSettings(wnd); });
+    cSettingWnd* settingWnd = cSettingWnd::createWindow(LANG("game settings", "title"), "rom_info", [this](cSettingWnd* wnd) { saveSettings(wnd); });
     
     settingWnd->addSettingTab(LANG("save type", "tab1"));
 

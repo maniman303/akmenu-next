@@ -22,7 +22,7 @@ class cSettingWnd : public akui::cForm {
     ~cSettingWnd() override;
 
   public:
-    static cSettingWnd* createWindow(cWindow* parent, const std::string& text, const std::string& id, std::function<void(cSettingWnd*)> onSaved);
+    static cSettingWnd* createWindow(const std::string& text, const std::string& id, std::function<void(cSettingWnd*)> onSaved);
 
     std::function<void(cSettingWnd*)> onSaved;
 
