@@ -282,9 +282,7 @@ int main(int argc, char* argv[]) {
         datetime().purge();
 
         swiWaitForVBlank();
-
-        gdi().present(GE_SUB);
-        gdi().present(GE_MAIN);
+        gdi().present();
     }
 
     return 0;

@@ -16,7 +16,7 @@ cZoomingIcon::cZoomingIcon() {
     _scale = 1.f;
     _needUpdateBuffer = false;
 
-    _sprite.init(0);
+    _sprite.init(0, true);
     _sprite.setPriority(1);
     _sprite.setAlpha(15);
     _sprite.show();

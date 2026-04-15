@@ -20,7 +20,7 @@ using namespace akui;
 cDiskIcon::cDiskIcon() : cWindow(NULL, "diskicon") {
     _show = true;
     _engine = GE_MAIN;
-    _icon.init(1);
+    _icon.init(1, true);
     _icon.setPosition(226, 174);
     _icon.setPriority(3);
     _icon.setBufferOffset(16);

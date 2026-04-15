@@ -108,10 +108,9 @@ class cGdi {
 
     void present(GRAPHICS_ENGINE engine);
 
+    void present();
+
     void scheduleDrop();
-#ifdef DEBUG
-    void switchSubEngineMode();
-#endif
 
   protected:
     void swapLCD(void);
@@ -131,10 +130,6 @@ class cGdi {
     u32 _layerPitch;
     u16* _workSub;
     u16* _bufferSub1;
-#ifdef DEBUG
-    u16* _bufferSub3;
-#endif
-    cSprite* _sprites;
     bool _scheduleDrop;
 };
 

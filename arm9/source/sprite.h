@@ -26,14 +26,17 @@ enum SPRITE_SHAPE {
 
 class cSprite {
   public:
-    cSprite() { init(0); }
+    cSprite();
 
     cSprite(u8 id);
 
+    cSprite(u8 id, bool main);
+
     ~cSprite();
 
-    static void sysinit();
-    void init(u16 id);
+    static void sysMainInit();
+    static void sysSubInit();
+    void init(u16 id, bool main);
     // void update();
     void setAlpha(u8 alpha);
     void setPosition(u16 x, u8 y);
@@ -65,6 +68,7 @@ class cSprite {
     u8 _alpha;
     u8 _priority;
     u16 _bufferOffset;
+    bool _main;
 };
 
 // class cSpritePool

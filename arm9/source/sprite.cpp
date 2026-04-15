@@ -10,13 +10,17 @@
 #include "sprite.h"
 #include <nds.h>
 
+cSprite::cSprite() {
+    init(0, true);
+}
+
 cSprite::cSprite(u8 id) {
-    init(id);
+    init(id, true);
 }
 
 cSprite::~cSprite() {}
 
-void cSprite::sysinit() {
+void cSprite::sysMainInit() {
     oamInit(&oamMain, SpriteMapping_Bmp_1D_128, true);
 
     for (int i = 0; i < 128; i++) {
@@ -30,19 +34,32 @@ void cSprite::sysinit() {
     oamEnable(&oamMain);
 }
 
-void cSprite::init(u16 id) {
+void cSprite::sysSubInit() {
+    oamInit(&oamSub, SpriteMapping_Bmp_1D_128, true);
+
+    for (int i = 0; i < 128; i++) {
+        oamSub.oamMemory[i].attribute[0] = ATTR0_DISABLED;
+        oamSub.oamMemory[i].attribute[1] = 0;
+        oamSub.oamMemory[i].attribute[2] = 0;
+        oamSub.oamMemory[i].filler = 0;
+    }
+
+    oamUpdate(&oamSub);
+    oamEnable(&oamSub);
+}
+
+void cSprite::init(u16 id, bool main) {
     _id = id;
-
     _size = SS_SIZE_32;
-
     _shape = SS_SHAPE_SQUARE;
-
     _bufferOffset = 0;
-
     _priority = 2;
+    _main = main;
 
-    _entry = &oamMain.oamMemory[_id];
-    _affine = &oamMain.oamRotationMemory[_id];
+    OamState oam = main ? oamMain : oamSub;
+
+    _entry = &oam.oamMemory[_id];
+    _affine = &oam.oamRotationMemory[_id];
 
     // initial x = 0, hidden, bitmap obj mode, square shape
     _entry->attribute[0] = ATTR0_DISABLED | ATTR0_BMP | ATTR0_SQUARE | 0;
@@ -65,7 +82,7 @@ void cSprite::hide() {
 }
 
 void cSprite::setAlpha(u8 alpha) {
-    oamSetAlpha(&oamMain, _id, alpha);
+    oamSetAlpha(_main ? &oamMain : &oamSub, _id, alpha);
 }
 
 void cSprite::setPosition(u16 x, u8 y) {
@@ -91,7 +108,7 @@ void cSprite::setPosition(u16 x, u8 y) {
     y -= offset;
     _y = y & 0xFF;
 
-    oamSetXY(&oamMain, _id, _x, _y);
+    oamSetXY(_main ? &oamMain : &oamSub, _id, _x, _y);
 }
 
 void cSprite::setSize(SPRITE_SIZE size) {
@@ -105,7 +122,7 @@ void cSprite::setShape(SPRITE_SHAPE shape) {
 }
 
 u16* cSprite::buffer() {
-    return SPRITE_GFX + (_bufferOffset * 64);
+    return (_main ? SPRITE_GFX : SPRITE_GFX_SUB) + (_bufferOffset * 64);
 }
 
 void cSprite::setBufferOffset(u32 offset) {
@@ -133,7 +150,7 @@ void cSprite::setScale(float scaleX, float scaleY) {
 
 void cSprite::setPriority(u8 priority) {
     _priority = priority;
-    oamSetPriority(&oamMain, _id, _priority);
+    oamSetPriority(_main ? &oamMain : &oamSub, _id, _priority);
 }
 
 bool cSprite::visible() {

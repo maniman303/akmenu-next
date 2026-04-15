@@ -28,76 +28,24 @@ static void ITCM_FUNC(dmaCopyWordsGdi)(uint8 channel, const void* src, void* des
     DC_InvalidateRange(dest, size);
 }
 
-#ifdef DEBUG
-PrintConsole custom_console;
-
-static void MyInitConsole(u16* aBufferSub1, u16* aBufferSub2) {
-    custom_console = *consoleGetDefault();
-
-    custom_console.loadGraphics = false;
-
-    consoleInit(&custom_console, custom_console.bgLayer, BgType_Text4bpp, BgSize_T_256x256,
-                custom_console.mapBase, custom_console.gfxBase, false, false);
-
-    custom_console.fontBgMap = aBufferSub1;
-    custom_console.fontBgGfx = aBufferSub2;
-
-    dmaCopy(custom_console.font.gfx, custom_console.fontBgGfx,
-            custom_console.font.numChars * 64 / 2);
-    custom_console.fontCurPal = 15 << 12;
-
-    u16* palette = BG_PALETTE_SUB;
-    palette[1 * 16 - 15] = RGB15(0, 0, 0);    // 30 normal black
-    palette[2 * 16 - 15] = RGB15(15, 0, 0);   // 31 normal red
-    palette[3 * 16 - 15] = RGB15(0, 15, 0);   // 32 normal green
-    palette[4 * 16 - 15] = RGB15(15, 15, 0);  // 33 normal yellow
-
-    palette[5 * 16 - 15] = RGB15(0, 0, 15);    // 34 normal blue
-    palette[6 * 16 - 15] = RGB15(15, 0, 15);   // 35 normal magenta
-    palette[7 * 16 - 15] = RGB15(0, 15, 15);   // 36 normal cyan
-    palette[8 * 16 - 15] = RGB15(24, 24, 24);  // 37 normal white
-
-    palette[9 * 16 - 15] = RGB15(15, 15, 15);  // 40 bright black
-    palette[10 * 16 - 15] = RGB15(31, 0, 0);   // 41 bright red
-    palette[11 * 16 - 15] = RGB15(0, 31, 0);   // 42 bright green
-    palette[12 * 16 - 15] = RGB15(31, 31, 0);  // 43 bright yellow
-
-    palette[13 * 16 - 15] = RGB15(0, 0, 31);    // 44 bright blue
-    palette[14 * 16 - 15] = RGB15(31, 0, 31);   // 45 bright magenta
-    palette[15 * 16 - 15] = RGB15(0, 31, 31);   // 46 bright cyan
-    palette[16 * 16 - 15] = RGB15(31, 31, 31);  // 47 & 39 bright white
-}
-#endif
-
-//TODO: compile as arm, not thumb
-
 cGdi::cGdi() {
     _transColor = 0;
     _mainEngineLayer = MEL_UP;
     _subEngineMode = SEM_TEXT;
     _workMain = NULL;
     _workSub = NULL;
-#ifdef DEBUG
-    _bufferSub3 = NULL;
-#endif
-    _sprites = NULL;
     _scheduleDrop = false;
 }
 
 cGdi::~cGdi() {
     if (NULL != _workMain) delete[] _workMain;
     if (NULL != _workSub) delete[] _workSub;
-#ifdef DEBUG
-    if (NULL != _bufferSub3) delete[] _bufferSub3;
-#endif
-    if (NULL != _sprites) delete[] _sprites;
 }
 
 void cGdi::init() {
     swapLCD();
     activeFbMain();
     activeFbSub();
-    cSprite::sysinit();
 }
 
 void cGdi::swapLCD(void) {
@@ -145,13 +93,15 @@ void cGdi::activeFbMain(void) {
     swiWaitForVBlank();  // remove tearing at bottop screen
     videoSetMode(MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE |
                  DISPLAY_SPR_1D_BMP_SIZE_128 | DISPLAY_SPR_1D_BMP);
+
+    cSprite::sysMainInit();
 }
 
 void cGdi::activeFbSub(void) {
     vramSetBankC(VRAM_C_SUB_BG_0x06200000);  // 128k
+    vramSetBankD(VRAM_D_SUB_SPRITE);
     _subEngineMode = SEM_GRAPHICS;
 
-    // BMP bg 的参数设置，从 VRAM地址 0x06200000 开始，优先级3
     REG_BG2CNT_SUB = BG_BMP16_256x256 | BG_BMP_BASE(0) | BG_PRIORITY_1;
     REG_BG2PA_SUB = 1 << 8;
     REG_BG2PD_SUB = 1 << 8;
@@ -160,14 +110,16 @@ void cGdi::activeFbSub(void) {
     REG_BG2Y_SUB = 0;
     REG_BG2X_SUB = 0;
 
-    _bufferSub1 = (u16*)0x06200000;
     _workSub = (u16*)new u32[256 * 192 / 2];
+    _bufferSub1 = (u16*)0x06200000;
 
     fillMemory(_workSub, 0x18000, 0xffffffff);
     fillMemory(_bufferSub1, 0x18000, 0xffffffff);
 
     swiWaitForVBlank();
-    videoSetModeSub(MODE_5_2D | DISPLAY_BG2_ACTIVE);
+    videoSetModeSub(MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D_BMP_SIZE_128 | DISPLAY_SPR_1D_BMP);
+
+    cSprite::sysSubInit();
 }
 
 static inline void putScreenPixel(u16* buffer, s16 x, s16 y, u16 color) {
@@ -351,8 +303,6 @@ void cGdi::frameRect(s16 x, s16 y, u16 w, u16 h, u16 thickness, GRAPHICS_ENGINE 
 
 ARM_CODE LIBNDS_NOINLINE
 void ITCM_FUNC(cGdi::fillRect)(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine) {
-    // color1 = (u16)BIT(15) | color1;
-    // color2 = (u16)BIT(15) | color2;
     u32 color = ((u32)color1 << 16) | color2;
     u32 altColor = ((u32)color2 << 16) | color1;
     u16* pDest = GE_MAIN == engine ? _workMain + (y << 8) + x + _layerPitch : _workSub + (y << 8) + x;
@@ -768,15 +718,13 @@ ARM_CODE LIBNDS_NOINLINE
 void ITCM_FUNC(cGdi::present)(GRAPHICS_ENGINE engine) {
     if (GE_MAIN == engine) {
         if (_scheduleDrop) {
-            // nocashMessage("Dropping background");
-            swiWaitForVBlank();
             dmaCopyWordsGdi(3, _workMain, _bufferMain1, 256 * 192 * 2);
             dmaCopyWordsGdi(3, _workMain + (256 * 192), _bufferMain3, 256 * 192 * 2);
-            fillMemory((void*)_workMain, 256 * 192 * 4, 0);
+            fillMemory((void*)_workMain, SCREEN_WIDTH * SCREEN_HEIGHT * 4, 0);
             _scheduleDrop = false;
         } else {
             dmaCopyWordsGdi(3, _workMain + _layerPitch, _mainEngineLayer == 0 ? _bufferMain1 : _bufferMain3, 256 * 192 * 2);
-            fillMemory((void*)(_workMain + _layerPitch), 256 * 192 * 2, 0);
+            fillMemory((void*)(_workMain + _layerPitch), SCREEN_WIDTH * SCREEN_HEIGHT * 2, 0);
         }     
 
         oamUpdate(&oamMain);
@@ -784,8 +732,30 @@ void ITCM_FUNC(cGdi::present)(GRAPHICS_ENGINE engine) {
     } else if (GE_SUB == engine) {
         if (SEM_GRAPHICS == _subEngineMode)
             dmaCopyWordsGdi(3, (void*)_workSub, (void*)_bufferSub1, 256 * 192 * 2);
-        // fillMemory((void*)_workSub, 0x18000, 0xffffffff);
+        fillMemory((void*)_workSub, SCREEN_WIDTH * SCREEN_HEIGHT, 0);
+        oamUpdate(&oamSub);
     }
+}
+
+ARM_CODE LIBNDS_NOINLINE
+void ITCM_FUNC(cGdi::present)() {
+    if (SEM_GRAPHICS == _subEngineMode)
+        dmaCopyWordsGdi(3, (void*)_workSub, (void*)_bufferSub1, 256 * 192 * 2);
+
+    bool scheduleDrop = _scheduleDrop;
+    if (scheduleDrop) {
+        swiWaitForVBlank();
+        dmaCopyWordsGdi(3, _workMain + (256 * 192), _bufferMain3, 256 * 192 * 2);
+        _scheduleDrop = false;
+    }
+
+    dmaCopyWordsGdi(3, _workMain + _layerPitch, _mainEngineLayer == 0 ? _bufferMain1 : _bufferMain3, 256 * 192 * 2);
+
+    fillMemory((void*)_workSub, SCREEN_WIDTH * SCREEN_HEIGHT * 2, 0);
+    fillMemory((void*)(_workMain + _layerPitch), SCREEN_WIDTH * SCREEN_HEIGHT * 2, 0);
+    
+    oamUpdate(&oamSub);
+    oamUpdate(&oamMain);
 }
 
 void cGdi::scheduleDrop() {
