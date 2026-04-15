@@ -41,27 +41,27 @@ void cUISettings::loadSettings() {
     CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
 
     showCalendar = ini.GetInt("global settings", "showCalendar", showCalendar);
-    formFrameColor = ini.GetInt("global settings", "formFrameColor", formFrameColor);
-    formBodyColor = ini.GetInt("global settings", "formBodyColor", formBodyColor);
-    formBodyColor2 = ini.GetInt("global settings", "formBodyColor2", formBodyColor);
-    formTextColor = ini.GetInt("global settings", "formTextColor", formTextColor);
-    formTextHighLightColor = ini.GetInt("global settings", "formTextHighLightColor", formTextColor);
-    formTitleTextColor = ini.GetInt("global settings", "formTitleTextColor", formTitleTextColor);
-    buttonTextColor = ini.GetInt("global settings", "buttonTextColor", buttonTextColor);
-    spinBoxNormalColor = ini.GetInt("global settings", "spinBoxNormalColor", spinBoxNormalColor);
-    spinBoxFocusColor = ini.GetInt("global settings", "spinBoxFocusColor", spinBoxFocusColor);
-    spinBoxTextColor = ini.GetInt("global settings", "spinBoxTextColor", spinBoxTextColor);
-    spinBoxTextHighLightColor = ini.GetInt("global settings", "spinBoxTextHiLightColor", spinBoxTextHighLightColor);
-    spinBoxTextNamedColor = ini.GetInt("global settings", "spinBoxTextNamedColor", spinBoxTextColor);
-    spinBoxFrameColor = ini.GetInt("global settings", "spinBoxFrameColor", spinBoxFrameColor);
-    listViewBarColor1 = ini.GetInt("global settings", "listViewBarColor1", listViewBarColor1);
-    listViewBarColor2 = ini.GetInt("global settings", "listViewBarColor2", listViewBarColor2);
-    listTextColor = ini.GetInt("global settings", "listTextColor", listTextColor);
+    formFrameColor = ini.GetInt("global settings", "formFrameColor", formFrameColor) | BIT(15);
+    formBodyColor = ini.GetInt("global settings", "formBodyColor", formBodyColor) | BIT(15);
+    formBodyColor2 = ini.GetInt("global settings", "formBodyColor2", formBodyColor) | BIT(15);
+    formTextColor = ini.GetInt("global settings", "formTextColor", formTextColor) | BIT(15);
+    formTextHighLightColor = ini.GetInt("global settings", "formTextHighLightColor", formTextColor) | BIT(15);
+    formTitleTextColor = ini.GetInt("global settings", "formTitleTextColor", formTitleTextColor) | BIT(15);
+    buttonTextColor = ini.GetInt("global settings", "buttonTextColor", buttonTextColor) | BIT(15);
+    spinBoxNormalColor = ini.GetInt("global settings", "spinBoxNormalColor", spinBoxNormalColor) | BIT(15);
+    spinBoxFocusColor = ini.GetInt("global settings", "spinBoxFocusColor", spinBoxFocusColor) | BIT(15);
+    spinBoxTextColor = ini.GetInt("global settings", "spinBoxTextColor", spinBoxTextColor) | BIT(15);
+    spinBoxTextHighLightColor = ini.GetInt("global settings", "spinBoxTextHiLightColor", spinBoxTextHighLightColor) | BIT(15);
+    spinBoxTextNamedColor = ini.GetInt("global settings", "spinBoxTextNamedColor", spinBoxTextColor) | BIT(15);
+    spinBoxFrameColor = ini.GetInt("global settings", "spinBoxFrameColor", spinBoxFrameColor) | BIT(15);
+    listViewBarColor1 = ini.GetInt("global settings", "listViewBarColor1", listViewBarColor1) | BIT(15);
+    listViewBarColor2 = ini.GetInt("global settings", "listViewBarColor2", listViewBarColor2) | BIT(15);
+    listTextColor = ini.GetInt("global settings", "listTextColor", listTextColor) | BIT(15);
     listTextHighLightColor =
-            ini.GetInt("global settings", "listTextHighLightColor", listTextHighLightColor);
-    popMenuTextColor = ini.GetInt("global settings", "popMenuTextColor", popMenuTextColor);
+            ini.GetInt("global settings", "listTextHighLightColor", listTextHighLightColor) | BIT(15);
+    popMenuTextColor = ini.GetInt("global settings", "popMenuTextColor", popMenuTextColor) | BIT(15);
     popMenuTextHighLightColor =
-            ini.GetInt("global settings", "popMenuTextHighLightColor", popMenuTextHighLightColor);
-    popMenuBarColor = ini.GetInt("global settings", "popMenuBarColor", popMenuBarColor);
+            ini.GetInt("global settings", "popMenuTextHighLightColor", popMenuTextHighLightColor) | BIT(15);
+    popMenuBarColor = ini.GetInt("global settings", "popMenuBarColor", popMenuBarColor) | BIT(15);
     thickness = ini.GetInt("global settings", "thickness", thickness);
 }

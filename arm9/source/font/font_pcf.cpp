@@ -6,11 +6,15 @@
     SPDX-License-Identifier: GPL-3.0-or-later
 */
 
-#include "font_pcf.h"
+
 #include <fcntl.h>
 #include <unistd.h>
+#include <unordered_map>
+#include "font_pcf.h"
 #include "font_pcf_internals.h"
 #include "language.h"
+
+std::unordered_map<u16, s32> map;
 
 cFontPcf::cFontPcf()
     : cFont(),
@@ -96,9 +100,10 @@ bool cFontPcf::ParseBitmaps(int aFont, u32 aSize, u32 aOffset) {
         u32* offsets = new (std::nothrow) u32[header.iCount];
         if (offsets) {
             do {
-                if (read(aFont, offsets, sizeof(u32) * header.iCount) !=
-                    (ssize_t)(sizeof(u32) * header.iCount))
+                if (read(aFont, offsets, sizeof(u32) * header.iCount) != (ssize_t)(sizeof(u32) * header.iCount)) {
                     break;
+                }
+
                 for (u32 ii = 0; ii < header.iCount; ii++) {
                     iGlyphs[ii].iOffset = offsets[ii];
                 }
@@ -239,8 +244,15 @@ u8 cFontPcf::GetDescend() const {
 }
 
 s32 cFontPcf::Search(u16 aCode) const {
+    if (map.find(aCode) != map.end()) {
+        return map[aCode];
+    }
+
     s32 result = SearchInternal(aCode);
     if (result < 0 && aCode > ' ') result = SearchInternal('?');
+
+    map[aCode] = result;
+
     return result;
 }
 
@@ -248,7 +260,6 @@ s32 cFontPcf::SearchInternal(u16 aCode) const {
     s32 low = 0, high = iCount - 1, curr;
     while (true) {
         curr = (low + high) / 2;
-        // curr=((aCode-iGlyphs[low].iCode)*(high-low)/(iGlyphs[high].iCode-iGlyphs[low].iCode))+low;
         if (aCode < iGlyphs[curr].iCode) {
             high = curr - 1;
         } else if (aCode > iGlyphs[curr].iCode) {

@@ -347,12 +347,10 @@ void cGdi::frameRect(s16 x, s16 y, u16 w, u16 h, u16 thickness, GRAPHICS_ENGINE 
 
 ARM_CODE LIBNDS_NOINLINE
 void ITCM_FUNC(cGdi::fillRect)(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine) {
-    color1 = (u16)BIT(15) | color1;
-    color2 = (u16)BIT(15) | color2;
-    ALIGN(4) u16 color[2] = { color1, color2 };
-    ALIGN(4) u16 altColor[2] = { color2, color1 };
-    u16* pSrc = (u16*)color;
-    u16* pAltSrc = (u16*)altColor;
+    // color1 = (u16)BIT(15) | color1;
+    // color2 = (u16)BIT(15) | color2;
+    u32 color = ((u32)color1 << 16) | color2;
+    u32 altColor = ((u32)color2 << 16) | color1;
     u16* pDest = GE_MAIN == engine ? _bufferMain2 + (y << 8) + x + _layerPitch : _bufferSub2 + (y << 8) + x;
 
     bool aligned = !(x & 1);
@@ -361,17 +359,25 @@ void ITCM_FUNC(cGdi::fillRect)(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 
     u16 halfWidth = (w - (aligned ? 0 : 1)) >> 1;
 
     for (u32 i = 0; i < h; ++i) {
-        u16* source = (i & 1) ? pSrc : pAltSrc;
+        u32 source = (i & 1) ? color : altColor;
         if (!aligned) {
-            *pDest = source[1];
+            *pDest = (u16)(source & 0x0000ffff);
             pDest++;
         }
         
-        swiFastCopy(source, pDest, COPY_MODE_WORD | COPY_MODE_FILL | halfWidth);
+        if (halfWidth == 1) {
+            *(u32*)(pDest) = source;
+        } else if (halfWidth == 2) {
+            *(u32*)(pDest) = source;
+            *(u32*)(pDest + 2) = source;
+        } else if (halfWidth != 0) {
+            swiFastCopy(&source, pDest, COPY_MODE_WORD | COPY_MODE_FILL | halfWidth);
+        }
+
         pDest += halfWidth << 1;
 
         if (remains) {
-            *pDest++ = *source;
+            *pDest++ = (u16)((source & 0xffff0000) >> 16);
         }
 
         pDest += destInc;
@@ -726,6 +732,8 @@ ARM_CODE LIBNDS_NOINLINE
 s16 ITCM_FUNC(cGdi::textOutRect)(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont) {
     u8 fontHeight = textFont.GetHeight();
     u8 fontDescend = textFont.GetDescend();
+    u16* pDest = GE_MAIN == engine ? _bufferMain2 + _layerPitch : _bufferSub2;
+    u16 color = GE_MAIN == engine ? _penColor : _penColorSub;
 
     const s16 originX = x, limitY = y + h - fontHeight;
     while (*text) {
@@ -737,9 +745,8 @@ s16 ITCM_FUNC(cGdi::textOutRect)(s16 x, s16 y, u16 w, u16 h, const char* text, G
         } else {
             u32 ww, add;
             textFont.Info(text, &ww, &add);
-            if (x + (s16)ww <= originX + w) {
-                textFont.Draw((GE_MAIN == engine) ? (_bufferMain2 + _layerPitch) : _bufferSub2, x, y,
-                            (const u8*)text, (GE_MAIN == engine) ? _penColor : _penColorSub);
+            if (x + (s16)ww <= std::min(originX + w, SCREEN_WIDTH)) {
+                textFont.Draw(pDest, x, y, (const u8*)text, color);
             }
             text += add;
             x += ww;
