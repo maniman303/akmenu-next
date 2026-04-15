@@ -647,18 +647,18 @@ void ITCM_FUNC(cGdi::maskBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s1
     u16 pitch = srcW + (srcW & 1);
     bool colorOverride = color != 0;
 
-    u16* srcOffset = NULL;
-    u16* destOffset = NULL;
+    u16 srcOffset = 0;
+    u16 destOffset = 0;
     u16 start = 0;
     u16 length = 0;
 
     for (u16 i = 0; i < destH; i++) {
-        srcOffset = pSrc + srcOffsetX + (i + srcOffsetY) * pitch;
-        destOffset = pDest + destX + (i + destY) * SCREEN_WIDTH;
+        srcOffset = srcOffsetX + (i + srcOffsetY) * pitch;
+        destOffset = destX + (i + destY) * SCREEN_WIDTH;
         start = 0;
         length = 0;
         for (u16 k = 0; k < destW; k++) {
-            u16 srcPixel = *(srcOffset + k);
+            u16 srcPixel = *(pSrc + srcOffset + k);
             if (srcPixel & 0x8000) {
                 if (length == 0) {
                     start = k;
@@ -667,7 +667,7 @@ void ITCM_FUNC(cGdi::maskBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s1
                 length++;
 
                 if (k == 0) {
-                    u16 lastPixel = *(srcOffset + destW - 1);
+                    u16 lastPixel = *(pSrc + srcOffset + destW - 1);
                     if (lastPixel & 0x8000) {
                         length = destW;
                         break;
@@ -681,14 +681,14 @@ void ITCM_FUNC(cGdi::maskBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s1
                 continue;
             } else if (colorOverride) {
                 for (u16 l = 0; l < length; l++) {
-                    *(destOffset + start + l) = color;
+                    *(pDest + destOffset + start + l) = color;
                 }
             } else if (length == 1) {
-                *(destOffset + start) = *(srcOffset + start);
-            } else if ((((u32)srcOffset + start) & 1) || (((u32)destOffset + start) & 1) || (length & 1)) {
-                swiCopy(srcOffset + start, destOffset + start, COPY_MODE_COPY | length);
+                *(pDest + destOffset + start) = *(pSrc + srcOffset + start);
+            } else if (((srcOffset + start) & 1) || ((destOffset + start) & 1) || (length & 1)) {
+                swiCopy(pSrc + srcOffset + start, pDest + destOffset + start, COPY_MODE_COPY | length);
             } else {
-                swiFastCopy(srcOffset + start, destOffset + start, COPY_MODE_WORD | COPY_MODE_COPY | length >> 1);
+                swiFastCopy(pSrc + srcOffset + start, pDest + destOffset + start, COPY_MODE_WORD | COPY_MODE_COPY | length >> 1);
             }
             
             length = 0;
@@ -698,14 +698,14 @@ void ITCM_FUNC(cGdi::maskBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s1
             continue;
         } else if (colorOverride) {
             for (u16 l = 0; l < length; l++) {
-                *(destOffset + start + l) = color;
+                *(pDest + destOffset + start + l) = color;
             }
         } else if (length == 1) {
-            *(destOffset + start) = *(srcOffset + start);
-        } else if ((((u32)srcOffset + start) & 1) || (((u32)destOffset + start) & 1) || (length & 1)) {
-            swiCopy(srcOffset + start, destOffset + start, COPY_MODE_COPY | length);
+            *(pDest + destOffset + start) = *(pSrc + srcOffset + start);
+        } else if (((srcOffset + start) & 1) || ((destOffset + start) & 1) || (length & 1)) {
+            swiCopy(pSrc + srcOffset + start, pDest + destOffset + start, COPY_MODE_COPY | length);
         } else {
-            swiFastCopy(srcOffset + start, destOffset + start, COPY_MODE_WORD | COPY_MODE_COPY | length >> 1);
+            swiFastCopy(pSrc + srcOffset + start, pDest + destOffset + start, COPY_MODE_WORD | COPY_MODE_COPY | length >> 1);
         }
     }
 }

@@ -14,13 +14,23 @@
 
 const char* cDateTime::weekdayStrings[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
+cDateTime::cDateTime() {
+    set = false;
+}
+
 void cDateTime::FillTimeParts(void) {
+    if (set) {
+        return;
+    }
+
     time_t epochTime;
     if (time(&epochTime) == (time_t)-1) {
         memset(&iTimeParts, 0, sizeof(iTimeParts));
     } else {
         localtime_r(&epochTime, &iTimeParts);
     }
+
+    set = true;
 }
 
 u16 cDateTime::year() {
@@ -89,4 +99,8 @@ std::string cDateTime::getTimeStampString() {
     // FillTimeParts();
     return formatString("%04d%02d%02d%02d%02d%02d", year(), month(), day(), hours(), minutes(),
                         seconds());
+}
+
+void cDateTime::purge() {
+    set = false;
 }

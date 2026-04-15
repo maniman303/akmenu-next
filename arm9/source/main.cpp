@@ -204,6 +204,8 @@ int main(int argc, char* argv[]) {
                 taskCruncher().process();
                 windowManager().update();
 
+                datetime().purge();
+
                 swiWaitForVBlank();
 
                 gdi().present(GE_MAIN);
@@ -276,6 +278,8 @@ int main(int argc, char* argv[]) {
         irq().drawTop();
 
         // nocashMessage(formatString("Ticks 8: %d.", timer().getTick()).c_str());
+
+        datetime().purge();
 
         swiWaitForVBlank();
 

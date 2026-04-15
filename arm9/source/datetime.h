@@ -17,12 +17,13 @@
 class cDateTime {
   private:
     tm iTimeParts;
+    bool set;
 
   private:
     void FillTimeParts(void);
 
   public:
-    cDateTime() {}
+    cDateTime();
     ~cDateTime() {}
 
   public:
@@ -44,6 +45,8 @@ class cDateTime {
     std::string getDateString(void);
     std::string getTimeString(void);
     std::string getTimeStampString(void);
+
+    void purge();
 };
 
 typedef t_singleton<cDateTime> dateTime_s;
