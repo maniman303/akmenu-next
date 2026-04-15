@@ -550,6 +550,7 @@ void ITCM_FUNC(cGdi::bitBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s16
 
     u16 temp1 = 0;
     u16 temp2 = 0;
+    u32 temp3 = 0;
 
     pDest += (destY * SCREEN_WIDTH) + destX;
     pSrc += srcOffsetX + (pitchPixel * srcOffsetY);
@@ -562,6 +563,7 @@ void ITCM_FUNC(cGdi::bitBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s16
           case 2:
             temp1 = *pSrc;
             temp2 = *(pSrc + 1);
+            temp3 = aligned ? ((u32)temp1 << 16) | temp2 : ((u32)temp2 << 16) | temp1;
             break;
           default:
             break;
@@ -570,9 +572,14 @@ void ITCM_FUNC(cGdi::bitBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s16
         for (u16 j = 0; j < repeats; j++) {
             if (destW == 1) {
                 *(pDest + j) = temp1;
+            } else if (aligned && destW == 2) {
+                swiFastCopy(&temp3, pDest, COPY_MODE_WORD | COPY_MODE_FILL | repeats);
+                break;
             } else if (destW == 2) {
-                *(pDest + (2 * j)) = temp1;
-                *(pDest + 1 + (2 * j)) = temp2;
+                *(pDest) = temp1;
+                swiFastCopy(&temp3, pDest + 1, COPY_MODE_WORD | COPY_MODE_FILL | (repeats - 1));
+                *(pDest -1 + (2 * repeats)) = temp2;
+                break;
             } else if (aligned && even && (destW != 0)) {
                 swiFastCopy(pSrc, pDest + (j * destW), COPY_MODE_WORD | COPY_MODE_COPY | halfPitch);
             } else {
@@ -658,59 +665,48 @@ void ITCM_FUNC(cGdi::maskBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s1
                 }
 
                 length++;
+
+                if (k == 0) {
+                    u16 lastPixel = *(srcOffset + destW - 1);
+                    if (lastPixel & 0x8000) {
+                        length = destW;
+                        break;
+                    }
+                }
+
                 continue;
             }
 
             if (length == 0) {
                 continue;
-            }
-            
-            if (colorOverride) {
+            } else if (colorOverride) {
                 for (u16 l = 0; l < length; l++) {
                     *(destOffset + start + l) = color;
                 }
-                length = 0;
-                continue;
-            }
-            
-            if (length == 1) {
+            } else if (length == 1) {
                 *(destOffset + start) = *(srcOffset + start);
-                length = 0;
-                continue;
+            } else if ((((u32)srcOffset + start) & 1) || (((u32)destOffset + start) & 1) || (length & 1)) {
+                swiCopy(srcOffset + start, destOffset + start, COPY_MODE_COPY | length);
+            } else {
+                swiFastCopy(srcOffset + start, destOffset + start, COPY_MODE_WORD | COPY_MODE_COPY | length >> 1);
             }
             
-            if ((((u32)srcOffset + start) & 1) || (((u32)destOffset + start) & 1) || (length & 1)) {
-                swiCopy(srcOffset + start, destOffset + start, COPY_MODE_COPY | length);
-                length = 0;
-                continue;
-            }
-
-            swiFastCopy(srcOffset + start, destOffset + start, COPY_MODE_WORD | COPY_MODE_COPY | length >> 1);
             length = 0;
         }
 
         if (length == 0) {
             continue;
-        }
-        
-        if (colorOverride) {
+        } else if (colorOverride) {
             for (u16 l = 0; l < length; l++) {
                 *(destOffset + start + l) = color;
             }
-            continue;
-        }
-        
-        if (length == 1) {
+        } else if (length == 1) {
             *(destOffset + start) = *(srcOffset + start);
-            continue;
-        }
-        
-        if ((((u32)srcOffset + start) & 1) || (((u32)destOffset + start) & 1) || (length & 1)) {
+        } else if ((((u32)srcOffset + start) & 1) || (((u32)destOffset + start) & 1) || (length & 1)) {
             swiCopy(srcOffset + start, destOffset + start, COPY_MODE_COPY | length);
-            continue;
+        } else {
+            swiFastCopy(srcOffset + start, destOffset + start, COPY_MODE_WORD | COPY_MODE_COPY | length >> 1);
         }
-
-        swiFastCopy(srcOffset + start, destOffset + start, COPY_MODE_WORD | COPY_MODE_COPY | length >> 1);
     }
 }
 
