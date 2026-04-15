@@ -71,14 +71,12 @@ void cPopMenu::draw() {
 }
 
 void cPopMenu::drawItems() {
-    // 循环绘制item文字，遇见 selected 文字就先绘制选择条
     for (size_t i = 0; i < _items.size(); ++i) {
         s16 itemX = position().x + _itemTopLeftPoint.x;
         s16 itemY = position().y + i * _itemHeight + _itemTopLeftPoint.y;
         if (_selectedItemIndex == (s16)i) {
             s16 barX = position().x + _barLeft;
             s16 barY = itemY - 2;
-            gdi().setPenColor(_barColor, _engine);
             gdi().fillRect(_barColor, _barColor, barX, barY, barWidth(), _itemHeight, _engine);
             gdi().setPenColor(_textHighLightColor, _engine);
         } else {

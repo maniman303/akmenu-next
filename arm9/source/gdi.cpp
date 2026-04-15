@@ -691,6 +691,8 @@ void ITCM_FUNC(cGdi::maskBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s1
                 }
             } else if (length == 1) {
                 *(pDest + destOffset + start) = *(pSrc + srcOffset + start);
+            } else if (length <= 4) {
+                memcpy(pDest + destOffset + start, pSrc + srcOffset + start, length * sizeof(u16));
             } else if (((srcOffset + start) & 1) || ((destOffset + start) & 1) || (length & 1)) {
                 swiCopy(pSrc + srcOffset + start, pDest + destOffset + start, COPY_MODE_COPY | length);
             } else {
@@ -708,6 +710,8 @@ void ITCM_FUNC(cGdi::maskBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s1
             }
         } else if (length == 1) {
             *(pDest + destOffset + start) = *(pSrc + srcOffset + start);
+        } else if (length <= 4) {
+            memcpy(pDest + destOffset + start, pSrc + srcOffset + start, length * sizeof(u16));
         } else if (((srcOffset + start) & 1) || ((destOffset + start) & 1) || (length & 1)) {
             swiCopy(pSrc + srcOffset + start, pDest + destOffset + start, COPY_MODE_COPY | length);
         } else {
