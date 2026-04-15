@@ -751,8 +751,11 @@ void ITCM_FUNC(cGdi::present)() {
 
     dmaCopyWordsGdi(3, _workMain + _layerPitch, _mainEngineLayer == 0 ? _bufferMain1 : _bufferMain3, 256 * 192 * 2);
 
-    fillMemory((void*)_workSub, SCREEN_WIDTH * SCREEN_HEIGHT * 2, 0);
-    fillMemory((void*)(_workMain + _layerPitch), SCREEN_WIDTH * SCREEN_HEIGHT * 2, 0);
+    u32 color = 0;
+    swiFastCopy(&color, _workSub, COPY_MODE_WORD | COPY_MODE_FILL | ((SCREEN_WIDTH * SCREEN_HEIGHT) >> 1));
+    swiFastCopy(&color, _workMain + _layerPitch, COPY_MODE_WORD | COPY_MODE_FILL | ((SCREEN_WIDTH * SCREEN_HEIGHT) >> 1));
+    // fillMemory((void*)_workSub, SCREEN_WIDTH * SCREEN_HEIGHT * 2, 0);
+    // fillMemory((void*)(_workMain + _layerPitch), SCREEN_WIDTH * SCREEN_HEIGHT * 2, 0);
     
     oamUpdate(&oamSub);
     oamUpdate(&oamMain);
