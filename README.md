@@ -34,6 +34,7 @@ This fork is a work in progress to rewrite the UI part of **akmenu-next**. Curre
 The end goal is to recreate (with proper theme that's not included yet) the aesthetic and feel of original Nintendo DS bios.
 
 Here are planned features:
+- Rewrite rendering pipeline with improved performance and future proofing
 - Animated focus border in main list.
 - New info box.
 - Button bar used in settings, modal dialogs, help menu.
