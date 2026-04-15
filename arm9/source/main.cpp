@@ -198,13 +198,13 @@ int main(int argc, char* argv[]) {
             });
 
             while (runAutoLoop) {
-                swiWaitForVBlank();
-
                 inputs = updateInput();
                 processInput(inputs);
                 
                 taskCruncher().process();
                 windowManager().update();
+
+                swiWaitForVBlank();
 
                 gdi().present(GE_MAIN);
             }
