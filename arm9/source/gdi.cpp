@@ -775,9 +775,9 @@ void ITCM_FUNC(cGdi::present)(GRAPHICS_ENGINE engine) {
 ARM_CODE LIBNDS_NOINLINE
 void ITCM_FUNC(cGdi::present)() {
     if (_scheduleSubDrop) {
-        swiWaitForVBlank();
         _scheduleSubDrop = false;
         oamUpdate(&oamSub);
+        swiWaitForVBlank();
     }
 
     if (SEM_GRAPHICS == _subEngineMode)
