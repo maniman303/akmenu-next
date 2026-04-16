@@ -61,14 +61,14 @@ class cFontPcf : public cFont {
     s32 SearchInternal(u16 aCode) const;
     s32 Search(u16 aCode) const;
     static u32 utf8toucs2(const u8* aSource, u32* aLength);
-    void DrawInternal(u16* mem, s16 x, s16 y, const u8* data, u16 color, u32 width, u32 height) const;
+    void DrawInternal(u16* mem, s16 x, s16 y, const u8* data, u16 color, u32 width, u32 height, u32 destWidth, u32 destHeight) const;
     static int Compare(const void* a, const void* b);
 
   public:
     cFontPcf();
     ~cFontPcf();
     bool Load(const char* aFileName);
-    void Draw(u16* mem, s16 x, s16 y, const u8* aText, u16 color) const;
+    void Draw(u16* mem, s16 x, s16 y, const u8* aText, u16 color, u32 destWidth, u32 destHeight) const override;
     void Info(const char* aString, u32* aWidth, u32* aSymbolCount) const;
     std::string GetFilename() const;
     u32 TextWidth(const std::string& aString) const;

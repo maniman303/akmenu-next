@@ -271,10 +271,15 @@ s32 cFontPcf::SearchInternal(u16 aCode) const {
     }
 }
 
-void cFontPcf::DrawInternal(u16* mem, s16 x, s16 y, const u8* data, u16 color, u32 width, u32 height) const {
+void cFontPcf::DrawInternal(u16* mem, s16 x, s16 y, const u8* data, u16 color, u32 width, u32 height, u32 destWidth, u32 destHeight) const {
     const u32 byteW = (width + 7) >> 3;
 
-    for (u32 ii = 0; ii < height; ii++) {
+    u32 offsetY = (u32)(y < 0 ? -1 * y : 0);
+    for (u32 ii = offsetY; ii < height; ii++) {
+        if (y + ii >= destHeight) {
+            return;
+        }
+
         u16* row = mem + ((y + ii) << 8);
         u32 pixelsLeft = width;
 
@@ -298,16 +303,17 @@ void cFontPcf::DrawInternal(u16* mem, s16 x, s16 y, const u8* data, u16 color, u
     }
 }
 
-void cFontPcf::Draw(u16* mem, s16 x, s16 y, const u8* aText, u16 color) const {
+void cFontPcf::Draw(u16* mem, s16 x, s16 y, const u8* aText, u16 color, u32 destWidth, u32 destHeight) const {
     if (!(iData && iGlyphs)) return;
     u32 code = utf8toucs2(aText, NULL);
     s32 index = Search(code);
     if (index >= 0) {
         x += iGlyphs[index].iLeft;
         y += -iGlyphs[index].iAscent + iAscent;
-        DrawInternal(mem, x, y, iData + iGlyphs[index].iOffset, color,
-                     -iGlyphs[index].iLeft + iGlyphs[index].iRight,
-                     iGlyphs[index].iAscent + iGlyphs[index].iDescent);
+        DrawInternal(mem, x, y, iData + iGlyphs[index].iOffset,
+            color, -iGlyphs[index].iLeft + iGlyphs[index].iRight,
+            iGlyphs[index].iAscent + iGlyphs[index].iDescent,
+            destWidth, destHeight);
     } else if (code > 0 && code < 8) {
         y += -9 + iAscent;
         u8 special[] = {
@@ -319,7 +325,7 @@ void cFontPcf::Draw(u16* mem, s16 x, s16 y, const u8* aText, u16 color) const {
                 0x3f, 0, 0x7f, 0, 0xc3, 0, 0xbb, 1, 0xc3, 1, 0xdb, 1, 0xbb, 1, 0xff, 1, 0xff, 1,
                 0x38, 0, 0x38, 0, 0x38, 0, 0xff, 1, 0xef, 1, 0xff, 1, 0x38, 0, 0x38, 0, 0x38, 0,
         };
-        DrawInternal(mem, x, y, special + (code - 1) * 18, color, 9, 9);
+        DrawInternal(mem, x, y, special + (code - 1) * 18, color, 9, 9, destWidth, destHeight);
     }
 }
 
