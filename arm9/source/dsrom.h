@@ -57,16 +57,18 @@ class DSRomInfo {
     bool isModernHomebrew(void);
     bool isGbaRom(void);
     DSRomInfo& operator=(const DSRomInfo& src);
-    void MayBeDSRom(const std::string& filename) {
+    void mayBeDSRom(const std::string& filename) {
         _isDSRom = EMayBe;
         _isHomebrew = EMayBe;
         _isModernHomebrew = EMayBe;
         _isDSiWare = EMayBe;
         _fileName = filename;
+        load();
     };
-    void MayBeGbaRom(const std::string& filename) {
+    void mayBeGbaRom(const std::string& filename) {
         _isGbaRom = EMayBe;
         _fileName = filename;
+        load();
     };
     bool setBannerFromFile(const std::string& anExtIcon, const std::string& path, const u8* aBanner);
 };

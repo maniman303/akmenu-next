@@ -251,12 +251,12 @@ void cMainList::processDirIcons() {
             if (".sav" == extName) {
                 memcpy(&rominfo.banner(), nds_save_banner_bin, sizeof(tNDSBanner));
             } else if (".gba" == extName) {
-                rominfo.MayBeGbaRom(filename);
+                rominfo.mayBeGbaRom(filename);
             } else if (".nds" != extName && ".dsi" != extName && ".srl" != extName) {
                 memcpy(&rominfo.banner(), unknown_banner_bin, sizeof(tNDSBanner));
                 allowUnknown = true;
             } else {
-                rominfo.MayBeDSRom(filename);
+                rominfo.mayBeDSRom(filename);
                 allowExt = false;
             }
 

@@ -174,7 +174,6 @@ void DSRomInfo::drawDSRomIcon(u8 x, u8 y, GRAPHICS_ENGINE engine, bool small) {
         fileIcons().Draw(_extIcon, x, y, engine);
         return;
     }
-    load();
     bool skiptransparent = false;
     switch (_saveInfo.getIcon()) {
         case SAVE_INFO_EX_ICON_TRANSPARENT:
@@ -195,7 +194,7 @@ void DSRomInfo::drawDSRomIcon(u8 x, u8 y, GRAPHICS_ENGINE engine, bool small) {
             int px = ((tile & 3) << 3) + ((pixel << 1) & 7);
             int py = ((tile >> 2) << 3) + (pixel >> 2);
 
-            if(small){
+            if (small){
                 px /= 2;
                 py /= 2;
             }
@@ -221,7 +220,6 @@ void DSRomInfo::drawDSRomIconMem(void* mem) {
         fileIcons().DrawMem(_extIcon, mem);
         return;
     }
-    load();
     u16* pmem = (u16*)mem;
     bool skiptransparent = false;
     switch (_saveInfo.getIcon()) {
@@ -279,47 +277,44 @@ bool DSRomInfo::loadGbaRomInfo(const std::string& filename) {
 }
 
 void DSRomInfo::load(void) {
-    if (_isDSRom == EMayBe) loadDSRomInfo(_fileName, true);
-    if (_isGbaRom == EMayBe) loadGbaRomInfo(_fileName);
+    if (_isDSRom == EMayBe) {
+        loadDSRomInfo(_fileName, true);
+    }
+
+    if (_isGbaRom == EMayBe) {
+        loadGbaRomInfo(_fileName);
+    }
 }
 
 tNDSBanner& DSRomInfo::banner(void) {
-    load();
     return _banner;
 }
 
 SAVE_INFO_EX& DSRomInfo::saveInfo(void) {
-    load();
     return _saveInfo;
 }
 
 u8 DSRomInfo::version(void) {
-    load();
     return _romVersion;
 }
 
 bool DSRomInfo::isDSRom(void) {
-    load();
     return (_isDSRom == ETrue) ? true : false;
 }
 
 bool DSRomInfo::isDSiWare(void) {
-    load();
     return (_isDSiWare == ETrue) ? true : false;
 }
 
 bool DSRomInfo::isHomebrew(void) {
-    load();
     return (_isHomebrew == ETrue) ? true : false;
 }
 
 bool DSRomInfo::isModernHomebrew(void) {
-    load();
     return (_isModernHomebrew == ETrue) ? true : false;
 }
 
 bool DSRomInfo::isGbaRom(void) {
-    load();
     return (_isGbaRom == ETrue) ? true : false;
 }
 

@@ -288,7 +288,7 @@ s16 NdsBootstrapLauncher::process(s16 iter) {
                 return -1;
             }
         } else {
-            _romInfo.MayBeDSRom(_romPath);
+            _romInfo.mayBeDSRom(_romPath);
             isDsiWare = _romInfo.isDSiWare();
 
             // check for DSiWare
