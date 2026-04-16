@@ -262,7 +262,6 @@ oldschool = Old school
 small = Small Icons
 modern = Modern
 internal = Internal
-animation = Animation
 12 hour = 12-hour clock
 custom icons = Custom Icons
 clock sound = Clock sound

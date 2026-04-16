@@ -59,7 +59,6 @@ class cGlobalSettings {
     bool showGbaRoms;
     bool gbaSleepHack;
     bool gbaAutoSave;
-    bool Animation;
     bool cheats;
     bool softreset;
     bool sdsave;

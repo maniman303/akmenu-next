@@ -35,7 +35,6 @@ cGlobalSettings::cGlobalSettings() {
     viewMode = EViewInternal;
     gbaSleepHack = false;
     gbaAutoSave = false;
-    Animation = true;
     cheats = false;
     softreset = true;
     dma = true;
@@ -80,7 +79,6 @@ void cGlobalSettings::loadSettings() {
     enterLastDirWhenBoot = ini.GetInt("system", "enterLastDirWhenBoot", enterLastDirWhenBoot);
     gbaSleepHack = ini.GetInt("system", "gbaSleepHack", gbaSleepHack);
     gbaAutoSave = ini.GetInt("system", "gbaAutoSave", gbaAutoSave);
-    Animation = ini.GetInt("system", "Animation", Animation);
     cheats = ini.GetInt("system", "cheats", cheats);
     softreset = ini.GetInt("system", "softreset", softreset);
     saveDir = ini.GetInt("system", "savedir", saveDir);
@@ -138,7 +136,6 @@ void cGlobalSettings::saveSettings() {
     ini.SetInt("system", "filePresentationMode", filePresentationMode);
     ini.SetInt("system", "gbaSleepHack", gbaSleepHack);
     ini.SetInt("system", "gbaAutoSave", gbaAutoSave);
-    ini.SetInt("system", "Animation", Animation);
     ini.SetInt("system", "cheats", cheats);
     ini.SetInt("system", "softreset", softreset);
     ini.SetInt("system", "dma", dma);

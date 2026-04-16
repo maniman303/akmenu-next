@@ -99,7 +99,6 @@ void cMainWnd::init() {
     _mainList->selectChanged.connect(this, &cMainWnd::listSelChange);
     _mainList->rowClicked.connect(this, &cMainWnd::onMainListSelItemClicked);
     _mainList->directoryChanged.connect(this, &cMainWnd::onFolderChanged);
-    _mainList->animateIcons.connect(this, &cMainWnd::onAnimation);
     addChildWindow(_mainList);
     windowManager().setFocusedWindow(_mainList);
     dbg_printf("mainlist %08x\n", _mainList);
@@ -459,7 +458,6 @@ void cMainWnd::showSettings(void) {
     _values.clear();
     _values.push_back(LANG("switches", "Disable"));
     _values.push_back(LANG("switches", "Enable"));
-    settingWnd->addSettingItem(LANG("interface settings", "animation"), _values, gs().Animation);
     settingWnd->addSettingItem(LANG("interface settings", "12 hour"), _values, gs().show12hrClock);
     settingWnd->addSettingItem(LANG("interface settings", "clock sound"), _values, gs().clockSound);
 
@@ -600,9 +598,8 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
             break;
     }
     gs().viewMode = settingWnd->getItemSelection(1, 1);
-    gs().Animation = settingWnd->getItemSelection(1, 2);
-    gs().show12hrClock = settingWnd->getItemSelection(1, 3);
-    gs().clockSound = settingWnd->getItemSelection(1, 4);
+    gs().show12hrClock = settingWnd->getItemSelection(1, 2);
+    gs().clockSound = settingWnd->getItemSelection(1, 3);
 
     // page 3: filesystem
     gs().showHiddenFiles = settingWnd->getItemSelection(2, 0);
@@ -744,13 +741,6 @@ void cMainWnd::onFolderChanged() {
     dbg_printf("%s\n", _mainList->getSelectedFullPath().c_str());
 
     _folderText->setText(dirShowName);
-}
-
-void cMainWnd::onAnimation(bool& anAllow) {
-    if (_startMenu->isVisible())
-        anAllow = false;
-    else if (windowManager().currentWindow() != this)
-        anAllow = false;
 }
 
 cWindow* cMainWnd::windowBelow(const cPoint& p) {

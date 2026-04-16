@@ -15,10 +15,8 @@
 #include "listview.h"
 #include "sigslot.h"
 #include "touchmessage.h"
-#include "zoomingicon.h"
 #include "image.h"
 
-// 显示游戏列表，文件列表等等
 class cMainList : public akui::cListView {
   public:
     enum VIEW_MODE { VM_LIST = 0, VM_ICON, VM_INTERNAL, VM_LIST_ICON };
@@ -70,8 +68,6 @@ class cMainList : public akui::cListView {
 
     akui::Signal0 directoryChanged;
 
-    akui::Signal1<bool&> animateIcons;
-
   public:
     bool IsFavorites(void);
 
@@ -82,13 +78,9 @@ class cMainList : public akui::cListView {
   protected:
     void draw();
 
-    void drawIcons();  // 直接画家算法画 icons
+    void drawIcons();
 
     void drawItemBackgrounds();
-
-    enum { POSITION = 0, CONTENT = 1 };
-
-    void updateActiveIcon(bool updateContent);  // 更新活动图标的坐标等等
 
     void updateInternalNames(void);
 
@@ -129,10 +121,6 @@ class cMainList : public akui::cListView {
     std::vector<std::string> _extnameFilter;
 
     std::vector<DSRomInfo> _romInfoList;
-
-    cZoomingIcon _activeIcon;
-
-    float _activeIconScale;
 
     bool _showAllFiles;
 

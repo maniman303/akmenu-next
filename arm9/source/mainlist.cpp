@@ -52,11 +52,6 @@ cMainList::cMainList(cWindow* parent, const std::string& text)
     _tallRowHeight = 38;
     _centerInternalColumn = false;
     _viewMode = VM_LIST;
-    _activeIconScale = 1;
-    _activeIcon.hide();
-    _activeIcon.update();
-    animationManager().addAnimation(&_activeIcon);
-    dbg_printf("_activeIcon.init\n");
 
     if (!isDSiMode()) {
         _topCount = 3;
@@ -131,8 +126,6 @@ int cMainList::init() {
     insertColumn(IS_FAVORITE_COLUMN, "isFavorite", 0);
 
     setViewMode((cMainList::VIEW_MODE)gs().viewMode);
-
-    _activeIcon.hide();
 
     return 1;
 }
@@ -698,8 +691,7 @@ void cMainList::onSelectChanged(u32 index) {
 }
 
 void cMainList::onScrolled(u32 index) {
-    _activeIconScale = 1;
-    // updateActiveIcon( CONTENT );
+    
 }
 
 void cMainList::backParentDir() {
@@ -789,7 +781,6 @@ void cMainList::draw() {
     updateInternalNames();
     drawItemBackgrounds();
     cListView::draw();
-    updateActiveIcon(POSITION);
     drawIcons();
 }
 
@@ -821,9 +812,6 @@ void cMainList::drawIcons()
     int icon_height = small ? 16 : 32;
 
     for (size_t i = 0; i < total; ++i) {
-        if (_firstVisibleRowId + i == _selectedRowId && _activeIcon.visible()) {
-            continue;
-        }
         s32 itemX = position().x + 1;
         s32 itemY = position().y + i * _rowHeight + ((_rowHeight - icon_height) >> 1) - 1;
         _romInfoList[_firstVisibleRowId + i].drawDSRomIcon(itemX, itemY, _engine, small);
@@ -867,37 +855,6 @@ void cMainList::setViewMode(VIEW_MODE mode) {
     }
 
     scrollTo(_selectedRowId - _visibleRowCount + 1);
-}
-
-void cMainList::updateActiveIcon(bool updateContent) {
-    const INPUT& temp = getInput();
-    bool allowAnimation = true;
-    animateIcons(allowAnimation);
-
-    // do not show active icon when hold key to list files. Otherwise the icon will not show
-    // correctly.
-    if (VM_LIST != _viewMode && VM_LIST_ICON != _viewMode && allowAnimation &&
-        _romInfoList.size() && 0 == temp.keysHeld && gs().Animation) {
-        if (!_activeIcon.visible()) {
-            u8 backBuffer[32 * 32 * 2];
-            zeroMemory(backBuffer, 32 * 32 * 2);
-            _romInfoList[_selectedRowId].drawDSRomIconMem(backBuffer);
-            memcpy(_activeIcon.buffer(), backBuffer, 32 * 32 * 2);
-            _activeIcon.setBufferChanged();
-
-            s32 itemX = position().x;
-            s32 itemY = position().y + (_selectedRowId - _firstVisibleRowId) * _rowHeight +
-                        ((_rowHeight - 32) >> 1) - 1;
-            _activeIcon.setPosition(itemX, itemY);
-            _activeIcon.show();
-            dbg_printf("sel %d ac ico x %d y %d\n", _selectedRowId, itemX, itemY);
-            for (u8 i = 0; i < 8; ++i) dbg_printf("%02x", backBuffer[i]);
-            dbg_printf("\n");
-        }
-    } else if (_activeIcon.visible()) {
-        _activeIcon.hide();
-        cwl();
-    }
 }
 
 std::string cMainList::getCurrentDir() {

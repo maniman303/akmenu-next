@@ -63,8 +63,6 @@ class cMainWnd : public akui::cForm {
 
     void onFolderChanged();
 
-    void onAnimation(bool& anAllow);
-
     void showFileInfo();
 
     void saveFileInfo(cRomInfoWnd* romInfoWnd);

@@ -8,7 +8,6 @@
 */
 
 #include "irqs.h"
-#include "animation.h"
 #include "analogclock.h"
 #include "bigclock.h"
 #include "calendar.h"
@@ -29,8 +28,6 @@
 using namespace akui;
 
 bool cIRQ::_vblankStarted(false);
-
-bool cIRQ::_control(false);
 
 void cIRQ::init() {
     irqSet(IRQ_VBLANK, vBlank);
@@ -53,10 +50,6 @@ void cIRQ::vblankStop() {
 
 bool cIRQ::isVblankStarted() {
     return _vblankStarted;
-}
-
-void cIRQ::setControl(bool control) {
-    _control = control;
 }
 
 void cIRQ::drawTop() {
@@ -84,17 +77,7 @@ void cIRQ::vBlank() {
         bigClock().blinkColon();
         smallClock().flipColon();
         batteryMeter().flipIcon();
-
-        if (_control) {
-            drawTop();
-
-            gdi().present(GE_SUB);
-        }
     }
-
-    // drawTop();
-
-    animationManager().update();
 
     if (REG_ROMCTRL & CARD_BUSY)
         diskIcon().turnOn();
