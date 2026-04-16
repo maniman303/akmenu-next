@@ -45,7 +45,7 @@ static int weeksInCurrentMonth() {
 void cCalendarWnd::draw() {
     int weeks = weeksInCurrentMonth();
     if (weeks == _weeks && _background.valid()) {
-        gdi().bitBlt(_background.buffer(), position().x, position().y, SCREEN_WIDTH, SCREEN_HEIGHT, selectedEngine());
+        // gdi().bitBlt(_background.buffer(), position().x, position().y, SCREEN_WIDTH, SCREEN_HEIGHT, selectedEngine());
         return;
     }
 
@@ -66,6 +66,12 @@ void cCalendarWnd::draw() {
     }
 
     _weeks = weeks;
-    gdi().bitBlt(_background.buffer(), position().x, position().y, SCREEN_WIDTH, SCREEN_HEIGHT, selectedEngine());
 
+    if (_background.width() < SCREEN_WIDTH || _background.height() < SCREEN_HEIGHT) {
+        return;
+    }
+
+    gdi().bitSubBackdrop(_background.buffer());
+
+    // gdi().bitBlt(_background.buffer(), position().x, position().y, SCREEN_WIDTH, SCREEN_HEIGHT, selectedEngine());
 }

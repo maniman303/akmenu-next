@@ -11,6 +11,7 @@
 
 #include <nds.h>
 #include <vector>
+#include "sprite.h"
 #include "bmp15.h"
 #include "singleton.h"
 #include "font.h"
@@ -34,48 +35,27 @@ class cGdi {
 
   public:
     void init();
-
     void drawPixel(u8 x, u8 y, GRAPHICS_ENGINE engine);
-
     void drawLine(s16 x1, s16 y1, s16 x2, s16 y2, GRAPHICS_ENGINE engine);
-
     void drawRadiusLine(s16 sx, s16 sy, u16 width, u16 length, s16 degrees, u16 color, GRAPHICS_ENGINE engine);
-
     void frameRect(s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine);
-
     void frameRect(s16 x, s16 y, u16 w, u16 h, u16 thickness, GRAPHICS_ENGINE engine);
-
     void fillRect(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine);
 
     inline u16 blendColors(u16 color, u16 dest, u16 src, u16 opacity);
-
     inline u32 blendColors32(u32 color, u32 dest, u32 src, u16 opacity);
 
     void fillRectBlend(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine, u16 opacity);
+    void maskBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH, GRAPHICS_ENGINE engine);
+    void maskBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH, GRAPHICS_ENGINE engine, u16 color);
+    void maskBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH, GRAPHICS_ENGINE engine);
+    void maskBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH, GRAPHICS_ENGINE engine, u16 color);
+    void bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH, GRAPHICS_ENGINE engine);
+    void bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH, u16 repeats, GRAPHICS_ENGINE engine);
+    void bitBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH, GRAPHICS_ENGINE engine);
+    void bitBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH, u16 repeats, GRAPHICS_ENGINE engine);
 
-    void maskBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH,
-                 GRAPHICS_ENGINE engine);
-
-    void maskBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH,
-                 GRAPHICS_ENGINE engine, u16 color);
-
-    void maskBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH,
-                 GRAPHICS_ENGINE engine);
-
-    void maskBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH,
-                 GRAPHICS_ENGINE engine, u16 color);
-
-    void bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH,
-                GRAPHICS_ENGINE engine);
-
-    void bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH,
-                u16 repeats, GRAPHICS_ENGINE engine);
-
-    void bitBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH,
-                GRAPHICS_ENGINE engine);
-
-    void bitBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH,
-                u16 repeats, GRAPHICS_ENGINE engine);
+    void bitSubBackdrop(const void* src);
 
     u16 getPenColor(GRAPHICS_ENGINE engine) {
         if (GE_MAIN == engine)
@@ -92,13 +72,9 @@ class cGdi {
     }
 
     void setTransColor(u16 color) { _transColor = color | BIT(15); }
-
     s16  textOut(s16 x, s16 y, const char* text, GRAPHICS_ENGINE engine);
-
     s16  textOut(s16 x, s16 y, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont);
-
     s16  textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine);
-
     s16  textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont);
 
     void setMainEngineLayer(MAIN_ENGINE_LAYER layer) {
@@ -107,9 +83,7 @@ class cGdi {
     }
 
     void present(GRAPHICS_ENGINE engine);
-
     void present();
-
     void scheduleDrop();
 
   protected:
@@ -131,6 +105,8 @@ class cGdi {
     u16* _workSub;
     u16* _bufferSub1;
     bool _scheduleDrop;
+    bool _scheduleSubDrop;
+    std::vector<cSprite> _sprites;
 };
 
 typedef t_singleton<cGdi> cGdi_s;

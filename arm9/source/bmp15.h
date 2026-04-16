@@ -48,7 +48,7 @@ class cBMP15 {
 
     u32 _pitch;
 
-    std::shared_ptr<u32[]> _buffer;  // 按 32 位地址对齐，可以在 bitblt 的时候加快速度
+    std::shared_ptr<u32[]> _buffer;
 
     std::string _filename;
 

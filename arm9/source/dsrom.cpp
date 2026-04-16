@@ -32,11 +32,7 @@ DSRomInfo::DSRomInfo() {
     memset(&_saveInfo, 0, sizeof(_saveInfo));
 }
 
-DSRomInfo::~DSRomInfo() {
-    if (_buffer != NULL) {
-        delete[] _buffer;
-    }
-}
+DSRomInfo::~DSRomInfo() { }
 
 DSRomInfo& DSRomInfo::operator=(const DSRomInfo& src) {
     memcpy(&_banner, &src._banner, sizeof(_banner));
@@ -188,13 +184,9 @@ bool DSRomInfo::loadDSRomInfo(const std::string& filename, bool loadBanner) {
 
     fclose(f);
 
-    if (_buffer != NULL) {
-        delete[] _buffer;
-        _buffer = NULL;
-    }
+    _buffer = std::shared_ptr<u32[]>(new u32[_lastSize ? 16 * 8 : 32 * 16]);
 
-    _buffer = new u32[_lastSize ? 16 * 8 : 32 * 16];
-    drawDSRomIconMem((u16*)_buffer, _lastSize);
+    drawDSRomIconMem((u16*)_buffer.get(), _lastSize);
 
     return true;
 }
@@ -210,24 +202,19 @@ void DSRomInfo::drawDSRomIcon(u8 x, u8 y, bool small, GRAPHICS_ENGINE engine) {
         gdi().maskBlt(icon_bg_bin, x, y, iconSize, iconSize, engine);
     }
 
-    if (small != _lastSize && _buffer != NULL) {
-        delete[] _buffer;
-        _buffer = NULL;
-    }
-
-    if (_buffer == NULL) {
-        _buffer = new u32[small ? 16 * 8 : 32 * 16];
+    if (small != _lastSize || !_buffer) {
+        _buffer = std::shared_ptr<u32[]>(new u32[small ? 16 * 8 : 32 * 16]);
         _lastSize = small;
-        drawDSRomIconMem((u16*)_buffer, small);
+        drawDSRomIconMem((u16*)_buffer.get(), small);
     }
 
-    gdi().maskBlt(_buffer, x, y, iconSize, iconSize, engine);
+    gdi().maskBlt(_buffer.get(), x, y, iconSize, iconSize, engine);
 }
 
 void DSRomInfo::drawDSRomIconMem(u16* mem, bool small) {
     bool skiptransparent = _saveInfo.getIcon() == SAVE_INFO_EX_ICON_AS_IS;
     u16 size = small ? 16 : 32;
-    fillMemory(_buffer, small ? 16 * 8 : 32 * 16 * sizeof(u32), 0);
+    fillMemory(_buffer.get(), small ? 16 * 8 : 32 * 16 * sizeof(u32), 0);
     for (int tile = 0; tile < 16; ++tile) {
         for (int pixel = 0; pixel < 32; ++pixel) {
             u8 a_byte = _banner.icon[(tile << 5) + pixel];
@@ -340,13 +327,13 @@ bool DSRomInfo::setBannerFromFile(const std::string& anExtIcon, const std::strin
         return false;
     }
 
-    if (_buffer != NULL) {
-        delete[] _buffer;
-        _buffer = NULL;
-    }
+    _buffer = std::shared_ptr<u32[]>(new u32[_lastSize ? 16 * 8 : 32 * 16]);
 
-    _buffer = new u32[_lastSize ? 16 * 8 : 32 * 16];
-    drawDSRomIconMem((u16*)_buffer, _lastSize);
+    drawDSRomIconMem((u16*)_buffer.get(), _lastSize);
 
     return true;
+}
+
+bool DSRomInfo::lastSize() {
+    return _lastSize;
 }

@@ -28,11 +28,11 @@ void cAnalogClock::init() {
     _lengthMinutes = ini.GetInt("analog clock", "lengthMinutes", 0);
     _lengthHours = ini.GetInt("analog clock", "lengthHours", 0);
     _lengthAlarm = ini.GetInt("analog clock", "lengthAlarm", 0);
-    _colorSeconds = ini.GetInt("analog clock", "colorSeconds", 0);
-    _colorMinutes = ini.GetInt("analog clock", "colorMinutes", 0);
-    _colorHours = ini.GetInt("analog clock", "colorHours", 0);
-    _colorAlarm = ini.GetInt("analog clock", "colorAlarm", 0);
-    _colorDot = ini.GetInt("analog clock", "colorDot", 0);
+    _colorSeconds = ini.GetInt("analog clock", "colorSeconds", 0) | BIT(15);
+    _colorMinutes = ini.GetInt("analog clock", "colorMinutes", 0) | BIT(15);
+    _colorHours = ini.GetInt("analog clock", "colorHours", 0) | BIT(15);
+    _colorAlarm = ini.GetInt("analog clock", "colorAlarm", 0) | BIT(15);
+    _colorDot = ini.GetInt("analog clock", "colorDot", 0) | BIT(15);
 }
 
 void cAnalogClock::draw() {

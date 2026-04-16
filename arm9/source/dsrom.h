@@ -11,6 +11,7 @@
 
 #include <nds.h>
 #include <string.h>
+#include <memory>
 #include "gdi.h"
 #include "savemngr.h"
 
@@ -29,7 +30,7 @@ class DSRomInfo {
     std::string _fileName;
     s32 _extIcon;
     u8 _romVersion;
-    u32* _buffer;
+    std::shared_ptr<u32[]> _buffer;
     bool _lastSize;
 
   private:
@@ -69,4 +70,5 @@ class DSRomInfo {
         load();
     };
     bool setBannerFromFile(const std::string& anExtIcon, const std::string& path, const u8* aBanner);
+    bool lastSize();
 };

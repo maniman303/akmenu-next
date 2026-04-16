@@ -27,9 +27,7 @@ enum SPRITE_SHAPE {
 class cSprite {
   public:
     cSprite();
-
     cSprite(u8 id);
-
     cSprite(u8 id, bool main);
 
     ~cSprite();
@@ -37,24 +35,22 @@ class cSprite {
     static void sysMainInit();
     static void sysSubInit();
     void init(u16 id, bool main);
-    // void update();
     void setAlpha(u8 alpha);
     void setPosition(u16 x, u8 y);
     void setSize(SPRITE_SIZE size);
     void setShape(SPRITE_SHAPE shape);
-    void setBufferOffset(u32 offset);
     void setScale(float scaleX, float scaleY);
     void setRotation(float angle);
     void show();
     void hide();
     bool visible();
     void setPriority(u8 priority);
-
     u16* buffer();
 
-    // cSprite & operator=( const cSprite & src );
 
   protected:
+    void setBufferOffset(u32 offset);
+
     SpriteEntry* _entry;
     SpriteRotation* _affine;
     u8 _id;

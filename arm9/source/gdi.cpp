@@ -35,6 +35,7 @@ cGdi::cGdi() {
     _workMain = NULL;
     _workSub = NULL;
     _scheduleDrop = false;
+    _scheduleSubDrop = false;
 }
 
 cGdi::~cGdi() {
@@ -93,8 +94,6 @@ void cGdi::activeFbMain(void) {
     swiWaitForVBlank();  // remove tearing at bottop screen
     videoSetMode(MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE |
                  DISPLAY_SPR_1D_BMP_SIZE_128 | DISPLAY_SPR_1D_BMP);
-
-    cSprite::sysMainInit();
 }
 
 void cGdi::activeFbSub(void) {
@@ -120,6 +119,22 @@ void cGdi::activeFbSub(void) {
     videoSetModeSub(MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D_BMP_SIZE_128 | DISPLAY_SPR_1D_BMP);
 
     cSprite::sysSubInit();
+
+    _sprites.clear();
+    for (int i = 0; i < 3; i++) {
+        for (int k = 0; k < 4; k++) {
+            int id = i * 4 + k;
+            _sprites.emplace_back(id, false);
+            cSprite* sprite = &_sprites.back();
+            sprite->setSize(SS_SIZE_64);
+            sprite->setPriority(3);
+            sprite->setPosition(k * 64, i * 64);
+            fillMemory(sprite->buffer(), 64 * 64 * 2, 0xffffffff);
+            sprite->show();
+        }
+    }
+
+    _scheduleSubDrop = true;
 }
 
 static inline void putScreenPixel(u16* buffer, s16 x, s16 y, u16 color) {
@@ -464,6 +479,26 @@ void cGdi::bitBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16
 }
 
 ARM_CODE LIBNDS_NOINLINE
+void ITCM_FUNC(cGdi::bitSubBackdrop)(const void* src) {
+    u16* pSrc = (u16*)src;
+
+    for (int i = 0; i < 3; i++) {
+        for (int k = 0; k < 4; k++) {
+            int id = i * 4 + k;
+            cSprite* sprite = &_sprites[id];
+            
+            for (int l = 0; l < 64; l++) {
+                u32* source = (u32*)(pSrc + (i * 64 * SCREEN_WIDTH) + (l * SCREEN_WIDTH) + (k * 64));
+                u32* destination = (u32*)(sprite->buffer() + (l * 64));
+                swiCopy(source, destination, COPY_MODE_WORD | 32);
+            }
+        }
+    }
+
+    _scheduleSubDrop = true;
+}
+
+ARM_CODE LIBNDS_NOINLINE
 void ITCM_FUNC(cGdi::bitBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH, u16 repeats, GRAPHICS_ENGINE engine) {
     u16* pSrc = (u16*)src;
     u16* pDest = (engine == GE_MAIN) ? 
@@ -739,6 +774,12 @@ void ITCM_FUNC(cGdi::present)(GRAPHICS_ENGINE engine) {
 
 ARM_CODE LIBNDS_NOINLINE
 void ITCM_FUNC(cGdi::present)() {
+    if (_scheduleSubDrop) {
+        swiWaitForVBlank();
+        _scheduleSubDrop = false;
+        oamUpdate(&oamSub);
+    }
+
     if (SEM_GRAPHICS == _subEngineMode)
         dmaCopyWordsGdi(3, (void*)_workSub, (void*)_bufferSub1, 256 * 192 * 2);
 
@@ -753,9 +794,6 @@ void ITCM_FUNC(cGdi::present)() {
 
     fillMemory((void*)_workSub, SCREEN_WIDTH * SCREEN_HEIGHT * 2, 0);
     fillMemory((void*)(_workMain + _layerPitch), SCREEN_WIDTH * SCREEN_HEIGHT * 2, 0);
-    
-    oamUpdate(&oamSub);
-    oamUpdate(&oamMain);
 }
 
 void cGdi::scheduleDrop() {

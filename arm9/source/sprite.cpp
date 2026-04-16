@@ -18,6 +18,10 @@ cSprite::cSprite(u8 id) {
     init(id, true);
 }
 
+cSprite::cSprite(u8 id, bool main) {
+    init(id, main);
+}
+
 cSprite::~cSprite() {}
 
 void cSprite::sysMainInit() {
@@ -71,6 +75,8 @@ void cSprite::init(u16 id, bool main) {
     _entry->attribute[2] = ATTR2_ALPHA(15) | ATTR2_PRIORITY(0) | 0;
 
     setScale(1, 1);
+
+    setBufferOffset(_id * 64);
 }
 
 void cSprite::show() {
