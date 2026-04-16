@@ -16,6 +16,27 @@
 #include "icons.h"
 #include "nds_banner_bin.h"
 #include "unknown_nds_banner_bin.h"
+#include "../../share/memtool.h"
+
+DSRomInfo::DSRomInfo() {
+    _isDSRom = EFalse;
+    _isDSiWare = EFalse;
+    _isHomebrew = EFalse;
+    _isModernHomebrew = EFalse;
+    _isGbaRom = EFalse;
+    _extIcon = -1;
+    _romVersion = 0;
+    _buffer = NULL;
+    _lastSize = false;
+    memset(&_banner, 0, sizeof(_banner));
+    memset(&_saveInfo, 0, sizeof(_saveInfo));
+}
+
+DSRomInfo::~DSRomInfo() {
+    if (_buffer != NULL) {
+        delete[] _buffer;
+    }
+}
 
 DSRomInfo& DSRomInfo::operator=(const DSRomInfo& src) {
     memcpy(&_banner, &src._banner, sizeof(_banner));
@@ -166,27 +187,47 @@ bool DSRomInfo::loadDSRomInfo(const std::string& filename, bool loadBanner) {
     }
 
     fclose(f);
+
+    if (_buffer != NULL) {
+        delete[] _buffer;
+        _buffer = NULL;
+    }
+
+    _buffer = new u32[_lastSize ? 16 * 8 : 32 * 16];
+    drawDSRomIconMem((u16*)_buffer, _lastSize);
+
     return true;
 }
 
-void DSRomInfo::drawDSRomIcon(u8 x, u8 y, GRAPHICS_ENGINE engine, bool small) {
+void DSRomInfo::drawDSRomIcon(u8 x, u8 y, bool small, GRAPHICS_ENGINE engine) {
     if (_extIcon >= 0) {
         fileIcons().Draw(_extIcon, x, y, engine);
         return;
     }
-    bool skiptransparent = false;
-    switch (_saveInfo.getIcon()) {
-        case SAVE_INFO_EX_ICON_TRANSPARENT:
-            break;
-        case SAVE_INFO_EX_ICON_AS_IS:
-            skiptransparent = true;
-            break;
-        case SAVE_INFO_EX_ICON_FIRMWARE:
-            u16 iconSize = small ? 16 : 32;
-            gdi().maskBlt(icon_bg_bin, x, y, iconSize, iconSize, engine);
-            break;
+
+    u16 iconSize = small ? 16 : 32;
+    if (_saveInfo.getIcon() == SAVE_INFO_EX_ICON_FIRMWARE) {
+        gdi().maskBlt(icon_bg_bin, x, y, iconSize, iconSize, engine);
     }
 
+    if (small != _lastSize && _buffer != NULL) {
+        delete[] _buffer;
+        _buffer = NULL;
+    }
+
+    if (_buffer == NULL) {
+        _buffer = new u32[small ? 16 * 8 : 32 * 16];
+        _lastSize = small;
+        drawDSRomIconMem((u16*)_buffer, small);
+    }
+
+    gdi().maskBlt(_buffer, x, y, iconSize, iconSize, engine);
+}
+
+void DSRomInfo::drawDSRomIconMem(u16* mem, bool small) {
+    bool skiptransparent = _saveInfo.getIcon() == SAVE_INFO_EX_ICON_AS_IS;
+    u16 size = small ? 16 : 32;
+    fillMemory(_buffer, small ? 16 * 8 : 32 * 16 * sizeof(u32), 0);
     for (int tile = 0; tile < 16; ++tile) {
         for (int pixel = 0; pixel < 32; ++pixel) {
             u8 a_byte = _banner.icon[(tile << 5) + pixel];
@@ -194,7 +235,7 @@ void DSRomInfo::drawDSRomIcon(u8 x, u8 y, GRAPHICS_ENGINE engine, bool small) {
             int px = ((tile & 3) << 3) + ((pixel << 1) & 7);
             int py = ((tile >> 2) << 3) + (pixel >> 2);
 
-            if (small){
+            if (small) {
                 px /= 2;
                 py /= 2;
             }
@@ -203,56 +244,11 @@ void DSRomInfo::drawDSRomIcon(u8 x, u8 y, GRAPHICS_ENGINE engine, bool small) {
             u8 idx2 = (a_byte & 0x0f);
 
             if (skiptransparent || 0 != idx1) {
-                gdi().setPenColor(_banner.palette[idx1], engine);
-                gdi().drawPixel(px + 1 + x, py + y, engine);
+                *(mem + (py * size) + px + 1) = BIT(15) | _banner.palette[idx1];
             }
 
             if (skiptransparent || 0 != idx2) {
-                gdi().setPenColor(_banner.palette[idx2], engine);
-                gdi().drawPixel(px + x, py + y, engine);
-            }
-        }
-    }
-}
-
-void DSRomInfo::drawDSRomIconMem(void* mem) {
-    if (_extIcon >= 0) {
-        fileIcons().DrawMem(_extIcon, mem);
-        return;
-    }
-    u16* pmem = (u16*)mem;
-    bool skiptransparent = false;
-    switch (_saveInfo.getIcon()) {
-        case SAVE_INFO_EX_ICON_TRANSPARENT:
-            break;
-        case SAVE_INFO_EX_ICON_AS_IS:
-            skiptransparent = true;
-            break;
-        case SAVE_INFO_EX_ICON_FIRMWARE:
-            cIcons::maskBlt((const u16*)icon_bg_bin, pmem);
-            break;
-    }
-    for (int tile = 0; tile < 16; ++tile) {
-        for (int pixel = 0; pixel < 32; ++pixel) {
-            u8 a_byte = _banner.icon[(tile << 5) + pixel];
-
-            // int px = (tile & 3) * 8 + (2 * pixel & 7);
-            // int py = (tile / 4) * 8 + (2 * pixel / 8);
-            int px = ((tile & 3) << 3) + ((pixel << 1) & 7);
-            int py = ((tile >> 2) << 3) + (pixel >> 2);
-
-            u8 idx1 = (a_byte & 0xf0) >> 4;
-            if (skiptransparent || 0 != idx1) {
-                pmem[py * 32 + px + 1] = _banner.palette[idx1] | BIT(15);
-                // gdi().setPenColor( _banner.palette[idx1] );
-                // gdi().drawPixel( px+1+x, py+y, engine );
-            }
-
-            u8 idx2 = (a_byte & 0x0f);
-            if (skiptransparent || 0 != idx2) {
-                pmem[py * 32 + px] = _banner.palette[idx2] | BIT(15);
-                // gdi().setPenColor( _banner.palette[idx2] );
-                // gdi().drawPixel( px+x, py+y, engine );
+                *(mem + (py * size) + px) = BIT(15) | _banner.palette[idx2];
             }
         }
     }
@@ -324,17 +320,33 @@ void DSRomInfo::setExtIcon(const std::string& aValue) {
 
 bool DSRomInfo::setBannerFromFile(const std::string& anExtIcon, const std::string& path, const u8* aBanner)
 {
-    if(!gs().icon) {
+    bool res = false;
+
+    if (!gs().icon) {
         setExtIcon(anExtIcon);
         memcpy(&banner(), aBanner, sizeof(tNDSBanner));
         
-        return true;
+        res = true;
+    } else {
+        setExtIcon(anExtIcon);
+        FILE* f = fopen(path.c_str(), "rb");
+        if (!f) return false;
+        size_t read = fread(&banner(), 1, sizeof(tNDSBanner), f);
+        fclose(f);
+        res = read == sizeof(tNDSBanner);
     }
 
-    setExtIcon(anExtIcon);
-    FILE* f = fopen(path.c_str(), "rb");
-    if (!f) return false;
-    size_t read = fread(&banner(), 1, sizeof(tNDSBanner), f);
-    fclose(f);
-    return read == sizeof(tNDSBanner);
+    if (!res) {
+        return false;
+    }
+
+    if (_buffer != NULL) {
+        delete[] _buffer;
+        _buffer = NULL;
+    }
+
+    _buffer = new u32[_lastSize ? 16 * 8 : 32 * 16];
+    drawDSRomIconMem((u16*)_buffer, _lastSize);
+
+    return true;
 }

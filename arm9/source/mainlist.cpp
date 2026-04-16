@@ -800,8 +800,7 @@ void cMainList::drawItemBackgrounds() {
     }
 }
 
-void cMainList::drawIcons()
-{
+void cMainList::drawIcons() {
     if (_viewMode == VM_LIST) {
         return;
     }
@@ -814,7 +813,7 @@ void cMainList::drawIcons()
     for (size_t i = 0; i < total; ++i) {
         s32 itemX = position().x + 1;
         s32 itemY = position().y + i * _rowHeight + ((_rowHeight - icon_height) >> 1) - 1;
-        _romInfoList[_firstVisibleRowId + i].drawDSRomIcon(itemX, itemY, _engine, small);
+        _romInfoList[_firstVisibleRowId + i].drawDSRomIcon(itemX, itemY, small, _engine);
     }
 }
 

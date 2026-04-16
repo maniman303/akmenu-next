@@ -29,23 +29,21 @@ class DSRomInfo {
     std::string _fileName;
     s32 _extIcon;
     u8 _romVersion;
+    u32* _buffer;
+    bool _lastSize;
 
   private:
     void load(void);
     bool loadGbaRomInfo(const std::string& filename);
     bool loadDSRomInfo(const std::string& filename, bool loadBanner);
+    void drawDSRomIconMem(u16* mem, bool small);
 
   public:
-    DSRomInfo()
-        : _isDSRom(EFalse), _isDSiWare(EFalse), _isHomebrew(EFalse), _isModernHomebrew(EFalse), _isGbaRom(EFalse), _extIcon(-1), _romVersion(0) {
-        // memcpy(&_banner,unknown_banner_bin,unknown_banner_bin_size);
-        memset(&_banner, 0, sizeof(_banner));
-        memset(&_saveInfo, 0, sizeof(_saveInfo));
-    }
+    DSRomInfo();
+    ~DSRomInfo();
 
   public:
-    void drawDSRomIcon(u8 x, u8 y, GRAPHICS_ENGINE engine, bool small);
-    void drawDSRomIconMem(void* mem);
+    void drawDSRomIcon(u8 x, u8 y, bool small, GRAPHICS_ENGINE engine);
     tNDSBanner& banner(void);
     SAVE_INFO_EX& saveInfo(void);
     u8 version(void);

@@ -281,7 +281,6 @@ namespace akui {
     }
 
     bool cListView::processKeyMessage(cKeyMessage message) {
-        // TODO: If can't select next / prev then return false
         if (message.isKeyUp(KEY_A)) {
             onRowClicked(_selectedRowId);
             rowClicked(_selectedRowId);

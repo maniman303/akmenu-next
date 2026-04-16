@@ -119,7 +119,7 @@ void cRomInfoWnd::draw() {
     _renderDesc.draw(windowRectangle(), _engine);
     int titleOffset = _renderDesc.titleSize().y;
 
-    _romInfo.drawDSRomIcon(position().x + 8, position().y + titleOffset + 8, selectedEngine(), false);
+    _romInfo.drawDSRomIcon(position().x + 8, position().y + titleOffset + 8, false, selectedEngine());
 
     gdi().setPenColor(uiSettings().formTextColor, selectedEngine());
     gdi().textOutRect(position().x + 48, position().y + titleOffset + 8, size().x - 40, 40, _romInfoText.c_str(),
