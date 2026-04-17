@@ -122,10 +122,12 @@ namespace akui {
         gdi().setMainEngineLayer(MEL_DOWN);
 
         for (cWindows::iterator it = _backgroundWindows.begin(); it != _backgroundWindows.end(); ++it) {
+            (*it).window()->renderBackdrop();
             (*it).window()->render();
         }
 
         if (includeCurrent && _currentWindow.window()) {
+            _currentWindow.window()->renderBackdrop();
             _currentWindow.window()->render();
         }
 

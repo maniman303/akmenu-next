@@ -77,6 +77,10 @@ class cGdi {
     s16  textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont);
 
     void setMainEngineLayer(MAIN_ENGINE_LAYER layer) {
+        if (layer == MEL_MIDDLE) {
+            _scheduleMainBackdrop = true;
+        }
+
         _mainEngineLayer = layer;
         _layerPitch = layer * SCREEN_WIDTH * SCREEN_HEIGHT;
     }
@@ -111,6 +115,7 @@ class cGdi {
     u16* _workSub;
     u16* _bufferSub1;
     bool _scheduleMainBackground;
+    bool _scheduleMainBackdrop;
     bool _scheduleSubBackground;
     std::vector<cSprite> _mainSprites;
     std::vector<cSprite> _subSprites;
