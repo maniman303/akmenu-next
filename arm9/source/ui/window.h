@@ -114,6 +114,8 @@ class cWindow : public SlotHolder {
         return *this;
     }
 
+    virtual bool shouldRenderBackdrop() { return false; }
+
     void render();
 
     void renderBackdrop();
@@ -126,8 +128,6 @@ class cWindow : public SlotHolder {
     virtual void draw() {};
 
     virtual void drawBackdrop() {};
-
-    virtual bool shouldDrawBackdrop() { return false; }
 
     //! \brief called when the window is shown, derived classes can override this to
     //! react to the window becoming visible

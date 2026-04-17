@@ -152,6 +152,8 @@ void cCalendar::drawText(const akui::cPoint& position, u32 value, u32 factor) {
 }
 
 void cCalendar::drawBackdrop() {
+    _lastDate = datetime().now();
+
     if (_showDay) {
         u8 weekdDayOfMonthFirstDay = datetime().weekDayOfMonthFirstDay();
         u8 today = datetime().day();
@@ -172,13 +174,11 @@ void cCalendar::drawBackdrop() {
     }
 }
 
-bool cCalendar::shouldDrawBackdrop() {
+bool cCalendar::shouldRenderBackdrop() {
     u32 now = datetime().now();
     if (now == _lastDate) {
         return false;
     }
-
-    _lastDate = now;
 
     return true;
 }

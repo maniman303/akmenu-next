@@ -22,7 +22,7 @@ class cCalendarWnd : public akui::cForm {
     cWindow& loadAppearance(const std::string& aFileName);
     void init();
     void drawBackdrop() override;
-    bool shouldDrawBackdrop() override;
+    bool shouldRenderBackdrop() override;
 
   protected:
     cBMP15 _background;

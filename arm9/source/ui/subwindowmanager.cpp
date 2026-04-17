@@ -37,8 +37,8 @@ void cSubWindowManager::update() {
 void cSubWindowManager::updateBackground() {
     bool drawBg = false;
 
-    drawBg |= calendarWnd().shouldDrawBackdrop();
-    drawBg |= calendar().shouldDrawBackdrop();
+    drawBg |= calendarWnd().shouldRenderBackdrop();
+    drawBg |= calendar().shouldRenderBackdrop();
 
     if (!drawBg) {
         return;

@@ -30,7 +30,11 @@ class cForm : public cWindow {
 
     cForm& removeChildWindow(cWindow* aWindow);
 
-    void draw();
+    bool shouldRenderBackdrop() override;
+
+    void draw() override;
+
+    void drawBackdrop() override;
 
     bool processKeyMessage(cKeyMessage message) override;
 

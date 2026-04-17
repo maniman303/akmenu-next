@@ -70,10 +70,27 @@ namespace akui {
         return *this;
     }
 
+    bool cForm::shouldRenderBackdrop() {
+        bool res = false;
+        std::list<cWindow*>::iterator it;
+        for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
+            res |= (*it)->shouldRenderBackdrop();
+        }
+
+        return res;
+    }
+
     void cForm::draw() {
         std::list<cWindow*>::iterator it;
         for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
             (*it)->render();
+        }
+    }
+
+    void cForm::drawBackdrop() {
+        std::list<cWindow*>::iterator it;
+        for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
+            (*it)->renderBackdrop();
         }
     }
 

@@ -104,17 +104,17 @@ namespace akui {
     }
 
     const cWindowManager& cWindowManager::update(void) {
-    #if 0
-        for(cWindows::iterator it=_backgroundWindows.begin();it!=_backgroundWindows.end();++it)
-        {
-        dbg_printf("background (%s)\n",(*it)()->text().c_str());
-        }
-        dbg_printf("currentWindow (%s)\n",_currentWindow()?_currentWindow()->text().c_str():"NULL");
-    #endif
         if (_currentWindow.window() != NULL) {
             _currentWindow.window()->update();
+            if (_currentWindow.window()->shouldRenderBackdrop()) {
+                gdi().setMainEngineLayer(MEL_MIDDLE);
+                _currentWindow.window()->renderBackdrop();
+                gdi().setMainEngineLayer(MEL_UP);
+            }
+
             _currentWindow.window()->render();
         }
+        
         return *this;
     }
 

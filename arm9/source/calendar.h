@@ -23,7 +23,7 @@ class cCalendar : public akui::cWindow {
   public:
     void init();
     void drawBackdrop() override;
-    bool shouldDrawBackdrop() override;
+    bool shouldRenderBackdrop() override;
     akui::cWindow& loadAppearance(const std::string& aFileName) override;
 
   protected:

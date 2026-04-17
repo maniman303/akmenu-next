@@ -66,16 +66,16 @@ void cCalendarWnd::drawBackdrop() {
         return;
     }
 
+    _lastDate = datetime().now();
+
     gdi().bitBlt(_background.buffer(), position().x, position().y, size().x, size().y, selectedEngine());
 }
 
-bool cCalendarWnd::shouldDrawBackdrop() {
+bool cCalendarWnd::shouldRenderBackdrop() {
     u32 now = datetime().now();
     if (now == _lastDate && _background.valid()) {
         return false;
     }
-
-    _lastDate = now;
 
     return true;
 }
