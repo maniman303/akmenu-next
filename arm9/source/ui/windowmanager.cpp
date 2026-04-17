@@ -49,7 +49,7 @@ namespace akui {
         }
         _currentWindow = cWindowRec(aWindow);
         setFocusedWindow(aWindow);
-        updateBackground();
+        updateBackground(false);
         return *this;
     }
 
@@ -77,8 +77,11 @@ namespace akui {
             // logger().info("Hierarchy includes focused window.");
             _focusedWindow = _currentWindow.window();
         }
+
+        updateBackground(true);
+        gdi().presentMain();
+        updateBackground(false);
         
-        updateBackground();
         return *this;
     }
 
@@ -115,16 +118,24 @@ namespace akui {
         return *this;
     }
 
-    const cWindowManager& cWindowManager::updateBackground(void) {
+    const cWindowManager& cWindowManager::updateBackground(bool includeCurrent) {
         gdi().setMainEngineLayer(MEL_DOWN);
-        for (cWindows::iterator it = _backgroundWindows.begin(); it != _backgroundWindows.end(); ++it) {
-            (*it).window()->update();
-        }
+
         for (cWindows::iterator it = _backgroundWindows.begin(); it != _backgroundWindows.end(); ++it) {
             (*it).window()->render();
         }
+
+        if (includeCurrent && _currentWindow.window()) {
+            _currentWindow.window()->render();
+        }
+
         gdi().setMainEngineLayer(MEL_UP);
-        gdi().scheduleDrop();
+        gdi().pushMainBackground();
+
+        if (includeCurrent && _currentWindow.window()) {
+            _currentWindow.window()->render();
+        }
+
         return *this;
     }
 

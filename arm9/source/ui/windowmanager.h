@@ -35,7 +35,7 @@ class cWindowManager {
     cWindow* _capturedWindow;  // process touch for non-focusable window
   protected:
     cWindow* windowBelowPen(void) const { return _windowBelowPen; }
-    const cWindowManager& updateBackground(void);
+    const cWindowManager& updateBackground(bool includeCurrent);
 
   public:
     cWindowManager();

@@ -27,6 +27,8 @@ class cIRQ {
 
     bool isVblankStarted();
 
+    void schedulePresent();
+
     static void drawTop();
 
     static void cardMC();
@@ -34,6 +36,8 @@ class cIRQ {
     static void vBlank();
 
     static bool _vblankStarted;
+
+    static bool _presentScheduled;
 };
 
 typedef t_singleton<cIRQ> irq_s;

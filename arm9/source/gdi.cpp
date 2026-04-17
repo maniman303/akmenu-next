@@ -34,8 +34,8 @@ cGdi::cGdi() {
     _subEngineMode = SEM_TEXT;
     _workMain = NULL;
     _workSub = NULL;
-    _scheduleDrop = false;
-    _scheduleSubDrop = false;
+    _scheduleMainBackground = false;
+    _scheduleSubBackground = false;
 }
 
 cGdi::~cGdi() {
@@ -54,14 +54,15 @@ void cGdi::swapLCD(void) {
 }
 
 void cGdi::activeFbMain(void) {
-    // vramSetBankB(VRAM_B_MAIN_BG_0x06000000);
     vramSetBankE(VRAM_E_MAIN_BG);
     vramSetBankF(VRAM_F_MAIN_BG_0x06010000);
     vramSetBankG(VRAM_G_MAIN_BG_0x06014000);
-    // vramSetBankD(VRAM_D_MAIN_BG_0x06020000);
+
     vramSetBankB(VRAM_B_MAIN_BG_0x06020000);
 
     vramSetBankA(VRAM_A_MAIN_SPRITE_0x06400000);
+
+    BG_PALETTE[0] = 0xffff;
 
     REG_BG2CNT = BG_BMP16_256x256 | BG_BMP_BASE(0) | BG_PRIORITY_1;
     REG_BG2PA = 1 << 8;  // 2 =放大倍数
@@ -79,14 +80,14 @@ void cGdi::activeFbMain(void) {
     REG_BG3Y = 0;
     REG_BG3X = 0;
 
-    _workMain = (u16*)new u16[256 * 192 * 2];
+    _workMain = (u16*)new u16[256 * 192 * 3];
     _bufferMain1 = (u16*)0x06000000;
     _bufferMain3 = (u16*)0x06020000;
 
     setMainEngineLayer(MEL_UP);
 
-    zeroMemory(_bufferMain1, 0x20000);
-    fillMemory(_bufferMain3, 0x20000, 0xffffffff);
+    fillMemory(_bufferMain1, 0x20000, 0);
+    fillMemory(_bufferMain3, 0x20000, 0);
 
     // REG_BLDCNT = BLEND_ALPHA | BLEND_DST_BG2 | BLEND_DST_BG3;
     // REG_BLDALPHA = (4 << 8) | 7;
@@ -94,12 +95,32 @@ void cGdi::activeFbMain(void) {
     swiWaitForVBlank();  // remove tearing at bottop screen
     videoSetMode(MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE |
                  DISPLAY_SPR_1D_BMP_SIZE_128 | DISPLAY_SPR_1D_BMP);
+
+    cSprite::sysMainInit();
+
+    _mainSprites.clear();
+    for (int i = 0; i < 3; i++) {
+        for (int k = 0; k < 4; k++) {
+            int id = i * 4 + k;
+            _mainSprites.emplace_back(id, true);
+            cSprite* sprite = &_mainSprites.back();
+            sprite->setSize(SS_SIZE_64);
+            sprite->setPriority(3);
+            sprite->setPosition(k * 64, i * 64);
+            fillMemory(sprite->buffer(), 64 * 64 * 2, 0xffffffff);
+            sprite->show();
+        }
+    }
+
+    _scheduleMainBackground = true;
 }
 
 void cGdi::activeFbSub(void) {
     vramSetBankC(VRAM_C_SUB_BG_0x06200000);  // 128k
     vramSetBankD(VRAM_D_SUB_SPRITE);
     _subEngineMode = SEM_GRAPHICS;
+
+    BG_PALETTE_SUB[0] = 0xffff;
 
     REG_BG2CNT_SUB = BG_BMP16_256x256 | BG_BMP_BASE(0) | BG_PRIORITY_1;
     REG_BG2PA_SUB = 1 << 8;
@@ -120,12 +141,12 @@ void cGdi::activeFbSub(void) {
 
     cSprite::sysSubInit();
 
-    _sprites.clear();
+    _subSprites.clear();
     for (int i = 0; i < 3; i++) {
         for (int k = 0; k < 4; k++) {
             int id = i * 4 + k;
-            _sprites.emplace_back(id, false);
-            cSprite* sprite = &_sprites.back();
+            _subSprites.emplace_back(id, false);
+            cSprite* sprite = &_subSprites.back();
             sprite->setSize(SS_SIZE_64);
             sprite->setPriority(3);
             sprite->setPosition(k * 64, i * 64);
@@ -134,7 +155,7 @@ void cGdi::activeFbSub(void) {
         }
     }
 
-    _scheduleSubDrop = true;
+    _scheduleSubBackground = true;
 }
 
 static inline void putScreenPixel(u16* buffer, s16 x, s16 y, u16 color) {
@@ -429,10 +450,6 @@ void ITCM_FUNC(cGdi::fillRectBlend)(u16 color1, u16 color2, s16 x, s16 y, u16 w,
         return;
     }
 
-    return;
-
-    // logger().info("Slow fillRectBlend.");
-
     u16* pSrc = ((GE_MAIN == engine) ? _bufferMain3 : _workSub) + (y << 8) + x;
     u16* pDest = ((GE_MAIN == engine) ? (_workMain + _layerPitch) : _workSub) + (y << 8) + x;
 
@@ -468,6 +485,56 @@ void ITCM_FUNC(cGdi::fillRectBlend)(u16 color1, u16 color2, s16 x, s16 y, u16 w,
     }
 }
 
+ARM_CODE LIBNDS_NOINLINE
+void ITCM_FUNC(cGdi::bitMainBackground)(const void* src) {
+    u16* pSrc = (u16*)src;
+
+    u32 size = 256 * 192 * 2;
+    DC_FlushRange(src, size);
+
+    for (int i = 0; i < 3; i++) {
+        for (int k = 0; k < 4; k++) {
+            int id = i * 4 + k;
+            cSprite* sprite = &_mainSprites[id];
+            
+            for (int l = 0; l < 64; l++) {
+                u32* source = (u32*)(pSrc + (i * 64 * SCREEN_WIDTH) + (l * SCREEN_WIDTH) + (k * 64));
+                u32* destination = (u32*)(sprite->buffer() + (l * 64));
+                // swiFastCopy(source, destination, COPY_MODE_WORD | 32);
+                dmaCopyWords(3, source, destination, 128);
+            }
+        }
+    }
+
+    DC_InvalidateRange(_mainSprites[0].buffer(), size);
+}
+
+ARM_CODE LIBNDS_NOINLINE
+void ITCM_FUNC(cGdi::bitSubBackground)(const void* src) {
+    u16* pSrc = (u16*)src;
+
+    u32 size = 256 * 192 * 2;
+    DC_FlushRange(src, size);
+
+    for (int i = 0; i < 3; i++) {
+        for (int k = 0; k < 4; k++) {
+            int id = i * 4 + k;
+            cSprite* sprite = &_subSprites[id];
+            
+            for (int l = 0; l < 64; l++) {
+                u32* source = (u32*)(pSrc + (i * 64 * SCREEN_WIDTH) + (l * SCREEN_WIDTH) + (k * 64));
+                u32* destination = (u32*)(sprite->buffer() + (l * 64));
+                // swiFastCopy(source, destination, COPY_MODE_WORD | 32);
+                dmaCopyWords(3, source, destination, 128);
+            }
+        }
+    }
+
+    DC_InvalidateRange(_subSprites[0].buffer(), size);
+
+    _scheduleSubBackground = true;
+}
+
 void cGdi::bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH, GRAPHICS_ENGINE engine) {
     bitBlt(src, destX, destY, destW, destH, 1, engine);
 }
@@ -478,26 +545,6 @@ void cGdi::bitBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH, u
 
 void cGdi::bitBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH, GRAPHICS_ENGINE engine) {
     bitBlt(src, srcW, srcH, destX, destY, destW, destH, 1, engine);
-}
-
-ARM_CODE LIBNDS_NOINLINE
-void ITCM_FUNC(cGdi::bitSubBackdrop)(const void* src) {
-    u16* pSrc = (u16*)src;
-
-    for (int i = 0; i < 3; i++) {
-        for (int k = 0; k < 4; k++) {
-            int id = i * 4 + k;
-            cSprite* sprite = &_sprites[id];
-            
-            for (int l = 0; l < 64; l++) {
-                u32* source = (u32*)(pSrc + (i * 64 * SCREEN_WIDTH) + (l * SCREEN_WIDTH) + (k * 64));
-                u32* destination = (u32*)(sprite->buffer() + (l * 64));
-                swiCopy(source, destination, COPY_MODE_WORD | 32);
-            }
-        }
-    }
-
-    _scheduleSubDrop = true;
 }
 
 ARM_CODE LIBNDS_NOINLINE
@@ -577,10 +624,10 @@ void ITCM_FUNC(cGdi::bitBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s16
                 swiFastCopy(&temp3, pDest + 1, COPY_MODE_WORD | COPY_MODE_FILL | (repeats - 1));
                 *(pDest -1 + (2 * repeats)) = temp2;
                 break;
-            } else if (aligned && even && (destW != 0) && halfPitch > 16) {
-                swiFastCopy(pSrc, pDest + (j * destW), COPY_MODE_WORD | halfPitch);
-            } else if (aligned && even && (destW != 0)) {
+            } else if (aligned && even && (destW != 0) && halfPitch <= 16) {
                 swiCopy(pSrc, pDest + (j * destW), COPY_MODE_WORD | halfPitch);
+            } else if (aligned && even && (destW != 0)) {
+                swiFastCopy(pSrc, pDest + (j * destW), COPY_MODE_WORD | halfPitch);
             } else {
                 swiCopy(pSrc, pDest + (j * destW), COPY_MODE_COPY | destW);
             }
@@ -758,52 +805,46 @@ s16 ITCM_FUNC(cGdi::textOutRect)(s16 x, s16 y, u16 w, u16 h, const char* text, G
 }
 
 ARM_CODE LIBNDS_NOINLINE
-void ITCM_FUNC(cGdi::present)(GRAPHICS_ENGINE engine) {
-    if (GE_MAIN == engine) {
-        if (_scheduleDrop) {
-            dmaCopyWordsGdi(3, _workMain, _bufferMain1, 256 * 192 * 2);
-            dmaCopyWordsGdi(3, _workMain + (256 * 192), _bufferMain3, 256 * 192 * 2);
-            fillMemory((void*)_workMain, SCREEN_WIDTH * SCREEN_HEIGHT * 4, 0);
-            _scheduleDrop = false;
-        } else {
-            dmaCopyWordsGdi(3, _workMain + _layerPitch, _mainEngineLayer == 0 ? _bufferMain1 : _bufferMain3, 256 * 192 * 2);
-            fillMemory((void*)(_workMain + _layerPitch), SCREEN_WIDTH * SCREEN_HEIGHT * 2, 0);
-        }     
-
-        oamUpdate(&oamMain);
-
-    } else if (GE_SUB == engine) {
-        if (SEM_GRAPHICS == _subEngineMode)
-            dmaCopyWordsGdi(3, (void*)_workSub, (void*)_bufferSub1, 256 * 192 * 2);
-        fillMemory((void*)_workSub, SCREEN_WIDTH * SCREEN_HEIGHT, 0);
-        oamUpdate(&oamSub);
-    }
+void ITCM_FUNC(cGdi::pushMainBackground)() {
+    bitMainBackground(_workMain + (MEL_DOWN * 256 * 192));
 }
 
 ARM_CODE LIBNDS_NOINLINE
 void ITCM_FUNC(cGdi::present)() {
-    if (_scheduleSubDrop) {
-        _scheduleSubDrop = false;
+    if (_scheduleSubBackground) {
         oamUpdate(&oamSub);
         swiWaitForVBlank();
-    }
-
-    if (SEM_GRAPHICS == _subEngineMode)
-        dmaCopyWordsGdi(3, (void*)_workSub, (void*)_bufferSub1, 256 * 192 * 2);
-
-    bool scheduleDrop = _scheduleDrop;
-    if (scheduleDrop) {
         swiWaitForVBlank();
-        dmaCopyWordsGdi(3, _workMain + (256 * 192), _bufferMain3, 256 * 192 * 2);
-        _scheduleDrop = false;
     }
 
-    dmaCopyWordsGdi(3, _workMain + _layerPitch, _mainEngineLayer == 0 ? _bufferMain1 : _bufferMain3, 256 * 192 * 2);
+    if (SEM_GRAPHICS == _subEngineMode) {
+        dmaCopyWordsGdi(2, (void*)_workSub, (void*)_bufferSub1, 256 * 192 * 2);
+    }
+    
+    if (_scheduleMainBackground) {
+        oamUpdate(&oamMain);
+        swiWaitForVBlank();
+    }
 
-    fillMemory((void*)_workSub, SCREEN_WIDTH * SCREEN_HEIGHT * 2, 0);
-    fillMemory((void*)(_workMain + _layerPitch), SCREEN_WIDTH * SCREEN_HEIGHT * 2, 0);
+    dmaCopyWordsGdi(3, _workMain, _bufferMain1, 256 * 192 * 2);
+
+    fillMemory((void*)(_workMain), SCREEN_WIDTH * SCREEN_HEIGHT * 2, 0);
+    fillMemory((void*)(_workSub), SCREEN_WIDTH * SCREEN_HEIGHT * 2, 0);
+
+    _scheduleMainBackground = false;
+    _scheduleSubBackground = false;
 }
 
-void cGdi::scheduleDrop() {
-    _scheduleDrop = true;
+ARM_CODE LIBNDS_NOINLINE
+void ITCM_FUNC(cGdi::presentMain)() {
+    if (_scheduleMainBackground) {
+        oamUpdate(&oamMain);
+        swiWaitForVBlank();
+    }
+
+    dmaCopyWordsGdi(3, _workMain, _bufferMain1, 256 * 192 * 2);
+
+    fillMemory((void*)(_workMain), SCREEN_WIDTH * SCREEN_HEIGHT * 2, 0);
+
+    _scheduleMainBackground = false;
 }

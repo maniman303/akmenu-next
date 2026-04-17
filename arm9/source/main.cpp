@@ -206,9 +206,11 @@ int main(int argc, char* argv[]) {
 
                 datetime().purge();
 
+                // irq().schedulePresent();
+
                 swiWaitForVBlank();
 
-                gdi().present(GE_MAIN);
+                gdi().present();
             }
         }
     }

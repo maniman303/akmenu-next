@@ -29,6 +29,8 @@ using namespace akui;
 
 bool cIRQ::_vblankStarted(false);
 
+bool cIRQ::_presentScheduled(false);
+
 void cIRQ::init() {
     irqSet(IRQ_VBLANK, vBlank);
     irqSet(IRQ_CARD_LINE, cardMC);
@@ -50,6 +52,10 @@ void cIRQ::vblankStop() {
 
 bool cIRQ::isVblankStarted() {
     return _vblankStarted;
+}
+
+void cIRQ::schedulePresent() {
+    _presentScheduled = true;
 }
 
 void cIRQ::drawTop() {
@@ -83,4 +89,9 @@ void cIRQ::vBlank() {
         diskIcon().turnOn();
     else
         diskIcon().turnOff();
+
+    if (_presentScheduled) {
+        _presentScheduled = false;
+        gdi().present();
+    }
 }

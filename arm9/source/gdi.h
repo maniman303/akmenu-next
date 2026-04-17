@@ -21,7 +21,7 @@
 
 enum GRAPHICS_ENGINE { GE_MAIN = 0, GE_SUB = 1 };
 
-enum MAIN_ENGINE_LAYER { MEL_UP = 0, MEL_DOWN = 1 };
+enum MAIN_ENGINE_LAYER { MEL_UP = 0, MEL_MIDDLE = 1, MEL_DOWN = 2 };
 
 enum SUB_ENGINE_MODE { SEM_TEXT = 0, SEM_GRAPHICS = 1 };
 
@@ -55,7 +55,8 @@ class cGdi {
     void bitBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH, GRAPHICS_ENGINE engine);
     void bitBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH, u16 repeats, GRAPHICS_ENGINE engine);
 
-    void bitSubBackdrop(const void* src);
+    void bitMainBackground(const void* src);
+    void bitSubBackground(const void* src);
 
     u16 getPenColor(GRAPHICS_ENGINE engine) {
         if (GE_MAIN == engine)
@@ -78,13 +79,17 @@ class cGdi {
     s16  textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont);
 
     void setMainEngineLayer(MAIN_ENGINE_LAYER layer) {
+        if (layer == MEL_DOWN) {
+            _scheduleMainBackground = true;
+        }
+
         _mainEngineLayer = layer;
-        _layerPitch = layer * 256 * 192;
+        _layerPitch = layer * SCREEN_WIDTH * SCREEN_HEIGHT;
     }
 
-    void present(GRAPHICS_ENGINE engine);
+    void pushMainBackground();
     void present();
-    void scheduleDrop();
+    void presentMain();
 
   protected:
     void swapLCD(void);
@@ -104,9 +109,10 @@ class cGdi {
     u32 _layerPitch;
     u16* _workSub;
     u16* _bufferSub1;
-    bool _scheduleDrop;
-    bool _scheduleSubDrop;
-    std::vector<cSprite> _sprites;
+    bool _scheduleMainBackground;
+    bool _scheduleSubBackground;
+    std::vector<cSprite> _mainSprites;
+    std::vector<cSprite> _subSprites;
 };
 
 typedef t_singleton<cGdi> cGdi_s;

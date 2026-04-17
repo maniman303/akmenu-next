@@ -33,7 +33,6 @@ namespace akui {
         _tip.setTextColor(uiSettings().formTextColor);
         _tip.setRelativePosition(cPoint(4, _size.y - 24));
         _tip.setSize(cSize(_size.x - 8, 12));
-        hide();
     }
 
     void cProgressWnd::draw() {
@@ -58,8 +57,6 @@ namespace akui {
 
     void cProgressWnd::setPercent(u8 percent) {
         _bar.setPercent(percent);
-        windowManager().update();
-        gdi().present(GE_MAIN);
     }
 
     void cProgressWnd::setTipText(const std::string& tipText) {
