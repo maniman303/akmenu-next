@@ -27,6 +27,7 @@ cCalendar::cCalendar() : cWindow(NULL, "calendar") {
     _showDay = false;
 
     _fixOnes = 0;
+    _lastDate = 0;
 }
 
 void cCalendar::init() {
@@ -78,7 +79,6 @@ cWindow& cCalendar::loadAppearance(const std::string& aFileName) {
 
 void cCalendar::drawDayNumber(u8 day, u8 weekdDayOfMonthFirstDay, u8 today) {
     if (day > 31) return;
-
     
     u8 weekDayOfDay = (((day - 1) % 7) + weekdDayOfMonthFirstDay) % 7;
     u8 x = weekDayOfDay * _daySize.x + _dayPosition.x;
@@ -152,7 +152,7 @@ void cCalendar::drawText(const akui::cPoint& position, u32 value, u32 factor) {
     }
 }
 
-void cCalendar::draw() {
+void cCalendar::drawBackdrop() {
     if (_showDay) {
         u8 weekdDayOfMonthFirstDay = datetime().weekDayOfMonthFirstDay();
         u8 today = datetime().day();
@@ -171,4 +171,15 @@ void cCalendar::draw() {
     if (_showYear) {
         drawText(_yearPosition, datetime().year(), 1000);
     }
+}
+
+bool cCalendar::shouldDrawBackdrop() {
+    u32 now = datetime().now();
+    if (now == _lastDate) {
+        return false;
+    }
+
+    _lastDate = now;
+
+    return true;
 }

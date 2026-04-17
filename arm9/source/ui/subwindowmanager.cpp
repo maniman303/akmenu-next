@@ -24,7 +24,6 @@ void cSubWindowManager::blink() {
 void cSubWindowManager::update() {
     updateBackground();
 
-    calendar().draw();
     analogClock().draw();
     bigClock().draw();
     batteryMeter().draw();
@@ -39,6 +38,7 @@ void cSubWindowManager::updateBackground() {
     bool drawBg = false;
 
     drawBg |= calendarWnd().shouldDrawBackdrop();
+    drawBg |= calendar().shouldDrawBackdrop();
 
     if (!drawBg) {
         return;
@@ -47,6 +47,7 @@ void cSubWindowManager::updateBackground() {
     gdi().setSubEngineLayer(SEL_DOWN);
     
     calendarWnd().drawBackdrop();
+    calendar().drawBackdrop();
 
     gdi().setSubEngineLayer(SEL_UP);
     gdi().pushSubBackground();

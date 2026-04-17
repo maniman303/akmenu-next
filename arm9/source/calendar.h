@@ -18,15 +18,13 @@
 class cCalendar : public akui::cWindow {
   public:
     cCalendar();
-
     ~cCalendar() {}
 
   public:
     void init();
-
-    void draw();
-
-    akui::cWindow& loadAppearance(const std::string& aFileName);
+    void drawBackdrop() override;
+    bool shouldDrawBackdrop() override;
+    akui::cWindow& loadAppearance(const std::string& aFileName) override;
 
   protected:
     void drawDayNumber(u8 day, u8 weekdDayOfMonthFirstDay, u8 today);
@@ -45,15 +43,13 @@ class cCalendar : public akui::cWindow {
     cBMP15 _dayNumbersSecond;
     cBMP15 _yearNumbers;
     cBMP15 _dateSelection;
-
     bool _showYear;
     bool _showMonth;
     bool _showDayX;
     bool _showDay;
-
     bool _colonShow;
-
     int _fixOnes;
+    u32 _lastDate;
 };
 
 typedef t_singleton<cCalendar> calendar_s;

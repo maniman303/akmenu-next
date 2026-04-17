@@ -123,7 +123,7 @@ class cWindow : public SlotHolder {
     GRAPHICS_ENGINE selectedEngine() { return _engine; }
 
   protected:
-    virtual void draw() = 0;
+    virtual void draw() {};
 
     virtual void drawBackdrop() {};
 
