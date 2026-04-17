@@ -19,7 +19,7 @@ using namespace akui;
 
 cCalendarWnd::cCalendarWnd() : cForm(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, "calendar window") {
     _filename = "";
-    _weeks = 6;
+    _lastDate = 0;
 }
 
 cCalendarWnd::~cCalendarWnd() {}
@@ -31,6 +31,8 @@ void cCalendarWnd::init() {
 
 cWindow& cCalendarWnd::loadAppearance(const std::string& aFileName) {
     _filename = aFileName;
+    setRelativePosition(cPoint(0, 0));
+    setSize(cSize(SCREEN_WIDTH, SCREEN_HEIGHT));
 
     return *this;
 }
@@ -42,12 +44,8 @@ static int weeksInCurrentMonth() {
     return ((daysOfMonth + weekdDayOfMonthFirstDay - 1) / 7) + 1;
 }
 
-void cCalendarWnd::draw() {
+void cCalendarWnd::drawBackdrop() {
     int weeks = weeksInCurrentMonth();
-    if (weeks == _weeks && _background.valid()) {
-        return;
-    }
-
     std::string bgFile(_filename);
     if (weeks == 4) {
         bgFile = replaceInString(bgFile, ".bmp", "_cal4.bmp");
@@ -64,11 +62,20 @@ void cCalendarWnd::draw() {
         _background = createBMP15FromFile(_filename);
     }
 
-    _weeks = weeks;
-
     if (_background.width() < SCREEN_WIDTH || _background.height() < SCREEN_HEIGHT) {
         return;
     }
 
-    gdi().bitSubBackground(_background.buffer());
+    gdi().bitBlt(_background.buffer(), position().x, position().y, size().x, size().y, selectedEngine());
+}
+
+bool cCalendarWnd::shouldDrawBackdrop() {
+    u32 now = datetime().now();
+    if (now == _lastDate && _background.valid()) {
+        return false;
+    }
+
+    _lastDate = now;
+
+    return true;
 }

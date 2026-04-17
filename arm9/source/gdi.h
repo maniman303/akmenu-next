@@ -20,10 +20,8 @@
 #define COLOR u16
 
 enum GRAPHICS_ENGINE { GE_MAIN = 0, GE_SUB = 1 };
-
 enum MAIN_ENGINE_LAYER { MEL_UP = 0, MEL_MIDDLE = 1, MEL_DOWN = 2 };
-
-enum SUB_ENGINE_MODE { SEM_TEXT = 0, SEM_GRAPHICS = 1 };
+enum SUB_ENGINE_LAYER { SEL_UP = 0, SEL_DOWN = 1 };
 
 class cSprite;
 
@@ -79,15 +77,17 @@ class cGdi {
     s16  textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont);
 
     void setMainEngineLayer(MAIN_ENGINE_LAYER layer) {
-        if (layer == MEL_DOWN) {
-            _scheduleMainBackground = true;
-        }
-
         _mainEngineLayer = layer;
         _layerPitch = layer * SCREEN_WIDTH * SCREEN_HEIGHT;
     }
 
+    void setSubEngineLayer(SUB_ENGINE_LAYER layer) {
+        _subEngineLayer = layer;
+        _subLayerPitch = layer * SCREEN_WIDTH * SCREEN_HEIGHT;
+    }
+
     void pushMainBackground();
+    void pushSubBackground();
     void present();
     void presentMain();
 
@@ -105,8 +105,9 @@ class cGdi {
     u16* _bufferMain1;
     u16* _bufferMain3;
     MAIN_ENGINE_LAYER _mainEngineLayer;
-    SUB_ENGINE_MODE _subEngineMode;
+    SUB_ENGINE_LAYER _subEngineLayer;
     u32 _layerPitch;
+    u32 _subLayerPitch;
     u16* _workSub;
     u16* _bufferSub1;
     bool _scheduleMainBackground;

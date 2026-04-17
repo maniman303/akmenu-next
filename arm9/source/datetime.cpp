@@ -53,6 +53,13 @@ u8 cDateTime::weekday() {
     return iTimeParts.tm_wday;
 }
 
+u32 cDateTime::now() {
+    u32 res = ((u32)year()) << 16;
+    res = res | ((u16)month()) << 8;
+    res = res | day();
+    return res;
+}
+
 u8 cDateTime::hours() {
     FillTimeParts();
     return iTimeParts.tm_hour;

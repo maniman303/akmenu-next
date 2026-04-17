@@ -33,6 +33,8 @@ class cDateTime {
     u8 day(void);
     u8 weekday(void);
 
+    u32 now(void);
+
     u8 hours(void);
     u8 minutes(void);
     u8 seconds(void);

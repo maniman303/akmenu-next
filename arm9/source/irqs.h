@@ -29,8 +29,6 @@ class cIRQ {
 
     void schedulePresent();
 
-    static void drawTop();
-
     static void cardMC();
 
     static void vBlank();

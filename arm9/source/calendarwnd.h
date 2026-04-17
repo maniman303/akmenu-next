@@ -16,20 +16,18 @@
 class cCalendarWnd : public akui::cForm {
   public:
     cCalendarWnd();
-
     ~cCalendarWnd();
 
   public:
     cWindow& loadAppearance(const std::string& aFileName);
-
     void init();
-
-    void draw();
+    void drawBackdrop() override;
+    bool shouldDrawBackdrop() override;
 
   protected:
     cBMP15 _background;
     std::string _filename;
-    int _weeks;
+    u32 _lastDate;
 };
 
 typedef t_singleton<cCalendarWnd> calendarWnd_s;

@@ -56,7 +56,9 @@
 #include "userwnd.h"
 #include "fsmngr.h"
 
+#include "ui/image.h"
 #include "ui/windowmanager.h"
+#include "ui/subwindowmanager.h"
 #include "ui/uisettings.h"
 
 using namespace akui;
@@ -277,7 +279,7 @@ int main(int argc, char* argv[]) {
 
         // nocashMessage(formatString("Ticks 7: %d.", timer().getTick()).c_str());
 
-        irq().drawTop();
+        subWindowManager().update();
 
         // nocashMessage(formatString("Ticks 8: %d.", timer().getTick()).c_str());
 

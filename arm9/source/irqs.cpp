@@ -8,22 +8,11 @@
 */
 
 #include "irqs.h"
-#include "analogclock.h"
-#include "bigclock.h"
-#include "calendar.h"
-#include "calendarwnd.h"
-#include "batterymeter.h"
-#include "booticon.h"
-#include "smalldate.h"
-#include "smallclock.h"
 #include "dbgtool.h"
-#include "diskicon.h"
 #include "timer.h"
-#include "userinput.h"
-#include "userwnd.h"
-#include "fpscounter.h"
+#include "diskicon.h"
 #include "logger.h"
-#include "windowmanager.h"
+#include "subwindowmanager.h"
 
 using namespace akui;
 
@@ -58,19 +47,6 @@ void cIRQ::schedulePresent() {
     _presentScheduled = true;
 }
 
-void cIRQ::drawTop() {
-    calendarWnd().draw();
-    calendar().draw();
-    analogClock().draw();
-    bigClock().draw();
-    batteryMeter().draw();
-    bootIcon().draw();
-    smallDate().draw();
-    smallClock().draw();
-    userWindow().draw();
-    fpsCounter().draw();
-}
-
 void cIRQ::vBlank() {
     if (!_vblankStarted) return;
 
@@ -80,9 +56,7 @@ void cIRQ::vBlank() {
 
     if (vBlankCounter++ >= 29) {
         vBlankCounter = 0;
-        bigClock().blinkColon();
-        smallClock().flipColon();
-        batteryMeter().flipIcon();
+        
     }
 
     if (REG_ROMCTRL & CARD_BUSY)

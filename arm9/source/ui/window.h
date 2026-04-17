@@ -114,7 +114,9 @@ class cWindow : public SlotHolder {
         return *this;
     }
 
-    cWindow& render();
+    void render();
+
+    void renderBackdrop();
 
     void setEngine(GRAPHICS_ENGINE engine) { _engine = engine; }
 
@@ -122,6 +124,10 @@ class cWindow : public SlotHolder {
 
   protected:
     virtual void draw() = 0;
+
+    virtual void drawBackdrop() {};
+
+    virtual bool shouldDrawBackdrop() { return false; }
 
     //! \brief called when the window is shown, derived classes can override this to
     //! react to the window becoming visible

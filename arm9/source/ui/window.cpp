@@ -104,10 +104,12 @@ bool cWindow::processTouchMessage(cTouchMessage message) {
     return false;
 }
 
-cWindow& cWindow::render() {
-    ////dbg_printf("cWindow::render this is %08x\n", this );
+void cWindow::render() {
     if (isVisible()) draw();
-    return *this;
+}
+
+void cWindow::renderBackdrop() {
+    if (isVisible()) drawBackdrop();
 }
 
 cWindow& cWindow::setSize(const cSize& aSize) {
