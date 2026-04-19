@@ -834,6 +834,10 @@ void ITCM_FUNC(cGdi::present)() {
     }
 
     if (_scheduleMainBackdrop) {
+        if (!_scheduleMainBackground) {
+            swiWaitForVBlank();
+        }
+
         dmaCopyWordsGdi(3, _workMain + (MEL_MIDDLE * SCREEN_WIDTH * SCREEN_HEIGHT), _bufferMain3, 256 * 192 * 2);
     }
 

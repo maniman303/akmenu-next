@@ -52,6 +52,7 @@ cMainList::cMainList(cWindow* parent, const std::string& text)
     _tallRowHeight = 38;
     _centerInternalColumn = false;
     _viewMode = VM_LIST;
+    _scheduleBackdrop = true;
 
     if (!isDSiMode()) {
         _topCount = 3;
@@ -518,6 +519,11 @@ bool cMainList::setupGameDir() {
     return rowsCount <= rowsToLoad;
 }
 
+void cMainList::onDirectoryChanged() {
+    scheduleBackdrop();
+    directoryChanged();
+}
+
 bool cMainList::enterDir(const std::string& dirName) {
     _saves.clear();
     if (startsWithString(dirName, "...") || dirName.empty())  // select RPG or SD card
@@ -526,6 +532,7 @@ bool cMainList::enterDir(const std::string& dirName) {
         _romInfoList.clear();
 
         if (gs().filePresentationMode < 2) {
+            onDirectoryChanged();
             return setupDefaultDir(false, false);
         }
 
@@ -535,18 +542,20 @@ bool cMainList::enterDir(const std::string& dirName) {
 
         processDirIcons();
 
+        onDirectoryChanged();
+
         return setupDefaultDir(skipSdCards, true);
     }
 
     if ("slot2:/" == dirName) {
         _currentDir = "";
-        directoryChanged();
+        onDirectoryChanged();
         return true;
     }
 
     if ("slot1:/" == dirName) {
         _currentDir = "";
-        directoryChanged();
+        onDirectoryChanged();
         return true;
     }
 
@@ -641,7 +650,7 @@ bool cMainList::enterDir(const std::string& dirName) {
 
     _currentDir = dirName;
 
-    directoryChanged();
+    onDirectoryChanged();
 
     return true;
 }
@@ -777,11 +786,18 @@ void cMainList::selectRom(const std::string& romPath){
     }
 }
 
+bool cMainList::canRenderBackdrop() {
+    return true;
+}
+
 void cMainList::draw() {
     updateInternalNames();
-    drawItemBackgrounds();
     cListView::draw();
     drawIcons();
+}
+
+void cMainList::drawBackdrop() {
+    drawItemBackgrounds();
 }
 
 void cMainList::drawItemBackgrounds() {

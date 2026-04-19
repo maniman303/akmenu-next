@@ -114,7 +114,13 @@ class cWindow : public SlotHolder {
         return *this;
     }
 
-    virtual bool shouldRenderBackdrop() { return false; }
+    void scheduleBackdrop() { _scheduleBackdrop = true; }
+
+    virtual bool canRenderBackdrop() { return false; }
+
+    virtual bool shouldRenderBackdrop() { return _scheduleBackdrop; }
+
+    virtual void onRenderBackdrop() { _scheduleBackdrop = false; }
 
     void render();
 
@@ -172,6 +178,7 @@ class cWindow : public SlotHolder {
     bool _isSizeSetByUser;      //!< Whether the user has explicitly set the window's size
     bool _isFocusable;
     bool _ignoreSizeEvent;
+    bool _scheduleBackdrop;
 
   protected:
     GRAPHICS_ENGINE _engine;

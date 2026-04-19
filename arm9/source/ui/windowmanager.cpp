@@ -49,6 +49,9 @@ namespace akui {
         }
         _currentWindow = cWindowRec(aWindow);
         setFocusedWindow(aWindow);
+        if (aWindow != NULL && aWindow->canRenderBackdrop()) {
+            aWindow->scheduleBackdrop();
+        }
         updateBackground(false);
         return *this;
     }
@@ -62,6 +65,9 @@ namespace akui {
                 _currentWindow = _backgroundWindows.back();
                 _backgroundWindows.pop_back();
                 setFocusedWindow(_currentWindow._focused);
+                if (_currentWindow.window()->canRenderBackdrop()) {
+                    _currentWindow.window()->scheduleBackdrop();
+                }
             }
         } else {
             for (cWindows::iterator it = _backgroundWindows.begin(); it != _backgroundWindows.end();
@@ -106,10 +112,11 @@ namespace akui {
     const cWindowManager& cWindowManager::update(void) {
         if (_currentWindow.window() != NULL) {
             _currentWindow.window()->update();
-            if (_currentWindow.window()->shouldRenderBackdrop()) {
+            if (_currentWindow.window()->canRenderBackdrop() && _currentWindow.window()->shouldRenderBackdrop()) {
                 gdi().setMainEngineLayer(MEL_MIDDLE);
                 _currentWindow.window()->renderBackdrop();
                 gdi().setMainEngineLayer(MEL_UP);
+                _currentWindow.window()->onRenderBackdrop();
             }
 
             _currentWindow.window()->render();
@@ -122,19 +129,27 @@ namespace akui {
         gdi().setMainEngineLayer(MEL_DOWN);
 
         for (cWindows::iterator it = _backgroundWindows.begin(); it != _backgroundWindows.end(); ++it) {
-            (*it).window()->renderBackdrop();
+            if ((*it).window()->canRenderBackdrop()) {
+                (*it).window()->renderBackdrop();
+            }
             (*it).window()->render();
         }
 
         if (includeCurrent && _currentWindow.window()) {
-            _currentWindow.window()->renderBackdrop();
+            if (_currentWindow.window()->canRenderBackdrop()) {
+                _currentWindow.window()->renderBackdrop();
+            }
             _currentWindow.window()->render();
         }
 
+        gdi().setMainEngineLayer(MEL_MIDDLE);
         gdi().setMainEngineLayer(MEL_UP);
         gdi().pushMainBackground();
 
         if (includeCurrent && _currentWindow.window()) {
+            if (_currentWindow.window()->canRenderBackdrop()) {
+                _currentWindow.window()->renderBackdrop();
+            }
             _currentWindow.window()->render();
         }
 

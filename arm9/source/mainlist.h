@@ -75,8 +75,12 @@ class cMainList : public akui::cListView {
 
     const std::vector<std::string>* Saves(void);
 
+    bool canRenderBackdrop() override;
+
   protected:
-    void draw();
+    void draw() override;
+
+    void drawBackdrop() override;
 
     void drawIcons();
 
@@ -91,6 +95,8 @@ class cMainList : public akui::cListView {
     bool setupDefaultDir(bool skipCards, bool skipFavorites);
 
     bool setupGameDir();
+
+    void onDirectoryChanged();
 
     std::vector<std::string> getLastPlayedRow();
 

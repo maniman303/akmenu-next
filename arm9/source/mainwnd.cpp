@@ -299,11 +299,8 @@ bool cMainWnd::processKeyMessage(cKeyMessage message) {
 
         if (isL) {
             _mainList->SwitchShowAllFiles();
-        } else {
-            _mainList->setViewMode((cMainList::VIEW_MODE)((_mainList->getViewMode() + 1) % 4));
+            return true;
         }
-
-        return true;
     }
 
     if (message.isKeyUp(KEY_R)) {

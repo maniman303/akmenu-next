@@ -30,7 +30,11 @@ class cForm : public cWindow {
 
     cForm& removeChildWindow(cWindow* aWindow);
 
+    bool canRenderBackdrop() override;
+
     bool shouldRenderBackdrop() override;
+
+    void onRenderBackdrop() override;
 
     void draw() override;
 

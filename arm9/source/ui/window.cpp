@@ -22,6 +22,7 @@ cWindow::cWindow(cWindow* aParent, const std::string& aText)
       _isSizeSetByUser(false),
       _isFocusable(true),
       _ignoreSizeEvent(false),
+      _scheduleBackdrop(false),
       _engine(GE_MAIN) {}
 
 cWindow::~cWindow() {
