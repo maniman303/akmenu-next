@@ -47,7 +47,9 @@ void cSubWindowManager::updateBackground() {
     gdi().setSubEngineLayer(SEL_DOWN);
     
     calendarWnd().drawBackdrop();
+    calendarWnd().onRenderBackdrop();
     calendar().drawBackdrop();
+    calendar().onRenderBackdrop();
 
     gdi().setSubEngineLayer(SEL_UP);
     gdi().pushSubBackground();

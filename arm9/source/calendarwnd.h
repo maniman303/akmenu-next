@@ -23,6 +23,7 @@ class cCalendarWnd : public akui::cForm {
     void init();
     void drawBackdrop() override;
     bool shouldRenderBackdrop() override;
+    void onRenderBackdrop() override;
 
   protected:
     cBMP15 _background;

@@ -182,3 +182,7 @@ bool cCalendar::shouldRenderBackdrop() {
 
     return true;
 }
+
+void cCalendar::onRenderBackdrop() {
+    _lastDate = datetime().now();
+}
