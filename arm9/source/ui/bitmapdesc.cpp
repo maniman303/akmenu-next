@@ -19,9 +19,6 @@ namespace akui {
     }
 
     cBitmapDesc::~cBitmapDesc() {
-        if (_background.valid()) {
-            destroyBMP15(_background);
-        }
     }
 
     void cBitmapDesc::draw(const cRect& area, GRAPHICS_ENGINE engine) const {

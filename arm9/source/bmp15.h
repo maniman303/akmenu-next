@@ -53,6 +53,8 @@ class cBMP15 {
     std::string _filename;
 
     void clear();
+
+    std::shared_ptr<u32[]>* rawBuffer() { return &_buffer; }
 };
 
 cBMP15 createBMP15(u32 width, u32 height);

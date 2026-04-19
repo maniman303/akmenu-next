@@ -26,7 +26,6 @@ void cBootIcon::draw() {
 
     std::string filename = gs().autorunWithLastRom ? SFN_UI_BOOT_AUTO_ICON : SFN_UI_BOOT_MANUAL_ICON;
     if (!_icon.valid() || _icon.filename() != filename) {
-        destroyBMP15(_icon);
         _icon = createBMP15FromFile(filename);
     }
 

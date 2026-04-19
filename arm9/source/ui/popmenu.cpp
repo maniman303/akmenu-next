@@ -130,6 +130,7 @@ bool cPopMenu::processTouchMessage(cTouchMessage message) {
         if (windowBelow(pos) == NULL) {
             hide();
         } else if (!_skipTouch) {
+            hide();
             itemClicked(_selectedItemIndex);
         }
 

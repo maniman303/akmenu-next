@@ -62,7 +62,6 @@ void cBatteryMeter::draw() {
     }
 
     if (!_battery.valid() || _battery.filename() != newFile) {
-        destroyBMP15(_battery);
         _battery = createBMP15FromFile(newFile);
     }
 

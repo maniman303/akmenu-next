@@ -13,6 +13,7 @@
 #include <string>
 #include "bmp15.h"
 #include "dbgtool.h"
+#include "logger.h"
 
 cBMP15::cBMP15() : _width(0), _height(0), _pitch(0), _buffer(NULL), _filename("") {}
 
@@ -27,6 +28,7 @@ cBMP15::~cBMP15() {
 }
 
 void cBMP15::clear() {
+    destroyBMP15(*this);
     _width = 0;
     _height = 0;
     _pitch = 0;
@@ -148,7 +150,13 @@ cBMP15 createBMP15FromFile(const std::string& filename) {
 void destroyBMP15(cBMP15& bmp) {
     if (!bmp.filename().empty()) {
         _bmpPool.remove_if([&](cBMP15& testItem) {
-            return testItem.filename() == bmp.filename();
+            long count = testItem.rawBuffer()->use_count();
+            bool res = count == 1 || (count <= 2 && testItem.filename() == bmp.filename());
+            // if (res) {
+            //     logger().info("Removing unused bmp.");
+            // }
+            
+            return res;
         });
     }
 }
