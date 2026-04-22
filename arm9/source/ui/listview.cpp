@@ -18,12 +18,6 @@
 namespace akui {
     void cListItem::setText(const std::string& text) {
         _text = text;
-        _lines = 1;
-        size_t pos = _text.find('\n');
-        while (_text.npos != pos) {
-            ++_lines;
-            pos = _text.find('\n', pos + 1);
-        }
     }
 
     cListView::cListView(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)

@@ -14,6 +14,7 @@
 #include "timer.h"
 #include "logger.h"
 #include "uisettings.h"
+#include "windowmanager.h"
 #include "../globalsettings.h"
 
 namespace akui {
@@ -92,9 +93,9 @@ s16 cPopMenu::barWidth(void) {
 
 bool cPopMenu::processKeyMessage(cKeyMessage message) {
     if (message.isKeyUp(KEY_A)) {
-        hide();
         // logger().info("Selecting pop menu option.");
         itemClicked(_selectedItemIndex);
+        hide();
         return true;
     }
 
@@ -130,8 +131,8 @@ bool cPopMenu::processTouchMessage(cTouchMessage message) {
         if (windowBelow(pos) == NULL) {
             hide();
         } else if (!_skipTouch) {
-            hide();
             itemClicked(_selectedItemIndex);
+            hide();
         }
 
          _skipTouch = false;
@@ -173,6 +174,10 @@ s32 cPopMenu::itemBelowPoint(const cPoint& pt) {
 
 void cPopMenu::onShow() {
     _selectedItemIndex = 0;
+}
+
+void cPopMenu::onHide() {
+    windowManager().removeWindow(this);
 }
 
 }  // namespace akui

@@ -44,7 +44,9 @@ class cPopMenu : public cWindow {
     Signal1<s16> itemClicked;
 
   protected:
-    void onShow();
+    void onShow() override;
+
+    void onHide() override;
 
     s32 itemBelowPoint(const cPoint& pt);
 

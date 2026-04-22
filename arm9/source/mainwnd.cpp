@@ -161,14 +161,10 @@ void cMainWnd::init() {
     addChildWindow(_folderText);
 
     // init startmenu
-    _startMenu = new cStartMenu(160, 40, 61, 108, this, "start menu");
-    //_startMenu->setRelativePosition( cPoint(160, 40) );
+    _startMenu = new cStartMenu(160, 40, 61, 108, NULL, "start menu");
     _startMenu->init();
     _startMenu->itemClicked.connect(this, &cMainWnd::startMenuItemClicked);
-    _startMenu->hide();
-    _startMenu->setRelativePosition(_startMenu->position());
-    addChildWindow(_startMenu);
-    // windowManager().addWindow( _startMenu );
+
     dbg_printf("startMenu %08x\n", _startMenu);
 
     diskIcon().loadAppearance(SFN_CARD_ICON_BLUE);
@@ -232,10 +228,9 @@ void cMainWnd::startMenuItemClicked(s16 i) {
 }
 
 void cMainWnd::startButtonClicked() {
-    if (_startMenu->isVisible()) {
-        _startMenu->hide();
-    } else if (!gs().safeMode) {
+    if (!gs().safeMode) {
         _startMenu->showForFile(_mainList->getSelectedFullPath());
+        windowManager().addWindow(_startMenu);
     }
 }
 
@@ -252,12 +247,6 @@ void cMainWnd::onGainedFocus() {
 }
 
 bool cMainWnd::processKeyMessage(cKeyMessage message) {
-    if (_startMenu->isVisible()) {
-        return _startMenu->processKeyMessage(message);
-    }
-
-    // logger().info("Main wnd key processing.");
-
     bool isL = message.isKeyShift(KEY_L);
     bool allow = !gs().safeMode;
     if (message.isKeyUp(KEY_Y)) {
@@ -315,10 +304,6 @@ bool cMainWnd::processKeyMessage(cKeyMessage message) {
 }
 
 bool cMainWnd::processTouchMessage(cTouchMessage message) {
-    if (_startMenu->isVisible()) {
-        return _startMenu->processTouchMessage(message);
-    }
-
     return cForm::processTouchMessage(message);
 }
 
@@ -738,10 +723,4 @@ void cMainWnd::onFolderChanged() {
     dbg_printf("%s\n", _mainList->getSelectedFullPath().c_str());
 
     _folderText->setText(dirShowName);
-}
-
-cWindow* cMainWnd::windowBelow(const cPoint& p) {
-    cWindow* wbp = cForm::windowBelow(p);
-    if (_startMenu->isVisible() && wbp != _startButton) wbp = _startMenu;
-    return wbp;
 }

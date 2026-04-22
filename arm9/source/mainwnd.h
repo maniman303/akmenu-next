@@ -36,8 +36,6 @@ class cMainWnd : public akui::cForm {
 
     void draw();
 
-    cWindow* windowBelow(const akui::cPoint& p);
-
     cMainList* _mainList;
 
   protected:
