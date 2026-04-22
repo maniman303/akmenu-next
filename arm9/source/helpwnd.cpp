@@ -52,7 +52,7 @@ cHelpWnd::cHelpWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::strin
 
     loadAppearance("");
 
-    for (size_t i = 0; i < 9; ++i) {
+    for (size_t i = 0; i < 8; ++i) {
         std::string textIndex = formatString("item%d", i);
         _helpText += LANG("help window", textIndex);
         _helpText += "\n";
@@ -62,7 +62,7 @@ cHelpWnd::cHelpWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::strin
     std::string ndsbsVer = fsManager().resolveSystemPath("/_nds/release-bootstrap.ver");
     
     char ndsbsBuffer[256];
-    _helpText += "https://github.com/coderkei\n";
+    _helpText += "https://github.com/maniman303\n";
     _helpText += formatString("AKMenu-Next %s.%s ", AKMENU_VERSION_MAIN, AKMENU_VERSION_SUB);
 
     if(gs().pico){

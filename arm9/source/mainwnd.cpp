@@ -393,14 +393,6 @@ void cMainWnd::showSettings(void) {
     _values.push_back(LANG("date format", "mm-dd-yyyy"));
     settingWnd->addSettingItem(LANG("date format", "title"), _values, gs().dateFormat);
 
-    // file list type
-    _values.clear();
-    for (size_t ii = 0; ii < 3; ++ii) {
-        std::string itemName = formatString("item%d", ii);
-        _values.push_back(LANG("filelist type", itemName));
-    }
-    settingWnd->addSettingItem(LANG("filelist type", "text"), _values, gs().fileListType);
-
     // reset hotkey
     _values.clear();
     _values.push_back(LANG("resethotkey", "0"));
@@ -436,7 +428,7 @@ void cMainWnd::showSettings(void) {
     _values.push_back(LANG("interface settings", "modern"));
     _values.push_back(LANG("interface settings", "internal"));
     _values.push_back(LANG("interface settings", "small"));
-    settingWnd->addSettingItem(LANG("interface settings", "filelist style"), _values, gs().viewMode);
+    settingWnd->addSettingItem(LANG("interface settings", "menu style"), _values, gs().viewMode);
     _values.clear();
     _values.push_back(LANG("switches", "Disable"));
     _values.push_back(LANG("switches", "Enable"));
@@ -454,6 +446,13 @@ void cMainWnd::showSettings(void) {
     _values.push_back(LANG("file settings", "presentation user only"));
     _values.push_back(LANG("file settings", "presentation games"));
     settingWnd->addSettingItem(LANG("file settings", "file presentation mode"), _values, gs().filePresentationMode);
+    // file list type
+    _values.clear();
+    for (size_t ii = 0; ii < 3; ++ii) {
+        std::string itemName = formatString("item%d", ii);
+        _values.push_back(LANG("filelist type", itemName));
+    }
+    settingWnd->addSettingItem(LANG("filelist type", "text"), _values, gs().fileListType);
     _values.clear();
     _values.push_back(".nds.sav");
     _values.push_back(".sav");
@@ -564,8 +563,7 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
     u32 uiIndexAfter = settingWnd->getItemSelection(0, 0);
     u32 langIndexAfter = settingWnd->getItemSelection(0, 1);
     gs().dateFormat = settingWnd->getItemSelection(0, 2);
-    gs().fileListType = settingWnd->getItemSelection(0, 3);
-    gs().resetHotKey = settingWnd->getItemSelection(0, 4);
+    gs().resetHotKey = settingWnd->getItemSelection(0, 3);
 
     // page 2: interface
     switch (settingWnd->getItemSelection(1, 0)) {
@@ -586,8 +584,9 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
     // page 3: filesystem
     gs().showHiddenFiles = settingWnd->getItemSelection(2, 0);
     gs().filePresentationMode = settingWnd->getItemSelection(2, 1);
-    gs().saveExt = settingWnd->getItemSelection(2, 2);
-    gs().saveDir = settingWnd->getItemSelection(2, 3);
+    gs().fileListType = settingWnd->getItemSelection(2, 2);
+    gs().saveExt = settingWnd->getItemSelection(2, 3);
+    gs().saveDir = settingWnd->getItemSelection(2, 4);
 
     // page 4: ndsbs
     gs().dsOnly = settingWnd->getItemSelection(3, 0);

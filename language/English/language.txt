@@ -145,7 +145,7 @@ title = Notify
 text = There is no device in Slot 2.
 
 [filelist type]
-text = Set file list type
+text = File extension filter
 item0 = NDS
 item1 = NDS + SAV
 item2 = ALL
@@ -192,7 +192,6 @@ item4 = %c  Favourites
 item5 = %c  Back to parent directory
 item6 = %c  Adjust Brightness (DS-Only)
 item7 = %s  Start Menu
-item8 = %s  Menu style new/classical
 
 [exp window]
 button = 3in1
@@ -257,7 +256,7 @@ presentation games = Minimal
 [interface settings]
 title = Interface settings
 scrolling speed = Scrolling speed
-filelist style = Filelist style
+menu style = Menu style
 oldschool = Old school
 small = Small Icons
 modern = Modern
