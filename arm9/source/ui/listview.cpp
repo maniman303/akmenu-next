@@ -163,7 +163,9 @@ namespace akui {
             for (size_t j = 0; j < columnCount; ++j) {
                 bool columnCenter = _columns[j].center;
                 s32 columnWidth = _columns[j].width;
-                s32 height = (_rows[_firstVisibleRowId + i][j].lines() * (font().GetHeight() + font().GetDescend())) - font().GetDescend();
+                std::string content = font().BreakLine(_rows[_firstVisibleRowId + i][j].text(), columnWidth);
+                std::vector<std::string> lines = splitLines(content);
+                s32 height = (lines.size() * (font().GetHeight() + font().GetDescend())) - font().GetDescend();
                 s32 itemX = position().x + _columns[j].offset;
                 s32 itemY = position().y + i * _rowHeight;
                 s32 textY = itemY + ((_rowHeight - height - 1) >> 1);
@@ -175,18 +177,14 @@ namespace akui {
                 if (ownerDraw.size()) {
                     ownerDraw(cOwnerDraw(_firstVisibleRowId + i, j, cPoint(itemX, itemY - 1),
                                         cSize(columnWidth, _rowHeight), textY, height,
-                                        _rows[_firstVisibleRowId + i][j].text().c_str(), _engine));
-                } else if (!columnCenter && columnWidth > 0) {
-                    gdi().textOutRect(itemX, textY, columnWidth, height,
-                                    _rows[_firstVisibleRowId + i][j].text().c_str(), _engine);
+                                        content.c_str(), _engine));
                 } else if (columnWidth > 0) {
-                    std::vector<std::string> lines = splitLines(_rows[_firstVisibleRowId + i][j].text());
                     for (size_t k = 0; k < lines.size(); k++) {
                         std::string line = lines[k];
                         s32 lineWidth = font().TextWidth(line);
-                        s32 lineX = itemX + ((columnWidth - lineWidth) / 2);
+                        s32 lineX = columnCenter ? itemX + ((columnWidth - lineWidth) / 2) : itemX;
                         s32 lineY = textY + 1 + k * (font().GetHeight() + font().GetDescend());
-                        gdi().textOutRect(lineX, lineY, lineWidth, height, line.c_str(), _engine);
+                        gdi().textOutRect(lineX, lineY, lineWidth, height, line.c_str(), _engine, font());
                     }
                 }
             }
