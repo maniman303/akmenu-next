@@ -23,12 +23,9 @@ cBMP15::cBMP15(u32 width, u32 height) : _width(0), _height(0), _pitch(0), _buffe
     _pitch = (width + (width & 1)) << 1;
 }
 
-cBMP15::~cBMP15() {
-    clear();
-}
+cBMP15::~cBMP15() { }
 
 void cBMP15::clear() {
-    destroyBMP15(*this);
     _width = 0;
     _height = 0;
     _pitch = 0;
@@ -147,16 +144,10 @@ cBMP15 createBMP15FromFile(const std::string& filename) {
     return bmp;
 }
 
-void destroyBMP15(cBMP15& bmp) {
-    if (!bmp.filename().empty()) {
-        _bmpPool.remove_if([&](cBMP15& testItem) {
-            long count = testItem.rawBuffer()->use_count();
-            bool res = count == 1 || (count <= 2 && testItem.filename() == bmp.filename());
-            // if (res) {
-            //     logger().info("Removing unused bmp.");
-            // }
-            
-            return res;
-        });
-    }
+void destroyBMP15() {
+    _bmpPool.remove_if([&](cBMP15& testItem) {
+        bool res = testItem.rawBuffer()->use_count() <= 1;
+        
+        return res;
+    });
 }

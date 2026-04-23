@@ -55,6 +55,7 @@
 #include "sram.h"
 #include "userwnd.h"
 #include "fsmngr.h"
+#include "bmp15.h"
 
 #include "ui/image.h"
 #include "ui/windowmanager.h"
@@ -207,6 +208,7 @@ int main(int argc, char* argv[]) {
                 windowManager().update();
 
                 datetime().purge();
+                destroyBMP15();
 
                 // irq().schedulePresent();
 
@@ -284,6 +286,7 @@ int main(int argc, char* argv[]) {
         // nocashMessage(formatString("Ticks 8: %d.", timer().getTick()).c_str());
 
         datetime().purge();
+        destroyBMP15();
 
         swiWaitForVBlank();
         gdi().present();

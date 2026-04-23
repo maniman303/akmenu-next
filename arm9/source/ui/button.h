@@ -15,94 +15,66 @@
 #include "window.h"
 
 namespace akui {
+  class cButton : public cWindow {
+    public:
+      enum State { up = 0, down = 1 };
 
-class cButtonDesc;
+      enum Style { single = 0, press = 1, toggle = 2 };
 
-class cButton : public cWindow {
-  public:
-    enum State { up = 0, down = 1 };
+      enum Alignment { left, center, right };
 
-    enum Style { single = 0, press = 1, toggle = 2 };
+      cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text);
 
-    enum Alignment { left, center, right };
+      cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text, bool hasAlpha);
 
-    cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text);
+      ~cButton();
 
-    cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text, bool hasAlpha);
+    public:
+      void draw();
 
-    ~cButton();
+      cWindow& loadAppearance(const std::string& aFileName);
 
-  public:
-    void draw();
+      bool valid() const;
 
-    cWindow& loadAppearance(const std::string& aFileName);
+      bool isTouchFocusable() override;
 
-    bool valid() const;
+      void setIsFocusable(bool isFocusable);
 
-    bool isTouchFocusable() override;
+      bool processTouchMessage(cTouchMessage message) override;
 
-    void setIsFocusable(bool isFocusable);
+      State state() { return _state; }
 
-    bool processTouchMessage(cTouchMessage message) override;
+      void setTextColor(COLOR color) { _textColor = color; }
 
-    State state() { return _state; }
+      COLOR textColor() { return _textColor; }
 
-    void setTextColor(COLOR color) { _textColor = color; }
+      void setStyle(Style style) { _style = style; }
 
-    COLOR textColor() { return _textColor; }
+      Style style() { return _style; }
 
-    void setStyle(Style style) { _style = style; }
+      void setAlignment(Alignment alignment) { _alignment = alignment; }
 
-    Style style() { return _style; }
+      Alignment alignment() { return _alignment; }
 
-    void setAlignment(Alignment alignment) { _alignment = alignment; }
+      void onPressed();
 
-    Alignment alignment() { return _alignment; }
+      void onReleased();
 
-    void onPressed();
+      void onClicked();
 
-    void onReleased();
+      bool hasAlpha() { return _hasAlpha; }
 
-    void onClicked();
+      Signal0 clicked;
 
-    bool hasAlpha() { return _hasAlpha; }
+      Signal0 pressed;
 
-    Signal0 clicked;
-
-    Signal0 pressed;
-
-  protected:
-    bool _captured;
-    State _state;
-    COLOR _textColor;
-    cButtonDesc* _renderDesc;
-    Style _style;
-    Alignment _alignment;
-    bool _hasAlpha;
-};
-
-// form desc，只负责画背景
-class cButtonDesc : public cRenderDesc {
-  public:
-    cButtonDesc();
-
-    ~cButtonDesc();
-
-  public:
-    cButtonDesc& setButton(cButton* button) {
-        _button = button;
-        return *this;
-    }
-
-    void draw(const cRect& area, GRAPHICS_ENGINE engine) const;
-
-    bool valid() const;
-
-    void loadData(const std::string& filename);
-
-  protected:
-    cButton* _button;
-    cBMP15 _background;
-    COLOR _textColor;
-};
+    protected:
+      bool _captured;
+      State _state;
+      COLOR _textColor;
+      cBMP15 _background;
+      Style _style;
+      Alignment _alignment;
+      bool _hasAlpha;
+  };
 }  // namespace akui
