@@ -3,7 +3,6 @@
 #include "bmp15.h"
 #include "point.h"
 #include "singleton.h"
-#include "bitmapdesc.h"
 #include "window.h"
 
 using namespace akui;

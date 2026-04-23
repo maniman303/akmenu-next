@@ -16,7 +16,6 @@ namespace akui {
     cProgressWnd::cProgressWnd()  // s32 x, s32 y, u32 w, u32 h, cWindow * parent, const std::string &
                                 // text )
         : cForm(0, 0, 0, 0, NULL, ""), _bar(0, 0, 180, 24, this, ""), _tip(0, 0, 180, 20, this, "") {
-        _renderDesc.setBltMode(BM_MASKBLT);
         setSize(cSize(226, 62));
         setRelativePosition(cPoint(14, 64));
     }
@@ -40,7 +39,10 @@ namespace akui {
             return;
         }
 
-        _renderDesc.draw(windowRectangle(), _engine);
+        if (_background.valid()) {
+            gdi().maskBlt(_background.buffer(), position().x, position().y, _background.width(), _background.height(), selectedEngine());
+        }
+
         cForm::draw();
     }
 
@@ -49,7 +51,7 @@ namespace akui {
     }
 
     cWindow& cProgressWnd::loadAppearance(const std::string& aFileName) {
-        _renderDesc.loadData(aFileName);
+        _background = createBMP15FromFile(aFileName);
         _bar.loadAppearance(SFN_PROGRESS_BAR_BG);
 
         return *this;

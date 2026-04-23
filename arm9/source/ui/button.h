@@ -18,54 +18,34 @@ namespace akui {
   class cButton : public cWindow {
     public:
       enum State { up = 0, down = 1 };
-
       enum Style { single = 0, press = 1, toggle = 2 };
-
       enum Alignment { left, center, right };
 
       cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text);
-
       cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text, bool hasAlpha);
 
       ~cButton();
 
     public:
-      void draw();
-
-      cWindow& loadAppearance(const std::string& aFileName);
-
+      void draw() override;
+      cWindow& loadAppearance(const std::string& aFileName) override;
       bool valid() const;
-
       bool isTouchFocusable() override;
-
       void setIsFocusable(bool isFocusable);
-
       bool processTouchMessage(cTouchMessage message) override;
-
       State state() { return _state; }
-
       void setTextColor(COLOR color) { _textColor = color; }
-
       COLOR textColor() { return _textColor; }
-
       void setStyle(Style style) { _style = style; }
-
       Style style() { return _style; }
-
       void setAlignment(Alignment alignment) { _alignment = alignment; }
-
       Alignment alignment() { return _alignment; }
-
       void onPressed();
-
       void onReleased();
-
       void onClicked();
-
       bool hasAlpha() { return _hasAlpha; }
 
       Signal0 clicked;
-
       Signal0 pressed;
 
     protected:

@@ -11,7 +11,6 @@
 
 #include <list>
 #include <functional>
-#include "bitmapdesc.h"
 #include "rectangle.h"
 #include "window.h"
 

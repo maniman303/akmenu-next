@@ -16,36 +16,28 @@
 
 namespace akui {
 
-class cProgressWnd : public cForm {
-  public:
-    cProgressWnd();  // s32 x, s32 y, u32 w, u32 h, cWindow * parent, const std::string & text );
+  class cProgressWnd : public cForm {
+    public:
+      cProgressWnd();  // s32 x, s32 y, u32 w, u32 h, cWindow * parent, const std::string & text );
 
-    ~cProgressWnd();
+      ~cProgressWnd();
 
-  public:
-    void init();
+    public:
+      void init();
+      void draw();
+      bool processKeyMessage(cKeyMessage message) override;
+      cWindow& loadAppearance(const std::string& aFileName);
+      void setPercent(u8 percent);
+      void setTipText(const std::string& tipText);
 
-    void draw();
+    protected:
+      void onShow();
+      void onHide();
 
-    bool processKeyMessage(cKeyMessage message) override;
-
-    cWindow& loadAppearance(const std::string& aFileName);
-
-    void setPercent(u8 percent);
-
-    void setTipText(const std::string& tipText);
-
-  protected:
-    void onShow();
-
-    void onHide();
-
-    cProgressBar _bar;
-
-    cStaticText _tip;
-
-    cBitmapDesc _renderDesc;
-};
+      cProgressBar _bar;
+      cStaticText _tip;
+      cBMP15 _background;
+  };
 
 }  // namespace akui
 

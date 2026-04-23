@@ -23,7 +23,7 @@ void cStartMenu::init() {
     addItem(START_MENU_ITEM_SETTING, LANG("start menu", "Setting"));
     addItem(START_MENU_ITEM_HELP, LANG("start menu", "Help"));
     //addItem(START_MENU_ITEM_TOOLS, LANG("start menu", "Tools"));
-    loadAppearance(SFN_UI_SETTINGS);
+    loadAppearance(SFN_STARTMENU_BG);
     dbg_printf("startmenu ok\n");
 }
 
@@ -37,11 +37,10 @@ bool cStartMenu::processKeyMessage(cKeyMessage message) {
 }
 
 cWindow& cStartMenu::loadAppearance(const std::string& aFileName) {
-    _renderDesc->loadData(SFN_STARTMENU_BG);
-    _size = _renderDesc->size();
+    cPopMenu::loadAppearance(aFileName);
+    setSize(cSize(_background.width(), _background.height()));
 
-    CIniFile ini = iniFiles().get(aFileName);
-    // std::string bgFile = ini.GetString( "bg", "file",  );
+    CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
     int ix = ini.GetInt("start menu", "itemX", 4);
     int iy = ini.GetInt("start menu", "itemY", 12);
     int x = ini.GetInt("start menu", "x", 4);

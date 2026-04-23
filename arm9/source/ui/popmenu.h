@@ -18,63 +18,43 @@
 
 namespace akui {
 
-class cPopMenu : public cWindow {
-  public:
-    cPopMenu(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text);
+  class cPopMenu : public cWindow {
+    public:
+      cPopMenu(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text);
 
-    ~cPopMenu();
+      ~cPopMenu();
 
-  public:
-    void draw();
+    public:
+      void draw() override;
+      cWindow& loadAppearance(const std::string& aFileName) override;
+      bool processKeyMessage(cKeyMessage message) override;
+      bool processTouchMessage(cTouchMessage message) override;
+      void popup();
+      void addItem(size_t index, const std::string& itemText);
+      void removeItem(size_t index);
+      size_t itemCount();
+      void clearItem();
 
-    bool processKeyMessage(cKeyMessage message) override;
+      Signal1<s16> itemClicked;
 
-    bool processTouchMessage(cTouchMessage message) override;
+    protected:
+      void onShow() override;
+      void onHide() override;
+      s32 itemBelowPoint(const cPoint& pt);
+      void drawItems();
+      s16 barWidth(void);
 
-    void popup();
-
-    void addItem(size_t index, const std::string& itemText);
-
-    void removeItem(size_t index);
-
-    size_t itemCount();
-
-    void clearItem();
-
-    Signal1<s16> itemClicked;
-
-  protected:
-    void onShow() override;
-
-    void onHide() override;
-
-    s32 itemBelowPoint(const cPoint& pt);
-
-    void drawItems();
-
-    s16 barWidth(void);
-
-    cPoint _itemTopLeftPoint;
-
-    std::vector<std::string> _items;
-
-    s16 _selectedItemIndex;
-
-    s16 _itemHeight;
-
-    s16 _itemWidth;
-    
-    s16 _barLeft;
-
-    COLOR _textColor;
-    
-    COLOR _textHighLightColor;
-    
-    COLOR _barColor;
-
-    cBitmapDesc* _renderDesc;
-    
-    bool _skipTouch;
-};
+      cPoint _itemTopLeftPoint;
+      std::vector<std::string> _items;
+      s16 _selectedItemIndex;
+      s16 _itemHeight;
+      s16 _itemWidth;
+      s16 _barLeft;
+      COLOR _textColor;
+      COLOR _textHighLightColor;
+      COLOR _barColor;
+      cBMP15 _background;
+      bool _skipTouch;
+  };
 
 }  // namespace akui

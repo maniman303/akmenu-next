@@ -19,165 +19,169 @@
 
 namespace akui {
 
-cPopMenu::cPopMenu(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
-    : cWindow(parent, text) {
-    setSize(cSize(w, h));
-    setRelativePosition(cPoint(x, y));
+    cPopMenu::cPopMenu(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
+        : cWindow(parent, text) {
+        setSize(cSize(w, h));
+        setRelativePosition(cPoint(x, y));
 
-    _selectedItemIndex = 0;
-    _itemHeight = 0;
-    _itemWidth = 0;
-    _barLeft = 2;
+        _selectedItemIndex = 0;
+        _itemHeight = 0;
+        _itemWidth = 0;
+        _barLeft = 2;
 
-    _textColor = uiSettings().popMenuTextColor;
-    _textHighLightColor = uiSettings().popMenuTextHighLightColor;
-    _barColor = uiSettings().popMenuBarColor;
+        _textColor = uiSettings().popMenuTextColor;
+        _textHighLightColor = uiSettings().popMenuTextHighLightColor;
+        _barColor = uiSettings().popMenuBarColor;
 
-    _renderDesc = new cBitmapDesc();
-    _renderDesc->setBltMode(BM_MASKBLT);
+        _skipTouch = false;
+    }
 
-    _skipTouch = false;
-}
+    cPopMenu::~cPopMenu() { }
 
-cPopMenu::~cPopMenu() {
-    if (NULL != _renderDesc) delete _renderDesc;
-}
+    void cPopMenu::popup() {
+        show();
+        return;
+    }
 
-void cPopMenu::popup() {
-    show();
-    return;
-}
+    void cPopMenu::addItem(size_t index, const std::string& itemText) {
+        if (index > _items.size()) index = _items.size();
+        _items.insert(_items.begin() + index, itemText);
+    }
 
-void cPopMenu::addItem(size_t index, const std::string& itemText) {
-    if (index > _items.size()) index = _items.size();
-    _items.insert(_items.begin() + index, itemText);
-}
+    void cPopMenu::removeItem(size_t index) {
+        if (index > _items.size() - 1) index = _items.size() - 1;
+        _items.erase(_items.begin() + index);
+    }
 
-void cPopMenu::removeItem(size_t index) {
-    if (index > _items.size() - 1) index = _items.size() - 1;
-    _items.erase(_items.begin() + index);
-}
+    size_t cPopMenu::itemCount() {
+        return _items.size();
+    }
 
-size_t cPopMenu::itemCount() {
-    return _items.size();
-}
+    void cPopMenu::clearItem() {
+        _items.clear();
+    }
 
-void cPopMenu::clearItem() {
-    _items.clear();
-}
+    cWindow& cPopMenu::loadAppearance(const std::string& aFileName) {
+        _background = createBMP15FromFile(aFileName);
 
-void cPopMenu::draw() {
-    _renderDesc->draw(windowRectangle(), selectedEngine());
-    drawItems();
-}
+        return *this;
+    }
 
-void cPopMenu::drawItems() {
-    for (size_t i = 0; i < _items.size(); ++i) {
-        s16 itemX = position().x + _itemTopLeftPoint.x;
-        s16 itemY = position().y + i * _itemHeight + _itemTopLeftPoint.y;
-        if (_selectedItemIndex == (s16)i) {
-            s16 barX = position().x + _barLeft;
-            s16 barY = itemY - 2;
-            gdi().fillRect(_barColor, _barColor, barX, barY, barWidth(), _itemHeight, _engine);
-            gdi().setPenColor(_textHighLightColor, _engine);
-        } else {
-            gdi().setPenColor(_textColor, _engine);
+    void cPopMenu::draw() {
+        if (_background.valid()) {
+            gdi().maskBlt(_background.buffer(), position().x, position().y, _background.width(), _background.height(), selectedEngine());
         }
-        gdi().textOut(itemX, itemY, _items[i].c_str(), _engine, fontSecondary());
-    }
-}
-
-s16 cPopMenu::barWidth(void) {
-    return _itemWidth ? _itemWidth : (_size.x - 2 * _barLeft);
-}
-
-bool cPopMenu::processKeyMessage(cKeyMessage message) {
-    if (message.isKeyUp(KEY_A)) {
-        // logger().info("Selecting pop menu option.");
-        itemClicked(_selectedItemIndex);
-        hide();
-        return true;
+        
+        drawItems();
     }
 
-    if (message.isKeyUp(KEY_B)) {
-        hide();
-        return true;
+    void cPopMenu::drawItems() {
+        for (size_t i = 0; i < _items.size(); ++i) {
+            s16 itemX = position().x + _itemTopLeftPoint.x;
+            s16 itemY = position().y + i * _itemHeight + _itemTopLeftPoint.y;
+            if (_selectedItemIndex == (s16)i) {
+                s16 barX = position().x + _barLeft;
+                s16 barY = itemY - 2;
+                gdi().fillRect(_barColor, _barColor, barX, barY, barWidth(), _itemHeight, _engine);
+                gdi().setPenColor(_textHighLightColor, _engine);
+            } else {
+                gdi().setPenColor(_textColor, _engine);
+            }
+            gdi().textOut(itemX, itemY, _items[i].c_str(), _engine, fontSecondary());
+        }
     }
 
-    if (message.isKeyDown(KEY_DOWN) || message.isKeyDown(KEY_UP)) {
-        gs().scrollTick = timer().getFrame();
-        // logger().info("Scroll setup: " + std::to_string(gs().scrollTick));
+    s16 cPopMenu::barWidth(void) {
+        return _itemWidth ? _itemWidth : (_size.x - 2 * _barLeft);
     }
 
-    u32 tickDiff = timer().getFrame() - gs().scrollTick;
-    if (message.isKeyDown(KEY_DOWN) || (message.isKeyHeld(KEY_DOWN) && tickDiff > gs().scrollWait && tickDiff % gs().scrollSpeed == 0)) {
-        _selectedItemIndex += 1;
-        if (_selectedItemIndex > (s16)_items.size() - 1) _selectedItemIndex = 0;
-        return true;
-    }
-
-    if (message.isKeyDown(KEY_UP) || (message.isKeyHeld(KEY_UP) && tickDiff > gs().scrollWait && tickDiff % gs().scrollSpeed == 0)) {
-        _selectedItemIndex -= 1;
-        if (_selectedItemIndex < 0) _selectedItemIndex = (s16)_items.size() - 1;
-        return true;
-    }
-
-    return false;
-}
-
-bool cPopMenu::processTouchMessage(cTouchMessage message) {
-    cPoint pos = message.position();
-    if (message.up()) {
-        if (windowBelow(pos) == NULL) {
-            hide();
-        } else if (!_skipTouch) {
+    bool cPopMenu::processKeyMessage(cKeyMessage message) {
+        if (message.isKeyUp(KEY_A)) {
+            // logger().info("Selecting pop menu option.");
             itemClicked(_selectedItemIndex);
             hide();
+            return true;
         }
 
-         _skipTouch = false;
+        if (message.isKeyUp(KEY_B)) {
+            hide();
+            return true;
+        }
 
-        return true;
+        if (message.isKeyDown(KEY_DOWN) || message.isKeyDown(KEY_UP)) {
+            gs().scrollTick = timer().getFrame();
+            // logger().info("Scroll setup: " + std::to_string(gs().scrollTick));
+        }
+
+        u32 tickDiff = timer().getFrame() - gs().scrollTick;
+        if (message.isKeyDown(KEY_DOWN) || (message.isKeyHeld(KEY_DOWN) && tickDiff > gs().scrollWait && tickDiff % gs().scrollSpeed == 0)) {
+            _selectedItemIndex += 1;
+            if (_selectedItemIndex > (s16)_items.size() - 1) _selectedItemIndex = 0;
+            return true;
+        }
+
+        if (message.isKeyDown(KEY_UP) || (message.isKeyHeld(KEY_UP) && tickDiff > gs().scrollWait && tickDiff % gs().scrollSpeed == 0)) {
+            _selectedItemIndex -= 1;
+            if (_selectedItemIndex < 0) _selectedItemIndex = (s16)_items.size() - 1;
+            return true;
+        }
+
+        return false;
     }
 
-    if (message.down() || message.move()) {
-        s32 item = itemBelowPoint(pos);
-        if (item == -1) {
-            _skipTouch = true;
-        } else {
+    bool cPopMenu::processTouchMessage(cTouchMessage message) {
+        cPoint pos = message.position();
+        if (message.up()) {
+            if (windowBelow(pos) == NULL) {
+                hide();
+            } else if (!_skipTouch) {
+                itemClicked(_selectedItemIndex);
+                hide();
+            }
+
             _skipTouch = false;
-            _selectedItemIndex = item;
+
+            return true;
         }
 
-        return true;
-    }
+        if (message.down() || message.move()) {
+            s32 item = itemBelowPoint(pos);
+            if (item == -1) {
+                _skipTouch = true;
+            } else {
+                _skipTouch = false;
+                _selectedItemIndex = item;
+            }
 
-    return false;
-}
-
-s32 cPopMenu::itemBelowPoint(const cPoint& pt) {
-    cPoint menuPos(position().x + _barLeft, position().y + _itemTopLeftPoint.y - 2);
-    cSize menuSize(size().x - _barLeft, _itemHeight * _items.size());
-    cRect rect(menuPos, menuPos + menuSize);
-
-    if (rect.surrounds(pt)) {
-        s32 item = (pt.y - menuPos.y) / _itemHeight;
-        if (item >= (s32)_items.size()) {
-            item = _items.size() - 1;
+            return true;
         }
 
-        return item;
+        return false;
     }
 
-    return -1;
-}
+    s32 cPopMenu::itemBelowPoint(const cPoint& pt) {
+        cPoint menuPos(position().x + _barLeft, position().y + _itemTopLeftPoint.y - 2);
+        cSize menuSize(size().x - _barLeft, _itemHeight * _items.size());
+        cRect rect(menuPos, menuPos + menuSize);
 
-void cPopMenu::onShow() {
-    _selectedItemIndex = 0;
-}
+        if (rect.surrounds(pt)) {
+            s32 item = (pt.y - menuPos.y) / _itemHeight;
+            if (item >= (s32)_items.size()) {
+                item = _items.size() - 1;
+            }
 
-void cPopMenu::onHide() {
-    windowManager().removeWindow(this);
-}
+            return item;
+        }
+
+        return -1;
+    }
+
+    void cPopMenu::onShow() {
+        _selectedItemIndex = 0;
+    }
+
+    void cPopMenu::onHide() {
+        windowManager().removeWindow(this);
+    }
 
 }  // namespace akui
