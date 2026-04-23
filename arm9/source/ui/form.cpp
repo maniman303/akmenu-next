@@ -40,23 +40,33 @@ namespace akui {
     }
 
     bool cForm::canRenderBackdrop() {
-        bool res = false;
-        std::list<cWindow*>::iterator it;
-        for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
-            res |= (*it)->canRenderBackdrop();
+        if (_canRenderBackdrop) {
+            return true;
         }
 
-        return res;
+        std::list<cWindow*>::iterator it;
+        for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
+            if ((*it)->canRenderBackdrop()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     bool cForm::shouldRenderBackdrop() {
-        bool res = false;
-        std::list<cWindow*>::iterator it;
-        for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
-            res |= (*it)->shouldRenderBackdrop();
+        if (_scheduleBackdrop) {
+            return true;
         }
 
-        return res | _scheduleBackdrop;
+        std::list<cWindow*>::iterator it;
+        for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
+            if ((*it)->shouldRenderBackdrop()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     void cForm::onRenderBackdrop() {

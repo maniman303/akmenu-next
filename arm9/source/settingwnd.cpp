@@ -75,6 +75,7 @@ cSettingWnd::cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     loadAppearance("");
 
     _currentTab = 0;
+    _canRenderBackdrop = true;
 
     scheduleBackdrop();
 }

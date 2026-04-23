@@ -52,6 +52,7 @@ cMainList::cMainList(cWindow* parent, const std::string& text)
     _tallRowHeight = 38;
     _centerInternalColumn = false;
     _viewMode = VM_LIST;
+    _canRenderBackdrop = true;
     _scheduleBackdrop = true;
 
     if (!isDSiMode()) {
@@ -784,10 +785,6 @@ void cMainList::selectRom(const std::string& romPath){
             break;
         }
     }
-}
-
-bool cMainList::canRenderBackdrop() {
-    return true;
 }
 
 void cMainList::draw() {

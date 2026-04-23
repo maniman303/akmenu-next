@@ -44,6 +44,7 @@ cRomInfoWnd::cRomInfoWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
       _buttonCopy(0, 0, 46, 18, this, "\x05 to RAM"),
       _buttonCheats(0, 0, 46, 18, this, "\x03 Cheats"),
       _saves(NULL) {
+    _canRenderBackdrop = true;
     loadAppearance("");
     onResize();
 }
@@ -51,7 +52,6 @@ cRomInfoWnd::cRomInfoWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
 cRomInfoWnd::~cRomInfoWnd() {}
 
 void cRomInfoWnd::draw() {
-    _renderDesc.draw(windowRectangle(), _engine);
     int titleOffset = _renderDesc.titleSize().y;
 
     _romInfo.drawDSRomIcon(position().x + 8, position().y + titleOffset + 8, false, selectedEngine());
@@ -70,6 +70,10 @@ void cRomInfoWnd::draw() {
                       _saveTypeText.c_str(), selectedEngine());
 
     cForm::draw();
+}
+
+void cRomInfoWnd::drawBackdrop() {
+    _renderDesc.draw(windowRectangle(), _engine);
 }
 
 bool cRomInfoWnd::processKeyMessage(cKeyMessage message) {

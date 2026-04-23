@@ -75,8 +75,6 @@ class cMainList : public akui::cListView {
 
     const std::vector<std::string>* Saves(void);
 
-    bool canRenderBackdrop() override;
-
   protected:
     void draw() override;
 

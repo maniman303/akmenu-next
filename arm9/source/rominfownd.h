@@ -26,7 +26,8 @@ class cRomInfoWnd : public akui::cForm {
   public:
     std::function<void(cRomInfoWnd*)> onSaved;
 
-    void draw();
+    void draw() override;
+    void drawBackdrop() override;
     bool processKeyMessage(cKeyMessage message) override;
     cWindow& loadAppearance(const std::string& aFileName);
     void setFileInfo(const std::string& fullName, const std::string& showName);
