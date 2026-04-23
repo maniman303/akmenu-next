@@ -25,10 +25,7 @@ void cExpWnd::showModal(cWindow* parent) {
     u32 h = 130;
     cExpWnd* modal = new cExpWnd((SCREEN_WIDTH - w) / 2, (SCREEN_HEIGHT - h) / 2, w, h, parent, LANG("exp window", "title"));
     
-    modal->setDynamic(true);
-    modal->doModal();
-
-    _modals.push_back(modal);
+    windowManager().addModal(modal);
 }
 
 cExpWnd::cExpWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)

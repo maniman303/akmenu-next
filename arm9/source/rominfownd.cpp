@@ -23,19 +23,17 @@
 
 using namespace akui;
 
-cRomInfoWnd* cRomInfoWnd::createWindow(const std::string& text, std::function<void(cRomInfoWnd*)> onSaved) {
+cRomInfoWnd::cRomInfoWnd(const std::string& text, std::function<void(cRomInfoWnd*)> onSaved) : cRomInfoWnd(0, 0, 0, 0, NULL, text) {
     CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
-    u32 w = 240;
-    u32 h = 144;
-    w = ini.GetInt("rom info window", "w", w);
-    h = ini.GetInt("rom info window", "h", h);
+    u32 w = ini.GetInt("rom info window", "w", 240);
+    u32 h = ini.GetInt("rom info window", "h", 144);
+    s32 x = (SCREEN_WIDTH - w) / 2;
+    s32 y = (SCREEN_HEIGHT - h) / 2;
 
-    cRomInfoWnd* wnd = new cRomInfoWnd((SCREEN_WIDTH - w) / 2, (SCREEN_HEIGHT - h) / 2, w, h, NULL, text);
-    wnd->setDynamic(true);
-    wnd->onSaved = onSaved;
-    _modals.push_back(wnd);
+    setRelativePosition(cPoint(x, y));
+    setSize(cSize(w, h));
 
-    return wnd;
+    this->onSaved = onSaved;
 }
 
 cRomInfoWnd::cRomInfoWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
@@ -46,71 +44,8 @@ cRomInfoWnd::cRomInfoWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
       _buttonCopy(0, 0, 46, 18, this, "\x05 to RAM"),
       _buttonCheats(0, 0, 46, 18, this, "\x03 Cheats"),
       _saves(NULL) {
-    s16 buttonY = size().y - _buttonOK.size().y - 4;
-
-    _buttonOK.setStyle(cButton::press);
-    _buttonOK.setText("\x01 " + LANG("setting window", "ok"));
-    _buttonOK.setTextColor(uis().buttonTextColor);
-    _buttonOK.loadAppearance(SFN_BUTTON3);
-    _buttonOK.clicked.connect(this, &cRomInfoWnd::onOK);
-    addChildWindow(&_buttonOK);
-
-    s16 nextButtonX = size().x;
-
-    s16 buttonPitch = _buttonOK.size().x + 8;
-    nextButtonX -= buttonPitch;
-
-    _buttonOK.setRelativePosition(cPoint(nextButtonX, buttonY));
-
-    _buttonSaveType.setStyle(cButton::press);
-    _buttonSaveType.setText("\x04 " + LANG("setting window", "savetype"));
-    _buttonSaveType.setTextColor(uis().buttonTextColor);
-    _buttonSaveType.loadAppearance(SFN_BUTTON4);
-    _buttonSaveType.clicked.connect(this, &cRomInfoWnd::pressSaveType);
-    addChildWindow(&_buttonSaveType);
-
-    buttonPitch = _buttonSaveType.size().x + 8;
-    s16 nextButtonXone = nextButtonX - buttonPitch;
-
-    _buttonSaveType.setRelativePosition(cPoint(nextButtonXone, buttonY));
-
-    _buttonCheats.setStyle(cButton::press);
-    _buttonCheats.setText("\x03 " + LANG("cheats", "title"));
-    _buttonCheats.setTextColor(uis().buttonTextColor);
-    _buttonCheats.loadAppearance(SFN_BUTTON3);
-    _buttonCheats.clicked.connect(this, &cRomInfoWnd::pressCheats);
-    addChildWindow(&_buttonCheats);
-
-    buttonPitch = _buttonCheats.size().x + 8;
-    nextButtonXone -= buttonPitch;
-
-    _buttonCheats.setRelativePosition(cPoint(nextButtonXone, buttonY));
-
-    _buttonFlash.setStyle(cButton::press);
-    _buttonFlash.setText("\x03 " + LANG("exp window", "flash to nor"));
-    _buttonFlash.setTextColor(uis().buttonTextColor);
-    _buttonFlash.loadAppearance(SFN_BUTTON3);
-    _buttonFlash.clicked.connect(this, &cRomInfoWnd::pressFlash);
-    addChildWindow(&_buttonFlash);
-
-    buttonPitch = _buttonFlash.size().x + 8;
-    nextButtonX -= buttonPitch;
-
-    _buttonFlash.setRelativePosition(cPoint(nextButtonX, buttonY));
-
-    _buttonCopy.setStyle(cButton::press);
-    _buttonCopy.setText("\x05 " + LANG("exp window", "copy to psram"));
-    _buttonCopy.setTextColor(uis().buttonTextColor);
-    _buttonCopy.loadAppearance(SFN_BUTTON3);
-    _buttonCopy.clicked.connect(this, &cRomInfoWnd::pressCopy);
-    addChildWindow(&_buttonCopy);
-
-    buttonPitch = _buttonCopy.size().x + 8;
-    nextButtonX -= buttonPitch;
-
-    _buttonCopy.setRelativePosition(cPoint(nextButtonX, buttonY));
-
     loadAppearance("");
+    onResize();
 }
 
 cRomInfoWnd::~cRomInfoWnd() {}
@@ -290,6 +225,72 @@ void cRomInfoWnd::onShow() {
     centerScreen();
 }
 
+void cRomInfoWnd::onResize() {
+    s16 buttonY = size().y - _buttonOK.size().y - 4;
+
+    _buttonOK.setStyle(cButton::press);
+    _buttonOK.setText("\x01 " + LANG("setting window", "ok"));
+    _buttonOK.setTextColor(uis().buttonTextColor);
+    _buttonOK.loadAppearance(SFN_BUTTON3);
+    _buttonOK.clicked.connect(this, &cRomInfoWnd::onOK);
+    addChildWindow(&_buttonOK);
+
+    s16 nextButtonX = size().x;
+
+    s16 buttonPitch = _buttonOK.size().x + 8;
+    nextButtonX -= buttonPitch;
+
+    _buttonOK.setRelativePosition(cPoint(nextButtonX, buttonY));
+
+    _buttonSaveType.setStyle(cButton::press);
+    _buttonSaveType.setText("\x04 " + LANG("setting window", "savetype"));
+    _buttonSaveType.setTextColor(uis().buttonTextColor);
+    _buttonSaveType.loadAppearance(SFN_BUTTON4);
+    _buttonSaveType.clicked.connect(this, &cRomInfoWnd::pressSaveType);
+    addChildWindow(&_buttonSaveType);
+
+    buttonPitch = _buttonSaveType.size().x + 8;
+    s16 nextButtonXone = nextButtonX - buttonPitch;
+
+    _buttonSaveType.setRelativePosition(cPoint(nextButtonXone, buttonY));
+
+    _buttonCheats.setStyle(cButton::press);
+    _buttonCheats.setText("\x03 " + LANG("cheats", "title"));
+    _buttonCheats.setTextColor(uis().buttonTextColor);
+    _buttonCheats.loadAppearance(SFN_BUTTON3);
+    _buttonCheats.clicked.connect(this, &cRomInfoWnd::pressCheats);
+    addChildWindow(&_buttonCheats);
+
+    buttonPitch = _buttonCheats.size().x + 8;
+    nextButtonXone -= buttonPitch;
+
+    _buttonCheats.setRelativePosition(cPoint(nextButtonXone, buttonY));
+
+    _buttonFlash.setStyle(cButton::press);
+    _buttonFlash.setText("\x03 " + LANG("exp window", "flash to nor"));
+    _buttonFlash.setTextColor(uis().buttonTextColor);
+    _buttonFlash.loadAppearance(SFN_BUTTON3);
+    _buttonFlash.clicked.connect(this, &cRomInfoWnd::pressFlash);
+    addChildWindow(&_buttonFlash);
+
+    buttonPitch = _buttonFlash.size().x + 8;
+    nextButtonX -= buttonPitch;
+
+    _buttonFlash.setRelativePosition(cPoint(nextButtonX, buttonY));
+
+    _buttonCopy.setStyle(cButton::press);
+    _buttonCopy.setText("\x05 " + LANG("exp window", "copy to psram"));
+    _buttonCopy.setTextColor(uis().buttonTextColor);
+    _buttonCopy.loadAppearance(SFN_BUTTON3);
+    _buttonCopy.clicked.connect(this, &cRomInfoWnd::pressCopy);
+    addChildWindow(&_buttonCopy);
+
+    buttonPitch = _buttonCopy.size().x + 8;
+    nextButtonX -= buttonPitch;
+
+    _buttonCopy.setRelativePosition(cPoint(nextButtonX, buttonY));
+}
+
 #define ITEM_SAVETYPE 0, 0
 
 #define ITEM_CHEATS 1, 0
@@ -299,7 +300,7 @@ void cRomInfoWnd::onShow() {
 void cRomInfoWnd::pressSaveType(void) {
     if (!_romInfo.isDSRom() || _romInfo.isHomebrew()) return;
 
-    cSettingWnd* settingWnd = cSettingWnd::createWindow(LANG("game settings", "title"), "rom_info", [this](cSettingWnd* wnd) { saveSettings(wnd); });
+    cSettingWnd* settingWnd = new cSettingWnd(LANG("game settings", "title"), "rom_info", [this](cSettingWnd* wnd) { saveSettings(wnd); });
     
     settingWnd->addSettingTab(LANG("save type", "tab1"));
 
@@ -370,7 +371,7 @@ void cRomInfoWnd::pressSaveType(void) {
     _values.push_back(LANG("icon", "firmware"));
     settingWnd->addSettingItem(LANG("icon", "icon"), _values, _romInfo.saveInfo().getIcon());
 
-    settingWnd->doModal();
+    windowManager().addModal(settingWnd);
 }
 
 void cRomInfoWnd::saveSettings(cSettingWnd* settingWnd) {

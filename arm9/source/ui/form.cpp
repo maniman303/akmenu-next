@@ -14,36 +14,6 @@
 #include "../stringtool.h"
 
 namespace akui {
-    std::vector<cForm*> cForm::_modals;
-
-    void cForm::cleanModals(cForm* current) {
-        auto it = _modals.begin();
-
-        // logger().info("Start modal cleanup.");
-
-        while (it != _modals.end()) {
-            cForm* modal = *it;
-
-            if (modal == current || windowManager().containsWindow(modal)) {
-                ++it;
-                continue;
-            }
-
-            if (modal->isActive()) {
-                logger().error("Modal is active.");
-                windowManager().setFocusedWindow(windowManager().currentWindow());
-            }
-
-            it = _modals.erase(it); // remove safely
-
-            if (modal != NULL && modal->isDynamic()) {
-                delete modal;
-            }
-        }
-
-        // logger().info("Finished modal cleanup.");
-    }
-
     cForm::cForm(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
         : cWindow(parent, text)
     //_renderDesc(NULL)
@@ -51,7 +21,6 @@ namespace akui {
         setSize(cSize(w, h));
         setRelativePosition(cPoint(x, y));
         _modalRet = -1;
-        _isDynamic = false;
     }
 
     cForm::~cForm() {
@@ -174,13 +143,6 @@ namespace akui {
         return _modalRet;
     }
 
-    void cForm::doModal() {
-        cleanModals(this);
-        windowManager().addWindow(this);
-        show();
-        // logger().info("Do modal.");
-    }
-
     void cForm::onOK() {
         _modalRet = 1;
         windowManager().removeWindow(this);
@@ -205,17 +167,18 @@ namespace akui {
         setRelativePosition(cPoint((SCREEN_WIDTH - _size.x) / 2, (SCREEN_HEIGHT - _size.y) / 2));
     }
 
-    bool cForm::isActive(void) const {
-        bool result = isFocused();
-        for (std::list<cWindow*>::const_iterator it = _childWindows.begin(); it != _childWindows.end(); it++) {
-            if (result) {
-                break;
-            }
+    bool cForm::hasFocus() const {
+        if (isFocused()) {
+            return true;
+        }
 
-            result = result || (*it)->isFocused();
+        for (std::list<cWindow*>::const_iterator it = _childWindows.begin(); it != _childWindows.end(); it++) {
+            if ((*it)->isFocused()) {
+                return true;
+            }
         }
         
-        return result;
+        return false;
     }
 
     cWindow& cForm::disableFocus(void) {
@@ -225,13 +188,4 @@ namespace akui {
         }
         return cWindow::disableFocus();
     }
-
-    bool cForm::isDynamic() {
-        return _isDynamic;
-    }
-
-    void cForm::setDynamic(bool isDynamic) {
-        _isDynamic = isDynamic;
-    }
-
 }  // namespace akui

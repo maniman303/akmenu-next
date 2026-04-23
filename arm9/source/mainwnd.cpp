@@ -361,7 +361,7 @@ void cMainWnd::showSettings(void) {
         return;
     }
 
-    cSettingWnd* settingWnd = cSettingWnd::createWindow(LANG("start menu", "Setting"), "main_settings", [this](cSettingWnd* wnd) { saveSettings(wnd); });
+    cSettingWnd* settingWnd = new cSettingWnd(LANG("start menu", "Setting"), "main_settings", [this](cSettingWnd* wnd) { saveSettings(wnd); });
     settingWnd->addSettingTab(LANG("system setting", "title"));
 
     // page 1: system
@@ -532,7 +532,7 @@ void cMainWnd::showSettings(void) {
 
     // logger().info("Start showing settings.");
 
-    settingWnd->doModal();
+    windowManager().addModal(settingWnd);
 
     // logger().info("Finish showing settings.");
 }
@@ -663,11 +663,12 @@ void cMainWnd::showFileInfo() {
 
     std::string showName = _mainList->getSelectedShowName();
     std::string fullPath = _mainList->getSelectedFullPath();
-    cRomInfoWnd* romInfoWnd = cRomInfoWnd::createWindow(LANG("rom info", "title"), [this](cRomInfoWnd* wnd) { saveFileInfo(wnd); });
+    cRomInfoWnd* romInfoWnd = new cRomInfoWnd(LANG("rom info", "title"), [this](cRomInfoWnd* wnd) { saveFileInfo(wnd); });
     romInfoWnd->setFileInfo(fullPath, showName);
     romInfoWnd->setRomInfo(rominfo);
     romInfoWnd->setSaves(_mainList->Saves());
-    romInfoWnd->doModal();
+    
+    windowManager().addModal(romInfoWnd);
 }
 
 void cMainWnd::saveFileInfo(cRomInfoWnd* romInfoWnd) {

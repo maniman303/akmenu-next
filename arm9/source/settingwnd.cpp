@@ -22,13 +22,8 @@
 
 using namespace akui;
 
-cSettingWnd* cSettingWnd::createWindow(const std::string& text, const std::string& id, std::function<void(cSettingWnd*)> onSaved) {
-    cSettingWnd* wnd = new cSettingWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, text, id);
-    wnd->setDynamic(true);
-    wnd->onSaved = onSaved;
-    _modals.push_back(wnd);
-
-    return wnd;
+cSettingWnd::cSettingWnd(const std::string& text, const std::string& id, std::function<void(cSettingWnd*)> onSaved) : cSettingWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, text, id) {
+    this->onSaved = onSaved;
 }
 
 cSettingWnd::cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text, const std::string& id)
@@ -293,14 +288,13 @@ ssize_t cSettingWnd::getItemSelection(size_t tabId, size_t itemId) {
 -1 - something else focused
 */
 ssize_t cSettingWnd::focusedItemId(void) {
-    ssize_t focusItem = -1;
     for (size_t ii = 0; ii < items(_currentTab).size(); ++ii) {
-        if (items(_currentTab)[ii]._item->isActive()) {
-            focusItem = ii;
-            break;
+        if (items(_currentTab)[ii]._item->hasFocus()) {
+            return ii;
         }
     }
-    return focusItem;
+
+    return -1;
 }
 
 cSpinBox* cSettingWnd::focusedItem(void) {

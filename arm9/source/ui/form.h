@@ -16,64 +16,37 @@
 
 namespace akui {
 
-class cForm : public cWindow {
-  public:
-    cForm(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text);
+  class cForm : public cWindow {
+    public:
+      cForm(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text);
 
-    ~cForm() override;
+      ~cForm() override;
 
-  public:
-    void doModal();
+    public:
+      cForm& addChildWindow(cWindow* aWindow);
+      cForm& removeChildWindow(cWindow* aWindow);
+      bool canRenderBackdrop() override;
+      bool shouldRenderBackdrop() override;
+      void onRenderBackdrop() override;
+      void draw() override;
+      void drawBackdrop() override;
+      bool processKeyMessage(cKeyMessage message) override;
+      bool processTouchMessage(cTouchMessage message) override;
+      cWindow* windowBelow(const cPoint& p);
+      u32 modalRet();
+      void centerScreen();
+      bool hasFocus() const override;
+      cWindow& disableFocus(void);
 
-    cForm& addChildWindow(cWindow* aWindow);
+      std::function<void()> onAccepted;
+      std::function<void()> onRejected;
 
-    cForm& removeChildWindow(cWindow* aWindow);
+    protected:
+      virtual void onOK();
+      virtual void onCancel();
+      std::list<cWindow*> _childWindows;
 
-    bool canRenderBackdrop() override;
-
-    bool shouldRenderBackdrop() override;
-
-    void onRenderBackdrop() override;
-
-    void draw() override;
-
-    void drawBackdrop() override;
-
-    bool processKeyMessage(cKeyMessage message) override;
-
-    bool processTouchMessage(cTouchMessage message) override;
-
-    cWindow* windowBelow(const cPoint& p);
-
-    u32 modalRet();
-
-    void centerScreen();
-
-    bool isActive(void) const;
-
-    cWindow& disableFocus(void);
-
-    bool isDynamic();
-
-    void setDynamic(bool isDynamic);
-
-    std::function<void()> onAccepted;
-    std::function<void()> onRejected;
-
-  protected:
-    static std::vector<cForm*> _modals;
-
-    static void cleanModals(cForm* current);
-
-    virtual void onOK();
-
-    virtual void onCancel();
-
-    std::list<cWindow*> _childWindows;
-
-    // cFormDesc * _renderDesc;
-    u32 _modalRet;
-    bool _isDynamic;
-};
+      u32 _modalRet;
+  };
 
 }  // namespace akui

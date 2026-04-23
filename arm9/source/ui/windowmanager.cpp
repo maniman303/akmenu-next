@@ -19,6 +19,30 @@ namespace akui {
 
     cWindowManager::~cWindowManager() {}
 
+    void cWindowManager::cleanModals() {
+        auto it = _modals.begin();
+
+        while (it != _modals.end()) {
+            cWindow* modal = *it;
+
+            if (windowManager().containsWindow(modal)) {
+                ++it;
+                continue;
+            }
+
+            if (modal->hasFocus()) {
+                logger().error("Modal is active.");
+                windowManager().setFocusedWindow(windowManager().currentWindow());
+            }
+
+            it = _modals.erase(it); // remove safely
+
+            if (modal != NULL) {
+                delete modal;
+            }
+        }
+    }
+
     void cWindowManager::setFocusedWindow(cWindow* aWindow) {
         setFocusedWindow(aWindow, false);
     }
@@ -53,6 +77,18 @@ namespace akui {
             aWindow->scheduleBackdrop();
         }
         updateBackground(false);
+        return *this;
+    }
+
+    cWindowManager& cWindowManager::addModal(cWindow* aWindow) {
+        if (aWindow == NULL) {
+            return *this;
+        }
+        
+        _modals.push_back(aWindow);
+        addWindow(aWindow);
+        aWindow->show();
+
         return *this;
     }
 
@@ -121,6 +157,8 @@ namespace akui {
 
             _currentWindow.window()->render();
         }
+
+        cleanModals();
         
         return *this;
     }

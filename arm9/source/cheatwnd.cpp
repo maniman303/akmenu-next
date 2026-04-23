@@ -28,10 +28,7 @@ void cCheatWnd::showModal(const std::string& aFileName) {
         return;
     }
 
-    modal->setDynamic(true);
-    modal->doModal();
-
-    _modals.push_back(modal);
+    windowManager().addModal(modal);
 }
 
 cCheatWnd::cCheatWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)

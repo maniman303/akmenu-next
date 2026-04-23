@@ -24,12 +24,10 @@ namespace akui {
     void cMessageBox::showModal(const std::string& title, const std::string& msg, u32 style,
         std::function<void()> onAccepted, std::function<void()> onRejected) {
         cMessageBox* modal = new cMessageBox(title, msg, style);
-        modal->setDynamic(true);
         modal->onAccepted = onAccepted;
         modal->onRejected = onRejected;
-        modal->doModal();
 
-        _modals.push_back(modal);
+        windowManager().addModal(modal);
     }
 
     cMessageBox::cMessageBox(const std::string& title, const std::string& msg, u32 style)

@@ -26,10 +26,7 @@ void cHelpWnd::showModal(cWindow* parent) {
     h = ini.GetInt("help window", "h", h);
     cHelpWnd* modal = new cHelpWnd((SCREEN_WIDTH - w) / 2, (SCREEN_HEIGHT - h) / 2, w, h, parent, LANG("help window", "title"));
     
-    modal->setDynamic(true);
-    modal->doModal();
-
-    _modals.push_back(modal);
+    windowManager().addModal(modal);
 }
 
 cHelpWnd::cHelpWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)

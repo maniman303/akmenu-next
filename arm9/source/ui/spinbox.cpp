@@ -120,7 +120,7 @@ namespace akui {
         u16 barColor = _normalColor;
         if (_namedAppearance) {
             _itemText.setTextColor(uiSettings().spinBoxTextNamedColor);
-        } else if (isActive()) {
+        } else if (hasFocus()) {
             barColor = _focusedColor;
             _itemText.setTextColor(uiSettings().spinBoxTextHighLightColor);
         } else {

@@ -44,6 +44,10 @@ bool cWindow::isFocused() const {
     return windowManager().focusedWindow() == this;
 }
 
+bool cWindow::hasFocus() const {
+    return isFocused();
+}
+
 cWindow& cWindow::enableFocused() {
     onGainedFocus();
     return *this;

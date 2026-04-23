@@ -57,6 +57,8 @@ class cWindow : public SlotHolder {
     //! returns \c true if this window currently has the focus
     bool isFocused() const;
 
+    virtual bool hasFocus() const;
+
     //! sets the focus to this window
     cWindow& enableFocused();
 

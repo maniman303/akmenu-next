@@ -28,11 +28,14 @@ class cWindowManager {
     typedef std::list<cWindowRec> cWindows;
 
   private:
+    void cleanModals();
+    
     cWindows _backgroundWindows;
     cWindowRec _currentWindow;
     cWindow* _focusedWindow;
     cWindow* _windowBelowPen;
     cWindow* _capturedWindow;  // process touch for non-focusable window
+    std::vector<cWindow*> _modals;
   protected:
     cWindow* windowBelowPen(void) const { return _windowBelowPen; }
     const cWindowManager& updateBackground(bool includeCurrent);
@@ -44,6 +47,7 @@ class cWindowManager {
     void setFocusedWindow(cWindow* aWindow);
     void setFocusedWindow(cWindow* aWindow, bool isTouch);
     cWindowManager& addWindow(cWindow* aWindow);
+    cWindowManager& addModal(cWindow* aWindow);
     cWindowManager& removeWindow(cWindow* aWindow);
     cWindow* currentWindow(void) const { return _currentWindow.window(); }
     bool containsWindow(cWindow* aWindow);
