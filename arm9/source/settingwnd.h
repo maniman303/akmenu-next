@@ -25,7 +25,9 @@ class cSettingWnd : public akui::cForm {
   public:
     std::function<void(cSettingWnd*)> onSaved;
 
-    void draw(void);
+    bool canRenderBackdrop() override { return true; }
+    void draw() override;
+    void drawBackdrop() override;
     bool processKeyMessage(cKeyMessage message) override;
     cWindow& loadAppearance(const std::string& aFileName);
     void addSettingTab(const std::string& text);

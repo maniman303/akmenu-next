@@ -830,14 +830,13 @@ void ITCM_FUNC(cGdi::present)() {
     
     if (_scheduleMainBackground) {
         oamUpdate(&oamMain);
+    }
+
+    if (_scheduleMainBackground || _scheduleMainBackdrop) {
         swiWaitForVBlank();
     }
 
     if (_scheduleMainBackdrop) {
-        if (!_scheduleMainBackground) {
-            swiWaitForVBlank();
-        }
-
         dmaCopyWordsGdi(3, _workMain + (MEL_MIDDLE * SCREEN_WIDTH * SCREEN_HEIGHT), _bufferMain3, 256 * 192 * 2);
     }
 
@@ -859,12 +858,24 @@ ARM_CODE LIBNDS_NOINLINE
 void ITCM_FUNC(cGdi::presentMain)() {
     if (_scheduleMainBackground) {
         oamUpdate(&oamMain);
+    }
+
+    if (_scheduleMainBackground || _scheduleMainBackdrop) {
         swiWaitForVBlank();
+    }
+
+    if (_scheduleMainBackdrop) {
+        dmaCopyWordsGdi(3, _workMain + (MEL_MIDDLE * SCREEN_WIDTH * SCREEN_HEIGHT), _bufferMain3, 256 * 192 * 2);
     }
 
     dmaCopyWordsGdi(3, _workMain, _bufferMain1, 256 * 192 * 2);
 
     fillMemory((void*)(_workMain), SCREEN_WIDTH * SCREEN_HEIGHT * 2, 0);
 
+    if (_scheduleMainBackdrop) {
+        fillMemory((void*)(_workMain + (MEL_MIDDLE * SCREEN_WIDTH * SCREEN_HEIGHT)), SCREEN_WIDTH * SCREEN_HEIGHT * 2, 0);
+    }
+
     _scheduleMainBackground = false;
+    _scheduleMainBackdrop = false;
 }

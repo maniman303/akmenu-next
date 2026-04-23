@@ -75,6 +75,8 @@ cSettingWnd::cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     loadAppearance("");
 
     _currentTab = 0;
+
+    scheduleBackdrop();
 }
 
 cSettingWnd::~cSettingWnd() {
@@ -87,10 +89,14 @@ cSettingWnd::~cSettingWnd() {
     }
 }
 
-void cSettingWnd::draw(void) {
-    _renderDesc.draw(windowRectangle(), _engine);
+void cSettingWnd::draw() {
     colorLabels();
     cForm::draw();
+}
+
+void cSettingWnd::drawBackdrop() {
+    _renderDesc.draw(windowRectangle(), _engine);
+    cForm::drawBackdrop();
 }
 
 bool cSettingWnd::processKeyMessage(cKeyMessage message) {

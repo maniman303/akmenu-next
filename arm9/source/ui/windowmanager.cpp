@@ -180,16 +180,20 @@ namespace akui {
             _currentWindow.window()->render();
         }
 
-        gdi().setMainEngineLayer(MEL_MIDDLE);
-        gdi().setMainEngineLayer(MEL_UP);
         gdi().pushMainBackground();
+        gdi().setMainEngineLayer(MEL_MIDDLE);
 
         if (includeCurrent && _currentWindow.window()) {
             if (_currentWindow.window()->canRenderBackdrop()) {
                 _currentWindow.window()->renderBackdrop();
             }
+
+            gdi().setMainEngineLayer(MEL_UP);
+
             _currentWindow.window()->render();
         }
+
+        gdi().setMainEngineLayer(MEL_UP);
 
         return *this;
     }
