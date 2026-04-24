@@ -5,8 +5,13 @@ TaskCruncher::TaskCruncher() {
     _deque = std::deque<TaskEntry>();
 }
 
-void TaskCruncher::push(std::unique_ptr<TaskWorker> task) {
-    _deque.push_front(TaskEntry(std::move(task), 0));
+void TaskCruncher::push(TaskWorker* task) {
+    if (task == NULL) {
+        logger().error("Pushing NULL task.");
+        return;
+    }
+
+    _deque.push_front(std::move(TaskEntry(task, 0)));
 }
 
 void TaskCruncher::process() {

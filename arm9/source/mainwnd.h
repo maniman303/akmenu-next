@@ -18,8 +18,9 @@
 #include "startmenu.h"
 #include "touchmessage.h"
 #include "rominfownd.h"
+#include "workindicator.h"
 
-class cMainWnd : public akui::cForm {
+class cMainWnd : public akui::cForm, public WorkIndicator {
   public:
     cMainWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text);
 
@@ -27,53 +28,30 @@ class cMainWnd : public akui::cForm {
 
   public:
     bool processKeyMessage(cKeyMessage message) override;
-
     bool processTouchMessage(cTouchMessage message) override;
-
-    cWindow& loadAppearance(const std::string& aFileName);
-
+    cWindow& loadAppearance(const std::string& aFileName) override;
+    bool busy() const override;
     void init();
-
     void draw();
 
     cMainList* _mainList;
 
   protected:
     void onGainedFocus() override;
-
     void onMainListSelItemClicked(u32 index);
-
-    void onKeyXPressed();
-
-    void onKeyYPressed();
-
-    void listSelChange(u32 i);
-
     void startMenuItemClicked(s16 i);
-
     void startButtonClicked();
-
     void brightnessButtonClicked();
-
     void showSettings(void);
-
     void saveSettings(cSettingWnd* settingWnd);
-
     void onFolderChanged();
-
     void showFileInfo();
-
     void saveFileInfo(cRomInfoWnd* romInfoWnd);
-
     void launchSelected();
 
     cStartMenu* _startMenu;
-
     akui::cButton* _startButton;
-
     akui::cButton* _brightnessButton;
-
     akui::cButton* _folderUpButton;
-
     akui::cStaticText* _folderText;
 };

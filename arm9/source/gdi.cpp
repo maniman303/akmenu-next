@@ -322,25 +322,51 @@ void cGdi::drawRadiusLine(s16 sx, s16 sy, u16 width, u16 length, s16 degrees, u1
 }
 
 void cGdi::frameRect(s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine) {
-    drawLine(x, y, x + w - 1, y, engine);
-    drawLine(x + w - 1, y, x + w - 1, y + h - 1, engine);
-    drawLine(x + w - 1, y + h - 1, x, y + h - 1, engine);
-    drawLine(x, y + h - 1, x, y, engine);
+    frameRect(x, y, w, h, 1, engine);
 }
 
 void cGdi::frameRect(s16 x, s16 y, u16 w, u16 h, u16 thickness, GRAPHICS_ENGINE engine) {
-    for (size_t ii = 0; ii < thickness; ++ii) {
-        frameRect(x, y, w, h, engine);
-        if (h <= 2 || w <= 2) break;
-        ++x;
-        ++y;
-        w -= 2;
-        h -= 2;
+    if (thickness == 0 || w == 0 || h == 0) {
+        return;
     }
+
+    u16 color = getPenColor(engine);
+    if (thickness * 2 >= w || thickness * 2 >= h) {
+        fillRect(color, color, x, y, w, h, engine);
+        return;
+    }
+
+    fillRect(color, color, x, y, w, thickness, engine);
+    fillRect(color, color, x, y + h - thickness, w, thickness, engine);
+    fillRect(color, color, x, y + thickness, thickness, h - 2 * thickness, engine);
+    fillRect(color, color, x + w - thickness, y + thickness, thickness, h - 2 * thickness, engine);
 }
 
 ARM_CODE LIBNDS_NOINLINE
 void ITCM_FUNC(cGdi::fillRect)(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine) {
+    s16 widthOffset = 0;
+    if (x < 0) {
+        widthOffset = x;
+        x = 0;
+    }
+
+    if ((s16)w + widthOffset <= 0 || x + w + widthOffset >= SCREEN_WIDTH) {
+        return;
+    }
+
+    s16 heightOffset = 0;
+    if (y < 0) {
+        heightOffset = y;
+        y = 0;
+    }
+
+    if ((s16)h + heightOffset <= 0 || y + h + heightOffset >= SCREEN_WIDTH) {
+        return;
+    }
+
+    w += widthOffset;
+    h += heightOffset;
+ 
     u32 color = ((u32)color1 << 16) | color2;
     u32 altColor = ((u32)color2 << 16) | color1;
     u16* pDest = GE_MAIN == engine ?
@@ -366,7 +392,7 @@ void ITCM_FUNC(cGdi::fillRect)(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 
             *(u32*)(pDest + 2) = source;
         } else if (halfWidth > 16) {
             swiFastCopy(&source, pDest, COPY_MODE_WORD | COPY_MODE_FILL | halfWidth);
-        } else if (halfWidth != 0) {
+        } else if (halfWidth > 0) {
             swiCopy(&source, pDest, COPY_MODE_WORD | COPY_MODE_FILL | halfWidth);
         }
 

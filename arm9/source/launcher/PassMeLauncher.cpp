@@ -11,8 +11,8 @@
 #include "PassMeLauncher.h"
 #include "nds_loader_arm9.h"
 
-std::unique_ptr<TaskWorker> PassMeLauncher::task() const {
-    return std::make_unique<PassMeLauncher>(*this);
+TaskWorker* PassMeLauncher::task() {
+    return this;
 }
 
 s16 PassMeLauncher::process(s16 iter) {

@@ -11,8 +11,8 @@
 #include "Slot1Launcher.h"
 #include "nds_loader_arm9.h"
 
-std::unique_ptr<TaskWorker> Slot1Launcher::task() const {
-    return std::make_unique<Slot1Launcher>(*this);
+TaskWorker* Slot1Launcher::task() {
+    return this;
 }
 
 s16 Slot1Launcher::process(s16 iter) {

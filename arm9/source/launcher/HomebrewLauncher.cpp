@@ -12,8 +12,8 @@
 #include "HomebrewLauncher.h"
 #include "nds_loader_arm9.h"
 
-std::unique_ptr<TaskWorker> HomebrewLauncher::task() const {
-    return std::make_unique<HomebrewLauncher>(*this);
+TaskWorker* HomebrewLauncher::task() {
+    return this;
 }
 
 s16 HomebrewLauncher::process(s16 iter) {

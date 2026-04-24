@@ -36,8 +36,8 @@ constexpr std::align_val_t cache_align { 32 };
 
 typedef void (*pico_loader_9_func_t)(void);
 
-std::unique_ptr<TaskWorker> PicoLoaderLauncher::task() const {
-    return std::make_unique<PicoLoaderLauncher>(*this);
+TaskWorker* PicoLoaderLauncher::task() {
+    return this;
 }
 
 void PicoLoaderLauncher::copyToVram(const char* loaderPath, void* destination) {

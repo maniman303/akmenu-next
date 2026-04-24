@@ -751,7 +751,11 @@ bool cMainList::processKeyMessage(cKeyMessage message) {
 }
 
 cRect cMainList::focusRectangle() const {
-    return windowRectangle();
+    u32 visibleRowId = _selectedRowId - _firstVisibleRowId;
+    cPoint rowPos = position() + cPoint(0, (visibleRowId * _rowHeight) - 1);
+    cSize rowSize = cSize(size().x, _rowHeight + 1);
+
+    return cRect(rowPos, rowSize, false);
 }
 
 std::string cMainList::getSelectedFullPath() {

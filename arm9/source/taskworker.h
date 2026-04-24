@@ -11,6 +11,6 @@ class TaskWorker {
 
     virtual s16 process(s16 iter);
 
-  private:
+  protected:
     std::function<void()> _onCompleted;
 };

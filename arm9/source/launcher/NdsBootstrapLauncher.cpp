@@ -57,8 +57,8 @@ void slot2RamAccess(){
     }
 }
 
-std::unique_ptr<TaskWorker> NdsBootstrapLauncher::task() const {
-    return std::make_unique<NdsBootstrapLauncher>(*this);
+TaskWorker* NdsBootstrapLauncher::task() {
+    return this;
 }
 
 bool NdsBootstrapLauncher::prepareCheats(const std::string& mRomPath) {

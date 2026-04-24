@@ -10,7 +10,7 @@ class TaskCruncher {
   public:
     TaskCruncher();
 
-    void push(std::unique_ptr<TaskWorker> task);
+    void push(TaskWorker* task);
 
     void process();
 
@@ -19,8 +19,14 @@ class TaskCruncher {
       std::unique_ptr<TaskWorker> task;
       s16 iter;
 
-      TaskEntry(std::unique_ptr<TaskWorker> t, s16 i)
-          : task(std::move(t)), iter(i) {}
+      TaskEntry(TaskWorker* t, s16 i)
+          : task(t), iter(i) {}
+
+      TaskEntry(TaskEntry&&) = default;
+      TaskEntry& operator=(TaskEntry&&) = default;
+
+      TaskEntry(const TaskEntry&) = delete;
+      TaskEntry& operator=(const TaskEntry&) = delete;
     };
 
     std::deque<TaskEntry> _deque;

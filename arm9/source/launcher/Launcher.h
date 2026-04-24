@@ -23,7 +23,7 @@ class Launcher : public TaskWorker {
     Launcher();
     virtual ~Launcher() = default;
 
-    virtual std::unique_ptr<TaskWorker> task() const = 0;
+    virtual TaskWorker* task() = 0;
     void launchRom(std::string romPath, std::string savePath, u32 flags, u32 cheatOffset, u32 cheatSize, bool hb);
 
   protected:

@@ -97,7 +97,6 @@ void cMainWnd::init() {
     // waitMs( 2000 );
     _mainList = new cMainList(this, "main list");
     _mainList->init();
-    _mainList->selectChanged.connect(this, &cMainWnd::listSelChange);
     _mainList->rowClicked.connect(this, &cMainWnd::onMainListSelItemClicked);
     _mainList->directoryChanged.connect(this, &cMainWnd::onFolderChanged);
     addChildWindow(_mainList);
@@ -175,25 +174,12 @@ void cMainWnd::init() {
     cFavorites::RemoveInvalidFavorites();
 }
 
-void cMainWnd::draw() {
-    cForm::draw();
+bool cMainWnd::busy() const {
+    return false;
 }
 
-void cMainWnd::listSelChange(u32 i) {
-#ifdef DEBUG
-    // dbg_printf( "main list item %d\n", i );
-    DSRomInfo info;
-    if (_mainList->getRomInfo(i, info)) {
-        char title[13] = {};
-        memcpy(title, info.saveInfo().gameTitle, 12);
-        char code[5] = {};
-        memcpy(code, info.saveInfo().gameCode, 4);
-        u16 crc = swiCRC16(0xffff, ((unsigned char*)&(info.banner())) + 32, 0x840 - 32);
-        dbg_printf("%s %s %04x %d %04x/%04x\n", title, code, info.saveInfo().gameCRC,
-                   info.isDSRom(), info.banner().crc, crc);
-        // dbg_printf("sizeof banner %08x\n", sizeof( info.banner() ) );
-    }
-#endif  // DEBUG
+void cMainWnd::draw() {
+    cForm::draw();
 }
 
 void cMainWnd::startMenuItemClicked(s16 i) {
@@ -230,8 +216,11 @@ void cMainWnd::startMenuItemClicked(s16 i) {
 
 void cMainWnd::startButtonClicked() {
     if (!gs().safeMode) {
-        _startMenu->showForFile(_mainList->getSelectedFullPath());
-        windowManager().addWindow(_startMenu);
+        WorkIndicatorTask* task = new WorkIndicatorTask({this}, [this]() {
+            _startMenu->showForFile(_mainList->getSelectedFullPath());
+            windowManager().addWindow(_startMenu);
+        });
+        task->schedule();
     }
 }
 
@@ -253,8 +242,8 @@ bool cMainWnd::processKeyMessage(cKeyMessage message) {
     if (message.isKeyUp(KEY_Y)) {
         if (isL) {
             showSettings();
-        } else {
-            onKeyYPressed();
+        } else if (!gs().safeMode) {
+            showFileInfo();
         }
 
         return true;
@@ -306,11 +295,6 @@ bool cMainWnd::processKeyMessage(cKeyMessage message) {
 
 bool cMainWnd::processTouchMessage(cTouchMessage message) {
     return cForm::processTouchMessage(message);
-}
-
-void cMainWnd::onKeyYPressed() {
-    if (gs().safeMode) return;
-    showFileInfo();
 }
 
 void cMainWnd::onMainListSelItemClicked(u32 index) {
@@ -627,7 +611,8 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
                 gs().saveSettings();
 
                 std::string launcherPath = fsManager().resolveSystemPath("/_nds/akmenunext/launcher.nds");
-                HomebrewLauncher().launchRom(launcherPath, "", 0, 0, 0, 0);
+                HomebrewLauncher* launcher = new HomebrewLauncher();
+                launcher->launchRom(launcherPath, "", 0, 0, 0, 0);
             },
             {});
     } else if (langIndex != langIndexAfter) {
@@ -637,7 +622,8 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
                 gs().saveSettings();
 
                 std::string launcherPath = fsManager().resolveSystemPath("/_nds/akmenunext/launcher.nds");
-                HomebrewLauncher().launchRom(launcherPath, "", 0, 0, 0, 0);
+                HomebrewLauncher* launcher = new HomebrewLauncher();
+                launcher->launchRom(launcherPath, "", 0, 0, 0, 0);
             },
             {});
     }
@@ -705,20 +691,23 @@ void cMainWnd::onFolderChanged() {
         if (mode == cGlobalSettings::ESlot2Ask) {
             cMessageBox::showModal(LANG("gba settings", "mode"), LANG("gba settings", "modetext"), MB_YES_NO,
                 [this]() {
-                    PassMeLauncher().launchRom("slot2:/", "", 0, 0, 0, 0);
+                    PassMeLauncher* launcher = new PassMeLauncher();
+                    launcher->launchRom("slot2:/", "", 0, 0, 0, 0);
                 },
                 [this]() {
                     CGbaLoader::StartGBA();
                 });
         }else if (mode == cGlobalSettings::ESlot2Nds) {
-            PassMeLauncher().launchRom("slot2:/", "", 0, 0, 0, 0);
+            PassMeLauncher* launcher = new PassMeLauncher();
+            launcher->launchRom("slot2:/", "", 0, 0, 0, 0);
         } else {
             CGbaLoader::StartGBA();
         }
     }
 
     if (_mainList->getSelectedFullPath() == "slot1:/") {
-        Slot1Launcher().launchRom("slot1:/", "", 0, 0, 0, 0);
+        Slot1Launcher* launcher = new Slot1Launcher();
+        launcher->launchRom("slot1:/", "", 0, 0, 0, 0);
     }
 
     dbg_printf("%s\n", _mainList->getSelectedFullPath().c_str());
