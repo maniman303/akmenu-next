@@ -24,6 +24,7 @@ cWindow::cWindow(cWindow* aParent, const std::string& aText)
       _ignoreSizeEvent(false),
       _canRenderBackdrop(false),
       _scheduleBackdrop(false),
+      _inputState(true),
       _engine(GE_MAIN) {}
 
 cWindow::~cWindow() {
@@ -60,6 +61,20 @@ cWindow& cWindow::enableFocused() {
 cWindow& cWindow::disableFocused() {
     onLostFocus();
     return *this;
+}
+
+cWindow& cWindow::enableInput() {
+    _inputState = true;
+    return *this;
+}
+
+cWindow& cWindow::disableInput() {
+    _inputState = false;
+    return *this;
+}
+
+bool cWindow::inputState() {
+    return _inputState;
 }
 
 cWindow* cWindow::windowBelow(const cPoint& p) {

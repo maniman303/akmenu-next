@@ -3,6 +3,7 @@
 #include <nds.h>
 #include <vector>
 #include "taskworker.h"
+#include "window.h"
 
 class WorkIndicator {
   public:
@@ -11,11 +12,11 @@ class WorkIndicator {
 
 class WorkIndicatorTask : public TaskWorker {
   public:
-    WorkIndicatorTask(std::vector<WorkIndicator*> indicators, std::function<void()> onCompleted);
+    WorkIndicatorTask(std::vector<WorkIndicator*> indicators, akui::cWindow* window, std::function<void()> onCompleted);
 
     s16 process(s16 iter) override;
     void schedule();
   private:
-  //TODO: A pointer to window to disable / enable input
+    akui::cWindow* _window;
     std::vector<WorkIndicator*> _indicators;
 };

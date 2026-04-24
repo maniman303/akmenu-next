@@ -203,11 +203,19 @@ namespace akui {
             return false;
         }
 
+        if (!_currentWindow.window()->inputState()) {
+            return false;
+        }
+
         return _currentWindow.window()->processKeyMessage(message);
     }
 
     bool cWindowManager::processTouchMessage(cTouchMessage message) {
         if (_currentWindow.window() == NULL) {
+            return false;
+        }
+
+        if (!_currentWindow.window()->inputState()) {
             return false;
         }
 

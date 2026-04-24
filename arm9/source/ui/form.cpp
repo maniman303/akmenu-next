@@ -191,11 +191,11 @@ namespace akui {
         return false;
     }
 
-    cWindow& cForm::disableFocus(void) {
+    cWindow& cForm::disableFocusable(void) {
         for (std::list<cWindow*>::iterator it = _childWindows.begin(); it != _childWindows.end();
             ++it) {
-            (*it)->disableFocus();
+            (*it)->disableFocusable();
         }
-        return cWindow::disableFocus();
+        return cWindow::disableFocusable();
     }
 }  // namespace akui

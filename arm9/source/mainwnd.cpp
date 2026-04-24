@@ -216,7 +216,7 @@ void cMainWnd::startMenuItemClicked(s16 i) {
 
 void cMainWnd::startButtonClicked() {
     if (!gs().safeMode) {
-        WorkIndicatorTask* task = new WorkIndicatorTask({this}, [this]() {
+        WorkIndicatorTask* task = new WorkIndicatorTask({this}, this, [this]() {
             _startMenu->showForFile(_mainList->getSelectedFullPath());
             windowManager().addWindow(_startMenu);
         });

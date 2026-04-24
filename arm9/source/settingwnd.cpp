@@ -36,7 +36,7 @@ cSettingWnd::cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     addChildWindow(&_tabSwitcher);
     _tabSwitcher.selectItem(0);
     _tabSwitcher.hide();
-    _tabSwitcher.disableFocus();
+    _tabSwitcher.disableFocusable();
 
     s16 buttonY = size().y - _buttonCancel.size().y - 4;
 

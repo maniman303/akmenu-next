@@ -67,6 +67,15 @@ class cWindow : public SlotHolder {
     //! removes the focus from this window
     cWindow& disableFocused();
 
+    //! enables input processing
+    cWindow& enableInput();
+
+    //! disables input processing
+    cWindow& disableInput();
+
+    //! returns if input is enabled
+    bool inputState();
+
   public:
     //! \brief Returns a pointer to the window below the passed in point
     //!
@@ -113,7 +122,7 @@ class cWindow : public SlotHolder {
 
     bool isFocusable() { return _isFocusable; }
 
-    virtual cWindow& disableFocus(void) {
+    virtual cWindow& disableFocusable(void) {
         _isFocusable = false;
         return *this;
     }
@@ -184,6 +193,7 @@ class cWindow : public SlotHolder {
     bool _ignoreSizeEvent;
     bool _canRenderBackdrop;
     bool _scheduleBackdrop;
+    bool _inputState;
 
   protected:
     GRAPHICS_ENGINE _engine;
