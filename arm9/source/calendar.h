@@ -29,14 +29,14 @@ class cCalendar : public akui::cWindow {
 
   protected:
     void drawDayNumber(u8 day, u8 weekdDayOfMonthFirstDay, u8 today);
-    void drawText(const akui::cPoint& position, u32 value, u32 factor);
-    void drawNumber(const akui::cPoint& position, u32 index, u32 value);
+    void drawText(const cPoint& position, u32 value, u32 factor);
+    void drawNumber(const cPoint& position, u32 index, u32 value);
 
-    akui::cPoint _dayPosition;
-    akui::cSize _daySize;
-    akui::cPoint _dayxPosition;
-    akui::cPoint _monthPosition;
-    akui::cPoint _yearPosition;
+    cPoint _dayPosition;
+    cSize _daySize;
+    cPoint _dayxPosition;
+    cPoint _monthPosition;
+    cPoint _yearPosition;
     COLOR _dayHighlightColor;
     COLOR _dayColorSunday;
     COLOR _dayColorSaturday;

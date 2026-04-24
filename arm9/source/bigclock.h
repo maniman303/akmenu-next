@@ -41,7 +41,7 @@ class cBigClock : public akui::cWindow {
     bool _show;
     bool _colonShow;
     bool _ampmShow;
-    akui::cPoint _ampmPosition;
+    cPoint _ampmPosition;
     COLOR _ampmColor;
 };
 

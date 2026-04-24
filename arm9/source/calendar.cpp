@@ -127,7 +127,7 @@ void cCalendar::drawDayNumber(u8 day, u8 weekdDayOfMonthFirstDay, u8 today) {
     }
 }
 
-void cCalendar::drawNumber(const akui::cPoint& position, u32 index, u32 value) {
+void cCalendar::drawNumber(const cPoint& position, u32 index, u32 value) {
     if (!_yearNumbers.valid()) return;
 
     u8 w = _yearNumbers.width();
@@ -139,7 +139,7 @@ void cCalendar::drawNumber(const akui::cPoint& position, u32 index, u32 value) {
     gdi().maskBlt(_yearNumbers.buffer() + value * pitch * h / 2, x, y, w, h, selectedEngine());
 }
 
-void cCalendar::drawText(const akui::cPoint& position, u32 value, u32 factor) {
+void cCalendar::drawText(const cPoint& position, u32 value, u32 factor) {
     u32 ii = 0;
     while (true) {
         u8 number = value / factor;

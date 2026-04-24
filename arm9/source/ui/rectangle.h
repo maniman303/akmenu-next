@@ -11,8 +11,6 @@
 
 #include "point.h"
 
-namespace akui {
-
 class cRect {
     // ---------------------------------------------------------------------------------------------
     //  Xstruction
@@ -135,9 +133,3 @@ class cRect {
     //! extents of the rectangle
     cPoint size_;
 };
-
-////! output operator
-// std::ostream& operator << (std::ostream& os, const cRect& rect);
-
-// *************************************************************************************************
-}  // namespace akui

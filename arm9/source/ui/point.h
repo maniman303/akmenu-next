@@ -11,7 +11,6 @@
 
 #include <algorithm>
 
-namespace akui {
 template <typename T>
 class t_point {
   public:
@@ -58,5 +57,3 @@ typedef t_point<int> cPoint;
 typedef t_point<float> cPointf;
 // size
 typedef t_point<int> cSize;
-
-}  // namespace akui

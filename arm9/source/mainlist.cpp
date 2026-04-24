@@ -748,6 +748,10 @@ bool cMainList::processKeyMessage(cKeyMessage message) {
     return cListView::processKeyMessage(message);
 }
 
+cRect cMainList::focusRectangle() const {
+    return windowRectangle();
+}
+
 std::string cMainList::getSelectedFullPath() {
     if (!_rows.size()) return std::string("");
     return _rows[_selectedRowId][REALNAME_COLUMN].text();

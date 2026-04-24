@@ -39,74 +39,45 @@ class cMainList : public akui::cListView {
 
   public:
     int init();
-
     bool enterDir(const std::string& dirName);
-
     void backParentDir();
-
     bool processKeyMessage(cKeyMessage message) override;
-
+    cRect focusRectangle() const override;
     std::string getCurrentDir();
-
     bool getRomInfo(u32 rowIndex, DSRomInfo& info) const;
-
     void setRomInfo(u32 rowIndex, const DSRomInfo& info);
-
     void selectRom(const std::string& romPath);
-
     void setViewMode(VIEW_MODE mode);
-
     std::string getSelectedFullPath();
-
     std::string getSelectedShowName();
-
     std::string getSelectedFileName();
-
     VIEW_MODE getViewMode() { return _viewMode; }
-
-    void arrangeIcons();
 
     akui::Signal0 directoryChanged;
 
   public:
     bool IsFavorites(void);
-
     void SwitchShowAllFiles(void);
-
     const std::vector<std::string>* Saves(void);
 
   protected:
     void draw() override;
-
     void drawBackdrop() override;
-
     void drawIcons();
-
     void drawItemBackgrounds();
-
     void updateInternalNames(void);
-
     bool insertEntryRow(size_t index, const std::vector<std::string>& texts, const DSRomInfo& romInfo);
-
     void processDirIcons();
-
     bool setupDefaultDir(bool skipCards, bool skipFavorites);
-
     bool setupGameDir();
-
     void onDirectoryChanged();
-
     std::vector<std::string> getLastPlayedRow();
-
     std::vector<std::vector<std::string>> getFavoriteRows(bool exclusive);
-
     std::vector<std::vector<std::string>> getGameRows(int rowsToLoad);
 
   protected:
     void onSelectChanged(u32 index);
-
     void onScrolled(u32 index);
-
     std::string processItemText(std::string text, int column);
 
   protected:
