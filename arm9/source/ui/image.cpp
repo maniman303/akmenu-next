@@ -48,8 +48,6 @@ namespace akui {
             return;
         }
 
-        const cPoint position = cPoint(x, y);
-        cRect rect(position, position);
         if (!_hasAlpha || repeats > 1) {
             gdi().bitBlt(_background.buffer(), x, y, size().x, size().y, repeats, selectedEngine());
         } else {

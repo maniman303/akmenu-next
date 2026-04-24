@@ -82,6 +82,7 @@ void cMainWnd::init() {
     int y = 0;
     int w = 0;
     int h = 0;
+    bool focus = false;
     COLOR color = 0;
     std::string file("");
     std::string text("");
@@ -108,8 +109,7 @@ void cMainWnd::init() {
     // init start button
     x = ini.GetInt("start button", "x", 0);
     y = ini.GetInt("start button", "y", 172);
-    w = ini.GetInt("start button", "w", 48);
-    h = ini.GetInt("start button", "h", 10);
+    focus = ini.GetInt("start button", "focus", 0);
     color = ini.GetInt("start button", "textColor", 0x7fff);
     file = ini.GetString("start button", "file", "none");
     text = ini.GetString("start button", "text", "ini");
@@ -120,9 +120,10 @@ void cMainWnd::init() {
         text = LANG("start menu", "START");
     }
 
-    _startButton = new cButton(x, y, w, h, this, text);
+    _startButton = new cButton(x, y, 48, 10, this, text);
     _startButton->setStyle(cButton::press);
     _startButton->setRelativePosition(cPoint(x, y));
+    _startButton->setIsFocusable(focus);
     _startButton->loadAppearance(file);
     _startButton->clicked.connect(this, &cMainWnd::startButtonClicked);
     _startButton->setTextColor(color | BIT(15));
@@ -132,10 +133,10 @@ void cMainWnd::init() {
     // init brightness button
     x = ini.GetInt("brightness btn", "x", 240);
     y = ini.GetInt("brightness btn", "y", 1);
-    w = ini.GetInt("brightness btn", "w", 16);
-    h = ini.GetInt("brightness btn", "h", 16);
-    _brightnessButton = new cButton(x, y, w, h, this, "");
+    focus = ini.GetInt("brightness btn", "focus", 0);
+    _brightnessButton = new cButton(x, y, 0, 0, this, "");
     _brightnessButton->setRelativePosition(cPoint(x, y));
+    _brightnessButton->setIsFocusable(focus);
     _brightnessButton->loadAppearance(SFN_BRIGHTNESS_BUTTON);
     _brightnessButton->pressed.connect(this, &cMainWnd::brightnessButtonClicked);
     addChildWindow(_brightnessButton);

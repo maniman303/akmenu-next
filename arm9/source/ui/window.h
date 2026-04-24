@@ -31,6 +31,8 @@ class cWindow : public SlotHolder {
 
     cRect windowRectangle() const;
 
+    virtual cRect focusRectangle() const;
+
     //! The window text is a string with a context sensitive interpretation. It can be the
     //! label of a button or the title of a frame window etc.
     const std::string& text() const { return _text; }

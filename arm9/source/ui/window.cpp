@@ -37,9 +37,12 @@ cWindow& cWindow::setWindowRectangle(const cRect& rect) {
 }
 
 cRect cWindow::windowRectangle() const {
-    return cRect(position(), position() + size());
+    return cRect(position(), size(), false);
 }
-// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+cRect cWindow::focusRectangle() const {
+    return windowRectangle();
+}
 
 bool cWindow::isFocused() const {
     return windowManager().focusedWindow() == this;

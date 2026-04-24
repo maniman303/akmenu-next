@@ -118,6 +118,20 @@ namespace akui {
         _isFocusable = isFocusable;
     }
 
+    bool cButton::processKeyMessage(cKeyMessage message) {
+        if (!isVisible() || !isFocused()) {
+            return false;
+        }
+
+        if (message.isKeyUp(KEY_A)) {
+            onClicked();
+            clicked();
+            return true;
+        }
+
+        return false;
+    }
+
     bool cButton::processTouchMessage(cTouchMessage message) {
         if (!isVisible()) {
             return false;

@@ -49,6 +49,8 @@ cMainList::cMainList(cWindow* parent, const std::string& text)
       _topSlot1(2),
       _topSlot2(3) {
     _textOffset = 0;
+    _iconPrefix = 1;
+    _iconSufix = 3;
     _tallRowHeight = 38;
     _centerInternalColumn = false;
     _viewMode = VM_LIST;
@@ -98,6 +100,8 @@ cMainList::~cMainList() {
 
 int cMainList::init() {
     CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
+    _iconPrefix = ini.GetInt("main list", "iconPrefix", 1);
+    _iconSufix = ini.GetInt("main list", "iconSufix", 3);
     _textOffset = ini.GetInt("main list", "textOffset", 0);
     _textColor = ini.GetInt("main list", "textColor", RGB15(7, 7, 7));
     _textColorHilight = ini.GetInt("main list", "textColorHilight", RGB15(31, 0, 31));
@@ -111,7 +115,7 @@ int cMainList::init() {
     s32 y = ini.GetInt("main list", "y", 20);
     setRelativePosition(cPoint(x, y));
 
-    s32 w = _parent->size().x - (2 * x);
+    s32 w = ini.GetInt("main list", "w", 248);
     s32 h = ini.GetInt("main list", "h", 152);
     h = (h / _tallRowHeight) * _tallRowHeight;
     setSize(cSize(w, h));
@@ -805,7 +809,7 @@ void cMainList::drawItemBackgrounds() {
     size_t total = std::min(_visibleRowCount, _rows.size() - _firstVisibleRowId);
 
     for (size_t i = 0; i < total; i++) {
-        s32 itemX = ((SCREEN_WIDTH - _itemBg->size().x) / 2) - relativePosition().x;
+        s32 itemX = 0;
         s32 itemY = i * _rowHeight;
 
         _itemBg->setRelativePosition(cPoint(itemX, itemY));
@@ -824,7 +828,7 @@ void cMainList::drawIcons() {
     int icon_height = small ? 16 : 32;
 
     for (size_t i = 0; i < total; ++i) {
-        s32 itemX = position().x + 1;
+        s32 itemX = position().x + _iconPrefix;
         s32 itemY = position().y + i * _rowHeight + ((_rowHeight - icon_height) >> 1) - 1;
         _romInfoList[_firstVisibleRowId + i].drawDSRomIcon(itemX, itemY, small, _engine);
     }
@@ -850,16 +854,16 @@ void cMainList::setViewMode(VIEW_MODE mode) {
             setRowHeight(18);
             break;
         case VM_ICON:
-            _columns[ICON_COLUMN].width = 36 + _textOffset;
-            _columns[SHOWNAME_COLUMN].width = size().x - 36 - _textOffset;
+            _columns[ICON_COLUMN].width = _iconPrefix + 32 + _iconSufix + _textOffset;
+            _columns[SHOWNAME_COLUMN].width = size().x - _iconPrefix - 32 - _iconSufix - (2 * _textOffset);
             _columns[INTERNALNAME_COLUMN].width = 0;
             arangeColumnsSize();
             setRowHeight(_tallRowHeight);
             break;
         case VM_INTERNAL:
-            _columns[ICON_COLUMN].width = 36 + _textOffset;
+            _columns[ICON_COLUMN].width = _iconPrefix + 32 + _iconSufix + _textOffset;
             _columns[SHOWNAME_COLUMN].width = 0;
-            _columns[INTERNALNAME_COLUMN].width = size().x - 36 - _textOffset;
+            _columns[INTERNALNAME_COLUMN].width = size().x - _iconPrefix - 32 - _iconSufix - (2 * _textOffset);
             _columns[INTERNALNAME_COLUMN].center = _centerInternalColumn;
             arangeColumnsSize();
             setRowHeight(_tallRowHeight);

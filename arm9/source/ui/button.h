@@ -32,6 +32,7 @@ namespace akui {
       bool valid() const;
       bool isTouchFocusable() override;
       void setIsFocusable(bool isFocusable);
+      bool processKeyMessage(cKeyMessage message) override;
       bool processTouchMessage(cTouchMessage message) override;
       State state() { return _state; }
       void setTextColor(COLOR color) { _textColor = color; }

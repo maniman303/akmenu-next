@@ -111,23 +111,16 @@ class cMainList : public akui::cListView {
 
   protected:
     int _textOffset;
-
+    int _iconPrefix;
+    int _iconSufix;
     int _tallRowHeight;
-
     bool _centerInternalColumn;
-
     akui::cImage* _itemBg;
-
     VIEW_MODE _viewMode;
-
     std::string _currentDir;
-
     std::vector<std::string> _extnameFilter;
-
     std::vector<DSRomInfo> _romInfoList;
-
     bool _showAllFiles;
-
     std::vector<std::string> _saves;
 
   protected:

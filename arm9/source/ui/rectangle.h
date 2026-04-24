@@ -24,6 +24,9 @@ class cRect {
     //! construction via two points
     cRect(const cPoint& p1, const cPoint& p2);
 
+    //! construction via point and size
+    cRect(const cPoint& p1, const cPoint& p2, bool usePoints);
+
     //! construction from components of the two corner points
     cRect(int x1, int y1, int x2, int y2);
 
