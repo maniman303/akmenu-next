@@ -81,9 +81,10 @@ class cMainList : public akui::cListView {
     std::string processItemText(std::string text, int column);
 
   protected:
-    int _textOffset;
     int _iconPrefix;
     int _iconSufix;
+    int _textPrefix;
+    int _textSufix;
     int _tallRowHeight;
     bool _centerInternalColumn;
     akui::cImage* _itemBg;

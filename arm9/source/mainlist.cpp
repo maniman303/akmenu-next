@@ -48,7 +48,8 @@ cMainList::cMainList(cWindow* parent, const std::string& text)
       _topFavorites(4),
       _topSlot1(2),
       _topSlot2(3) {
-    _textOffset = 0;
+    _textPrefix = 0;
+    _textSufix = 0;
     _iconPrefix = 1;
     _iconSufix = 3;
     _tallRowHeight = 38;
@@ -102,7 +103,8 @@ int cMainList::init() {
     CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
     _iconPrefix = ini.GetInt("main list", "iconPrefix", 1);
     _iconSufix = ini.GetInt("main list", "iconSufix", 3);
-    _textOffset = ini.GetInt("main list", "textOffset", 0);
+    _textPrefix = ini.GetInt("main list", "textPrefix", 0);
+    _textSufix = ini.GetInt("main list", "textSufix", 0);
     _textColor = ini.GetInt("main list", "textColor", RGB15(7, 7, 7));
     _textColorHilight = ini.GetInt("main list", "textColorHilight", RGB15(31, 0, 31));
     _selectionBarColor1 = ini.GetInt("main list", "selectionBarColor1", RGB15(16, 20, 24));
@@ -858,16 +860,16 @@ void cMainList::setViewMode(VIEW_MODE mode) {
             setRowHeight(18);
             break;
         case VM_ICON:
-            _columns[ICON_COLUMN].width = _iconPrefix + 32 + _iconSufix + _textOffset;
-            _columns[SHOWNAME_COLUMN].width = size().x - _iconPrefix - 32 - _iconSufix - (2 * _textOffset);
+            _columns[ICON_COLUMN].width = _iconPrefix + 32 + _iconSufix + _textPrefix;
+            _columns[SHOWNAME_COLUMN].width = size().x - _iconPrefix - 32 - _iconSufix - _textPrefix - _textSufix;
             _columns[INTERNALNAME_COLUMN].width = 0;
             arangeColumnsSize();
             setRowHeight(_tallRowHeight);
             break;
         case VM_INTERNAL:
-            _columns[ICON_COLUMN].width = _iconPrefix + 32 + _iconSufix + _textOffset;
+            _columns[ICON_COLUMN].width = _iconPrefix + 32 + _iconSufix + _textPrefix;
             _columns[SHOWNAME_COLUMN].width = 0;
-            _columns[INTERNALNAME_COLUMN].width = size().x - _iconPrefix - 32 - _iconSufix - (2 * _textOffset);
+            _columns[INTERNALNAME_COLUMN].width = size().x - _iconPrefix - 32 - _iconSufix - _textPrefix - _textSufix;
             _columns[INTERNALNAME_COLUMN].center = _centerInternalColumn;
             arangeColumnsSize();
             setRowHeight(_tallRowHeight);
