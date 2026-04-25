@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nds.h>
+#include "bmp15.h"
 #include "window.h"
 #include "animation.h"
 #include "../workindicator.h"
@@ -25,4 +26,8 @@ class cFocusBorder : public WorkIndicator {
     cRect _prevFocus;
     cRect _nextFocus;
     Animation _animation;
+    cBMP15 _ftr;
+    cBMP15 _ftl;
+    cBMP15 _fbr;
+    cBMP15 _fbl;
 };

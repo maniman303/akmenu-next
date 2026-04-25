@@ -171,34 +171,13 @@ namespace akui {
             return true;
         }
 
-        if (message.isKeyDown(KEY_DOWN) || message.isKeyDown(KEY_UP) || message.isKeyDown(KEY_LEFT) || message.isKeyDown(KEY_RIGHT)) {
-            gs().scrollTick = timer().getFrame();
-        }
-
-        u32 tickDiff = timer().getFrame() - gs().scrollTick;
-        if (message.isKeyShift(KEY_DOWN)) {
-            if (!message.isKeyDown(KEY_DOWN) && (tickDiff <= gs().scrollWait || (tickDiff % gs().scrollSpeed) != 0)) {
-                return true;
-            }
-
+        if (message.isKeyDown(KEY_DOWN)) {
             focused = findChildYAxis(focused->focusRectangle().center(), 1);
-        } else if (message.isKeyShift(KEY_UP)) {
-            if (!message.isKeyDown(KEY_UP) && (tickDiff <= gs().scrollWait || (tickDiff % gs().scrollSpeed) != 0)) {
-                return true;
-            }
-
+        } else if (message.isKeyDown(KEY_UP)) {
             focused = findChildYAxis(focused->focusRectangle().center(), -1);
-        } else if (message.isKeyShift(KEY_LEFT)) {
-            if (!message.isKeyDown(KEY_LEFT) && (tickDiff <= gs().scrollWait || (tickDiff % gs().scrollSpeed) != 0)) {
-                return true;
-            }
-
+        } else if (message.isKeyDown(KEY_LEFT)) {
             focused = findChildXAxis(focused->focusRectangle().center(), -1);
-        } else if (message.isKeyShift(KEY_RIGHT)) {
-            if (!message.isKeyDown(KEY_RIGHT) && (tickDiff <= gs().scrollWait || (tickDiff % gs().scrollSpeed) != 0)) {
-                return true;
-            }
-
+        } else if (message.isKeyDown(KEY_RIGHT)) {
             focused = findChildXAxis(focused->focusRectangle().center(), 1);
         }
 

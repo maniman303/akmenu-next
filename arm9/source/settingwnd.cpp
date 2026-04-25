@@ -342,7 +342,7 @@ void cSettingWnd::ShowTab(size_t index) {
         items(index)[ii]._item->show();
     }
 
-    _tabSwitcher.setPrefixIcon(SFN_UI_PREFIXES_DIRECTORY + prefixIconName(index));
+    _tabSwitcher.setPrefixIcon(SFN_UI_PREFIXES_DIRECTORY + "/" + prefixIconName(index));
 
     if (items(index).size()) windowManager().setFocusedWindow(items(index)[0]._item);
 }

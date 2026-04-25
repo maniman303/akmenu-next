@@ -25,6 +25,15 @@ void cFocusBorder::init() {
 
     s32 duration = ini.GetInt("focus border", "duration", 0);
     _animation.setDuration(duration);
+
+    if (!_show) {
+        return;
+    }
+
+    _ftr = createBMP15FromFile(SFN_UI_FOCUS_TR);
+    _ftl = createBMP15FromFile(SFN_UI_FOCUS_TL);
+    _fbr = createBMP15FromFile(SFN_UI_FOCUS_BR);
+    _fbl = createBMP15FromFile(SFN_UI_FOCUS_BL);
 }
 
 void cFocusBorder::update() {
@@ -63,8 +72,36 @@ void cFocusBorder::draw(GRAPHICS_ENGINE engine) {
         return;
     }
 
-    gdi().setPenColor(_color, engine);
-    gdi().frameRect(_currentFocus.position().x, _currentFocus.position().y, _currentFocus.size().x, _currentFocus.size().y, _thickness, engine);
+    bool drawRect = true;
+    s32 startX = _currentFocus.position().x;
+    s32 startY = _currentFocus.position().y;
+    s32 width = _currentFocus.size().x;
+    s32 height = _currentFocus.size().y;
+    if (_ftl.valid()) {
+        drawRect = false;
+        gdi().maskBlt(_ftl.buffer(), startX, startY, _ftl.width(), _ftl.height(), engine);
+    }
+
+    if (_ftr.valid()) {
+        drawRect = false;
+        gdi().maskBlt(_ftr.buffer(), startX + width - _ftr.width(), startY, _ftr.width(), _ftr.height(), engine);
+    }
+
+    if (_fbl.valid()) {
+        drawRect = false;
+        gdi().maskBlt(_fbl.buffer(), startX, startY + height - _fbl.height(), _fbl.width(), _fbl.height(), engine);
+    }
+
+    if (_fbr.valid()) {
+        drawRect = false;
+        gdi().maskBlt(_fbr.buffer(), startX + width - _fbr.width(), startY + height - _fbr.height(), _fbr.width(), _fbr.height(), engine);
+    }
+
+    if (drawRect) {
+        gdi().setPenColor(_color, engine);
+        gdi().frameRect(startX, startY, width, height, _thickness, engine);
+        return;
+    }
 }
 
 bool cFocusBorder::busy() const {

@@ -299,13 +299,19 @@ namespace akui {
             gs().scrollTick = timer().getFrame();
         }
 
+        if (gs().scrollTick == 0) {
+            return false;
+        }
+
         u32 tickDiff = timer().getFrame() - gs().scrollTick;
         if (message.isKeyShift(KEY_DOWN)) {
             if (!message.isKeyDown(KEY_DOWN) && (tickDiff <= gs().scrollWait || (tickDiff % gs().scrollSpeed) != 0)) {
                 return true;
             }
 
-            return selectNext();
+            if (selectNext()) {
+                return true;
+            }
         }
 
         if (message.isKeyShift(KEY_UP)) {
@@ -313,8 +319,12 @@ namespace akui {
                 return true;
             }
 
-            return selectPrev();
+            if (selectPrev()) {
+                return true;
+            }
         }
+
+        gs().scrollTick = 0;
 
         return false;
     }
