@@ -15,7 +15,7 @@ cSmallDate::cSmallDate() : cWindow(NULL, "SmallDate") {
 
 void cSmallDate::init() {
     CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
-    _textColor = ini.GetInt("small date", "color", 0xFFFF);
+    _textColor = ini.GetInt("small date", "color", 0xFFFF) | BIT(15);
     _show = ini.GetInt("small date", "show", _show);
 
     int dx = ini.GetInt("small date", "x", 0);

@@ -17,7 +17,7 @@ cSmallClock::cSmallClock() : cWindow(NULL, "SmallClock") {
 
 void cSmallClock::init() {
     CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
-    _textColor = ini.GetInt("small clock", "color", 0xFFFF);
+    _textColor = ini.GetInt("small clock", "color", 0xFFFF) | BIT(15);
     _show = ini.GetInt("small clock", "show", _show);
     int dx = ini.GetInt("small clock", "x", 0);
     int dy = ini.GetInt("small clock", "y", 0);

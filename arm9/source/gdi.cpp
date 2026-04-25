@@ -19,6 +19,7 @@
 #include "userinput.h"
 #include "logger.h"
 #include "blockds/ndstypes.h"
+#include "blockds/video.h"
 #include "../../share/memtool.h"
 
 ARM_CODE LIBNDS_NOINLINE
@@ -92,9 +93,6 @@ void cGdi::activeFbMain(void) {
     fillMemory(_bufferMain1, 0x20000, 0);
     fillMemory(_bufferMain3, 0x20000, 0);
 
-    // REG_BLDCNT = BLEND_ALPHA | BLEND_DST_BG2 | BLEND_DST_BG3;
-    // REG_BLDALPHA = (4 << 8) | 7;
-
     swiWaitForVBlank();  // remove tearing at bottop screen
     videoSetMode(MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_BG3_ACTIVE | DISPLAY_SPR_ACTIVE |
                  DISPLAY_SPR_1D_BMP_SIZE_128 | DISPLAY_SPR_1D_BMP);
@@ -123,7 +121,7 @@ void cGdi::activeFbSub(void) {
     vramSetBankC(VRAM_C_SUB_BG_0x06200000);  // 128k
     vramSetBankD(VRAM_D_SUB_SPRITE);
 
-    BG_PALETTE_SUB[0] = 0x7fff;
+    BG_PALETTE_SUB[0] = 0xffff;
 
     REG_BG2CNT_SUB = BG_BMP16_256x256 | BG_BMP_BASE(0) | BG_PRIORITY_1;
     REG_BG2PA_SUB = 1 << 8;
@@ -136,8 +134,8 @@ void cGdi::activeFbSub(void) {
     _workSub = (u16*)new u32[(256 * 192 * 2) >> 1];
     _bufferSub1 = (u16*)0x06200000;
 
-    fillMemory(_workSub, 0x18000, 0xffffffff);
-    fillMemory(_bufferSub1, 0x18000, 0xffffffff);
+    fillMemory(_workSub, 0x18000, 0x0);
+    fillMemory(_bufferSub1, 0x18000, 0x0);
 
     swiWaitForVBlank();
     videoSetModeSub(MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D_BMP_SIZE_128 | DISPLAY_SPR_1D_BMP);
@@ -151,7 +149,7 @@ void cGdi::activeFbSub(void) {
             _subSprites.emplace_back(id, false);
             cSprite* sprite = &_subSprites.back();
             sprite->setSize(SS_SIZE_64);
-            sprite->setPriority(3);
+            sprite->setPriority(2);
             sprite->setPosition(k * 64, i * 64);
             sprite->show();
         }
@@ -160,6 +158,31 @@ void cGdi::activeFbSub(void) {
     fillMemory(_subSprites[0].buffer(), SCREEN_WIDTH * SCREEN_HEIGHT * 2, 0xffffffff);
 
     _scheduleSubBackground = true;
+}
+
+void cGdi::setScreenTransparency(u16 value, GRAPHICS_ENGINE engine) {
+    if (value > 100) {
+        value = 0;
+    }
+
+    u16 topLvl = value / 6;
+    u16 downLvl = 16 - topLvl;
+
+    if (engine == GE_SUB) {
+        REG_MASTER_BRIGHT_SUB = BIT(14) | downLvl;
+
+        return;
+    }
+
+    // REG_BLDCNT = BLEND_ALPHA | 
+    //          BLEND_SRC_SPRITE | 
+    //          BLEND_SRC_BG2 | 
+    //          BLEND_SRC_BG3 | 
+    //          BLEND_DST_BACKDROP;
+    // REG_BLDY = BLDY_EVY(0);
+    // REG_BLDALPHA = topLvl | (downLvl << 8);
+
+    REG_MASTER_BRIGHT = BIT(14) | downLvl;
 }
 
 static inline void putScreenPixel(u16* buffer, s16 x, s16 y, u16 color) {

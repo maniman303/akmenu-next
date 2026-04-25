@@ -33,6 +33,7 @@ class cGdi {
 
   public:
     void init();
+    void setScreenTransparency(u16 value, GRAPHICS_ENGINE engine);
     void drawPixel(u8 x, u8 y, GRAPHICS_ENGINE engine);
     void drawLine(s16 x1, s16 y1, s16 x2, s16 y2, GRAPHICS_ENGINE engine);
     void drawRadiusLine(s16 sx, s16 sy, u16 width, u16 length, s16 degrees, u16 color, GRAPHICS_ENGINE engine);

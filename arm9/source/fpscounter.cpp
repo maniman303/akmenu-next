@@ -13,7 +13,7 @@ cFpsCounter::cFpsCounter() : cWindow(NULL, "FpsCounter") {
 
 void cFpsCounter::init() {
     CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
-    _textColor = ini.GetInt("fps counter", "color", 0xFFFF);
+    _textColor = ini.GetInt("fps counter", "color", 0xFFFF) | BIT(15);
     _show = ini.GetInt("fps counter", "show", _show);
     int dx = ini.GetInt("fps counter", "x", 0);
     int dy = ini.GetInt("fps counter", "y", 0);
@@ -22,5 +22,6 @@ void cFpsCounter::init() {
 }
 
 void cFpsCounter::draw() {
+    gdi().setPenColor(_textColor, _engine);
     gdi().textOut(position().x, position().y, formatString("FPS: %02d", timer().getFps()).c_str(), _engine, fontSecondary());
 }
