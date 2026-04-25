@@ -307,7 +307,11 @@ bool cMainWnd::processTouchMessage(cTouchMessage message) {
 }
 
 void cMainWnd::onMainListSelItemClicked(u32 index) {
-    launchSelected();
+    WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder}, this, [this](){
+        launchSelected();
+    });
+    
+    task->schedule();
 }
 
 void cMainWnd::setFocusedChild(cWindow* child) {
@@ -695,7 +699,6 @@ void cMainWnd::onFolderChanged() {
     if (_mainList->getSelectedFullPath() == "slot2:/") {
         u8 chk = CGbaLoader::GetGbaHeader();
         if (chk != GBA_HEADER.complement) {
-            dbg_printf("chk %02x header checksum %02x\n", chk, GBA_HEADER.complement);
             std::string title = LANG("no gba card", "title");
             std::string text = LANG("no gba card", "text");
             cMessageBox::showModal(title, text, MB_OK);
@@ -704,30 +707,34 @@ void cMainWnd::onFolderChanged() {
             return;
         }
 
-        int mode = gs().slot2mode;
-        if (mode == cGlobalSettings::ESlot2Ask) {
-            cMessageBox::showModal(LANG("gba settings", "mode"), LANG("gba settings", "modetext"), MB_YES_NO,
-                [this]() {
-                    PassMeLauncher* launcher = new PassMeLauncher();
-                    launcher->launchRom("slot2:/", "", 0, 0, 0, 0);
-                },
-                [this]() {
-                    CGbaLoader::StartGBA();
-                });
-        }else if (mode == cGlobalSettings::ESlot2Nds) {
-            PassMeLauncher* launcher = new PassMeLauncher();
-            launcher->launchRom("slot2:/", "", 0, 0, 0, 0);
-        } else {
-            CGbaLoader::StartGBA();
-        }
+        WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder}, this, [this]() {
+            int mode = gs().slot2mode;
+            if (mode == cGlobalSettings::ESlot2Ask) {
+                cMessageBox::showModal(LANG("gba settings", "mode"), LANG("gba settings", "modetext"), MB_YES_NO,
+                    [this]() {
+                        PassMeLauncher* launcher = new PassMeLauncher();
+                        launcher->launchRom("slot2:/", "", 0, 0, 0, 0);
+                    },
+                    [this]() {
+                        CGbaLoader::StartGBA();
+                    });
+            } else if (mode == cGlobalSettings::ESlot2Nds) {
+                PassMeLauncher* launcher = new PassMeLauncher();
+                launcher->launchRom("slot2:/", "", 0, 0, 0, 0);
+            } else {
+                CGbaLoader::StartGBA();
+            }
+        });
+        task->schedule();
     }
 
     if (_mainList->getSelectedFullPath() == "slot1:/") {
-        Slot1Launcher* launcher = new Slot1Launcher();
-        launcher->launchRom("slot1:/", "", 0, 0, 0, 0);
+        WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder}, this, [this](){
+            Slot1Launcher* launcher = new Slot1Launcher();
+            launcher->launchRom("slot1:/", "", 0, 0, 0, 0);
+        });
+        task->schedule();
     }
-
-    dbg_printf("%s\n", _mainList->getSelectedFullPath().c_str());
 
     _folderText->setText(dirShowName);
 }

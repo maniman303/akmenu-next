@@ -4,11 +4,11 @@
 
 Animation::Animation() : Animation(0) {}
 
-Animation::Animation(u16 duration) {
-    _duration = duration;
+Animation::Animation(s32 duration) {
     _startTick = 0;
     _isPlaying = false;
     _isReversed = false;
+    setDuration(duration);
 }
 
 void Animation::play() {
@@ -44,8 +44,12 @@ bool Animation::isReversed() const {
     return _isReversed;
 }
 
-void Animation::setDuration(u16 duration) {
-    _duration = duration;
+void Animation::setDuration(s32 duration) {
+    if (duration < 0) {
+        duration = 0;
+    }
+
+    _duration = (u16)duration;
 }
 
 u16 Animation::duration() const {

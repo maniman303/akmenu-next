@@ -5,7 +5,7 @@
 class Animation {
   public:
     Animation();
-    Animation(u16 duration);
+    Animation(s32 duration);
 
     void play();
     void reverse();
@@ -13,7 +13,7 @@ class Animation {
     bool isCompleted() const;
     bool isPlaying() const;
     bool isReversed() const;
-    void setDuration(u16 duration);
+    void setDuration(s32 duration);
     u16 duration() const;
     u16 value();
 

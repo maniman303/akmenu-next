@@ -13,7 +13,6 @@ cFocusBorder::cFocusBorder(akui::cWindow* parent) {
     _currentFocus = cRect(cPoint(0, 0), cSize(0, 0), false);
     _prevFocus = cRect(cPoint(0, 0), cSize(0, 0), false);
     _nextFocus = cRect(cPoint(0, 0), cSize(0, 0), false);
-    _animation.setDuration(7);
 }
 
 void cFocusBorder::init() {
@@ -23,6 +22,9 @@ void cFocusBorder::init() {
     _show = ini.GetInt("focus border", "show", _show);
     _color = ini.GetInt("focus border", "color", _color) | BIT(15);
     _thickness = ini.GetInt("focus border", "thickness", _thickness);
+
+    s32 duration = ini.GetInt("focus border", "duration", 0);
+    _animation.setDuration(duration);
 }
 
 void cFocusBorder::update() {
