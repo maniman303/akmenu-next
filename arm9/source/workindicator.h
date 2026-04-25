@@ -7,6 +7,7 @@
 
 class WorkIndicator {
   public:
+    virtual ~WorkIndicator() {} 
     virtual bool busy() const = 0;
 };
 

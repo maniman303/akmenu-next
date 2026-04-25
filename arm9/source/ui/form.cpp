@@ -130,6 +130,16 @@ namespace akui {
         return false;
     }
 
+    cRect cForm::focusRectangle() const {
+        for (cWindow* child : _childWindows) {
+            if (child->isVisible() && child->isFocused()) {
+                return child->focusRectangle();
+            }
+        }
+
+        return cWindow::focusRectangle();
+    }
+
     cWindow* cForm::windowBelow(const cPoint& p) {
         cWindow* ret = cWindow::windowBelow(p);  // 先看自己在不在点下面
         if (ret == NULL) {

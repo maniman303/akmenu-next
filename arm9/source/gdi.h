@@ -57,10 +57,11 @@ class cGdi {
     void bitSubBackground(const void* src);
 
     u16 getPenColor(GRAPHICS_ENGINE engine) {
-        if (GE_MAIN == engine)
-            return _penColor & ~BIT(15);
-        else
-            return _penColorSub & ~BIT(15);
+        if (GE_MAIN == engine) {
+            return _penColor;
+        }
+
+        return _penColorSub;
     }
 
     void setPenColor(u16 color, GRAPHICS_ENGINE engine) {

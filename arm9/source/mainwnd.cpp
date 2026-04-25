@@ -47,7 +47,8 @@ cMainWnd::cMainWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::strin
       _startButton(NULL),
       _brightnessButton(NULL),
       _folderUpButton(NULL),
-      _folderText(NULL) {}
+      _folderText(NULL),
+      _focusBorder(NULL) {}
 
 cMainWnd::~cMainWnd() {
     if (_folderText != NULL) {
@@ -72,6 +73,10 @@ cMainWnd::~cMainWnd() {
 
     if (_mainList != NULL) {
         delete _mainList;
+    }
+
+    if (_focusBorder != NULL) {
+        delete _focusBorder;
     }
 
     windowManager().removeWindow(this);
@@ -167,6 +172,9 @@ void cMainWnd::init() {
 
     dbg_printf("startMenu %08x\n", _startMenu);
 
+    _focusBorder = new cFocusBorder(this);
+    _focusBorder->init();
+
     diskIcon().loadAppearance(SFN_CARD_ICON_BLUE);
     diskIcon().setParent(this);
     addChildWindow(&diskIcon());
@@ -174,12 +182,13 @@ void cMainWnd::init() {
     cFavorites::RemoveInvalidFavorites();
 }
 
-bool cMainWnd::busy() const {
-    return false;
+void cMainWnd::update() {
+    _focusBorder->update();
 }
 
 void cMainWnd::draw() {
     cForm::draw();
+    _focusBorder->draw(selectedEngine());
 }
 
 void cMainWnd::startMenuItemClicked(s16 i) {
@@ -216,7 +225,7 @@ void cMainWnd::startMenuItemClicked(s16 i) {
 
 void cMainWnd::startButtonClicked() {
     if (!gs().safeMode) {
-        WorkIndicatorTask* task = new WorkIndicatorTask({this}, this, [this]() {
+        WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder}, this, [this]() {
             _startMenu->showForFile(_mainList->getSelectedFullPath());
             windowManager().addWindow(_startMenu);
         });

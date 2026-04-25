@@ -350,7 +350,12 @@ void ITCM_FUNC(cGdi::fillRect)(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 
         x = 0;
     }
 
-    if ((s16)w + widthOffset <= 0 || x + w + widthOffset >= SCREEN_WIDTH) {
+    if (x + w + widthOffset > SCREEN_WIDTH) {
+        widthOffset = SCREEN_WIDTH - x - (s16)w;
+    }
+
+    if ((s16)w + widthOffset <= 0 || x >= SCREEN_WIDTH) {
+        logger().info("Finish fill rect on width.");
         return;
     }
 
@@ -360,7 +365,12 @@ void ITCM_FUNC(cGdi::fillRect)(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 
         y = 0;
     }
 
-    if ((s16)h + heightOffset <= 0 || y + h + heightOffset >= SCREEN_WIDTH) {
+    if (y + h + heightOffset > SCREEN_HEIGHT) {
+        heightOffset = SCREEN_HEIGHT - y - (s16)h;
+    }
+
+    if ((s16)h + heightOffset <= 0 || y >= SCREEN_HEIGHT) {
+        logger().info("Finish fill rect on height.");
         return;
     }
 
@@ -378,7 +388,7 @@ void ITCM_FUNC(cGdi::fillRect)(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 
     u16 destInc = 256 - w;
     u16 halfWidth = (w - (aligned ? 0 : 1)) >> 1;
 
-    for (u32 i = 0; i < h; ++i) {
+    for (u32 i = 0; i < h; i++) {
         u32 source = (i & 1) ? color : altColor;
         if (!aligned) {
             *pDest = (u16)(source & 0x0000ffff);

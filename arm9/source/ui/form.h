@@ -32,6 +32,7 @@ namespace akui {
       void drawBackdrop() override;
       bool processKeyMessage(cKeyMessage message) override;
       bool processTouchMessage(cTouchMessage message) override;
+      cRect focusRectangle() const override;
       cWindow* windowBelow(const cPoint& p);
       u32 modalRet();
       void centerScreen();

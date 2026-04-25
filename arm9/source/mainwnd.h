@@ -18,9 +18,9 @@
 #include "startmenu.h"
 #include "touchmessage.h"
 #include "rominfownd.h"
-#include "workindicator.h"
+#include "ui/focusborder.h"
 
-class cMainWnd : public akui::cForm, public WorkIndicator {
+class cMainWnd : public akui::cForm {
   public:
     cMainWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text);
 
@@ -30,7 +30,7 @@ class cMainWnd : public akui::cForm, public WorkIndicator {
     bool processKeyMessage(cKeyMessage message) override;
     bool processTouchMessage(cTouchMessage message) override;
     cWindow& loadAppearance(const std::string& aFileName) override;
-    bool busy() const override;
+    void update() override;
     void init();
     void draw();
 
@@ -54,4 +54,5 @@ class cMainWnd : public akui::cForm, public WorkIndicator {
     akui::cButton* _brightnessButton;
     akui::cButton* _folderUpButton;
     akui::cStaticText* _folderText;
+    cFocusBorder* _focusBorder;
 };
