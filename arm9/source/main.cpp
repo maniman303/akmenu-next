@@ -119,6 +119,21 @@ void saveSram() {
     fclose(saveFile);
 }
 
+void initMainWindow(std::string lastDirectory, std::string lastFile) {
+    cMainWnd* wnd = new cMainWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, "main window");
+    wnd->init();
+
+    if (!wnd->_mainList->enterDir(lastDirectory != "..." ? lastDirectory : gs().startupFolder)) {
+        wnd->_mainList->enterDir("...");
+    } else {
+        wnd->_mainList->selectRom(lastFile);
+    }
+
+    windowManager().addWindow(wnd);
+    
+    // TODO: Schedule both screens fade in task
+}
+
 int main(int argc, char* argv[]) {
     consoleDebugInit(DebugDevice_NOCASH);
 
@@ -188,10 +203,6 @@ int main(int argc, char* argv[]) {
 
     progressWnd().init();
 
-    cImage* background = new cImage(NULL, cSize(SCREEN_WIDTH, SCREEN_HEIGHT), 0xffff);
-
-    windowManager().addWindow(background);
-
     if (!fsManager().isRebooted() && gs().autorunWithLastRom && lastFile != "..." && !lastFile.empty()) {
         INPUT& inputs = updateInput();
         if (!(inputs.keysHeld & KEY_B)) {
@@ -210,8 +221,6 @@ int main(int argc, char* argv[]) {
                 datetime().purge();
                 destroyBMP15();
 
-                // irq().schedulePresent();
-
                 swiWaitForVBlank();
 
                 gdi().present();
@@ -219,31 +228,16 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    background->loadAppearance(SFN_LOWER_SCREEN_BG);
-
-    calendarWnd().init();
-    calendar().init();
-    analogClock().init();
-    bigClock().init();
-    batteryMeter().init();
-    bootIcon().init();
-
-    smallDate().init();
-    smallClock().init();
-
+    subWindowManager().init();
     fpsCounter().init();
 
-    cMainWnd* wnd = new cMainWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, "main window");
-    wnd->init();
+    cImage* background = new cImage(NULL, cSize(SCREEN_WIDTH, SCREEN_HEIGHT), 0xffff);    
+    background->loadAppearance(SFN_LOWER_SCREEN_BG);
+    windowManager().addWindow(background);
+
+    initMainWindow(lastDirectory, lastFile);
 
     irq().vblankStart();
-
-    dbg_printf("lastDirectory '%s'\n", lastDirectory.c_str());
-    if (!wnd->_mainList->enterDir("..." != lastDirectory ? lastDirectory : gs().startupFolder)) {
-        wnd->_mainList->enterDir("...");
-    } else {
-        wnd->_mainList->selectRom(lastFile);
-    }
 
     *(u32*)(0xCFFFD0C) = 0x454D4D43;
     while (*(u32*)(0xCFFFD0C) != 0) {
@@ -251,39 +245,20 @@ int main(int argc, char* argv[]) {
     }
 
     while (true) {
-        // nocashMessage(formatString("Ticks 1: %d.", timer().getTick()).c_str());
-
         timer().updateFrames();
-
-        // nocashMessage(formatString("Ticks 2: %d.", timer().getTick()).c_str());
-
         tickSound().play();
 
         if (timer().getFrame() % 15 == 0) {
             sd().update();
         }
 
-        // nocashMessage(formatString("Ticks 3: %d.", timer().getTick()).c_str());
-
         INPUT& inputs = updateInput();
-
-        // nocashMessage(formatString("Ticks 4: %d.", timer().getTick()).c_str());
-
         processInput(inputs);
 
-        // nocashMessage(formatString("Ticks 5: %d.", timer().getTick()).c_str());
-        
         taskCruncher().process();
 
-        // nocashMessage(formatString("Ticks 6: %d.", timer().getTick()).c_str());
-
         windowManager().update();
-
-        // nocashMessage(formatString("Ticks 7: %d.", timer().getTick()).c_str());
-
         subWindowManager().update();
-
-        // nocashMessage(formatString("Ticks 8: %d.", timer().getTick()).c_str());
 
         datetime().purge();
         destroyBMP15();

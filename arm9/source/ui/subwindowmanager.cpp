@@ -15,6 +15,18 @@ cSubWindowManager::cSubWindowManager() {}
 
 cSubWindowManager::~cSubWindowManager() {}
 
+void cSubWindowManager::init() {
+    calendarWnd().init();
+    calendar().init();
+    analogClock().init();
+    bigClock().init();
+    batteryMeter().init();
+    bootIcon().init();
+
+    smallDate().init();
+    smallClock().init();
+}
+
 void cSubWindowManager::blink() {
     bigClock().blinkColon();
     smallClock().flipColon();

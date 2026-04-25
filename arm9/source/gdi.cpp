@@ -65,7 +65,7 @@ void cGdi::activeFbMain(void) {
 
     vramSetBankA(VRAM_A_MAIN_SPRITE_0x06400000);
 
-    BG_PALETTE[0] = 0xffff;
+    BG_PALETTE[0] = 0x7fff;
 
     REG_BG2CNT = BG_BMP16_256x256 | BG_BMP_BASE(0) | BG_PRIORITY_1;
     REG_BG2PA = 1 << 8;  // 2 =放大倍数
@@ -110,10 +110,11 @@ void cGdi::activeFbMain(void) {
             sprite->setSize(SS_SIZE_64);
             sprite->setPriority(3);
             sprite->setPosition(k * 64, i * 64);
-            fillMemory(sprite->buffer(), 64 * 64 * 2, 0xffffffff);
             sprite->show();
         }
     }
+
+    fillMemory(_mainSprites[0].buffer(), SCREEN_WIDTH * SCREEN_HEIGHT * 2, 0xffffffff);
 
     _scheduleMainBackground = true;
 }
@@ -122,7 +123,7 @@ void cGdi::activeFbSub(void) {
     vramSetBankC(VRAM_C_SUB_BG_0x06200000);  // 128k
     vramSetBankD(VRAM_D_SUB_SPRITE);
 
-    BG_PALETTE_SUB[0] = 0xffff;
+    BG_PALETTE_SUB[0] = 0x7fff;
 
     REG_BG2CNT_SUB = BG_BMP16_256x256 | BG_BMP_BASE(0) | BG_PRIORITY_1;
     REG_BG2PA_SUB = 1 << 8;
@@ -152,10 +153,11 @@ void cGdi::activeFbSub(void) {
             sprite->setSize(SS_SIZE_64);
             sprite->setPriority(3);
             sprite->setPosition(k * 64, i * 64);
-            fillMemory(sprite->buffer(), 64 * 64 * 2, 0xffffffff);
             sprite->show();
         }
     }
+
+    fillMemory(_subSprites[0].buffer(), SCREEN_WIDTH * SCREEN_HEIGHT * 2, 0xffffffff);
 
     _scheduleSubBackground = true;
 }

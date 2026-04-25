@@ -96,7 +96,6 @@ void cMainWnd::init() {
     // self init
     dbg_printf("mainwnd init() %08x\n", this);
     loadAppearance(SFN_LOWER_SCREEN_BG);
-    windowManager().addWindow(this);
 
     // init game file list
     // waitMs( 2000 );
@@ -105,8 +104,6 @@ void cMainWnd::init() {
     _mainList->rowClicked.connect(this, &cMainWnd::onMainListSelItemClicked);
     _mainList->directoryChanged.connect(this, &cMainWnd::onFolderChanged);
     addChildWindow(_mainList);
-    windowManager().setFocusedWindow(_mainList);
-    dbg_printf("mainlist %08x\n", _mainList);
 
     // waitMs( 1000 );
 

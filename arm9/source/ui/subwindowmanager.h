@@ -8,6 +8,7 @@ class cSubWindowManager {
     cSubWindowManager();
     ~cSubWindowManager();
 
+    void init();
     void blink();
     void update();
   private:
