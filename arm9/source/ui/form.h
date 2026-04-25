@@ -45,6 +45,8 @@ namespace akui {
     protected:
       virtual void onOK();
       virtual void onCancel();
+      cWindow* findChildXAxis(cPoint current, s16 direction);
+      cWindow* findChildYAxis(cPoint current, s16 direction);
       std::list<cWindow*> _childWindows;
 
       u32 _modalRet;

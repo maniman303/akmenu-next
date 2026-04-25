@@ -9,6 +9,7 @@ cDiskIcon::cDiskIcon() : cWindow(NULL, "diskicon") {
     _show = false;
     _blink = false;
     _engine = GE_MAIN;
+    _isFocusable = false;
 }
 
 void cDiskIcon::draw() {

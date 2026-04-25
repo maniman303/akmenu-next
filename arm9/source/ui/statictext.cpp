@@ -20,6 +20,7 @@ cStaticText::cStaticText(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     _size.y = h;
     _primaryFont = true;
     _textColor = uiSettings().formTextColor;  //(RGB15(31,31,31))
+    _isFocusable = false;
 
     setRelativePosition(cPoint(x, y));
 }

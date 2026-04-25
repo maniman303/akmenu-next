@@ -279,40 +279,39 @@ namespace akui {
             return true;
         }
 
-        if (message.isKeyUp(KEY_LEFT)) {
-            selectRow(selectedRowId() - visibleRowCount());
+        if (message.isKeyShift(KEY_LEFT) || message.isKeyUp(KEY_LEFT)) {
+            if (message.isKeyUp(KEY_LEFT)) {
+                selectRow(selectedRowId() - visibleRowCount());
+            }
+
             return true;
         }
 
-        if (message.isKeyUp(KEY_RIGHT)) {
-            selectRow(selectedRowId() + visibleRowCount());
+        if (message.isKeyShift(KEY_RIGHT) || message.isKeyUp(KEY_RIGHT)) {
+            if (message.isKeyUp(KEY_RIGHT)) {
+                selectRow(selectedRowId() + visibleRowCount());
+            }
+
             return true;
         }
 
         if (message.isKeyDown(KEY_DOWN) || message.isKeyDown(KEY_UP)) {
-            // logger().info("Key set tick.");
             gs().scrollTick = timer().getFrame();
         }
 
         u32 tickDiff = timer().getFrame() - gs().scrollTick;
-        if (message.isKeyDown(KEY_DOWN) || message.isKeyHeld(KEY_DOWN)) {
+        if (message.isKeyShift(KEY_DOWN)) {
             if (!message.isKeyDown(KEY_DOWN) && (tickDiff <= gs().scrollWait || (tickDiff % gs().scrollSpeed) != 0)) {
-                // logger().info("Key down wait. Tick diff: " + std::to_string(tickDiff));
                 return true;
             }
 
-            // logger().info("Key down fire. Is down: " + std::to_string(message.isKeyDown(KEY_DOWN)) + ", scroll speed: " + std::to_string(gs().scrollSpeed) + ", tick diff: " + std::to_string(tickDiff));
-            
             return selectNext();
         }
 
-        if (message.isKeyDown(KEY_UP) || message.isKeyHeld(KEY_UP)) {
+        if (message.isKeyShift(KEY_UP)) {
             if (!message.isKeyDown(KEY_UP) && (tickDiff <= gs().scrollWait || (tickDiff % gs().scrollSpeed) != 0)) {
-                // logger().info("Key up wait. Tick diff: " + std::to_string(tickDiff));
                 return true;
             }
-
-            // logger().info("Key up fire. Is down: " + std::to_string(message.isKeyDown(KEY_UP)));
 
             return selectPrev();
         }

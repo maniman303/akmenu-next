@@ -33,13 +33,10 @@ class cRect {
     // ---------------------------------------------------------------------------------------------
   public:
     //! returns the position (i.e. lowest value corner) of the rectangle
-    cPoint position() const { return position_; }
+    cPoint position() const { return _position; }
 
     //! returns half the rectangle's size
-    cSize halfSize() const { return cPoint(size_.x >> 1, size_.y >> 1); }
-
-    //! the center point
-    cPoint centerPoint() const;
+    cSize halfSize() const { return cPoint(_size.x >> 1, _size.y >> 1); }
 
     //! is the passed in point within the rectangle's horizontal edges
     bool isAboveAndBelow(const cPoint& p) const;
@@ -51,16 +48,19 @@ class cRect {
     bool surrounds(const cPoint& p) const;
 
     //! the smallest x coord
-    int minX() const { return position_.x; }
+    int minX() const { return _position.x; }
 
     //! the smallest y coord
-    int minY() const { return position_.y; }
+    int minY() const { return _position.y; }
 
     //! the largest x coord
-    int maxX() const { return position_.x + size_.x; }
+    int maxX() const { return _position.x + _size.x; }
 
     //! the largest y coord
-    int maxY() const { return position_.y + size_.y; }
+    int maxY() const { return _position.y + _size.y; }
+
+    //! the center point
+    cPoint center() const;
 
     //! the top right corner point
     cPoint topRight() const;
@@ -75,17 +75,17 @@ class cRect {
     cPoint bottomRight() const;
 
     //! returns the current size
-    cPoint size() const { return size_; }
+    cPoint size() const { return _size; }
 
     //! move to the passed in point
     cRect& setPosition(const cPoint& p) {
-        position_ = p;
+        _position = p;
         return *this;
     }
 
     //! resize to the passed in size
     cRect& setSize(const cSize& s) {
-        size_ = s;
+        _size = s;
         return *this;
     }
 
@@ -128,8 +128,8 @@ class cRect {
     // ----------------------------------------------------------------------------------------------
   private:
     //! lowest value corner of the rectangle
-    cPoint position_;
+    cPoint _position;
 
     //! extents of the rectangle
-    cPoint size_;
+    cPoint _size;
 };

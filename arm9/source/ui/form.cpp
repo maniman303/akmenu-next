@@ -11,6 +11,7 @@
 #include "timer.h"
 #include "logger.h"
 #include "windowmanager.h"
+#include "../globalsettings.h"
 #include "../stringtool.h"
 
 namespace akui {
@@ -94,21 +95,121 @@ namespace akui {
         }
     }
 
+    cWindow* cForm::findChildXAxis(cPoint current, s16 direction) {
+        cWindow* res = NULL;
+        s32 minScore = INT32_MAX;
+
+        for (cWindow* child : _childWindows) {
+            if (!child->isFocusable() || !child->isVisible()) {
+                continue;
+            }
+
+            cPoint position = child->focusRectangle().center();
+
+            if (position.x * direction <= current.x * direction) {
+                continue;
+            }
+
+            s32 score = std::abs(current.x - position.x) + std::abs(current.y - position.y) * std::abs(current.y - position.y);
+            if (score >= minScore) {
+                continue;
+            }
+
+            res = child;
+            minScore = score;
+        }
+
+        return res;
+    }
+
+    cWindow* cForm::findChildYAxis(cPoint current, s16 direction) {
+        cWindow* res = NULL;
+        s32 minScore = INT32_MAX;
+
+        for (cWindow* child : _childWindows) {
+            if (!child->isFocusable() || !child->isVisible() || child->size() == cSize(0, 0)) {
+                continue;
+            }
+
+            cPoint position = child->focusRectangle().center();
+
+            if (position.y * direction <= current.y * direction) {
+                continue;
+            }
+
+            s32 score = std::abs(current.y - position.y) + std::abs(current.x - position.x) * std::abs(current.x - position.x);
+            if (score >= minScore) {
+                continue;
+            }
+
+            res = child;
+            minScore = score;
+        }
+
+        return res;
+    }
+
     bool cForm::processKeyMessage(cKeyMessage message) {
         if (!isVisible()) {
             return false;
         }
 
-        // TODO: Run input on focused children, if returns false visit another children
-        std::list<cWindow*>::iterator it;
-        for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
-            cWindow* window = *it;
-            if (window->isVisible() && window->processKeyMessage(message)) {
-                return true;
+        cWindow* focused = NULL;
+        for (cWindow* child : _childWindows) {
+            if (child->isFocused()) {
+                focused = child;
+                break;
             }
         }
 
-        return false;
+        if (focused == NULL) {
+            return false;
+        }
+
+        bool focusedRes = focused->isVisible() ? focused->processKeyMessage(message) : false;
+        if (focusedRes) {
+            return true;
+        }
+
+        if (message.isKeyDown(KEY_DOWN) || message.isKeyDown(KEY_UP) || message.isKeyDown(KEY_LEFT) || message.isKeyDown(KEY_RIGHT)) {
+            gs().scrollTick = timer().getFrame();
+        }
+
+        u32 tickDiff = timer().getFrame() - gs().scrollTick;
+        if (message.isKeyShift(KEY_DOWN)) {
+            if (!message.isKeyDown(KEY_DOWN) && (tickDiff <= gs().scrollWait || (tickDiff % gs().scrollSpeed) != 0)) {
+                return true;
+            }
+
+            focused = findChildYAxis(focused->focusRectangle().center(), 1);
+        } else if (message.isKeyShift(KEY_UP)) {
+            if (!message.isKeyDown(KEY_UP) && (tickDiff <= gs().scrollWait || (tickDiff % gs().scrollSpeed) != 0)) {
+                return true;
+            }
+
+            focused = findChildYAxis(focused->focusRectangle().center(), -1);
+        } else if (message.isKeyShift(KEY_LEFT)) {
+            if (!message.isKeyDown(KEY_LEFT) && (tickDiff <= gs().scrollWait || (tickDiff % gs().scrollSpeed) != 0)) {
+                return true;
+            }
+
+            focused = findChildXAxis(focused->focusRectangle().center(), -1);
+        } else if (message.isKeyShift(KEY_RIGHT)) {
+            if (!message.isKeyDown(KEY_RIGHT) && (tickDiff <= gs().scrollWait || (tickDiff % gs().scrollSpeed) != 0)) {
+                return true;
+            }
+
+            focused = findChildXAxis(focused->focusRectangle().center(), 1);
+        }
+
+        if (focused == NULL) {
+            return false;
+        }
+
+        // logger().info("Choosing child: " + focused->text());
+        windowManager().setFocusedWindow(focused);
+
+        return true;
     }
 
     bool cForm::processTouchMessage(cTouchMessage message) {
