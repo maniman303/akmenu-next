@@ -310,6 +310,14 @@ void cMainWnd::onMainListSelItemClicked(u32 index) {
     launchSelected();
 }
 
+void cMainWnd::setFocusedChild(cWindow* child) {
+    WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder}, this, [this, child]() {
+        windowManager().setFocusedWindow(child);
+    });
+
+    task->schedule();
+}
+
 void cMainWnd::launchSelected() {
     std::string fullPath = _mainList->getSelectedFullPath();
     std::string romName = _mainList->getSelectedShowName();

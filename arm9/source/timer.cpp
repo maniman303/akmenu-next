@@ -54,14 +54,14 @@ u32 cTimer::updateFrames() {
     return _frames;
 }
 
-u32 cTimer::getTick() {
+u32 cTimer::getTick() const {
     return _ticks;
 }
 
-u32 cTimer::getFrame() {
+u32 cTimer::getFrame() const {
     return _frames;
 }
 
-u32 cTimer::getFps() {
+u32 cTimer::getFps() const {
     return _fps;
 }

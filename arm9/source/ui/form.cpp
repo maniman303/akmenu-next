@@ -202,12 +202,11 @@ namespace akui {
             focused = findChildXAxis(focused->focusRectangle().center(), 1);
         }
 
-        if (focused == NULL) {
+        if (focused == NULL || windowManager().focusedWindow() == focused) {
             return false;
         }
 
-        // logger().info("Choosing child: " + focused->text());
-        windowManager().setFocusedWindow(focused);
+        setFocusedChild(focused);
 
         return true;
     }
@@ -282,6 +281,10 @@ namespace akui {
         if (onRejected) {
             onRejected();
         }
+    }
+
+    void cForm::setFocusedChild(cWindow* child) {
+        windowManager().setFocusedWindow(child);
     }
 
     void cForm::centerScreen() {

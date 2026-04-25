@@ -2,6 +2,8 @@
 #include "animation.h"
 #include "../timer.h"
 
+Animation::Animation() : Animation(0) {}
+
 Animation::Animation(u16 duration) {
     _duration = duration;
     _startTick = 0;
@@ -30,19 +32,23 @@ void Animation::reset() {
     _startTick = 0;
 }
 
-bool Animation::isCompleted() {
+bool Animation::isCompleted() const {
     return _isPlaying && _startTick + _duration <= timer().getTick();
 }
 
-bool Animation::isPlaying() {
+bool Animation::isPlaying() const {
     return _isPlaying && _startTick + _duration > timer().getTick();
 }
 
-bool Animation::isReversed() {
+bool Animation::isReversed() const {
     return _isReversed;
 }
 
-u16 Animation::duration() {
+void Animation::setDuration(u16 duration) {
+    _duration = duration;
+}
+
+u16 Animation::duration() const {
     return _duration;
 }
 

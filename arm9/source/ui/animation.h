@@ -4,15 +4,17 @@
 
 class Animation {
   public:
+    Animation();
     Animation(u16 duration);
 
     void play();
     void reverse();
     void reset();
-    bool isCompleted();
-    bool isPlaying();
-    bool isReversed();
-    u16 duration();
+    bool isCompleted() const;
+    bool isPlaying() const;
+    bool isReversed() const;
+    void setDuration(u16 duration);
+    u16 duration() const;
     u16 value();
 
   private:

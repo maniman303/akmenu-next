@@ -1,6 +1,7 @@
 #include "focusborder.h"
 #include "cachedinifile.h"
 #include "systemfilenames.h"
+#include "twin.h"
 #include "../logger.h"
 
 cFocusBorder::cFocusBorder(akui::cWindow* parent) {
@@ -10,6 +11,9 @@ cFocusBorder::cFocusBorder(akui::cWindow* parent) {
     _color = 0x0;
     _thickness = 2;
     _currentFocus = cRect(cPoint(0, 0), cSize(0, 0), false);
+    _prevFocus = cRect(cPoint(0, 0), cSize(0, 0), false);
+    _nextFocus = cRect(cPoint(0, 0), cSize(0, 0), false);
+    _animation.setDuration(7);
 }
 
 void cFocusBorder::init() {
@@ -19,8 +23,6 @@ void cFocusBorder::init() {
     _show = ini.GetInt("focus border", "show", _show);
     _color = ini.GetInt("focus border", "color", _color) | BIT(15);
     _thickness = ini.GetInt("focus border", "thickness", _thickness);
-
-    // logger().info("Init focus border.");
 }
 
 void cFocusBorder::update() {
@@ -28,28 +30,41 @@ void cFocusBorder::update() {
         return;
     }
 
-    // logger().info("Updating focus border.");
+    cRect focus = _parent->focusRectangle();
+    if (_currentFocus == focus) {
+        return;
+    }
 
-    _currentFocus = _parent->focusRectangle();
-}
-
-void cFocusBorder::draw(GRAPHICS_ENGINE engine) {
-    if (!_init || !_show) {
-        // logger().info("Skipping focus border due to init / show.");
+    if (_nextFocus == focus) {
+        cPoint pos = twin().point(_prevFocus.position(), _nextFocus.position(), _animation.value());
+        cSize size = twin().point(_prevFocus.size(), _nextFocus.size(), _animation.value());
+        _currentFocus = cRect(pos, size, false);
         return;
     }
 
     if (_currentFocus.size().x == 0 || _currentFocus.size().y == 0) {
-        // logger().info("Skipping focus border due to size.");
+        _currentFocus = focus;
         return;
     }
 
-    // logger().info("Drawing focus border.");
+    _prevFocus = _currentFocus;
+    _nextFocus = focus;
+    _animation.play();
+}
+
+void cFocusBorder::draw(GRAPHICS_ENGINE engine) {
+    if (!_init || !_show) {
+        return;
+    }
+
+    if (_currentFocus.size().x == 0 || _currentFocus.size().y == 0) {
+        return;
+    }
 
     gdi().setPenColor(_color, engine);
     gdi().frameRect(_currentFocus.position().x, _currentFocus.position().y, _currentFocus.size().x, _currentFocus.size().y, _thickness, engine);
 }
 
 bool cFocusBorder::busy() const {
-    return false;
+    return _animation.isPlaying();
 }

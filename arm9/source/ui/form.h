@@ -45,6 +45,7 @@ namespace akui {
     protected:
       virtual void onOK();
       virtual void onCancel();
+      virtual void setFocusedChild(cWindow* child);
       cWindow* findChildXAxis(cPoint current, s16 direction);
       cWindow* findChildYAxis(cPoint current, s16 direction);
       std::list<cWindow*> _childWindows;

@@ -2,6 +2,7 @@
 
 #include <nds.h>
 #include "window.h"
+#include "animation.h"
 #include "../workindicator.h"
 #include "../gdi.h"
 
@@ -21,4 +22,7 @@ class cFocusBorder : public WorkIndicator {
     u16 _color;
     u16 _thickness;
     cRect _currentFocus;
+    cRect _prevFocus;
+    cRect _nextFocus;
+    Animation _animation;
 };

@@ -39,6 +39,7 @@ class cMainWnd : public akui::cForm {
   protected:
     void onGainedFocus() override;
     void onMainListSelItemClicked(u32 index);
+    void setFocusedChild(cWindow* child) override;
     void startMenuItemClicked(s16 i);
     void startButtonClicked();
     void brightnessButtonClicked();

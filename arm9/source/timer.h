@@ -25,11 +25,11 @@ class cTimer {
 
     u32 updateFrames();
 
-    u32 getTick();
+    u32 getTick() const;
 
-    u32 getFrame();
+    u32 getFrame() const;
 
-    u32 getFps();
+    u32 getFps() const;
 
   private:
     u16 _prevFps;
