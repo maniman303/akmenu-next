@@ -47,8 +47,8 @@ void cFocusBorder::update() {
     }
 
     if (_nextFocus == focus) {
-        cPoint pos = twin().point(_prevFocus.position(), _nextFocus.position(), _animation.value());
-        cSize size = twin().point(_prevFocus.size(), _nextFocus.size(), _animation.value());
+        cPoint pos = twin().point(_prevFocus.position(), _nextFocus.position(), _animation.value(), TWIN_EASE::EASE_OUT);
+        cSize size = twin().point(_prevFocus.size(), _nextFocus.size(), _animation.value(), TWIN_EASE::EASE_OUT);
         _currentFocus = cRect(pos, size, false);
         return;
     }
