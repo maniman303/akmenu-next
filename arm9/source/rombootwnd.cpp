@@ -1,5 +1,7 @@
 #include "rombootwnd.h"
 #include "language.h"
+#include "twin.h"
+#include "logger.h"
 #include "../romlauncher.h"
 #include "font/fontfactory.h"
 #include "ui/windowmanager.h"
@@ -13,6 +15,9 @@ cRomBootWnd::cRomBootWnd(std::string romPath, std::function<void()> onExit) :
     _romPath = romPath;
     _onExit = onExit;
     _romInfo.mayBeDSRom(romPath);
+
+    _timer = 0;
+    _pressAnimation.setDuration(35);
 
     _engine = GE_MAIN;
     _canRenderBackdrop = true;
@@ -60,7 +65,29 @@ bool cRomBootWnd::processTouchMessage(cTouchMessage message) {
 }
 
 void cRomBootWnd::update() {
+    if (_timer < 16) {
+        gdi().setMainLayerTransparency(0, MEL_UP);
+        _timer++;
+        return;
+    }
+
+    if (!_pressAnimation.isPlaying() && !_pressAnimation.isCompleted()) {
+        _pressAnimation.play();
+    }
+    
+    if (_pressAnimation.isCompleted()) {
+        if (_pressAnimation.isReversed()) {
+            _pressAnimation.play();
+        } else {
+            _pressAnimation.reverse();
+        }
+    }
+
+    u16 transparency = (u16)twin().int32(0, 100, _pressAnimation.value(), TWIN_EASE::EASE_OUT);
+    // logger().info("Set transparency to: " + std::to_string(transparency));
+
     // TODO: Animate "Press START..." fade in and out
+    gdi().setMainLayerTransparency(transparency, MEL_UP);
 }
 
 void cRomBootWnd::onGainedFocus() {
@@ -81,7 +108,7 @@ void cRomBootWnd::onGainedFocus() {
     _launchText.setFont(false);
 
     _pressText.setText(LANG("rom boot", "press"));
-    _pressText.setRelativePosition(cPoint(0, 172));
+    _pressText.setRelativePosition(cPoint(0, 168));
     _pressText.setSize(cSize(SCREEN_WIDTH, 32));
     _pressText.setTextColor(0x0 | BIT(15));
     _pressText.setCentered(true);
@@ -112,7 +139,7 @@ void cRomBootWnd::drawBackdrop() {
 void cRomBootWnd::moveToMain() {
     ScreenFadeTask* task = new ScreenFadeTask(true, false, false);
     task->setOnCompleted([this](){
-        // TODO: Set UP layer transparency to 100
+        gdi().setMainLayerTransparency(100, MEL_UP);
 
         if (_onExit) {
             _onExit();

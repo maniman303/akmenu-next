@@ -66,7 +66,7 @@ void cGdi::activeFbMain(void) {
 
     vramSetBankA(VRAM_A_MAIN_SPRITE_0x06400000);
 
-    BG_PALETTE[0] = 0x7fff;
+    BG_PALETTE[0] = 0xffff;
 
     REG_BG2CNT = BG_BMP16_256x256 | BG_BMP_BASE(0) | BG_PRIORITY_1;
     REG_BG2PA = 1 << 8;  // 2 =放大倍数
@@ -165,8 +165,12 @@ void cGdi::setScreenTransparency(u16 value, GRAPHICS_ENGINE engine) {
 }
 
 void cGdi::setScreenTransparency(u16 value, bool light, GRAPHICS_ENGINE engine) {
-    if (value > 100) {
+    if (value > INT16_MAX) {
         value = 0;
+    }
+
+    if (value > 100) {
+        value = 100;
     }
 
     u16 topLvl = value / 6;
@@ -187,6 +191,29 @@ void cGdi::setScreenTransparency(u16 value, bool light, GRAPHICS_ENGINE engine) 
     // REG_BLDALPHA = topLvl | (downLvl << 8);
 
     REG_MASTER_BRIGHT = BIT(light ? 14 : 15) | downLvl;
+}
+
+void cGdi::setMainLayerTransparency(u16 value, MAIN_ENGINE_LAYER layer) {
+    if (value > INT16_MAX) {
+        value = 0;
+    }
+
+    if (value > 100) {
+        value = 100;
+    }
+
+    if (layer == MEL_UP) {
+        REG_BLDCNT = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3 | BLEND_DST_SPRITE | BLEND_DST_BACKDROP;
+    } else if (layer == MEL_MIDDLE) {
+        REG_BLDCNT = BLEND_ALPHA | BLEND_SRC_BG3 | BLEND_DST_SPRITE | BLEND_DST_BACKDROP;
+    } else {
+        return;
+    }
+
+    u16 aLvl = value / 6;
+    u16 bLvl = 16 - aLvl;
+
+    REG_BLDALPHA = aLvl | (bLvl << 8);    
 }
 
 static inline void putScreenPixel(u16* buffer, s16 x, s16 y, u16 color) {
@@ -384,7 +411,6 @@ void ITCM_FUNC(cGdi::fillRect)(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 
     }
 
     if ((s16)w + widthOffset <= 0 || x >= SCREEN_WIDTH) {
-        logger().info("Finish fill rect on width.");
         return;
     }
 
@@ -399,7 +425,6 @@ void ITCM_FUNC(cGdi::fillRect)(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 
     }
 
     if ((s16)h + heightOffset <= 0 || y >= SCREEN_HEIGHT) {
-        logger().info("Finish fill rect on height.");
         return;
     }
 

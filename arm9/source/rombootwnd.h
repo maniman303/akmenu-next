@@ -3,7 +3,8 @@
 #include <nds.h>
 #include <string>
 #include <functional>
-#include "../dsrom.h"
+#include "dsrom.h"
+#include "ui/animation.h"
 #include "ui/statictext.h"
 #include "ui/window.h"
 
@@ -28,6 +29,8 @@ class cRomBootWnd : public akui::cWindow {
     std::string _romPath;
     DSRomInfo _romInfo;
     std::function<void()> _onExit;
+    u16 _timer;
+    Animation _pressAnimation;
     akui::cStaticText _launchText;
     akui::cStaticText _nameText;
     akui::cStaticText _pressText;

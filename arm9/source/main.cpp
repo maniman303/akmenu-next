@@ -121,8 +121,6 @@ void saveSram() {
 }
 
 void initMainWindow(std::string lastDirectory, std::string lastFile) {
-    logger().info("Set up main wnd.");
-
     cImage* background = new cImage(NULL, cSize(SCREEN_WIDTH, SCREEN_HEIGHT), 0xffff);    
     background->loadAppearance(SFN_LOWER_SCREEN_BG);
     windowManager().addWindow(background);
@@ -138,8 +136,6 @@ void initMainWindow(std::string lastDirectory, std::string lastFile) {
 
     windowManager().addWindow(wnd);
     tickSound().run();
-
-    logger().info("Main wnd added.");
     
     ScreenFadeTask* fadeTask = new ScreenFadeTask();
     fadeTask->schedule();

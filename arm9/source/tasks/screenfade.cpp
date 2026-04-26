@@ -14,8 +14,6 @@ ScreenFadeTask::ScreenFadeTask(bool main, bool sub, bool fadeIn) {
 }
 
 s16 ScreenFadeTask::process(s16 iter) {
-    logger().info("Processing fade with iter: " + std::to_string(iter));
-    
     if (iter == 0 && !_animation.isPlaying()) {
         _animation.play();
     }
@@ -31,7 +29,6 @@ s16 ScreenFadeTask::process(s16 iter) {
     }
 
     if (iter != 0 && _animation.isCompleted()) {
-        logger().info("Fade exit with iter: " + std::to_string(iter));
         return -1;
     }
 
