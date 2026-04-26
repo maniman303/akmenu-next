@@ -7,8 +7,8 @@
 
 #pragma once
 
+#include <functional>
 #include "dsrom.h"
-#include "functional"
 
 enum TLaunchResult {
     ELaunchRomOk,

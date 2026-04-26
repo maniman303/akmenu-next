@@ -32,7 +32,7 @@ class cMainWnd : public akui::cForm {
     cWindow& loadAppearance(const std::string& aFileName) override;
     void update() override;
     void init();
-    void draw();
+    void draw() override;
 
     cMainList* _mainList;
 

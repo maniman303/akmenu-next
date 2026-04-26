@@ -122,6 +122,10 @@ void saveSram() {
 }
 
 void initMainWindow(std::string lastDirectory, std::string lastFile) {
+    cImage* background = new cImage(NULL, cSize(SCREEN_WIDTH, SCREEN_HEIGHT), 0xffff);    
+    background->loadAppearance(SFN_LOWER_SCREEN_BG);
+    windowManager().addWindow(background);
+
     cMainWnd* wnd = new cMainWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, "main window");
     wnd->init();
 
@@ -133,7 +137,8 @@ void initMainWindow(std::string lastDirectory, std::string lastFile) {
 
     windowManager().addWindow(wnd);
     
-    // TODO: Schedule both screens fade in task
+    ScreenFadeTask* fadeTask = new ScreenFadeTask();
+    fadeTask->schedule();
 }
 
 int main(int argc, char* argv[]) {
@@ -233,10 +238,6 @@ int main(int argc, char* argv[]) {
     subWindowManager().init();
     fpsCounter().init();
 
-    cImage* background = new cImage(NULL, cSize(SCREEN_WIDTH, SCREEN_HEIGHT), 0xffff);    
-    background->loadAppearance(SFN_LOWER_SCREEN_BG);
-    windowManager().addWindow(background);
-
     initMainWindow(lastDirectory, lastFile);
 
     irq().vblankStart();
@@ -245,9 +246,6 @@ int main(int argc, char* argv[]) {
     while (*(u32*)(0xCFFFD0C) != 0) {
         swiDelay(100);
     }
-
-    ScreenFadeTask* fadeTask = new ScreenFadeTask();
-    fadeTask->schedule();
 
     while (true) {
         timer().updateFrames();
