@@ -239,6 +239,7 @@ cWindow& cMainWnd::loadAppearance(const std::string& aFileName) {
 }
 
 void cMainWnd::onGainedFocus() {
+    cForm::onGainedFocus();
     windowManager().setFocusedWindow(_mainList);
 }
 

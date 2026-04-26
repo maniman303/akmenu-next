@@ -40,6 +40,10 @@ namespace akui {
         return *this;
     }
 
+    void cForm::onGainedFocus() {
+        gs().scrollTick = 0;
+    }
+
     bool cForm::canRenderBackdrop() {
         if (_canRenderBackdrop) {
             return true;

@@ -251,6 +251,7 @@ void cSettingWnd::onShow() {
 }
 
 void cSettingWnd::onGainedFocus() {
+    cForm::onGainedFocus();
     ShowTab(_currentTab);
 }
 

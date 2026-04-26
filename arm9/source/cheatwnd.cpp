@@ -112,6 +112,7 @@ void cCheatWnd::draw() {
 }
 
 void cCheatWnd::onGainedFocus() {
+    cForm::onGainedFocus();
     windowManager().setFocusedWindow(&_list);
 }
 

@@ -192,7 +192,9 @@ namespace akui {
         return *this;
     }
 
-    void cSpinBox::onGainedFocus() {}
+    void cSpinBox::onGainedFocus() {
+        cForm::onGainedFocus();
+    }
 
     void cSpinBox::onResize() {
         dbg_printf("spin box on resize\n");

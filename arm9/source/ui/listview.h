@@ -71,7 +71,7 @@ class cListView : public cWindow {
     };
 
   public:
-    void draw();
+    void draw() override;
 
     bool insertColumn(size_t index, const std::string& text, u8 width);
 
