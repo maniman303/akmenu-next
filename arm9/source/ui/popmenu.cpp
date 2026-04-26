@@ -110,7 +110,10 @@ namespace akui {
 
         if (message.isKeyDown(KEY_DOWN) || message.isKeyDown(KEY_UP)) {
             gs().scrollTick = timer().getFrame();
-            // logger().info("Scroll setup: " + std::to_string(gs().scrollTick));
+        }
+
+        if (gs().scrollTick == 0) {
+            return false;
         }
 
         u32 tickDiff = timer().getFrame() - gs().scrollTick;

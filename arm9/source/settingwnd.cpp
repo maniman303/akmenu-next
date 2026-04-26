@@ -135,6 +135,10 @@ bool cSettingWnd::processKeyMessage(cKeyMessage message) {
         gs().scrollTick = timer().getFrame();
     }
 
+    if (gs().scrollTick == 0) {
+        return false;
+    }
+
     u32 tickDiff = timer().getFrame() - gs().scrollTick;
     if (message.isKeyDown(KEY_DOWN) || (message.isKeyHeld(KEY_DOWN) && tickDiff > gs().scrollWait && tickDiff % gs().scrollSpeed == 0)) {
         onUIKeyDOWN();

@@ -193,7 +193,7 @@ namespace akui {
     }
 
     void cSpinBox::onGainedFocus() {
-        cForm::onGainedFocus();
+        // cForm::onGainedFocus();
     }
 
     void cSpinBox::onResize() {
