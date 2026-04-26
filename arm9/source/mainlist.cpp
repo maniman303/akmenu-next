@@ -894,11 +894,7 @@ void cMainList::updateInternalNames(void) {
         for (size_t ii = 0; ii < total; ++ii) {
             if (0 == _rows[_firstVisibleRowId + ii][INTERNALNAME_COLUMN].text().length()) {
                 if (_romInfoList[_firstVisibleRowId + ii].isDSRom()) {
-                    _rows[_firstVisibleRowId + ii][INTERNALNAME_COLUMN].setText(
-                            unicode_to_local_string(_romInfoList[_firstVisibleRowId + ii]
-                                                            .banner()
-                                                            .titles[gs().language],
-                                                    128, NULL));
+                    _rows[_firstVisibleRowId + ii][INTERNALNAME_COLUMN].setText(_romInfoList[_firstVisibleRowId + ii].getDsLocTitle());
                 } else {
                     _rows[_firstVisibleRowId + ii][INTERNALNAME_COLUMN].setText(
                             _rows[_firstVisibleRowId + ii][SHOWNAME_COLUMN].text());

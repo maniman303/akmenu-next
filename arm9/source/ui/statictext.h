@@ -16,20 +16,19 @@ namespace akui {
 
 class cStaticText : public cWindow {
   public:
+    cStaticText(cWindow* parent);
     cStaticText(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text);
 
     ~cStaticText();
 
   public:
-    void draw();
-
+    void draw() override;
     cWindow& loadAppearance(const std::string& aFileName);
-
     void setTextColor(COLOR color);
-
     void setFont(bool primary);
-
+    void setCentered(bool centered);
   protected:
+    bool _centered;
     bool _primaryFont;
     COLOR _textColor;
 };

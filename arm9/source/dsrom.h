@@ -10,7 +10,7 @@
 #pragma once
 
 #include <nds.h>
-#include <string.h>
+#include <string>
 #include <memory>
 #include "gdi.h"
 #include "savemngr.h"
@@ -45,6 +45,7 @@ class DSRomInfo {
 
   public:
     void drawDSRomIcon(u8 x, u8 y, bool small, GRAPHICS_ENGINE engine);
+    std::string getDsLocTitle();
     tNDSBanner& banner(void);
     SAVE_INFO_EX& saveInfo(void);
     u8 version(void);

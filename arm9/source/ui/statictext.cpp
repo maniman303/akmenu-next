@@ -14,11 +14,14 @@
 
 namespace akui {
 
+cStaticText::cStaticText(cWindow* parent) : cStaticText(0, 0, 0, 0, parent, "") {}
+
 cStaticText::cStaticText(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
     : cWindow(parent, text) {
     _size.x = w;
     _size.y = h;
     _primaryFont = true;
+    _centered = false;
     _textColor = uiSettings().formTextColor;  //(RGB15(31,31,31))
     _isFocusable = false;
 
@@ -46,6 +49,10 @@ void cStaticText::setTextColor(COLOR color) {
 
 void cStaticText::setFont(bool primary) {
     _primaryFont = primary;
+}
+
+void cStaticText::setCentered(bool centered) {
+    _centered = centered;
 }
 
 }  // namespace akui

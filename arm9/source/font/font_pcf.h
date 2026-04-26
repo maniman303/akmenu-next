@@ -72,6 +72,7 @@ class cFontPcf : public cFont {
     void Info(const char* aString, u32* aWidth, u32* aSymbolCount) const;
     std::string GetFilename() const;
     u32 TextWidth(const std::string& aString) const;
+    u32 TextHeight(const std::string& aString) const;
     void SetHeight(u8 height);
     u8 GetHeight() const;
     void SetDescend(u8 descend);

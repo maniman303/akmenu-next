@@ -74,6 +74,13 @@ u32 cFontPcf::TextWidth(const std::string& aString) const {
     return res;
 }
 
+u32 cFontPcf::TextHeight(const std::string& aString) const {
+    s32 lines = linesInString(aString);
+    s32 descLines = lines > 0 ? lines - 1 : 0;
+
+    return lines * GetHeight() + descLines * GetDescend();
+}
+
 bool cFontPcf::ParseAccels(int aFont, u32 aSize, u32 aOffset) {
     bool res = false;
     if (lseek(aFont, aOffset, SEEK_SET) < 0) return false;

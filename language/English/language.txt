@@ -323,6 +323,10 @@ text = Menu hotkey
 5 = l-r-a-b-x-y
 6 = Custom
 
+[rom boot]
+launching = Launching
+press = Press START or touch screen to continue
+
 [override]
 text = Language override
 0 = System

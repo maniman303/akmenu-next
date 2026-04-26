@@ -16,6 +16,7 @@
 #include "icons.h"
 #include "nds_banner_bin.h"
 #include "unknown_nds_banner_bin.h"
+#include "unicode.h"
 #include "../../share/memtool.h"
 
 DSRomInfo::DSRomInfo() {
@@ -239,6 +240,14 @@ void DSRomInfo::drawDSRomIconMem(u16* mem, bool small) {
             }
         }
     }
+}
+
+std::string DSRomInfo::getDsLocTitle() {
+    if (!isDSRom()) {
+        return "";
+    }
+
+    return unicode_to_local_string(banner().titles[gs().language], 128, NULL);
 }
 
 bool DSRomInfo::loadGbaRomInfo(const std::string& filename) {

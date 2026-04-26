@@ -1,15 +1,21 @@
 #include "rombootwnd.h"
+#include "language.h"
 #include "../romlauncher.h"
+#include "font/fontfactory.h"
 #include "ui/windowmanager.h"
 #include "tasks/screenfade.h"
 
-cRomBootWnd::cRomBootWnd(std::string romPath, std::function<void()> onExit) {
+cRomBootWnd::cRomBootWnd(std::string romPath, std::function<void()> onExit) : akui::cWindow(NULL, "rom boot"), _nameText(this), _continueText(this) {
     _romPath = romPath;
     _onExit = onExit;
     _romInfo.mayBeDSRom(romPath);
 
+    _engine = GE_MAIN;
     _canRenderBackdrop = true;
     _scheduleBackdrop = true;
+
+    setRelativePosition(cPoint(0, 0));
+    setSize(cSize(SCREEN_WIDTH, SCREEN_HEIGHT));
 }
 
 akui::cWindow& cRomBootWnd::loadAppearance(const std::string& aFileName) {
@@ -57,14 +63,23 @@ void cRomBootWnd::update() {
 
 void cRomBootWnd::onGainedFocus() {
     gdi().setScreenTransparency(0, GE_SUB);
-    if (_romInfo.isDSRom()) {
+    if (!_romInfo.isDSRom()) {
+        akui::windowManager().removeWindow(this);
+        if (_onExit) {
+            _onExit();
+        }
         return;
     }
 
-    akui::windowManager().removeWindow(this);
-    if (_onExit) {
-        _onExit();
-    }
+    _continueText.setText(LANG("rom boot", "press"));
+    _continueText.setRelativePosition(cPoint(0, 128));
+    _continueText.setSize(cSize(SCREEN_WIDTH, 64));
+    _continueText.setTextColor(0x0 | BIT(15));
+    _continueText.setCentered(true);
+
+    std::string romName = LANG("rom boot", "launching") + "\n" + _romInfo.getDsLocTitle();
+    u16 romNameHeight = font().TextHeight(romName);
+    _nameText.setText(romName);
 }
 
 void cRomBootWnd::draw() {
@@ -72,7 +87,13 @@ void cRomBootWnd::draw() {
 }
 
 void cRomBootWnd::drawBackdrop() {
-    // TODO: Implement
+    if (!_romInfo.isDSRom()) {
+        return;
+    }
+
+    _romInfo.drawDSRomIcon(32, 48, false, selectedEngine());
+
+    // TODO: Draw text
 }
 
 void cRomBootWnd::moveToMain() {

@@ -4,6 +4,7 @@
 #include <string>
 #include <functional>
 #include "../dsrom.h"
+#include "ui/statictext.h"
 #include "ui/window.h"
 
 class cRomBootWnd : public akui::cWindow {
@@ -25,4 +26,6 @@ class cRomBootWnd : public akui::cWindow {
     std::string _romPath;
     DSRomInfo _romInfo;
     std::function<void()> _onExit;
+    akui::cStaticText _nameText;
+    akui::cStaticText _continueText;
 };
