@@ -17,7 +17,7 @@ cRomBootWnd::cRomBootWnd(std::string romPath, std::function<void()> onExit) :
     _romInfo.mayBeDSRom(romPath);
 
     _timer = 0;
-    _pressAnimation.setDuration(35);
+    _pressAnimation.setDuration(30);
 
     _engine = GE_MAIN;
     _canRenderBackdrop = true;
