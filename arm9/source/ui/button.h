@@ -14,48 +14,46 @@
 #include "renderdesc.h"
 #include "window.h"
 
-namespace akui {
-  class cButton : public cWindow {
-    public:
-      enum State { up = 0, down = 1 };
-      enum Style { single = 0, press = 1, toggle = 2 };
-      enum Alignment { left, center, right };
+class cButton : public cWindow {
+  public:
+    enum State { up = 0, down = 1 };
+    enum Style { single = 0, press = 1, toggle = 2 };
+    enum Alignment { left, center, right };
 
-      cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text);
-      cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text, bool hasAlpha);
+    cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text);
+    cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text, bool hasAlpha);
 
-      ~cButton();
+    ~cButton();
 
-    public:
-      void draw() override;
-      cWindow& loadAppearance(const std::string& aFileName) override;
-      bool valid() const;
-      bool isTouchFocusable() override;
-      void setIsFocusable(bool isFocusable);
-      bool processKeyMessage(cKeyMessage message) override;
-      bool processTouchMessage(cTouchMessage message) override;
-      State state() { return _state; }
-      void setTextColor(COLOR color) { _textColor = color; }
-      COLOR textColor() { return _textColor; }
-      void setStyle(Style style) { _style = style; }
-      Style style() { return _style; }
-      void setAlignment(Alignment alignment) { _alignment = alignment; }
-      Alignment alignment() { return _alignment; }
-      void onPressed();
-      void onReleased();
-      void onClicked();
-      bool hasAlpha() { return _hasAlpha; }
+  public:
+    void draw() override;
+    cWindow& loadAppearance(const std::string& aFileName) override;
+    bool valid() const;
+    bool isTouchFocusable() override;
+    void setIsFocusable(bool isFocusable);
+    bool processKeyMessage(cKeyMessage message) override;
+    bool processTouchMessage(cTouchMessage message) override;
+    State state() { return _state; }
+    void setTextColor(COLOR color) { _textColor = color; }
+    COLOR textColor() { return _textColor; }
+    void setStyle(Style style) { _style = style; }
+    Style style() { return _style; }
+    void setAlignment(Alignment alignment) { _alignment = alignment; }
+    Alignment alignment() { return _alignment; }
+    void onPressed();
+    void onReleased();
+    void onClicked();
+    bool hasAlpha() { return _hasAlpha; }
 
-      Signal0 clicked;
-      Signal0 pressed;
+    Signal0 clicked;
+    Signal0 pressed;
 
-    protected:
-      bool _captured;
-      State _state;
-      COLOR _textColor;
-      cBMP15 _background;
-      Style _style;
-      Alignment _alignment;
-      bool _hasAlpha;
-  };
-}  // namespace akui
+  protected:
+    bool _captured;
+    State _state;
+    COLOR _textColor;
+    cBMP15 _background;
+    Style _style;
+    Alignment _alignment;
+    bool _hasAlpha;
+};

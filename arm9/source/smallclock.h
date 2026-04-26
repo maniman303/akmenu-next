@@ -5,8 +5,6 @@
 #include "singleton.h"
 #include "window.h"
 
-using namespace akui;
-
 class cSmallClock : public cWindow {
   public:
     cSmallClock();

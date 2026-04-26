@@ -23,8 +23,6 @@
 
 #include "saves/ROMList.h"
 
-using namespace akui;
-
 cSaveManager::cSaveManager() : _lastLoadedFilename("") {}
 
 cSaveManager::~cSaveManager() {}

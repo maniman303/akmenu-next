@@ -12,8 +12,6 @@
 #include "bmp15.h"
 #include "window.h"
 
-namespace akui {
-
 class cStaticText : public cWindow {
   public:
     cStaticText(cWindow* parent);
@@ -32,5 +30,3 @@ class cStaticText : public cWindow {
     bool _primaryFont;
     COLOR _textColor;
 };
-
-}  // namespace akui

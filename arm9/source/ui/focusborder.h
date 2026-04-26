@@ -9,7 +9,7 @@
 
 class cFocusBorder : public WorkIndicator {
   public:
-    cFocusBorder(akui::cWindow* parent);
+    cFocusBorder(cWindow* parent);
 
     void init();
     void update();
@@ -17,7 +17,7 @@ class cFocusBorder : public WorkIndicator {
     bool busy() const override;
 
   private:
-    akui::cWindow* _parent;
+    cWindow* _parent;
     bool _init;
     bool _show;
     u16 _color;

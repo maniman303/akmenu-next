@@ -33,12 +33,12 @@ class cExpWnd : public akui::cForm {
     void onRAM();
     void onSRAM();
     void onShow() override;
-    akui::cButton _buttonOK;
-    akui::cButton _buttonCancel;
-    akui::cButton _buttonRAM;
-    akui::cButton _buttonSRAM;
+    cButton _buttonOK;
+    cButton _buttonCancel;
+    cButton _buttonRAM;
+    cButton _buttonSRAM;
     akui::cSpinBox _Rumble;
-    akui::cStaticText _Label;
+    cStaticText _Label;
     akui::cFormDesc _renderDesc;
     std::string _romName;
 };

@@ -14,7 +14,7 @@
 #include "singleton.h"
 #include "window.h"
 
-class cDiskIcon : public akui::cWindow {
+class cDiskIcon : public cWindow {
   public:
     cDiskIcon();
 
@@ -27,7 +27,7 @@ class cDiskIcon : public akui::cWindow {
 
     void turnOff();
 
-    akui::cWindow& loadAppearance(const std::string& aFileName);
+    cWindow& loadAppearance(const std::string& aFileName);
 
     void blink(void);
 

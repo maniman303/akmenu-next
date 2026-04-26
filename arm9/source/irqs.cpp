@@ -14,8 +14,6 @@
 #include "logger.h"
 #include "subwindowmanager.h"
 
-using namespace akui;
-
 bool cIRQ::_vblankStarted(false);
 
 bool cIRQ::_presentScheduled(false);

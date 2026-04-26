@@ -6,9 +6,7 @@
 #include "singleton.h"
 #include "window.h"
 
-using namespace akui;
-
-class cSmallDate : public akui::cWindow {
+class cSmallDate : public cWindow {
   public:
     cSmallDate();
 
@@ -19,7 +17,7 @@ class cSmallDate : public akui::cWindow {
 
     void draw();
 
-    akui::cWindow& loadAppearance(const std::string& aFileName) { return *this; }
+    cWindow& loadAppearance(const std::string& aFileName) { return *this; }
 
   protected:
     u16 _textColor;

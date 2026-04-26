@@ -39,10 +39,10 @@ class cCheatWnd : public akui::cForm, public cCheat {
     void onDraw(const akui::cListView::cOwnerDraw& data);
     void drawMark(const akui::cListView::cOwnerDraw& od, u16 width);
     void generateList(void);
-    akui::cButton _buttonDeselect;
-    akui::cButton _buttonInfo;
-    akui::cButton _buttonGenerate;
-    akui::cButton _buttonCancel;
+    cButton _buttonDeselect;
+    cButton _buttonInfo;
+    cButton _buttonGenerate;
+    cButton _buttonCancel;
     akui::cFormDesc _renderDesc;
     akui::cListView _list;
 

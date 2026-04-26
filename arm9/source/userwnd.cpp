@@ -18,8 +18,6 @@
 #include "unicode.h"
 #include "windowmanager.h"
 
-using namespace akui;
-
 cUserWindow::cUserWindow() : cWindow(NULL, "UserWindow") {
     _px = _py = 0;
     _tx = _ty = _tw = _th = 0;

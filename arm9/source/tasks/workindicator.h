@@ -13,11 +13,11 @@ class WorkIndicator {
 
 class WorkIndicatorTask : public TaskWorker {
   public:
-    WorkIndicatorTask(std::vector<WorkIndicator*> indicators, akui::cWindow* window, std::function<void()> onCompleted);
+    WorkIndicatorTask(std::vector<WorkIndicator*> indicators, cWindow* window, std::function<void()> onCompleted);
 
     s16 process(s16 iter) override;
     void schedule();
   private:
-    akui::cWindow* _window;
+    cWindow* _window;
     std::vector<WorkIndicator*> _indicators;
 };

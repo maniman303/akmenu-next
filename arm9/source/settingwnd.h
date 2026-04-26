@@ -37,9 +37,9 @@ class cSettingWnd : public akui::cForm {
 
   protected:
     struct sSettingItem {
-        akui::cStaticText* _label;
+        cStaticText* _label;
         akui::cSpinBox* _item;
-        sSettingItem(akui::cStaticText* label, akui::cSpinBox* item) : _label(label), _item(item){};
+        sSettingItem(cStaticText* label, akui::cSpinBox* item) : _label(label), _item(item){};
     };
     struct sSettingTab {
         std::vector<sSettingItem>* _tab;
@@ -83,7 +83,7 @@ class cSettingWnd : public akui::cForm {
     std::string _id;
 
     akui::cSpinBox _tabSwitcher;
-    akui::cButton _buttonOK;
-    akui::cButton _buttonCancel;
+    cButton _buttonOK;
+    cButton _buttonCancel;
     akui::cFormDesc _renderDesc;
 };

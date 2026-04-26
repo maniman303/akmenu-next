@@ -8,7 +8,7 @@
 #include "tasks/screenfade.h"
 
 cRomBootWnd::cRomBootWnd(std::string romPath, std::function<void()> onExit) :
- akui::cWindow(NULL, "rom boot"),
+ cWindow(NULL, "rom boot"),
  _launchText(this),
  _nameText(this),
  _pressText(this) {
@@ -29,7 +29,7 @@ cRomBootWnd::cRomBootWnd(std::string romPath, std::function<void()> onExit) :
 
 cRomBootWnd::~cRomBootWnd() { }
 
-akui::cWindow& cRomBootWnd::loadAppearance(const std::string& aFileName) {
+cWindow& cRomBootWnd::loadAppearance(const std::string& aFileName) {
     return *this;
 }
 
@@ -65,7 +65,7 @@ bool cRomBootWnd::processTouchMessage(cTouchMessage message) {
 }
 
 void cRomBootWnd::update() {
-    if (_timer < 16) {
+    if (_timer < 24) {
         gdi().setMainLayerTransparency(0, MEL_UP);
         _timer++;
         return;
@@ -93,7 +93,7 @@ void cRomBootWnd::update() {
 void cRomBootWnd::onGainedFocus() {
     gdi().setScreenTransparency(0, GE_SUB);
     if (!_romInfo.isDSRom()) {
-        akui::windowManager().removeWindow(this);
+        windowManager().removeWindow(this);
         if (_onExit) {
             _onExit();
         }
@@ -144,7 +144,7 @@ void cRomBootWnd::moveToMain() {
         if (_onExit) {
             _onExit();
         }
-        akui::windowManager().removeWindow(this);
+        windowManager().removeWindow(this);
     });
     
     task->schedule();

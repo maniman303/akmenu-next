@@ -15,7 +15,7 @@
 #include "singleton.h"
 #include "window.h"
 
-class cCalendar : public akui::cWindow {
+class cCalendar : public cWindow {
   public:
     cCalendar();
     ~cCalendar() {}
@@ -25,7 +25,7 @@ class cCalendar : public akui::cWindow {
     void drawBackdrop() override;
     bool shouldRenderBackdrop() override;
     void onRenderBackdrop() override;
-    akui::cWindow& loadAppearance(const std::string& aFileName) override;
+    cWindow& loadAppearance(const std::string& aFileName) override;
 
   protected:
     void drawDayNumber(u8 day, u8 weekdDayOfMonthFirstDay, u8 today);

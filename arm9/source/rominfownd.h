@@ -49,11 +49,11 @@ class cRomInfoWnd : public akui::cForm {
     void onResize() override;
     void addCode();
 
-    akui::cButton _buttonOK;
-    akui::cButton _buttonSaveType;
-    akui::cButton _buttonFlash;
-    akui::cButton _buttonCopy;
-    akui::cButton _buttonCheats;
+    cButton _buttonOK;
+    cButton _buttonSaveType;
+    cButton _buttonFlash;
+    cButton _buttonCopy;
+    cButton _buttonCheats;
     akui::cFormDesc _renderDesc;
     DSRomInfo _romInfo;
     std::string _romInfoText;

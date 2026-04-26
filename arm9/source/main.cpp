@@ -65,8 +65,6 @@
 #include "tasks/taskcruncher.h"
 #include "tasks/screenfade.h"
 
-using namespace akui;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -121,7 +119,7 @@ void saveSram() {
 }
 
 void initMainWindow(std::string lastDirectory, std::string lastFile) {
-    cImage* background = new cImage(NULL, cSize(SCREEN_WIDTH, SCREEN_HEIGHT), 0xffff);    
+    akui::cImage* background = new akui::cImage(NULL, cSize(SCREEN_WIDTH, SCREEN_HEIGHT), 0xffff);    
     background->loadAppearance(SFN_LOWER_SCREEN_BG);
     windowManager().addWindow(background);
 
@@ -217,6 +215,7 @@ int main(int argc, char* argv[]) {
         cRomBootWnd* romBoot = new cRomBootWnd(lastFile, [lastDirectory, lastFile]() {
             initMainWindow(lastDirectory, lastFile);    
         });
+
         windowManager().addModal(romBoot);
 
         ScreenFadeTask* fadeTask = new ScreenFadeTask(true, false, true);

@@ -15,8 +15,6 @@
 #include "timer.h"
 #include "windowmanager.h"
 
-using namespace akui;
-
 static INPUT inputs;
 static INPUT lastInputs;
 

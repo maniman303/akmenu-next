@@ -15,8 +15,6 @@
 #include "systemfilenames.h"
 #include "windowmanager.h"
 
-using namespace akui;
-
 void cStartMenu::init() {
     addItem(START_MENU_ITEM_FAVORITES, LANG("start menu", "Set favorite"));
     addItem(START_MENU_ITEM_INFO, LANG("start menu", "Info"));

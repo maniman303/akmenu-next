@@ -5,8 +5,6 @@
 #include "singleton.h"
 #include "window.h"
 
-using namespace akui;
-
 #define PM_BATTERY_LOW   BIT(0)
 #define PM_AC_PRESENT    BIT(1)
 

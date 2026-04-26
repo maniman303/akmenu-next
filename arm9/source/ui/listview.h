@@ -16,12 +16,13 @@
 namespace akui {
 class cListColumn {
   public:
-    cListColumn() : index(0), width(0), offset(0), text("") {}
+    cListColumn() : index(0), width(0), offset(0), mainFont(false), text("") {}
 
     u32 index;
     u16 width;
     u16 offset;
     bool center;
+    bool mainFont;
     std::string text;
 };
 

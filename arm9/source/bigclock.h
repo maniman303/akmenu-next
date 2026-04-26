@@ -15,7 +15,7 @@
 #include "window.h"
 
 // class cClockNumber : public
-class cBigClock : public akui::cWindow {
+class cBigClock : public cWindow {
   public:
     cBigClock();
 
@@ -28,7 +28,7 @@ class cBigClock : public akui::cWindow {
 
     void blinkColon();
 
-    akui::cWindow& loadAppearance(const std::string& aFileName);
+    cWindow& loadAppearance(const std::string& aFileName);
 
   protected:
     void drawNumber(u8 id, u8 number);

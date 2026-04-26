@@ -53,7 +53,7 @@ class cMainList : public akui::cListView {
     std::string getSelectedFileName();
     VIEW_MODE getViewMode() { return _viewMode; }
 
-    akui::Signal0 directoryChanged;
+    Signal0 directoryChanged;
 
   public:
     bool IsFavorites(void);

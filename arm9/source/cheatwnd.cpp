@@ -17,8 +17,6 @@
 #include "timer.h"
 #include "windowmanager.h"
 
-using namespace akui;
-
 void cCheatWnd::showModal(const std::string& aFileName) {
     u32 w = 256;
     u32 h = 179;
@@ -108,11 +106,11 @@ cCheatWnd::~cCheatWnd() {}
 
 void cCheatWnd::draw() {
     _renderDesc.draw(windowRectangle(), _engine);
-    cForm::draw();
+    akui::cForm::draw();
 }
 
 void cCheatWnd::onGainedFocus() {
-    cForm::onGainedFocus();
+    akui::cForm::onGainedFocus();
     windowManager().setFocusedWindow(&_list);
 }
 
@@ -221,11 +219,11 @@ void cCheatWnd::onInfo(void) {
     std::string body(_data[index]._title);
     body += "\n\n";
     body += _data[index]._comment;
-    cMessageBox::showModal(LANG("cheats", "title"), body, MB_OK);
+    akui::cMessageBox::showModal(LANG("cheats", "title"), body, MB_OK);
 }
 
 void cCheatWnd::onCancel(void) {
-    cForm::onCancel();
+    akui::cForm::onCancel();
 }
 
 static void updateDB(u8 value, u32 offset, FILE* db) {
@@ -253,17 +251,17 @@ void cCheatWnd::onGenerate(void) {
         fclose(db);
     }
 
-    cForm::onOK();
+    akui::cForm::onOK();
 }
 
-void cCheatWnd::drawMark(const cListView::cOwnerDraw& od, u16 width) {
+void cCheatWnd::drawMark(const akui::cListView::cOwnerDraw& od, u16 width) {
     u16 color = gdi().getPenColor(od._engine);
     u16 size = od._size.y - ESelectTop * 2;
     gdi().fillRect(color, color, od._position.x + ((width - size) >> 1) - 1,
                    od._position.y + ESelectTop, size, size, od._engine);
 }
 
-void cCheatWnd::onDraw(const cListView::cOwnerDraw& od) {
+void cCheatWnd::onDraw(const akui::cListView::cOwnerDraw& od) {
     size_t index = _indexes[od._row];
     u32 flags = _data[index]._flags;
     if (od._col == EIconColumn) {

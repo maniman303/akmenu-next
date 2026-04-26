@@ -3,8 +3,6 @@
 #include "cachedinifile.h"
 #include "systemfilenames.h"
 
-using namespace akui;
-
 cDiskIcon::cDiskIcon() : cWindow(NULL, "diskicon") {
     _show = false;
     _blink = false;

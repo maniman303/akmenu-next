@@ -18,9 +18,8 @@
 #include "fontfactory.h"
 #include "timer.h"
 #include "logger.h"
-#define TOP_MARGIN 4
 
-using namespace akui;
+#define TOP_MARGIN 4
 
 cSettingWnd::cSettingWnd(const std::string& text, const std::string& id, std::function<void(cSettingWnd*)> onSaved) : cSettingWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, text, id) {
     this->onSaved = onSaved;
@@ -154,7 +153,7 @@ bool cSettingWnd::processKeyMessage(cKeyMessage message) {
 }
 
 void cSettingWnd::onOK(void) {
-    cMessageBox::showModal(LANG("setting window", "confirm"), _confirmMessage, MB_OK | MB_CANCEL, [this]() {
+    akui::cMessageBox::showModal(LANG("setting window", "confirm"), _confirmMessage, MB_OK | MB_CANCEL, [this]() {
         if (onSaved) {
             onSaved(this);
         }
@@ -220,7 +219,7 @@ void cSettingWnd::addSettingItem(const std::string& text, const std::vector<std:
     s32 itemY = (items(lastTab).size() * 20) + static_cast<s32>(_titleOffset) + tabSwitcherHeight + TOP_MARGIN;
     s32 itemX = 8;
 
-    cSpinBox* item = new cSpinBox(0, 0, 108, 18, this, "spin");
+    akui::cSpinBox* item = new akui::cSpinBox(0, 0, 108, 18, this, "spin");
     for (size_t ii = 0; ii < itemTexts.size(); ++ii) {
         item->insertItem(itemTexts[ii], ii);
     }
@@ -272,12 +271,12 @@ void cSettingWnd::onUIKeyDOWN(void) {
 }
 
 void cSettingWnd::onUIKeyLEFT(void) {
-    cSpinBox* item = focusedItem();
+    akui::cSpinBox* item = focusedItem();
     if (item) item->selectPrev();
 }
 
 void cSettingWnd::onUIKeyRIGHT(void) {
-    cSpinBox* item = focusedItem();
+    akui::cSpinBox* item = focusedItem();
     if (item) item->selectNext();
 }
 
@@ -309,7 +308,7 @@ ssize_t cSettingWnd::focusedItemId(void) {
     return -1;
 }
 
-cSpinBox* cSettingWnd::focusedItem(void) {
+akui::cSpinBox* cSettingWnd::focusedItem(void) {
     ssize_t focusItem = focusedItemId();
     if (focusItem >= 0) return items(_currentTab)[focusItem]._item;
     return NULL;
@@ -349,7 +348,9 @@ void cSettingWnd::ShowTab(size_t index) {
 
     _tabSwitcher.setPrefixIcon(SFN_UI_PREFIXES_DIRECTORY + "/" + prefixIconName(index));
 
-    if (items(index).size()) windowManager().setFocusedWindow(items(index)[0]._item);
+    if (items(index).size()) {
+        windowManager().setFocusedWindow(items(index)[0]._item);
+    }
 }
 
 void cSettingWnd::SwitchTab(size_t oldIndex, size_t newIndex) {

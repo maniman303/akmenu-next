@@ -15,9 +15,7 @@
 #include "stringtool.h"
 #include "datetime.h"
 
-using namespace akui;
-
-cCalendarWnd::cCalendarWnd() : cForm(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, "calendar window") {
+cCalendarWnd::cCalendarWnd() : akui::cForm(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, "calendar window") {
     _filename = "";
     _lastDate = 0;
 }

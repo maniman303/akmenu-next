@@ -36,7 +36,7 @@ class cHelpWnd : public akui::cForm {
 
     void onShow() override;
 
-    akui::cButton _buttonOK;
+    cButton _buttonOK;
 
     akui::cFormDesc _renderDesc;
 

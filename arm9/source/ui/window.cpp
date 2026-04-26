@@ -10,8 +10,6 @@
 #include "window.h"
 #include "windowmanager.h"
 
-namespace akui {
-
 cWindow::cWindow(cWindow* aParent, const std::string& aText)
     : _parent(aParent),
       _text(aText),
@@ -167,5 +165,3 @@ cWindow& cWindow::setText(const std::string& aText) {
     onTextChanged();
     return *this;
 }
-
-}  // namespace akui

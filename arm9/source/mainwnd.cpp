@@ -38,8 +38,6 @@
 #include "launcher/PassMeLauncher.h"
 #include "launcher/Slot1Launcher.h"
 
-using namespace akui;
-
 cMainWnd::cMainWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
     : cForm(x, y, w, h, parent, text),
       _mainList(NULL),
@@ -355,7 +353,7 @@ void cMainWnd::launchSelected() {
         return;
     }
 
-    cMessageBox::showModal(LANG("no free space", "title"), LANG("no free space", "text"), MB_OK);
+    akui::cMessageBox::showModal(LANG("no free space", "title"), LANG("no free space", "text"), MB_OK);
 }
 
 void cMainWnd::showSettings(void) {
@@ -623,7 +621,7 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
     }
 
     if (uiIndex != uiIndexAfter) {
-        cMessageBox::showModal(LANG("ui style changed", "title"), LANG("ui style changed", "text"), MB_YES | MB_NO,
+        akui::cMessageBox::showModal(LANG("ui style changed", "title"), LANG("ui style changed", "text"), MB_YES | MB_NO,
             [this, uiNames, uiIndexAfter, langNames, langIndexAfter]() {
                 gs().uiName = uiNames[uiIndexAfter];
                 gs().langDirectory = langNames[langIndexAfter];
@@ -635,7 +633,7 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
             },
             {});
     } else if (langIndex != langIndexAfter) {
-        cMessageBox::showModal(LANG("language changed", "title"), LANG("language changed", "text"), MB_YES | MB_NO,
+        akui::cMessageBox::showModal(LANG("language changed", "title"), LANG("language changed", "text"), MB_YES | MB_NO,
             [this, langNames, langIndexAfter]() {
                 gs().langDirectory = langNames[langIndexAfter];
                 gs().saveSettings();
@@ -699,7 +697,7 @@ void cMainWnd::onFolderChanged() {
         if (chk != GBA_HEADER.complement) {
             std::string title = LANG("no gba card", "title");
             std::string text = LANG("no gba card", "text");
-            cMessageBox::showModal(title, text, MB_OK);
+            akui::cMessageBox::showModal(title, text, MB_OK);
             _mainList->enterDir("...");
             _mainList->selectRow(_mainList->Slot2());
             return;
@@ -708,7 +706,7 @@ void cMainWnd::onFolderChanged() {
         WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder}, this, [this]() {
             int mode = gs().slot2mode;
             if (mode == cGlobalSettings::ESlot2Ask) {
-                cMessageBox::showModal(LANG("gba settings", "mode"), LANG("gba settings", "modetext"), MB_YES_NO,
+                akui::cMessageBox::showModal(LANG("gba settings", "mode"), LANG("gba settings", "modetext"), MB_YES_NO,
                     [this]() {
                         PassMeLauncher* launcher = new PassMeLauncher();
                         launcher->launchRom("slot2:/", "", 0, 0, 0, 0);

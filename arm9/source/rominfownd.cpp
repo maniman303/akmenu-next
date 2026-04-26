@@ -21,8 +21,6 @@
 #include "unicode.h"
 #include "windowmanager.h"
 
-using namespace akui;
-
 cRomInfoWnd::cRomInfoWnd(const std::string& text, std::function<void(cRomInfoWnd*)> onSaved) : cRomInfoWnd(0, 0, 0, 0, NULL, text) {
     CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
     u32 w = ini.GetInt("rom info window", "w", 240);

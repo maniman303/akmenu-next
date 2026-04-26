@@ -4,7 +4,7 @@
 #include "twin.h"
 #include "../logger.h"
 
-cFocusBorder::cFocusBorder(akui::cWindow* parent) {
+cFocusBorder::cFocusBorder(cWindow* parent) {
     _parent = parent;
     _init = false;
     _show = false;
@@ -77,24 +77,26 @@ void cFocusBorder::draw(GRAPHICS_ENGINE engine) {
     s32 startY = _currentFocus.position().y;
     s32 width = _currentFocus.size().x;
     s32 height = _currentFocus.size().y;
-    if (_ftl.valid()) {
-        drawRect = false;
-        gdi().maskBlt(_ftl.buffer(), startX, startY, _ftl.width(), _ftl.height(), engine);
-    }
+    if (_ftl.width() + _ftr.width() <= (u32)width && _ftl.height() + _fbl.height() <= (u32)height) {
+        if (_ftl.valid()) {
+            drawRect = false;
+            gdi().maskBlt(_ftl.buffer(), startX, startY, _ftl.width(), _ftl.height(), engine);
+        }
 
-    if (_ftr.valid()) {
-        drawRect = false;
-        gdi().maskBlt(_ftr.buffer(), startX + width - _ftr.width(), startY, _ftr.width(), _ftr.height(), engine);
-    }
+        if (_ftr.valid()) {
+            drawRect = false;
+            gdi().maskBlt(_ftr.buffer(), startX + width - _ftr.width(), startY, _ftr.width(), _ftr.height(), engine);
+        }
 
-    if (_fbl.valid()) {
-        drawRect = false;
-        gdi().maskBlt(_fbl.buffer(), startX, startY + height - _fbl.height(), _fbl.width(), _fbl.height(), engine);
-    }
+        if (_fbl.valid()) {
+            drawRect = false;
+            gdi().maskBlt(_fbl.buffer(), startX, startY + height - _fbl.height(), _fbl.width(), _fbl.height(), engine);
+        }
 
-    if (_fbr.valid()) {
-        drawRect = false;
-        gdi().maskBlt(_fbr.buffer(), startX + width - _fbr.width(), startY + height - _fbr.height(), _fbr.width(), _fbr.height(), engine);
+        if (_fbr.valid()) {
+            drawRect = false;
+            gdi().maskBlt(_fbr.buffer(), startX + width - _fbr.width(), startY + height - _fbr.height(), _fbr.width(), _fbr.height(), engine);
+        }
     }
 
     if (drawRect) {

@@ -19,8 +19,6 @@
 #include "touchmessage.h"
 #include "userinput.h"
 
-namespace akui {
-
 class cWindow : public SlotHolder {
   public:
     explicit cWindow(cWindow* aParent = 0, const std::string& aText = "");
@@ -198,5 +196,3 @@ class cWindow : public SlotHolder {
   protected:
     GRAPHICS_ENGINE _engine;
 };
-
-}  // namespace akui

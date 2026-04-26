@@ -155,11 +155,12 @@ namespace akui {
 
         for (size_t i = 0; i < total; ++i) {
             for (size_t j = 0; j < columnCount; ++j) {
+                cFont& columnFont = _columns[j].mainFont ? font() : fontSecondary();
                 bool columnCenter = _columns[j].center;
                 s32 columnWidth = _columns[j].width;
-                std::string content = font().BreakLine(_rows[_firstVisibleRowId + i][j].text(), columnWidth);
+                std::string content = columnFont.BreakLine(_rows[_firstVisibleRowId + i][j].text(), columnWidth);
                 std::vector<std::string> lines = splitLines(content);
-                s32 height = (lines.size() * (font().GetHeight() + font().GetDescend())) - font().GetDescend();
+                s32 height = (lines.size() * (columnFont.GetHeight() + columnFont.GetDescend())) - columnFont.GetDescend();
                 s32 itemX = position().x + _columns[j].offset;
                 s32 itemY = position().y + i * _rowHeight;
                 s32 textY = itemY + ((_rowHeight - height - 1) >> 1);
@@ -175,10 +176,10 @@ namespace akui {
                 } else if (columnWidth > 0) {
                     for (size_t k = 0; k < lines.size(); k++) {
                         std::string line = lines[k];
-                        s32 lineWidth = font().TextWidth(line);
+                        s32 lineWidth = columnFont.TextWidth(line);
                         s32 lineX = columnCenter ? itemX + ((columnWidth - lineWidth) / 2) : itemX;
-                        s32 lineY = textY + 1 + k * (font().GetHeight() + font().GetDescend());
-                        gdi().textOutRect(lineX, lineY, lineWidth, height, line.c_str(), _engine, font());
+                        s32 lineY = textY + 1 + k * (columnFont.GetHeight() + columnFont.GetDescend());
+                        gdi().textOutRect(lineX, lineY, lineWidth, height, line.c_str(), _engine, columnFont);
                     }
                 }
             }

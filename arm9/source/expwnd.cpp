@@ -18,8 +18,6 @@
 #include "windowmanager.h"
 #include "cachedinifile.h"
 
-using namespace akui;
-
 void cExpWnd::showModal(cWindow* parent) {
     u32 w = 250;
     u32 h = 130;

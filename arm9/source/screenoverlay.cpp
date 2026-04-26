@@ -5,7 +5,7 @@ cScreenOverlay::cScreenOverlay() {
     _background = createBMP15((u16)SCREEN_WIDTH, (u16)SCREEN_HEIGHT, 0xffff);
 }
 
-akui::cWindow& cScreenOverlay::loadAppearance(const std::string& aFileName) {
+cWindow& cScreenOverlay::loadAppearance(const std::string& aFileName) {
     _background = createBMP15FromFile(aFileName);
     if (!_background.valid()) {
         _background = createBMP15((u16)SCREEN_WIDTH, (u16)SCREEN_HEIGHT, 0xffff);

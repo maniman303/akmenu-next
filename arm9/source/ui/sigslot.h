@@ -16,8 +16,6 @@
 #include <list>
 #include <set>
 
-namespace akui {
-
 class SlotHolder;
 
 class BasicConnection0 {
@@ -451,5 +449,3 @@ class Signal1 : public BasicSignal1<Type1> {
     }
     size_t size(void) { return BasicSignal1<Type1>::connectedSlots_.size(); }
 };
-
-}  // namespace akui

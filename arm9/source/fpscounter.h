@@ -4,8 +4,6 @@
 #include "singleton.h"
 #include "window.h"
 
-using namespace akui;
-
 class cFpsCounter : public cWindow {
   public:
     cFpsCounter();

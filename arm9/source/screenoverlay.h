@@ -3,14 +3,14 @@
 #include "bmp15.h"
 #include "window.h"
 
-class cScreenOverlay : public akui::cWindow {
+class cScreenOverlay : public cWindow {
   public:
     cScreenOverlay();
 
   public:
     void draw() override;
 
-    akui::cWindow& loadAppearance(const std::string& aFileName) override;
+    cWindow& loadAppearance(const std::string& aFileName) override;
 
   protected:
     cBMP15 _background;

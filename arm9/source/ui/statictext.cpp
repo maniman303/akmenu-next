@@ -11,9 +11,6 @@
 #include "fontfactory.h"
 #include "uisettings.h"
 #include "../stringtool.h"
-//#include "gdi.h"
-
-namespace akui {
 
 cStaticText::cStaticText(cWindow* parent) : cStaticText(0, 0, 0, 0, parent, "") {}
 
@@ -70,5 +67,3 @@ void cStaticText::setFont(bool primary) {
 void cStaticText::setCentered(bool centered) {
     _centered = centered;
 }
-
-}  // namespace akui

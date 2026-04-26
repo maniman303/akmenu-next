@@ -37,8 +37,6 @@
 #include "ui/msgbox.h"
 #include "../../share/memtool.h"
 
-using namespace akui;
-
 cMainList::cMainList(cWindow* parent, const std::string& text)
     : cListView(4, 20, 248, 152, parent, text),
       _showAllFiles(false),
@@ -138,7 +136,7 @@ int cMainList::init() {
     return 1;
 }
 
-static bool itemSortComp(const cListView::itemVector& item1, const cListView::itemVector& item2) {
+static bool itemSortComp(const akui::cListView::itemVector& item1, const akui::cListView::itemVector& item2) {
     const std::string& fn1 = item1[cMainList::SHOWNAME_COLUMN].text();
     const std::string& fn2 = item2[cMainList::SHOWNAME_COLUMN].text();
 
@@ -583,7 +581,7 @@ bool cMainList::enterDir(const std::string& dirName) {
             if (fsManager().getFSRoot() == dirName) {
                 std::string title = LANG("sd card error", "title");
                 std::string sdError = LANG("sd card error", "text");
-                cMessageBox::showModal(title, sdError, MB_OK);
+                akui::cMessageBox::showModal(title, sdError, MB_OK);
             }
             dbg_printf("Unable to open directory<%s>.\n", dirName.c_str());
             return false;
@@ -835,11 +833,12 @@ void cMainList::drawIcons() {
     size_t total = std::min(_visibleRowCount, _rows.size() - _firstVisibleRowId);
 
     bool small = (_viewMode == VM_LIST_ICON) ? true : false;
-    int icon_height = small ? 16 : 32;
+    int iconHeight = small ? 16 : 32;
+    int prefix = small ? 0 : _iconPrefix;
 
     for (size_t i = 0; i < total; ++i) {
-        s32 itemX = position().x + _iconPrefix;
-        s32 itemY = position().y + i * _rowHeight + ((_rowHeight - icon_height) >> 1) - 1;
+        s32 itemX = position().x + prefix;
+        s32 itemY = position().y + i * _rowHeight + ((_rowHeight - iconHeight) >> 1) - 1;
         _romInfoList[_firstVisibleRowId + i].drawDSRomIcon(itemX, itemY, small, _engine);
     }
 }
@@ -852,6 +851,7 @@ void cMainList::setViewMode(VIEW_MODE mode) {
         case VM_LIST:
             _columns[ICON_COLUMN].width = 0;
             _columns[SHOWNAME_COLUMN].width = size().x;
+            _columns[SHOWNAME_COLUMN].mainFont = false;
             _columns[INTERNALNAME_COLUMN].width = 0;
             arangeColumnsSize();
             setRowHeight(15);
@@ -859,6 +859,7 @@ void cMainList::setViewMode(VIEW_MODE mode) {
         case VM_LIST_ICON:
             _columns[ICON_COLUMN].width = 21;
             _columns[SHOWNAME_COLUMN].width = size().x - 21;
+            _columns[SHOWNAME_COLUMN].mainFont = false;
             _columns[INTERNALNAME_COLUMN].width = 0;
             arangeColumnsSize();
             setRowHeight(18);
@@ -866,6 +867,7 @@ void cMainList::setViewMode(VIEW_MODE mode) {
         case VM_ICON:
             _columns[ICON_COLUMN].width = _iconPrefix + 32 + _iconSufix + _textPrefix;
             _columns[SHOWNAME_COLUMN].width = size().x - _iconPrefix - 32 - _iconSufix - _textPrefix - _textSufix;
+            _columns[SHOWNAME_COLUMN].mainFont = true;
             _columns[INTERNALNAME_COLUMN].width = 0;
             arangeColumnsSize();
             setRowHeight(_tallRowHeight);
@@ -875,6 +877,7 @@ void cMainList::setViewMode(VIEW_MODE mode) {
             _columns[SHOWNAME_COLUMN].width = 0;
             _columns[INTERNALNAME_COLUMN].width = size().x - _iconPrefix - 32 - _iconSufix - _textPrefix - _textSufix;
             _columns[INTERNALNAME_COLUMN].center = _centerInternalColumn;
+            _columns[INTERNALNAME_COLUMN].mainFont = true;
             arangeColumnsSize();
             setRowHeight(_tallRowHeight);
             break;

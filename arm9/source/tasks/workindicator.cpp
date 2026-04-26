@@ -2,7 +2,7 @@
 #include "taskcruncher.h"
 #include "logger.h"
 
-WorkIndicatorTask::WorkIndicatorTask(std::vector<WorkIndicator*> indicators, akui::cWindow* window, std::function<void()> onCompleted) {
+WorkIndicatorTask::WorkIndicatorTask(std::vector<WorkIndicator*> indicators, cWindow* window, std::function<void()> onCompleted) {
     _indicators = indicators;
     _window = window;
     _onCompleted = onCompleted;

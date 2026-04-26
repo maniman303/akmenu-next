@@ -8,12 +8,12 @@
 #include "ui/statictext.h"
 #include "ui/window.h"
 
-class cRomBootWnd : public akui::cWindow {
+class cRomBootWnd : public cWindow {
   public:
     cRomBootWnd(std::string romPath, std::function<void()> onExit);
     ~cRomBootWnd() override;
 
-    akui::cWindow& loadAppearance(const std::string& aFileName) override;
+    cWindow& loadAppearance(const std::string& aFileName) override;
     bool processKeyMessage(cKeyMessage message) override;
     bool processTouchMessage(cTouchMessage message) override;
     void update() override;
@@ -31,7 +31,7 @@ class cRomBootWnd : public akui::cWindow {
     std::function<void()> _onExit;
     u16 _timer;
     Animation _pressAnimation;
-    akui::cStaticText _launchText;
-    akui::cStaticText _nameText;
-    akui::cStaticText _pressText;
+    cStaticText _launchText;
+    cStaticText _nameText;
+    cStaticText _pressText;
 };

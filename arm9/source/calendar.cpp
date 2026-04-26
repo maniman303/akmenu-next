@@ -14,8 +14,6 @@
 #include "systemfilenames.h"
 #include "windowmanager.h"
 
-using namespace akui;
-
 cCalendar::cCalendar() : cWindow(NULL, "calendar") {
     setSize(cSize(0, 0));
     _engine = GE_SUB;

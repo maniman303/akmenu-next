@@ -51,9 +51,9 @@ class cMainWnd : public akui::cForm {
     void launchSelected();
 
     cStartMenu* _startMenu;
-    akui::cButton* _startButton;
-    akui::cButton* _brightnessButton;
-    akui::cButton* _folderUpButton;
-    akui::cStaticText* _folderText;
+    cButton* _startButton;
+    cButton* _brightnessButton;
+    cButton* _folderUpButton;
+    cStaticText* _folderText;
     cFocusBorder* _focusBorder;
 };

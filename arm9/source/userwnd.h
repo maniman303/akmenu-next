@@ -15,7 +15,7 @@
 #include "singleton.h"
 #include "window.h"
 
-class cUserWindow : public akui::cWindow {
+class cUserWindow : public cWindow {
   public:
     cUserWindow();
 
@@ -24,7 +24,7 @@ class cUserWindow : public akui::cWindow {
   public:
     void draw();
 
-    akui::cWindow& loadAppearance(const std::string& aFileName) { return *this; }
+    cWindow& loadAppearance(const std::string& aFileName) { return *this; }
 
   protected:
     void init();

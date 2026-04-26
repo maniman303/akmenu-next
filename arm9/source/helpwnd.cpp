@@ -16,8 +16,6 @@
 #include "version.h"
 #include "windowmanager.h"
 
-using namespace akui;
-
 void cHelpWnd::showModal(cWindow* parent) {
     CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
     u32 w = 200;

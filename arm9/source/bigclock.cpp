@@ -14,8 +14,6 @@
 #include "systemfilenames.h"
 #include "windowmanager.h"
 
-using namespace akui;
-
 cBigClock::cBigClock() : cWindow(NULL, "big clock") {
     _engine = GE_SUB;
     _show = false;
