@@ -325,7 +325,7 @@ text = Menu hotkey
 
 [rom boot]
 launching = Launching software
-press = Press START or touch screen to continue
+press = Press START or Touch Screen to continue.
 
 [override]
 text = Language override

@@ -13,6 +13,7 @@ extern const unsigned int tick_raw_len;
 #define TICK_VOLUME_MAX 127
 
 cTickSound::cTickSound() {
+    _running = false;
     _rawData = NULL;
     _dataSize = 0;
     _pcmStart = NULL;
@@ -127,6 +128,10 @@ bool cTickSound::load(std::string filepath) {
 }
 
 void cTickSound::play() {
+    if (!_running) {
+        return;
+    }
+
     if (!sd().fifoStatus()) {
         return;
     }
@@ -166,6 +171,10 @@ int cTickSound::playTickFromWav(u8 volume) {
     }
 
     return soundPlaySample(pcmStart, (SoundFormat)soundFormat, dataSize, sampleRate, volume, 64, false, 0);
+}
+
+void cTickSound::run() {
+    _running = true;
 }
 
 const u8 tick_raw[] = {

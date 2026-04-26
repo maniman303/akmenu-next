@@ -11,6 +11,7 @@ class cTickSound {
     ~cTickSound();
 
     bool load(std::string filepath);
+    void run();
 
     void play();
 
@@ -19,6 +20,7 @@ class cTickSound {
 
     int playTickFromWav(u8 volume);
 
+    bool _running;
     u8* _rawData;
     u32  _dataSize;
     u8* _pcmStart;

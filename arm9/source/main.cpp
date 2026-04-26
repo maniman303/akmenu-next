@@ -137,6 +137,7 @@ void initMainWindow(std::string lastDirectory, std::string lastFile) {
     }
 
     windowManager().addWindow(wnd);
+    tickSound().run();
 
     logger().info("Main wnd added.");
     

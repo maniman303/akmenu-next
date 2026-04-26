@@ -5,7 +5,11 @@
 #include "ui/windowmanager.h"
 #include "tasks/screenfade.h"
 
-cRomBootWnd::cRomBootWnd(std::string romPath, std::function<void()> onExit) : akui::cWindow(NULL, "rom boot"), _nameText(this), _pressText(this) {
+cRomBootWnd::cRomBootWnd(std::string romPath, std::function<void()> onExit) :
+ akui::cWindow(NULL, "rom boot"),
+ _launchText(this),
+ _nameText(this),
+ _pressText(this) {
     _romPath = romPath;
     _onExit = onExit;
     _romInfo.mayBeDSRom(romPath);
@@ -69,18 +73,25 @@ void cRomBootWnd::onGainedFocus() {
         return;
     }
 
+    _launchText.setText(LANG("rom boot", "launching"));
+    _launchText.setRelativePosition(cPoint(0, 56));
+    _launchText.setSize(cSize(SCREEN_WIDTH, 32));
+    _launchText.setTextColor(0x0 | BIT(15));
+    _launchText.setCentered(true);
+    _launchText.setFont(false);
+
     _pressText.setText(LANG("rom boot", "press"));
-    _pressText.setRelativePosition(cPoint(0, 164));
-    _pressText.setSize(cSize(SCREEN_WIDTH, 64));
+    _pressText.setRelativePosition(cPoint(0, 172));
+    _pressText.setSize(cSize(SCREEN_WIDTH, 32));
     _pressText.setTextColor(0x0 | BIT(15));
     _pressText.setCentered(true);
 
     std::string romName = _romInfo.getDsLocTitle();
     u16 romNameHeight = font().TextHeight(romName);
-    u16 romNameY = (164 - romNameHeight) >> 1;
+    u16 romNameY = (196 - romNameHeight) >> 1;
     _nameText.setText(romName);
-    _nameText.setRelativePosition(cPoint(96, romNameY));
-    _nameText.setSize(cSize(144, romNameHeight + font().GetDescend()));
+    _nameText.setRelativePosition(cPoint(112, romNameY));
+    _nameText.setSize(cSize(128, romNameHeight + font().GetDescend()));
     _nameText.setTextColor(0x0 | BIT(15));
 }
 
@@ -93,7 +104,8 @@ void cRomBootWnd::drawBackdrop() {
         return;
     }
 
-    _romInfo.drawDSRomIcon(32, 66, false, selectedEngine());
+    _launchText.draw();
+    _romInfo.drawDSRomIcon(64, 82, false, selectedEngine());
     _nameText.draw();
 }
 

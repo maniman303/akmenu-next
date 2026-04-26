@@ -28,6 +28,7 @@ class cRomBootWnd : public akui::cWindow {
     std::string _romPath;
     DSRomInfo _romInfo;
     std::function<void()> _onExit;
+    akui::cStaticText _launchText;
     akui::cStaticText _nameText;
     akui::cStaticText _pressText;
 };
