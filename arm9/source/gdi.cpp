@@ -161,6 +161,10 @@ void cGdi::activeFbSub(void) {
 }
 
 void cGdi::setScreenTransparency(u16 value, GRAPHICS_ENGINE engine) {
+    setScreenTransparency(value, true, engine);
+}
+
+void cGdi::setScreenTransparency(u16 value, bool light, GRAPHICS_ENGINE engine) {
     if (value > 100) {
         value = 0;
     }
@@ -169,7 +173,7 @@ void cGdi::setScreenTransparency(u16 value, GRAPHICS_ENGINE engine) {
     u16 downLvl = 16 - topLvl;
 
     if (engine == GE_SUB) {
-        REG_MASTER_BRIGHT_SUB = BIT(14) | downLvl;
+        REG_MASTER_BRIGHT_SUB = BIT(light ? 14 : 15) | downLvl;
 
         return;
     }
@@ -182,7 +186,7 @@ void cGdi::setScreenTransparency(u16 value, GRAPHICS_ENGINE engine) {
     // REG_BLDY = BLDY_EVY(0);
     // REG_BLDALPHA = topLvl | (downLvl << 8);
 
-    REG_MASTER_BRIGHT = BIT(14) | downLvl;
+    REG_MASTER_BRIGHT = BIT(light ? 14 : 15) | downLvl;
 }
 
 static inline void putScreenPixel(u16* buffer, s16 x, s16 y, u16 color) {

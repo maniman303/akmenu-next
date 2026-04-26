@@ -29,6 +29,7 @@
 #include "../mainlist.h"
 #include "../systemfilenames.h"
 #include "../language.h"
+#include "../gdi.h"
 #include "../ui/msgbox.h"
 #include "../ui/progresswnd.h"
 
@@ -142,6 +143,13 @@ bool PicoLoaderLauncher::setParameters(void) {
 s16 PicoLoaderLauncher::process(s16 iter) {
     static const char picoLoaderPath7[] = "fat:/_pico/picoLoader7.bin";
     static const char picoLoaderPath9[] = "fat:/_pico/picoLoader9.bin";
+
+    if (iter == 0) {
+        gdi().setScreenTransparency(0, false, GE_MAIN);
+        gdi().setScreenTransparency(0, false, GE_SUB);
+
+        return 1;
+    }
 
     if (access(picoLoaderPath7, F_OK) != 0) {
         showModalOk(LOADER_NOT_FOUND_TITLE, formatString(LOADER_NOT_FOUND_MESSAGE.c_str(), picoLoaderPath7));

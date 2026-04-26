@@ -393,9 +393,16 @@ s16 NdsBootstrapLauncher::process(s16 iter) {
             slot2RamAccess();
         }
 
+        gdi().setScreenTransparency(0, GE_MAIN);
+        gdi().setScreenTransparency(0, GE_SUB);
+
+        return 8;
+      case 8:
         // Launch
         eRunNdsRetCode rc = runNdsFile(_argv[0], _argv.size(), &_argv[0]);
         if (rc == RUN_NDS_OK) {
+            gdi().setScreenTransparency(100, GE_MAIN);
+            gdi().setScreenTransparency(100, GE_SUB);
             return -1;
         }
 
