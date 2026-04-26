@@ -1,5 +1,5 @@
 #include "Launcher.h"
-#include "../taskcruncher.h"
+#include "../tasks/taskcruncher.h"
 #include "../ui/msgbox.h"
 
 Launcher::Launcher() {

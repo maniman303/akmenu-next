@@ -38,7 +38,6 @@
 #include "image.h"
 
 #include "ticksound.h"
-#include "taskcruncher.h"
 
 #include "smalldate.h"
 #include "smallclock.h"
@@ -61,6 +60,9 @@
 #include "ui/windowmanager.h"
 #include "ui/subwindowmanager.h"
 #include "ui/uisettings.h"
+
+#include "tasks/taskcruncher.h"
+#include "tasks/screenfade.h"
 
 using namespace akui;
 
@@ -243,6 +245,9 @@ int main(int argc, char* argv[]) {
     while (*(u32*)(0xCFFFD0C) != 0) {
         swiDelay(100);
     }
+
+    ScreenFadeTask* fadeTask = new ScreenFadeTask();
+    fadeTask->schedule();
 
     while (true) {
         timer().updateFrames();

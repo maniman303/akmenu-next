@@ -5,7 +5,7 @@
 #include <memory>
 #include "../language.h"
 #include "../ui/msgbox.h"
-#include "../taskworker.h"
+#include "../tasks/taskworker.h"
 
 #define LOADER_NOT_FOUND_TITLE LANG("loader", "not found")
 #define LOADER_NOT_FOUND_MESSAGE LANG("loader", "not found message")

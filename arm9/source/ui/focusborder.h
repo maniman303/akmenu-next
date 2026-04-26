@@ -4,7 +4,7 @@
 #include "bmp15.h"
 #include "window.h"
 #include "animation.h"
-#include "../workindicator.h"
+#include "../tasks/workindicator.h"
 #include "../gdi.h"
 
 class cFocusBorder : public WorkIndicator {
