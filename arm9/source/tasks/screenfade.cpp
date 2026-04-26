@@ -1,5 +1,6 @@
 #include "screenfade.h"
 #include "taskcruncher.h"
+#include "../logger.h"
 
 ScreenFadeTask::ScreenFadeTask() : ScreenFadeTask::ScreenFadeTask(true, true, true) {}
 
@@ -13,15 +14,13 @@ ScreenFadeTask::ScreenFadeTask(bool main, bool sub, bool fadeIn) {
 }
 
 s16 ScreenFadeTask::process(s16 iter) {
-    if (_animation.isCompleted()) {
-        return -1;
-    }
+    logger().info("Processing fade with iter: " + std::to_string(iter));
     
     if (iter == 0 && !_animation.isPlaying()) {
         _animation.play();
     }
 
-    u16 value = _animation.value();
+    u16 value = _fadeIn ? _animation.value() : 100 - _animation.value();
     
     if (_main) {
         gdi().setScreenTransparency(value, GE_MAIN);
@@ -31,19 +30,22 @@ s16 ScreenFadeTask::process(s16 iter) {
         gdi().setScreenTransparency(value, GE_SUB);
     }
 
+    if (iter != 0 && _animation.isCompleted()) {
+        logger().info("Fade exit with iter: " + std::to_string(iter));
+        return -1;
+    }
+
     return 1;
 }
 
 void ScreenFadeTask::schedule() {
     if (_main) {
-        gdi().setScreenTransparency(0, GE_MAIN);
+        gdi().setScreenTransparency(_fadeIn ? 0 : 100, GE_MAIN);
     }
 
     if (_sub) {
-        gdi().setScreenTransparency(0, GE_SUB);
+        gdi().setScreenTransparency(_fadeIn ? 0 : 100, GE_SUB);
     }
-
-    _animation.play();
 
     taskCruncher().push(this);
 }

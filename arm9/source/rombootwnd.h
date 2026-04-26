@@ -10,6 +10,7 @@
 class cRomBootWnd : public akui::cWindow {
   public:
     cRomBootWnd(std::string romPath, std::function<void()> onExit);
+    ~cRomBootWnd() override;
 
     akui::cWindow& loadAppearance(const std::string& aFileName) override;
     bool processKeyMessage(cKeyMessage message) override;
@@ -23,9 +24,10 @@ class cRomBootWnd : public akui::cWindow {
 
   private:
     void moveToMain();
+    void startRom();
     std::string _romPath;
     DSRomInfo _romInfo;
     std::function<void()> _onExit;
     akui::cStaticText _nameText;
-    akui::cStaticText _continueText;
+    akui::cStaticText _pressText;
 };

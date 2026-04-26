@@ -22,6 +22,7 @@
 
 #include "mainlist.h"
 #include "mainwnd.h"
+#include "rombootwnd.h"
 #include "startmenu.h"
 #include "systemfilenames.h"
 #include "timer.h"
@@ -74,8 +75,6 @@ void __libnds_exit(int rc) {}
 }
 #endif
 
-static bool runAutoLoop = false;
-
 void saveSram() {
     CIniFile f;
     if (!f.LoadIniFile(SFN_LAST_GBA_SAVEINFO)) {
@@ -122,6 +121,8 @@ void saveSram() {
 }
 
 void initMainWindow(std::string lastDirectory, std::string lastFile) {
+    logger().info("Set up main wnd.");
+
     cImage* background = new cImage(NULL, cSize(SCREEN_WIDTH, SCREEN_HEIGHT), 0xffff);    
     background->loadAppearance(SFN_LOWER_SCREEN_BG);
     windowManager().addWindow(background);
@@ -136,6 +137,8 @@ void initMainWindow(std::string lastDirectory, std::string lastFile) {
     }
 
     windowManager().addWindow(wnd);
+
+    logger().info("Main wnd added.");
     
     ScreenFadeTask* fadeTask = new ScreenFadeTask();
     fadeTask->schedule();
@@ -210,35 +213,20 @@ int main(int argc, char* argv[]) {
 
     progressWnd().init();
 
-    if (!fsManager().isRebooted() && gs().autorunWithLastRom && lastFile != "..." && !lastFile.empty()) {
-        INPUT& inputs = updateInput();
-        if (!(inputs.keysHeld & KEY_B)) {
-            runAutoLoop = true;
-            autoLaunchRom(lastFile, []() {
-                runAutoLoop = false;
-            });
-
-            while (runAutoLoop) {
-                inputs = updateInput();
-                processInput(inputs);
-                
-                taskCruncher().process();
-                windowManager().update();
-
-                datetime().purge();
-                destroyBMP15();
-
-                swiWaitForVBlank();
-
-                gdi().present();
-            }
-        }
-    }
-
     subWindowManager().init();
     fpsCounter().init();
 
-    initMainWindow(lastDirectory, lastFile);
+    if (gs().autorunWithLastRom && lastFile != "..." && !lastFile.empty()) {
+        cRomBootWnd* romBoot = new cRomBootWnd(lastFile, [lastDirectory, lastFile]() {
+            initMainWindow(lastDirectory, lastFile);    
+        });
+        windowManager().addModal(romBoot);
+
+        ScreenFadeTask* fadeTask = new ScreenFadeTask(true, false, true);
+        fadeTask->schedule();
+    } else {
+        initMainWindow(lastDirectory, lastFile);
+    }
 
     irq().vblankStart();
 

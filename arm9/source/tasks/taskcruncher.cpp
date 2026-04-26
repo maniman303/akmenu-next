@@ -26,5 +26,13 @@ void TaskCruncher::process() {
     }
 
     entry.task->onCompleted();
-    _deque.pop_front();
+
+    std::deque<TaskCruncher::TaskEntry>::iterator it = _deque.begin();
+    while (it != _deque.end()) {
+        if (it->iter < 0) {
+            it = _deque.erase(it);
+        } else {
+            it++;
+        }
+    }
 }

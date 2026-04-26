@@ -324,7 +324,7 @@ text = Menu hotkey
 6 = Custom
 
 [rom boot]
-launching = Launching
+launching = Launching software
 press = Press START or touch screen to continue
 
 [override]

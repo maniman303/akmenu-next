@@ -10,6 +10,7 @@
 #include "statictext.h"
 #include "fontfactory.h"
 #include "uisettings.h"
+#include "../stringtool.h"
 //#include "gdi.h"
 
 namespace akui {
@@ -36,7 +37,22 @@ void cStaticText::draw() {
     }
 
     gdi().setPenColor(_textColor, _engine);
-    gdi().textOutRect(position().x, position().y, size().x, size().y, _text.c_str(), selectedEngine(), _primaryFont ? font() : fontSecondary());
+
+    cFont& textFont = _primaryFont ? font() : fontSecondary();
+    if (!_centered) {
+        gdi().textOutRect(position().x, position().y, size().x, size().y, _text.c_str(), selectedEngine(), textFont);
+        return;
+    }
+    
+    std::string content = textFont.BreakLine(text(), size().x);
+    std::vector<std::string> lines = splitLines(content);
+    for (size_t i = 0; i < lines.size(); i++) {
+        u32 textWidth = textFont.TextWidth(lines[i]);
+        u32 textHeight = textFont.GetHeight() + textFont.GetDescend();
+        s16 posX = position().x + (size().x - textWidth) / 2;
+        s16 posY = position().y + i * textHeight;
+        gdi().textOutRect(posX, posY, size().x, size().y, lines[i].c_str(), selectedEngine(), textFont);
+    }
 }
 
 cWindow& cStaticText::loadAppearance(const std::string& aFileName) {

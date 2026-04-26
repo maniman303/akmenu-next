@@ -5,7 +5,7 @@
 #include "ui/windowmanager.h"
 #include "tasks/screenfade.h"
 
-cRomBootWnd::cRomBootWnd(std::string romPath, std::function<void()> onExit) : akui::cWindow(NULL, "rom boot"), _nameText(this), _continueText(this) {
+cRomBootWnd::cRomBootWnd(std::string romPath, std::function<void()> onExit) : akui::cWindow(NULL, "rom boot"), _nameText(this), _pressText(this) {
     _romPath = romPath;
     _onExit = onExit;
     _romInfo.mayBeDSRom(romPath);
@@ -18,6 +18,8 @@ cRomBootWnd::cRomBootWnd(std::string romPath, std::function<void()> onExit) : ak
     setSize(cSize(SCREEN_WIDTH, SCREEN_HEIGHT));
 }
 
+cRomBootWnd::~cRomBootWnd() { }
+
 akui::cWindow& cRomBootWnd::loadAppearance(const std::string& aFileName) {
     return *this;
 }
@@ -25,9 +27,7 @@ akui::cWindow& cRomBootWnd::loadAppearance(const std::string& aFileName) {
 bool cRomBootWnd::processKeyMessage(cKeyMessage message) {
     if (message.isKeyDown(KEY_START) || message.isKeyDown(KEY_A)) {
         disableInput();
-        if (launchRom(_romPath, _romInfo, false, "") != ELaunchRomOk) {
-            moveToMain();
-        }
+        startRom();
 
         return true;
     }
@@ -47,9 +47,7 @@ bool cRomBootWnd::processTouchMessage(cTouchMessage message) {
         message.position().x > 0 && message.position().x < SCREEN_WIDTH -1 &&
         message.position().y > 0 && message.position().y < SCREEN_HEIGHT - 1) {
         disableInput();
-        if (launchRom(_romPath, _romInfo, false, "") != ELaunchRomOk) {
-            moveToMain();
-        }
+        startRom();
 
         return true;
     }
@@ -71,19 +69,23 @@ void cRomBootWnd::onGainedFocus() {
         return;
     }
 
-    _continueText.setText(LANG("rom boot", "press"));
-    _continueText.setRelativePosition(cPoint(0, 128));
-    _continueText.setSize(cSize(SCREEN_WIDTH, 64));
-    _continueText.setTextColor(0x0 | BIT(15));
-    _continueText.setCentered(true);
+    _pressText.setText(LANG("rom boot", "press"));
+    _pressText.setRelativePosition(cPoint(0, 164));
+    _pressText.setSize(cSize(SCREEN_WIDTH, 64));
+    _pressText.setTextColor(0x0 | BIT(15));
+    _pressText.setCentered(true);
 
-    std::string romName = LANG("rom boot", "launching") + "\n" + _romInfo.getDsLocTitle();
+    std::string romName = _romInfo.getDsLocTitle();
     u16 romNameHeight = font().TextHeight(romName);
+    u16 romNameY = (164 - romNameHeight) >> 1;
     _nameText.setText(romName);
+    _nameText.setRelativePosition(cPoint(96, romNameY));
+    _nameText.setSize(cSize(144, romNameHeight + font().GetDescend()));
+    _nameText.setTextColor(0x0 | BIT(15));
 }
 
 void cRomBootWnd::draw() {
-    // TODO: Implement
+    _pressText.draw();
 }
 
 void cRomBootWnd::drawBackdrop() {
@@ -91,9 +93,8 @@ void cRomBootWnd::drawBackdrop() {
         return;
     }
 
-    _romInfo.drawDSRomIcon(32, 48, false, selectedEngine());
-
-    // TODO: Draw text
+    _romInfo.drawDSRomIcon(32, 66, false, selectedEngine());
+    _nameText.draw();
 }
 
 void cRomBootWnd::moveToMain() {
@@ -101,11 +102,18 @@ void cRomBootWnd::moveToMain() {
     task->setOnCompleted([this](){
         // TODO: Set UP layer transparency to 100
 
-        akui::windowManager().removeWindow(this);
         if (_onExit) {
             _onExit();
         }
+        akui::windowManager().removeWindow(this);
     });
     
     task->schedule();
+}
+
+void cRomBootWnd::startRom() {
+    gdi().setScreenTransparency(0, selectedEngine());
+    if (launchRom(_romPath, _romInfo, false, "") != ELaunchRomOk) {
+        moveToMain();
+    }
 }
