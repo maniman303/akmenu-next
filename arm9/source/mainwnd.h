@@ -43,16 +43,18 @@ class cMainWnd : public akui::cForm {
     void startMenuItemClicked(s16 i);
     void startButtonClicked();
     void brightnessButtonClicked();
+    void clockButtonClicked();
     void showSettings(void);
     void saveSettings(cSettingWnd* settingWnd);
     void onFolderChanged();
-    void showFileInfo();
+    void showFileInfo(u32 id);
     void saveFileInfo(cRomInfoWnd* romInfoWnd);
     void launchSelected();
 
     cStartMenu* _startMenu;
     cButton* _startButton;
     cButton* _brightnessButton;
+    cButton* _clockButton;
     cButton* _folderUpButton;
     cStaticText* _folderText;
     cFocusBorder* _focusBorder;

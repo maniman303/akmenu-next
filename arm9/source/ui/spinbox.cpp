@@ -38,8 +38,8 @@ namespace akui {
 
         _isFocusable = !namedAppearance;
 
-        _prevButton.pressed.connect(this, &cSpinBox::selectPrev);
-        _nextButton.pressed.connect(this, &cSpinBox::selectNext);
+        _prevButton.clicked.connect(this, &cSpinBox::selectPrev);
+        _nextButton.clicked.connect(this, &cSpinBox::selectNext);
 
         addChildWindow(&_itemText);
         addChildWindow(&_prevButton);

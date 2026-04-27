@@ -11,6 +11,7 @@
 #include "fontfactory.h"
 #include "uisettings.h"
 #include "window.h"
+#include "../logger.h"
 
 cButton::cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text) : cButton(x, y, w, h, parent, text, true) {}
 
@@ -123,7 +124,6 @@ bool cButton::processKeyMessage(cKeyMessage message) {
     }
 
     if (message.isKeyUp(KEY_A)) {
-        onClicked();
         clicked();
         return true;
     }
@@ -146,18 +146,13 @@ bool cButton::processTouchMessage(cTouchMessage message) {
         _state = up;
 
         if (myRect.surrounds(message.position())) {
-            onClicked();
             clicked();
-        } else {
-            onReleased();
         }
 
         return true;
     }
 
     if (message.down() && myRect.surrounds(message.position())) {
-        onPressed();
-        pressed();
         _captured = true;
         _state = down;
         
@@ -166,9 +161,3 @@ bool cButton::processTouchMessage(cTouchMessage message) {
 
     return false;
 }
-
-void cButton::onPressed() {}
-
-void cButton::onReleased() {}
-
-void cButton::onClicked() {}

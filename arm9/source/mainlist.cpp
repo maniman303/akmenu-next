@@ -756,21 +756,43 @@ cRect cMainList::focusRectangle() const {
     return cRect(rowPos, rowSize, false);
 }
 
-std::string cMainList::getSelectedFullPath() {
-    if (!_rows.size()) return std::string("");
-    return _rows[_selectedRowId][REALNAME_COLUMN].text();
+std::string cMainList::getRowFullPath(u32 id) {
+    if (!_rows.size() || id >= (u32)_rows.size()) {
+        return std::string("");
+    }
+
+    return _rows[id][REALNAME_COLUMN].text();
 }
 
-std::string cMainList::getSelectedShowName() {
-    if (!_rows.size()) return std::string("");
-    return _rows[_selectedRowId][SHOWNAME_COLUMN].text();
+std::string cMainList::getRowShowName(u32 id) {
+    if (!_rows.size() || id >= (u32)_rows.size()) {
+        return std::string("");
+    }
+
+    return _rows[id][SHOWNAME_COLUMN].text();
 }
 
-std::string cMainList::getSelectedFileName() {
-    if (!_rows.size()) return std::string("");
-    std::string fullPath = _rows[_selectedRowId][REALNAME_COLUMN].text();
+std::string cMainList::getRowFileName(u32 id) {
+    if (!_rows.size() || id >= (u32)_rows.size()) {
+        return std::string("");
+    }
+
+    std::string fullPath = _rows[id][REALNAME_COLUMN].text();
     size_t lastSlashPos = fullPath.find_last_of("/\\");
+
     return fullPath.substr(lastSlashPos + 1);
+}
+
+u32 cMainList::getRowIdByPath(std::string path) {
+    path = toLowerString(path);
+    for (size_t i = 0; i < _rows.size(); i++) {
+        std::string fullPath = _rows[i][REALNAME_COLUMN].text();
+        if (toLowerString(fullPath) == path) {
+            return i;
+        }
+    }
+
+    return UINT16_MAX;
 }
 
 bool cMainList::getRomInfo(u32 rowIndex, DSRomInfo& info) const {

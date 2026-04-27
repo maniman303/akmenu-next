@@ -7,6 +7,7 @@
 #include "fifotool.h"
 #include "systemfilenames.h"
 #include "globalsettings.h"
+#include "savemngr.h"
 
 cFSManager::cFSManager() : _isSDInserted(false), _isFlashcart(false), _isRebooted(false), _fsRoot() {}
 

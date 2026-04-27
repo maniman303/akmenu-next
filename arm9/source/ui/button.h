@@ -40,13 +40,9 @@ class cButton : public cWindow {
     Style style() { return _style; }
     void setAlignment(Alignment alignment) { _alignment = alignment; }
     Alignment alignment() { return _alignment; }
-    void onPressed();
-    void onReleased();
-    void onClicked();
     bool hasAlpha() { return _hasAlpha; }
 
     Signal0 clicked;
-    Signal0 pressed;
 
   protected:
     bool _captured;

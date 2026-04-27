@@ -235,6 +235,10 @@ class cSaveManager {
 
     void updateSaveInfoByInfo(SAVE_INFO_EX& gameInfo);
 
+    std::string lastFile() const;
+    
+    std::string lastDirectory() const;
+
     static DISPLAY_SAVE_TYPE SaveTypeToDisplaySaveType(SAVE_TYPE aSaveType);
     static SAVE_TYPE DisplaySaveTypeToSaveType(DISPLAY_SAVE_TYPE aSaveType);
 
@@ -244,6 +248,10 @@ class cSaveManager {
     std::vector<SAVE_INFO_EX> _customSaveList;
 
     std::string _lastLoadedFilename;
+
+    std::string _lastFile;
+
+    std::string _lastDir;
 };
 
 typedef t_singleton<cSaveManager> SaveManager_s;

@@ -16,10 +16,11 @@
 #include "language.h"
 #include "msgbox.h"
 #include "systemfilenames.h"
-#include "ui/binaryfind.h"
 #include "uisettings.h"
 #include "unicode.h"
+#include "logger.h"
 #include "windowmanager.h"
+#include "ui/binaryfind.h"
 
 cRomInfoWnd::cRomInfoWnd(const std::string& text, std::function<void(cRomInfoWnd*)> onSaved) : cRomInfoWnd(0, 0, 0, 0, NULL, text) {
     CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
@@ -44,6 +45,42 @@ cRomInfoWnd::cRomInfoWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
       _saves(NULL) {
     _canRenderBackdrop = true;
     loadAppearance("");
+
+    _buttonOK.setStyle(cButton::press);
+    _buttonOK.setText("\x01 " + LANG("setting window", "ok"));
+    _buttonOK.setTextColor(uis().buttonTextColor);
+    _buttonOK.loadAppearance(SFN_BUTTON3);
+    _buttonOK.clicked.connect(this, &cRomInfoWnd::onOK);
+    addChildWindow(&_buttonOK);
+
+    _buttonSaveType.setStyle(cButton::press);
+    _buttonSaveType.setText("\x04 " + LANG("setting window", "savetype"));
+    _buttonSaveType.setTextColor(uis().buttonTextColor);
+    _buttonSaveType.loadAppearance(SFN_BUTTON4);
+    _buttonSaveType.clicked.connect(this, &cRomInfoWnd::pressSaveType);
+    addChildWindow(&_buttonSaveType);
+
+    _buttonCheats.setStyle(cButton::press);
+    _buttonCheats.setText("\x03 " + LANG("cheats", "title"));
+    _buttonCheats.setTextColor(uis().buttonTextColor);
+    _buttonCheats.loadAppearance(SFN_BUTTON3);
+    _buttonCheats.clicked.connect(this, &cRomInfoWnd::pressCheats);
+    addChildWindow(&_buttonCheats);
+
+    _buttonFlash.setStyle(cButton::press);
+    _buttonFlash.setText("\x03 " + LANG("exp window", "flash to nor"));
+    _buttonFlash.setTextColor(uis().buttonTextColor);
+    _buttonFlash.loadAppearance(SFN_BUTTON3);
+    _buttonFlash.clicked.connect(this, &cRomInfoWnd::pressFlash);
+    addChildWindow(&_buttonFlash);
+
+    _buttonCopy.setStyle(cButton::press);
+    _buttonCopy.setText("\x05 " + LANG("exp window", "copy to psram"));
+    _buttonCopy.setTextColor(uis().buttonTextColor);
+    _buttonCopy.loadAppearance(SFN_BUTTON3);
+    _buttonCopy.clicked.connect(this, &cRomInfoWnd::pressCopy);
+    addChildWindow(&_buttonCopy);
+
     onResize();
 }
 
@@ -229,14 +266,6 @@ void cRomInfoWnd::onShow() {
 
 void cRomInfoWnd::onResize() {
     s16 buttonY = size().y - _buttonOK.size().y - 4;
-
-    _buttonOK.setStyle(cButton::press);
-    _buttonOK.setText("\x01 " + LANG("setting window", "ok"));
-    _buttonOK.setTextColor(uis().buttonTextColor);
-    _buttonOK.loadAppearance(SFN_BUTTON3);
-    _buttonOK.clicked.connect(this, &cRomInfoWnd::onOK);
-    addChildWindow(&_buttonOK);
-
     s16 nextButtonX = size().x;
 
     s16 buttonPitch = _buttonOK.size().x + 8;
@@ -244,48 +273,20 @@ void cRomInfoWnd::onResize() {
 
     _buttonOK.setRelativePosition(cPoint(nextButtonX, buttonY));
 
-    _buttonSaveType.setStyle(cButton::press);
-    _buttonSaveType.setText("\x04 " + LANG("setting window", "savetype"));
-    _buttonSaveType.setTextColor(uis().buttonTextColor);
-    _buttonSaveType.loadAppearance(SFN_BUTTON4);
-    _buttonSaveType.clicked.connect(this, &cRomInfoWnd::pressSaveType);
-    addChildWindow(&_buttonSaveType);
-
     buttonPitch = _buttonSaveType.size().x + 8;
     s16 nextButtonXone = nextButtonX - buttonPitch;
 
     _buttonSaveType.setRelativePosition(cPoint(nextButtonXone, buttonY));
-
-    _buttonCheats.setStyle(cButton::press);
-    _buttonCheats.setText("\x03 " + LANG("cheats", "title"));
-    _buttonCheats.setTextColor(uis().buttonTextColor);
-    _buttonCheats.loadAppearance(SFN_BUTTON3);
-    _buttonCheats.clicked.connect(this, &cRomInfoWnd::pressCheats);
-    addChildWindow(&_buttonCheats);
 
     buttonPitch = _buttonCheats.size().x + 8;
     nextButtonXone -= buttonPitch;
 
     _buttonCheats.setRelativePosition(cPoint(nextButtonXone, buttonY));
 
-    _buttonFlash.setStyle(cButton::press);
-    _buttonFlash.setText("\x03 " + LANG("exp window", "flash to nor"));
-    _buttonFlash.setTextColor(uis().buttonTextColor);
-    _buttonFlash.loadAppearance(SFN_BUTTON3);
-    _buttonFlash.clicked.connect(this, &cRomInfoWnd::pressFlash);
-    addChildWindow(&_buttonFlash);
-
     buttonPitch = _buttonFlash.size().x + 8;
     nextButtonX -= buttonPitch;
 
     _buttonFlash.setRelativePosition(cPoint(nextButtonX, buttonY));
-
-    _buttonCopy.setStyle(cButton::press);
-    _buttonCopy.setText("\x05 " + LANG("exp window", "copy to psram"));
-    _buttonCopy.setTextColor(uis().buttonTextColor);
-    _buttonCopy.loadAppearance(SFN_BUTTON3);
-    _buttonCopy.clicked.connect(this, &cRomInfoWnd::pressCopy);
-    addChildWindow(&_buttonCopy);
 
     buttonPitch = _buttonCopy.size().x + 8;
     nextButtonX -= buttonPitch;

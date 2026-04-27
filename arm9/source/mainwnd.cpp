@@ -44,6 +44,7 @@ cMainWnd::cMainWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::strin
       _startMenu(NULL),
       _startButton(NULL),
       _brightnessButton(NULL),
+      _clockButton(NULL),
       _folderUpButton(NULL),
       _folderText(NULL),
       _focusBorder(NULL) {}
@@ -86,6 +87,7 @@ void cMainWnd::init() {
     int w = 0;
     int h = 0;
     bool focus = false;
+    bool show = false;
     COLOR color = 0;
     std::string file("");
     std::string text("");
@@ -109,6 +111,7 @@ void cMainWnd::init() {
     x = ini.GetInt("start button", "x", 0);
     y = ini.GetInt("start button", "y", 172);
     focus = ini.GetInt("start button", "focus", 0);
+    show = ini.GetInt("start button", "show", 1);
     color = ini.GetInt("start button", "textColor", 0x7fff);
     file = ini.GetString("start button", "file", "none");
     text = ini.GetString("start button", "text", "ini");
@@ -126,19 +129,33 @@ void cMainWnd::init() {
     _startButton->loadAppearance(file);
     _startButton->clicked.connect(this, &cMainWnd::startButtonClicked);
     _startButton->setTextColor(color | BIT(15));
-    if (!ini.GetInt("start button", "show", 1)) _startButton->hide();
+    if (!show) _startButton->hide();
     addChildWindow(_startButton);
 
     // init brightness button
     x = ini.GetInt("brightness btn", "x", 240);
     y = ini.GetInt("brightness btn", "y", 1);
     focus = ini.GetInt("brightness btn", "focus", 0);
+    show = ini.GetInt("brightness btn", "show", 1);
     _brightnessButton = new cButton(x, y, 0, 0, this, "");
     _brightnessButton->setRelativePosition(cPoint(x, y));
     _brightnessButton->setIsFocusable(focus);
     _brightnessButton->loadAppearance(SFN_BRIGHTNESS_BUTTON);
-    _brightnessButton->pressed.connect(this, &cMainWnd::brightnessButtonClicked);
+    _brightnessButton->clicked.connect(this, &cMainWnd::brightnessButtonClicked);
+    if (!show) _brightnessButton->hide();
     addChildWindow(_brightnessButton);
+
+    x = ini.GetInt("clock btn", "x", 240);
+    y = ini.GetInt("clock btn", "y", 1);
+    focus = ini.GetInt("clock btn", "focus", 0);
+    show = ini.GetInt("clock btn", "show", 0);
+    _clockButton = new cButton(x, y, 0, 0, this, "");
+    _clockButton->setRelativePosition(cPoint(x, y));
+    _clockButton->setIsFocusable(focus);
+    _clockButton->loadAppearance(SFN_CLOCK_BUTTON);
+    _clockButton->clicked.connect(this, &cMainWnd::clockButtonClicked);
+    if (!show) _clockButton->hide();
+    addChildWindow(_clockButton);
 
     x = ini.GetInt("folderup btn", "x", 0);
     y = ini.GetInt("folderup btn", "y", 2);
@@ -148,7 +165,7 @@ void cMainWnd::init() {
     _folderUpButton->setRelativePosition(cPoint(x, y));
     _folderUpButton->loadAppearance(SFN_FOLDERUP_BUTTON);
     _folderUpButton->setSize(cSize(w, h));
-    _folderUpButton->pressed.connect(_mainList, &cMainList::backParentDir);
+    _folderUpButton->clicked.connect(_mainList, &cMainList::backParentDir);
     addChildWindow(_folderUpButton);
 
     x = ini.GetInt("folder text", "x", 20);
@@ -190,7 +207,7 @@ void cMainWnd::startMenuItemClicked(s16 i) {
     dbg_printf("start menu item %d\n", i);
 
     if (START_MENU_ITEM_FAVORITES == i) {
-        std::string selectedFullPath = _mainList->getSelectedFullPath();
+        std::string selectedFullPath = _mainList->getRowFullPath(_mainList->selectedRowId());
         bool favoritesRes = false;
         if (cFavorites::IsInFavorites(selectedFullPath)) {
             favoritesRes = cFavorites::RemoveFromFavorites(selectedFullPath);
@@ -204,7 +221,7 @@ void cMainWnd::startMenuItemClicked(s16 i) {
     }
 
     else if (START_MENU_ITEM_INFO == i) {
-        showFileInfo();
+        showFileInfo(_mainList->selectedRowId());
     }
 
     else if (START_MENU_ITEM_SETTING == i) {
@@ -221,7 +238,7 @@ void cMainWnd::startMenuItemClicked(s16 i) {
 void cMainWnd::startButtonClicked() {
     if (!gs().safeMode) {
         WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder}, this, [this]() {
-            _startMenu->showForFile(_mainList->getSelectedFullPath());
+            _startMenu->showForFile(_mainList->getRowFullPath(_mainList->selectedRowId()));
             windowManager().addWindow(_startMenu);
         });
         task->schedule();
@@ -230,6 +247,20 @@ void cMainWnd::startButtonClicked() {
 
 void cMainWnd::brightnessButtonClicked() {
     gs().nextBrightness();
+}
+
+void cMainWnd::clockButtonClicked() {
+    std::string lastFile = saveManager().lastFile();
+    if (lastFile == "..." || lastFile.empty()) {
+        return;
+    }
+
+    u32 selectedId = _mainList->getRowIdByPath(lastFile);
+    if (selectedId >= UINT16_MAX) {
+        return;
+    }
+
+    showFileInfo(selectedId);
 }
 
 cWindow& cMainWnd::loadAppearance(const std::string& aFileName) {
@@ -248,7 +279,7 @@ bool cMainWnd::processKeyMessage(cKeyMessage message) {
         if (isL) {
             showSettings();
         } else if (!gs().safeMode) {
-            showFileInfo();
+            showFileInfo(_mainList->selectedRowId());
         }
 
         return true;
@@ -260,7 +291,7 @@ bool cMainWnd::processKeyMessage(cKeyMessage message) {
                 DSRomInfo rominfo;
                 if (_mainList->getRomInfo(_mainList->selectedRowId(), rominfo) &&
                     rominfo.isDSRom() && !rominfo.isHomebrew()) {
-                    cRomInfoWnd::showCheats(_mainList->getSelectedFullPath());
+                    cRomInfoWnd::showCheats(_mainList->getRowFullPath(_mainList->selectedRowId()));
                 }
             }
         } else {
@@ -319,9 +350,10 @@ void cMainWnd::setFocusedChild(cWindow* child) {
 }
 
 void cMainWnd::launchSelected() {
-    std::string fullPath = _mainList->getSelectedFullPath();
-    std::string romName = _mainList->getSelectedShowName();
-    std::string fileName = _mainList->getSelectedFileName();
+    u32 selectedRowId = _mainList->selectedRowId();
+    std::string fullPath = _mainList->getRowFullPath(selectedRowId);
+    std::string romName = _mainList->getRowShowName(selectedRowId);
+    std::string fileName = _mainList->getRowFileName(selectedRowId);
     size_t lastSlashPos = fullPath.find_last_of("/\\");
     std::string directory = fullPath.substr(0, lastSlashPos + 1);
     
@@ -657,16 +689,15 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
     }
 }
 
-void cMainWnd::showFileInfo() {
+void cMainWnd::showFileInfo(u32 id) {
+    u32 selectedRomId = id;
     DSRomInfo rominfo;
-    if (!_mainList->getRomInfo(_mainList->selectedRowId(), rominfo)) {
+    if (!_mainList->getRomInfo(selectedRomId, rominfo)) {
         return;
     }
 
-    dbg_printf("show '%s' info\n", _mainList->getSelectedFullPath().c_str());
-
-    std::string showName = _mainList->getSelectedShowName();
-    std::string fullPath = _mainList->getSelectedFullPath();
+    std::string showName = _mainList->getRowShowName(selectedRomId);
+    std::string fullPath = _mainList->getRowFullPath(selectedRomId);
     cRomInfoWnd* romInfoWnd = new cRomInfoWnd(LANG("rom info", "title"), [this](cRomInfoWnd* wnd) { saveFileInfo(wnd); });
     romInfoWnd->setFileInfo(fullPath, showName);
     romInfoWnd->setRomInfo(rominfo);
@@ -692,7 +723,8 @@ void cMainWnd::onFolderChanged() {
         return;
     }
 
-    if (_mainList->getSelectedFullPath() == "slot2:/") {
+    u32 selectedRowId = _mainList->selectedRowId();
+    if (_mainList->getRowFullPath(selectedRowId) == "slot2:/") {
         u8 chk = CGbaLoader::GetGbaHeader();
         if (chk != GBA_HEADER.complement) {
             std::string title = LANG("no gba card", "title");
@@ -724,7 +756,7 @@ void cMainWnd::onFolderChanged() {
         task->schedule();
     }
 
-    if (_mainList->getSelectedFullPath() == "slot1:/") {
+    if (_mainList->getRowFullPath(selectedRowId) == "slot1:/") {
         WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder}, this, [this](){
             Slot1Launcher* launcher = new Slot1Launcher();
             launcher->launchRom("slot1:/", "", 0, 0, 0, 0);

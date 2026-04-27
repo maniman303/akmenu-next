@@ -118,7 +118,7 @@ void saveSram() {
     fclose(saveFile);
 }
 
-void initMainWindow(std::string lastDirectory, std::string lastFile) {
+void initMainWindow() {
     akui::cImage* background = new akui::cImage(NULL, cSize(SCREEN_WIDTH, SCREEN_HEIGHT), 0xffff);    
     background->loadAppearance(SFN_LOWER_SCREEN_BG);
     windowManager().addWindow(background);
@@ -126,10 +126,21 @@ void initMainWindow(std::string lastDirectory, std::string lastFile) {
     cMainWnd* wnd = new cMainWnd(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, "main window");
     wnd->init();
 
-    if (!wnd->_mainList->enterDir(lastDirectory != "..." ? lastDirectory : gs().startupFolder)) {
-        wnd->_mainList->enterDir("...");
+    std::string lastDirectory = saveManager().lastDirectory();
+    std::string lastFile = saveManager().lastFile();
+
+    if (gs().filePresentationMode < 2) {
+        if (wnd->_mainList->enterDir(lastDirectory != "..." ? lastDirectory : gs().startupFolder)) {
+            wnd->_mainList->selectRom(lastFile);
+        } else {
+            wnd->_mainList->enterDir("...");
+        }
     } else {
-        wnd->_mainList->selectRom(lastFile);
+        wnd->_mainList->enterDir("...");
+
+        if (lastFile != "..." && !lastFile.empty()) {
+            wnd->_mainList->selectRom(lastFile);
+        }
     }
 
     windowManager().addWindow(wnd);
@@ -189,18 +200,6 @@ int main(int argc, char* argv[]) {
     tickSound().load(SFN_UI_TICK_SOUND);
     sd().update();
 
-    // set last directory
-    std::string lastDirectory = "...", lastFile = "...";
-    if (gs().enterLastDirWhenBoot || gs().autorunWithLastRom) {
-        lastFile = saveManager().getLastInfo();
-        if (lastFile.empty()) {
-            lastFile = "...";
-        } else if (gs().enterLastDirWhenBoot && gs().filePresentationMode < 2) {
-            size_t slashPos = lastFile.find_last_of('/');
-            if (lastFile.npos != slashPos) lastDirectory = lastFile.substr(0, slashPos + 1);
-        }
-    }
-
     // Backup save data from chip and gba sram save data to flash.
     if (gs().gbaAutoSave && expansion().IsValid()) {
         saveSram();
@@ -211,9 +210,9 @@ int main(int argc, char* argv[]) {
     subWindowManager().init();
     fpsCounter().init();
 
-    if (gs().autorunWithLastRom && lastFile != "..." && !lastFile.empty()) {
-        cRomBootWnd* romBoot = new cRomBootWnd(lastFile, [lastDirectory, lastFile]() {
-            initMainWindow(lastDirectory, lastFile);    
+    if (gs().autorunWithLastRom && saveManager().lastFile() != "..." && !saveManager().lastFile().empty()) {
+        cRomBootWnd* romBoot = new cRomBootWnd(saveManager().lastFile(), []() {
+            initMainWindow();    
         });
 
         windowManager().addModal(romBoot);
@@ -221,7 +220,7 @@ int main(int argc, char* argv[]) {
         ScreenFadeTask* fadeTask = new ScreenFadeTask(true, false, true);
         fadeTask->schedule();
     } else {
-        initMainWindow(lastDirectory, lastFile);
+        initMainWindow();
     }
 
     irq().vblankStart();

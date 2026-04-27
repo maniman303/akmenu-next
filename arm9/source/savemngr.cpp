@@ -23,7 +23,7 @@
 
 #include "saves/ROMList.h"
 
-cSaveManager::cSaveManager() : _lastLoadedFilename("") {}
+cSaveManager::cSaveManager() : _lastLoadedFilename(""), _lastFile("..."), _lastDir("...") {}
 
 cSaveManager::~cSaveManager() {}
 
@@ -157,7 +157,15 @@ bool cSaveManager::loadLastInfo(std::string& lastLoadedFilename) {
     }
 
     _lastLoadedFilename = lastLoadedFilename = f.GetString("Save Info", "lastLoaded", "");
-    if ("" == lastLoadedFilename) return false;
+    if (_lastLoadedFilename.empty()) {
+        return false;
+    }
+
+    _lastFile = _lastLoadedFilename;
+    size_t slashPos = _lastFile.find_last_of('/');
+    if (_lastFile.npos != slashPos) {
+        _lastDir = _lastFile.substr(0, slashPos + 1);
+    }
 
     return true;
 }
@@ -173,6 +181,14 @@ bool cSaveManager::clearLastInfo() {
     }
     
     return true;
+}
+
+std::string cSaveManager::lastFile() const {
+    return _lastFile;
+}
+
+std::string cSaveManager::lastDirectory() const {
+    return _lastDir;
 }
 
 bool cSaveManager::initializeSaveFile(const std::string& romFilename, u8 slot, u32 size) {

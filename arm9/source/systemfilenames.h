@@ -42,6 +42,7 @@
 #define SFN_SPINBG_M_NAMED SFN_UI_DIRECTORY + gs().uiName + "/spin_bg_named_middle.bmp"
 #define SFN_SPINBG_R_NAMED SFN_UI_DIRECTORY + gs().uiName + "/spin_bg_named_right.bmp"
 #define SFN_BRIGHTNESS_BUTTON SFN_UI_DIRECTORY + gs().uiName + "/brightness.bmp"
+#define SFN_CLOCK_BUTTON SFN_UI_DIRECTORY + gs().uiName + "/clock.bmp"
 #define SFN_FOLDERUP_BUTTON SFN_UI_DIRECTORY + gs().uiName + "/folder_up.bmp"
 #define SFN_STARTMENU_BG SFN_UI_DIRECTORY + gs().uiName + "/menu_bg.bmp"
 #define SFN_CLOCK_NUMBERS SFN_UI_DIRECTORY + gs().uiName + "/calendar/clock_numbers.bmp"
