@@ -61,18 +61,21 @@ void cUserWindow::init() {
 }
 
 void cUserWindow::draw() {
+    int posX = position().x;
+    int posY = position().y;
+
     if (_showCustomPic && _userPicture.valid()) {
-        gdi().maskBlt(_userPicture.buffer(), _px, _py, _userPicture.width(), _userPicture.height(),
+        gdi().maskBlt(_userPicture.buffer(), posX + _px, posY + _py, _userPicture.width(), _userPicture.height(),
                       _engine);
     }
 
     if (_showCustomText && _userText != "") {
         gdi().setPenColor(_userTextColor, _engine);
-        gdi().textOutRect(_tx, _ty, _tw, _th, _userText.c_str(), _engine, fontSecondary());
+        gdi().textOutRect(posX + _tx, posY + _ty, _tw, _th, _userText.c_str(), _engine, fontSecondary());
     }
 
     if (_showUserName && _userName != "") {
         gdi().setPenColor(_userNameColor, _engine);
-        gdi().textOut(_ux, _uy, _userName.c_str(), _engine, fontSecondary());
+        gdi().textOut(posX + _ux, posY + _uy, _userName.c_str(), _engine, fontSecondary());
     }
 }

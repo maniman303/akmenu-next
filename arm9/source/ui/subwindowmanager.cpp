@@ -1,15 +1,9 @@
 #include "subwindowmanager.h"
-#include "analogclock.h"
-#include "bigclock.h"
-#include "calendar.h"
-#include "calendarwnd.h"
-#include "batterymeter.h"
-#include "booticon.h"
-#include "smalldate.h"
-#include "smallclock.h"
-#include "diskicon.h"
-#include "userwnd.h"
-#include "fpscounter.h"
+#include "../analogclock.h"
+#include "../bigclock.h"
+#include "../calendar.h"
+#include "../calendarwnd.h"
+#include "../topbar.h"
 
 cSubWindowManager::cSubWindowManager() {}
 
@@ -20,30 +14,25 @@ void cSubWindowManager::init() {
     calendar().init();
     analogClock().init();
     bigClock().init();
-    batteryMeter().init();
-    bootIcon().init();
 
-    smallDate().init();
-    smallClock().init();
+    topbar().init();
 }
 
 void cSubWindowManager::blink() {
     bigClock().blinkColon();
-    smallClock().flipColon();
-    batteryMeter().flipIcon();
+    
+    topbar().blink();
 }
 
 void cSubWindowManager::update() {
     updateBackground();
 
+    topbar().update();
+
     analogClock().draw();
     bigClock().draw();
-    batteryMeter().draw();
-    bootIcon().draw();
-    smallDate().draw();
-    smallClock().draw();
-    userWindow().draw();
-    fpsCounter().draw();
+
+    topbar().draw();
 }
 
 void cSubWindowManager::updateBackground() {

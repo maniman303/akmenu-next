@@ -71,7 +71,7 @@ void cRomBootWnd::update() {
         return;
     }
 
-    if (!_pressAnimation.isPlaying() && !_pressAnimation.isCompleted()) {
+    if (!_pressAnimation.isPlaying()) {
         _pressAnimation.play();
     }
     

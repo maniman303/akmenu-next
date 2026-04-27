@@ -45,6 +45,8 @@
 #define SFN_CLOCK_BUTTON SFN_UI_DIRECTORY + gs().uiName + "/clock.bmp"
 #define SFN_FOLDERUP_BUTTON SFN_UI_DIRECTORY + gs().uiName + "/folder_up.bmp"
 #define SFN_STARTMENU_BG SFN_UI_DIRECTORY + gs().uiName + "/menu_bg.bmp"
+#define SFN_TOPBAR_BG SFN_UI_DIRECTORY + gs().uiName + "/topbar.bmp"
+#define SFN_TOPBAR_OVERLAY SFN_UI_DIRECTORY + gs().uiName + "/topbar_overlay.bmp"
 #define SFN_CLOCK_NUMBERS SFN_UI_DIRECTORY + gs().uiName + "/calendar/clock_numbers.bmp"
 #define SFN_CLOCK_COLON SFN_UI_DIRECTORY + gs().uiName + "/calendar/clock_colon.bmp"
 #define SFN_DAY_NUMBERS SFN_UI_DIRECTORY + gs().uiName + "/calendar/day_numbers.bmp"

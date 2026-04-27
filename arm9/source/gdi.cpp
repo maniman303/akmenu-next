@@ -658,7 +658,7 @@ void cGdi::bitBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16
 }
 
 ARM_CODE LIBNDS_NOINLINE
-void ITCM_FUNC(cGdi::bitBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH, u16 repeats, GRAPHICS_ENGINE engine) {
+void ITCM_FUNC(cGdi::bitBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, s32 destW, s32 destH, u16 repeats, GRAPHICS_ENGINE engine) {
     u16* pSrc = (u16*)src;
     u16* pDest = (engine == GE_MAIN) ? 
                     (_workMain + _layerPitch) : 
@@ -762,8 +762,7 @@ void cGdi::maskBlt(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u1
 }
 
 ARM_CODE LIBNDS_NOINLINE
-void ITCM_FUNC(cGdi::maskBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, u16 destW, u16 destH,
-                   GRAPHICS_ENGINE engine, u16 color) {
+void ITCM_FUNC(cGdi::maskBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s16 destY, s32 destW, s32 destH, GRAPHICS_ENGINE engine, u16 color) {
     u16* pSrc = (u16*)src;
     u16* pDest = GE_MAIN == engine ?
         _workMain + _layerPitch :

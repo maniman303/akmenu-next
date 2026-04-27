@@ -281,8 +281,18 @@ s32 cFontPcf::SearchInternal(u16 aCode) const {
 void cFontPcf::DrawInternal(u16* mem, s16 x, s16 y, const u8* data, u16 color, u32 width, u32 height, u32 destWidth, u32 destHeight) const {
     const u32 byteW = (width + 7) >> 3;
 
-    u32 offsetY = (u32)(y < 0 ? -1 * y : 0);
-    for (u32 ii = offsetY; ii < height; ii++) {
+    u32 offsetY = 0;
+    if (y < 0) {
+        offsetY = (u32) -1 * y;
+        y = 0;
+        data += offsetY * byteW;
+        if (offsetY >= height) {
+            return;
+        }
+
+        height -= offsetY;
+    }
+    for (u32 ii = 0; ii < height; ii++) {
         if (y + ii >= destHeight) {
             return;
         }

@@ -37,7 +37,7 @@ bool Animation::isCompleted() const {
 }
 
 bool Animation::isPlaying() const {
-    return _isPlaying && _startTick + _duration > timer().getTick();
+    return _isPlaying;
 }
 
 bool Animation::isReversed() const {

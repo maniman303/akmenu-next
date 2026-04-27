@@ -1,8 +1,8 @@
 #pragma once
 
-#include "point.h"
 #include "singleton.h"
-#include "window.h"
+#include "ui/point.h"
+#include "ui/window.h"
 
 #define PM_BATTERY_LOW   BIT(0)
 #define PM_AC_PRESENT    BIT(1)
@@ -15,9 +15,7 @@ class cAnalogClock : public cWindow {
 
   public:
     void init();
-
     void draw() override;
-
     cWindow& loadAppearance(const std::string& aFileName) override { return *this; }
 
   protected:
