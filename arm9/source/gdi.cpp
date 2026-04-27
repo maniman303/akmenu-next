@@ -470,6 +470,24 @@ void ITCM_FUNC(cGdi::fillRect)(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 
     }
 }
 
+u16 cGdi::colorizeColor(u16 grey, u16 tint) {
+    if ((grey & 0x8000) == 0 || (tint & 0x8000) == 0) {
+        return grey;
+    }
+
+    const u32 lum = (static_cast<u32>(grey) & 0x1fu);
+
+    const u32 tr = (static_cast<u32>(tint))        & 0x1fu;
+    const u32 tg = (static_cast<u32>(tint) >> 5u)  & 0x1fu;
+    const u32 tb = (static_cast<u32>(tint) >> 10u) & 0x1fu;
+
+    const u32 r = (tr * lum) >> 5u;
+    const u32 g = (tg * lum) >> 5u;
+    const u32 b = (tb * lum) >> 5u;
+
+    return static_cast<u16>((b << 10u) | (g << 5u) | r | BIT(15));
+}
+
 u16 cGdi::blendColors(u16 color, u16 dest, u16 src, u16 opacity) {
     if (opacity >= 100) {
         return color;
