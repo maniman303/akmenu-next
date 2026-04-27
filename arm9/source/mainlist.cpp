@@ -149,6 +149,12 @@ static bool itemSortComp(const akui::cListView::itemVector& item1, const akui::c
     if (realFn1.back() == '/' && realFn2.back() != '/') return true;
     if (realFn1.back() != '/' && realFn2.back() == '/') return false;
 
+    if (realFn1 == "slot1:/") return true;
+    if (realFn2 == "slot1:/") return false;
+
+    if (realFn1 == "slot2:/" && realFn2 != "slot1:/") return true;
+    if (realFn1 != "slot1:/" && realFn2 == "slot2:/") return false;
+
     const bool isLastFn1 = (item1.size() > cMainList::IS_FAVORITE_COLUMN) && (item1[cMainList::IS_FAVORITE_COLUMN].text() == "last");
     const bool isLastFn2 = (item2.size() > cMainList::IS_FAVORITE_COLUMN) && (item2[cMainList::IS_FAVORITE_COLUMN].text() == "last");
 
@@ -519,6 +525,32 @@ bool cMainList::setupGameDir() {
     int rowsCount = static_cast<int>(rows.size());
     for (int i = 0; i < std::min(rowsCount, rowsToLoad); i++) {
         insertEntryRow(getRowCount(), rows[i], DSRomInfo());
+    }
+
+    if (isDSiMode() && !fsManager().isFlashcart()) {
+        std::string nand = getIconPath("nand_banner.bin");
+        std::vector<std::string> slotRow;
+        slotRow.push_back(LANG("mainlist", "slot1 card"));
+        slotRow.push_back("");
+        slotRow.push_back("slot1:/");
+        
+        DSRomInfo romInfo;
+        romInfo.setBannerFromFile("folder", nand, nand_banner_bin);
+
+        insertEntryRow(getRowCount(), slotRow, romInfo);
+    }
+    
+    if (CGbaLoader::GetGbaHeader() == GBA_HEADER.complement) {
+        std::string gba = getIconPath("gba_banner.bin");
+        std::vector<std::string> slotRow;
+        slotRow.push_back(LANG("mainlist", "slot2 card"));
+        slotRow.push_back("");
+        slotRow.push_back("slot2:/");
+        
+        DSRomInfo romInfo;
+        romInfo.setBannerFromFile("folder", gba, gba_banner_bin);
+
+        insertEntryRow(getRowCount(), slotRow, romInfo);
     }
 
     return rowsCount <= rowsToLoad;
