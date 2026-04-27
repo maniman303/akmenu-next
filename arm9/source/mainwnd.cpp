@@ -587,7 +587,7 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
     // page 1: system
     u32 langIndexAfter = settingWnd->getItemSelection(0, 0);
     gs().dateFormat = settingWnd->getItemSelection(0, 1);
-    gs().show12hrClock = settingWnd->getItemSelection(1, 2);
+    gs().show12hrClock = settingWnd->getItemSelection(0, 2);
     gs().autorunWithLastRom = settingWnd->getItemSelection(0, 3);
 
     // page 2: interface

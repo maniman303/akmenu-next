@@ -32,6 +32,10 @@ void cSmallClock::draw() {
 
     int hours = datetime().hours();
     int minutes = datetime().minutes();
+
+    if (gs().show12hrClock && hours > 12) {
+        hours -= 12;
+    }
     
     const cFont& textFont = fontSecondary();
     u32 textWidth = textFont.TextWidth(formatString("%02d", hours));
