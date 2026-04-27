@@ -1,46 +1,38 @@
-<p align="center">
-   <img width="802" height="211" alt="image" src="https://github.com/user-attachments/assets/93b07874-5f3f-4572-b2e3-74bdabd757a0" />
-</p>
+## AKMenu-Mako
 
-<p align="center">
-   <a href="https://gbatemp.net/threads/ds-i-3ds-akmenu-next-wood-frontend-for-nds-bootstrap.665743/">
-      <img src="https://img.shields.io/badge/GBAtemp-Thread-blue.svg" alt="GBAtemp thread">
-   </a>
-   <a href="https://github.com/coderkei/akmenu-next/actions/workflows/main.yml">
-      <img src="https://github.com/coderkei/akmenu-next/actions/workflows/main.yml/badge.svg" alt="Build status on GitHub Actions">
-   </a>
-</p>
-
-## AKMenu-Next
-
-Frontend for [nds-bootstrap](https://github.com/DS-Homebrew/nds-bootstrap/) and [Pico-Loader](https://github.com/LNH-team/pico-loader) based upon [lifehansolhacker's akmenu4 port](https://github.com/lifehackerhansol/akmenu4).
+Frontend for [nds-bootstrap](https://github.com/DS-Homebrew/nds-bootstrap/) and [Pico-Loader](https://github.com/LNH-team/pico-loader) based upon [coderkei's akmenu-next](https://github.com/coderkei/akmenu-next) fork of [lifehansolhacker's akmenu4](https://github.com/lifehackerhansol/akmenu4) port.
 
 ## Changes in this fork
 
-This fork is a work in progress to rewrite the UI part of **akmenu-next**. Currently it includes following changes:
+This fork is a work in progress project aimed to rewrite the UI part of **akmenu-next**. Currently it includes following changes:
 
-- Rendering went through overhaul with bugfixes, new features, and code duplication removal.
+- Rendering went through massive overhaul with performance improvements, bugfixes, new features, and code duplication removal.
 - Font rendering was significantly enhanced, secondary small font was added.
 - Modal dialogs were rewritten from scratch to unblock main loop.
 - Rom launchers were rewritten froms scratch with a brand new system of splitting tasks per frames.
 - Input system was rewritten for simplicity and flexibility.
-- Many new UI elements were added like battery meter, boot icon, small date, small clock, analogue clock.
+- Many new UI elements were added like analogue clock, battery meter, boot icon, small date, small clock.
 - Some UI elements were enhanced, enriched, eg. settings section header can be separately themed.
 - First sound effects were created: clock ticking.
 - Added new settings for minimalistic rom list, auto rom launching.
-- Improved visuals of auto launching last played games.
+- Improved visuals of auto launching last played games with separate screen.
+- Added animated focus border to main screen.
 - Many bug fixes.
 
 The end goal is to recreate (with proper theme that's not included yet) the aesthetic and feel of original Nintendo DS bios.
 
-Here are planned features:
-- Rewrite rendering pipeline with improved performance and future proofing
-- Animated focus border in main list.
+Plans for near future:
+- Clean up settings.
+- Add system for coloring bmps with system color.
+- Add clean theme to repo.
+- Add more vfx sounds.
+- Add support for gbarunner3.
+
+Plans for far future:
 - New info box.
 - Button bar used in settings, modal dialogs, help menu.
 - Top screen header used in settings, file manager, help menu.
 - Redesigned rom info menu, help menu, cheat window menu.
-- Navigation sounds.
 - Animations.
 - Redesigned start menu inspired by bios settings.
 - Optional vertical rom list, similar to DSi and 3ds menu.

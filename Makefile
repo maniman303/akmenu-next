@@ -16,8 +16,8 @@ GAME_ICON := icon.bmp
 NITRO_FILES :=
 
 # These set the information text in the nds file
-GAME_TITLE     := AKMenu-Next
-GAME_SUBTITLE1 := github.com/coderkei
+GAME_TITLE     := AKMenu-Mako
+GAME_SUBTITLE1 := github.com/maniman303
 
 ifeq ($(OS),Windows_NT)
     MAKE_CIA = ./tools/make_cia.exe
