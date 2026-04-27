@@ -52,7 +52,7 @@ void cTopBar::update() {
         return;
     }
 
-    if (!_animation.isPlaying() && _firstDraw) {
+    if (!_animation.isPlaying() && _firstDraw && gdi().getScreenTransparency(selectedEngine()) == 100) {
         _animation.play();
     }
 
