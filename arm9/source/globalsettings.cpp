@@ -23,7 +23,6 @@ cGlobalSettings::cGlobalSettings() {
     startupFolder = "...";
     dateFormat = 0;
     fileListType = 0;
-    showHiddenFiles = false;
     clockSound = false;
     filePresentationMode = 0;
     minimalModeRomsCount = 20;
@@ -73,7 +72,6 @@ void cGlobalSettings::loadSettings() {
     dateFormat = ini.GetInt("system", "dateFormat", dateFormat);
     fileListType = ini.GetInt("system", "fileListType", fileListType);
     clockSound = ini.GetInt("system", "clockSound", clockSound);
-    showHiddenFiles = ini.GetInt("system", "showHiddenFiles", showHiddenFiles);
     filePresentationMode = ini.GetInt("system", "filePresentationMode", filePresentationMode);
     minimalModeRomsCount = ini.GetInt("system", "minimalModeRomsCount", minimalModeRomsCount);
     enterLastDirWhenBoot = ini.GetInt("system", "enterLastDirWhenBoot", enterLastDirWhenBoot);
@@ -131,7 +129,6 @@ void cGlobalSettings::saveSettings() {
     ini.SetString("system", "langDirectory", langDirectory);
     ini.SetInt("system", "dateFormat", dateFormat);
     ini.SetInt("system", "fileListType", fileListType);
-    ini.SetInt("system", "showHiddenFiles", showHiddenFiles);
     ini.SetInt("system", "clockSound", clockSound);
     ini.SetInt("system", "filePresentationMode", filePresentationMode);
     ini.SetInt("system", "gbaSleepHack", gbaSleepHack);
@@ -184,14 +181,9 @@ void cGlobalSettings::saveSettings() {
 void cGlobalSettings::updateSafeMode(void) {
     if (safeMode) {
         fileListType = 0;
-        showHiddenFiles = false;
+        filePresentationMode = 2;
         viewMode = EViewInternal;
     }
-}
-
-u32 cGlobalSettings::CopyBufferSize(void) {
-    if (font().FontRAM() < 300 * 1024) return 1024 * 1024;
-    return 512 * 1024;
 }
 
 void cGlobalSettings::nextBrightness(void) {

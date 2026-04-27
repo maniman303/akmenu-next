@@ -77,5 +77,5 @@ class cFontPcf : public cFont {
     u8 GetHeight() const;
     void SetDescend(u8 descend);
     u8 GetDescend() const;
-    u32 FontRAM(void);
+    u32 FontRAM(void) override;
 };

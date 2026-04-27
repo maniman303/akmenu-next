@@ -52,7 +52,7 @@ bool cWindow::hasFocus() const {
 }
 
 cWindow& cWindow::enableFocused() {
-    onGainedFocus();
+    onFocused();
     return *this;
 }
 

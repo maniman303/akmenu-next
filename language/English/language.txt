@@ -150,6 +150,9 @@ item0 = NDS
 item1 = NDS + SAV
 item2 = ALL
 
+[quick resume]
+text = Quick resume
+
 [nds bootstrap]
 text = Version of nds-bootstrap
 release = Release
@@ -161,7 +164,6 @@ inimissingtitle = INI error
 inimissing = File ndsbs.ini from _nds/akmenunext is missing or is corrupt. Please restore this file or reinstall akmenu-next.
 phatCol = DS Phat Colors
 loader = Game loader
-auto run = Auto run last game
 
 [language]
 text = Language
@@ -175,7 +177,7 @@ cn = 简体中文
 zh = 繁體中文
 
 [ui style]
-text = User Interface style
+text = System theme
 
 [date format]
 title = Date format
@@ -253,15 +255,26 @@ presentation full = Full
 presentation user only = Focused
 presentation games = Minimal
 
+[clock format]
+text = Clock format
+12 hour = 12h
+24 hour = 24h
+
+[menu style]
+menu = Menu style
+item = Menu item style
+full = Full
+user only = Focused
+games = Minimal
+
 [interface settings]
 title = Interface settings
 scrolling speed = Scrolling speed
-menu style = Menu style
+menu item = Menu item style
 oldschool = Old school
 small = Small Icons
 modern = Modern
 internal = Internal
-12 hour = 12-hour clock
 custom icons = Custom Icons
 clock sound = Clock sound
 

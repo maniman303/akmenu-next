@@ -19,7 +19,7 @@ class cRomBootWnd : public cWindow {
     void update() override;
 
   protected:
-    void onGainedFocus() override;
+    void onFocused() override;
     void draw() override;
     void drawBackdrop() override;
 

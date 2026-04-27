@@ -40,7 +40,7 @@ namespace akui {
         return *this;
     }
 
-    void cForm::onGainedFocus() {
+    void cForm::onFocused() {
         gs().scrollTick = 0;
     }
 

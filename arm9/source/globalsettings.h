@@ -30,7 +30,6 @@ class cGlobalSettings {
     void loadSettings();
     void saveSettings();
     void updateSafeMode(void);
-    static u32 CopyBufferSize(void);
     void nextBrightness(void);
     void setBrightness(u32 level);
 
@@ -51,7 +50,6 @@ class cGlobalSettings {
     int romLauncher;
     int viewMode;
     int slot2mode;
-    bool showHiddenFiles;
     bool clockSound;
     int filePresentationMode;
     int minimalModeRomsCount;

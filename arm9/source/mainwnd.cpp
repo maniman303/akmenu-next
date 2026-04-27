@@ -267,8 +267,8 @@ cWindow& cMainWnd::loadAppearance(const std::string& aFileName) {
     return *this;
 }
 
-void cMainWnd::onGainedFocus() {
-    cForm::onGainedFocus();
+void cMainWnd::onFocused() {
+    cForm::onFocused();
     windowManager().setFocusedWindow(_mainList);
 }
 
@@ -398,28 +398,15 @@ void cMainWnd::showSettings(void) {
     cSettingWnd* settingWnd = new cSettingWnd(LANG("start menu", "Setting"), "main_settings", [this](cSettingWnd* wnd) { saveSettings(wnd); });
     settingWnd->addSettingTab(LANG("system setting", "title"));
 
+    std::vector<std::string> _values;
+    
     // page 1: system
-    // user interface style
-    std::string currentUIStyle = gs().uiName;
-    u32 uiIndex = 0;
-    u32 langIndex = 0;
-    std::vector<std::string> _values = fsManager().getUiNames();
-    
-    for (size_t ii = 0; ii < _values.size(); ++ii) {
-        if (_values[ii] == gs().uiName) uiIndex = ii;
-    }
-
-    std::vector<std::string> uiNames = _values;
-    settingWnd->addSettingItem(LANG("ui style", "text"), _values, uiIndex);
-
     // language
+    u32 langIndex = 0;
     _values = fsManager().getLangNames();
-    
     for (size_t ii = 0; ii < _values.size(); ++ii) {
         if (_values[ii] == gs().langDirectory) langIndex = ii;
     }
-
-    std::vector<std::string> langNames = _values;
     settingWnd->addSettingItem(LANG("language", "text"), _values, langIndex);
 
     _values.clear();
@@ -427,19 +414,28 @@ void cMainWnd::showSettings(void) {
     _values.push_back(LANG("date format", "mm-dd-yyyy"));
     settingWnd->addSettingItem(LANG("date format", "title"), _values, gs().dateFormat);
 
-    // reset hotkey
     _values.clear();
-    _values.push_back(LANG("resethotkey", "0"));
-    _values.push_back(LANG("resethotkey", "1"));
-    _values.push_back(LANG("resethotkey", "2"));
-    _values.push_back(LANG("resethotkey", "3"));
-    _values.push_back(LANG("resethotkey", "4"));
-    _values.push_back(LANG("resethotkey", "5"));
-    _values.push_back(LANG("resethotkey", "6"));
-    settingWnd->addSettingItem(LANG("resethotkey", "text"), _values, gs().resetHotKey);
+    _values.push_back(LANG("clock format", "24 hour"));
+    _values.push_back(LANG("clock format", "12 hour"));
+    settingWnd->addSettingItem(LANG("clock format", "text"), _values, gs().show12hrClock);
+
+    _values.clear();
+    _values.push_back(LANG("switches", "Disable"));
+    _values.push_back(LANG("switches", "Enable"));
+    settingWnd->addSettingItem(LANG("quick resume", "text"), _values, gs().autorunWithLastRom);
 
     // page 2: interface
     settingWnd->addSettingTab(LANG("interface settings", "title"));
+
+    // user interface style
+    u32 uiIndex = 0;
+    std::string currentUIStyle = gs().uiName;
+    _values = fsManager().getUiNames();
+    for (size_t ii = 0; ii < _values.size(); ++ii) {
+        if (_values[ii] == gs().uiName) uiIndex = ii;
+    }
+    settingWnd->addSettingItem(LANG("ui style", "text"), _values, uiIndex);
+
     size_t scrollSpeed = 0;
     switch (gs().scrollSpeed) {
         case cGlobalSettings::EScrollFast:
@@ -457,29 +453,23 @@ void cMainWnd::showSettings(void) {
     _values.push_back(LANG("scrolling", "medium"));
     _values.push_back(LANG("scrolling", "slow"));
     settingWnd->addSettingItem(LANG("interface settings", "scrolling speed"), _values, scrollSpeed);
+
+    _values.clear();
+    _values.push_back(LANG("menu style", "full"));
+    _values.push_back(LANG("menu style", "user only"));
+    _values.push_back(LANG("menu style", "games"));
+    settingWnd->addSettingItem(LANG("menu style", "menu"), _values, gs().filePresentationMode);
+
     _values.clear();
     _values.push_back(LANG("interface settings", "oldschool"));
     _values.push_back(LANG("interface settings", "modern"));
     _values.push_back(LANG("interface settings", "internal"));
     _values.push_back(LANG("interface settings", "small"));
-    settingWnd->addSettingItem(LANG("interface settings", "menu style"), _values, gs().viewMode);
-    _values.clear();
-    _values.push_back(LANG("switches", "Disable"));
-    _values.push_back(LANG("switches", "Enable"));
-    settingWnd->addSettingItem(LANG("interface settings", "12 hour"), _values, gs().show12hrClock);
-    settingWnd->addSettingItem(LANG("interface settings", "clock sound"), _values, gs().clockSound);
+    settingWnd->addSettingItem(LANG("menu style", "item"), _values, gs().viewMode);
 
     // page 3: filesystem
     settingWnd->addSettingTab(LANG("file settings", "title"));
-    _values.clear();
-    _values.push_back(LANG("switches", "Disable"));
-    _values.push_back(LANG("switches", "Enable"));
-    settingWnd->addSettingItem(LANG("file settings", "show hidden files"), _values, gs().showHiddenFiles);
-    _values.clear();
-    _values.push_back(LANG("file settings", "presentation full"));
-    _values.push_back(LANG("file settings", "presentation user only"));
-    _values.push_back(LANG("file settings", "presentation games"));
-    settingWnd->addSettingItem(LANG("file settings", "file presentation mode"), _values, gs().filePresentationMode);
+    
     // file list type
     _values.clear();
     for (size_t ii = 0; ii < 3; ++ii) {
@@ -487,10 +477,12 @@ void cMainWnd::showSettings(void) {
         _values.push_back(LANG("filelist type", itemName));
     }
     settingWnd->addSettingItem(LANG("filelist type", "text"), _values, gs().fileListType);
+    
     _values.clear();
     _values.push_back(".nds.sav");
     _values.push_back(".sav");
     settingWnd->addSettingItem(LANG("file settings", "save extension"), _values, gs().saveExt);
+
     _values.clear();
     _values.push_back(LANG("message box", "no"));
     _values.push_back(LANG("message box", "yes"));
@@ -519,12 +511,16 @@ void cMainWnd::showSettings(void) {
     _values.push_back(LANG("override", "8"));
     settingWnd->addSettingItem(LANG("override", "text"), _values, gs().languageOverride);
 
-    if (isDSiMode()){
-        _values.clear();
-        _values.push_back(LANG("switches", "Disable"));
-        _values.push_back(LANG("switches", "Enable"));
-        settingWnd->addSettingItem(LANG("nds bootstrap", "phatCol"), _values, gs().phatCol);
-    }
+    // reset hotkey
+    _values.clear();
+    _values.push_back(LANG("resethotkey", "0"));
+    _values.push_back(LANG("resethotkey", "1"));
+    _values.push_back(LANG("resethotkey", "2"));
+    _values.push_back(LANG("resethotkey", "3"));
+    _values.push_back(LANG("resethotkey", "4"));
+    _values.push_back(LANG("resethotkey", "5"));
+    _values.push_back(LANG("resethotkey", "6"));
+    settingWnd->addSettingItem(LANG("resethotkey", "text"), _values, gs().resetHotKey);
 
     if (fsManager().isFlashcart()){
         _values.clear();
@@ -532,11 +528,6 @@ void cMainWnd::showSettings(void) {
         _values.push_back("Pico-Loader");
         settingWnd->addSettingItem(LANG("nds bootstrap", "loader"), _values, gs().pico);
     }
-
-    _values.clear();
-    _values.push_back(LANG("switches", "Disable"));
-    _values.push_back(LANG("switches", "Enable"));
-    settingWnd->addSettingItem(LANG("nds bootstrap", "auto run"), _values, gs().autorunWithLastRom);
 
 #ifdef __KERNEL_LAUNCHER_SUPPORT__
     _values.clear();
@@ -550,7 +541,13 @@ void cMainWnd::showSettings(void) {
     _values.clear();
     _values.push_back(LANG("switches", "Disable"));
     _values.push_back(LANG("switches", "Enable"));
+    settingWnd->addSettingItem(LANG("interface settings", "clock sound"), _values, gs().clockSound);
+
+    _values.clear();
+    _values.push_back(LANG("switches", "Disable"));
+    _values.push_back(LANG("switches", "Enable"));
     settingWnd->addSettingItem(LANG("patches", "cheating system"), _values, gs().cheats);
+
     _values.clear();
     _values.push_back(LANG("gba settings", "modeask"));
     _values.push_back(LANG("gba settings", "modegba"));
@@ -564,11 +561,7 @@ void cMainWnd::showSettings(void) {
         settingWnd->addSettingItem(LANG("patches", "hbstrap"), _values, gs().hbStrap);
     }
 
-    // logger().info("Start showing settings.");
-
     windowManager().addModal(settingWnd);
-
-    // logger().info("Finish showing settings.");
 }
 
 void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
@@ -577,30 +570,30 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
     }
 
     u8 currentFileListType = gs().fileListType;
-    bool currentShowHiddenFiles = gs().showHiddenFiles;
     int currentfilePresentationMode = gs().filePresentationMode;
 
     u32 uiIndex = 0;
-    u32 langIndex = 0;
     std::vector<std::string> uiNames = fsManager().getUiNames();
-    std::vector<std::string> langNames = fsManager().getLangNames();
-
     for (size_t ii = 0; ii < uiNames.size(); ++ii) {
         if (uiNames[ii] == gs().uiName) uiIndex = ii;
     }
 
+    u32 langIndex = 0;
+    std::vector<std::string> langNames = fsManager().getLangNames();
     for (size_t ii = 0; ii < langNames.size(); ++ii) {
         if (langNames[ii] == gs().langDirectory) langIndex = ii;
     }
     
     // page 1: system
-    u32 uiIndexAfter = settingWnd->getItemSelection(0, 0);
-    u32 langIndexAfter = settingWnd->getItemSelection(0, 1);
-    gs().dateFormat = settingWnd->getItemSelection(0, 2);
-    gs().resetHotKey = settingWnd->getItemSelection(0, 3);
+    u32 langIndexAfter = settingWnd->getItemSelection(0, 0);
+    gs().dateFormat = settingWnd->getItemSelection(0, 1);
+    gs().show12hrClock = settingWnd->getItemSelection(1, 2);
+    gs().autorunWithLastRom = settingWnd->getItemSelection(0, 3);
 
     // page 2: interface
-    switch (settingWnd->getItemSelection(1, 0)) {
+    u32 uiIndexAfter = settingWnd->getItemSelection(1, 0);
+
+    switch (settingWnd->getItemSelection(1, 1)) {
         case 0:
             gs().scrollSpeed = cGlobalSettings::EScrollFast;
             break;
@@ -611,45 +604,34 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
             gs().scrollSpeed = cGlobalSettings::EScrollSlow;
             break;
     }
-    gs().viewMode = settingWnd->getItemSelection(1, 1);
-    gs().show12hrClock = settingWnd->getItemSelection(1, 2);
-    gs().clockSound = settingWnd->getItemSelection(1, 3);
+    gs().filePresentationMode = settingWnd->getItemSelection(1, 2);
+    gs().viewMode = settingWnd->getItemSelection(1, 3);
 
     // page 3: filesystem
-    gs().showHiddenFiles = settingWnd->getItemSelection(2, 0);
-    gs().filePresentationMode = settingWnd->getItemSelection(2, 1);
-    gs().fileListType = settingWnd->getItemSelection(2, 2);
-    gs().saveExt = settingWnd->getItemSelection(2, 3);
-    gs().saveDir = settingWnd->getItemSelection(2, 4);
+    gs().fileListType = settingWnd->getItemSelection(2, 0);
+    gs().saveExt = settingWnd->getItemSelection(2, 1);
+    gs().saveDir = settingWnd->getItemSelection(2, 2);
 
     // page 4: ndsbs
     gs().dsOnly = settingWnd->getItemSelection(3, 0);
     gs().nightly = settingWnd->getItemSelection(3, 1);
     gs().languageOverride = settingWnd->getItemSelection(3,2);
+    gs().resetHotKey = settingWnd->getItemSelection(3, 3);
 
     size_t autoRunItem = 3;
-    if (isDSiMode()) {
-        autoRunItem++;
-        gs().phatCol = settingWnd->getItemSelection(3, 3);
-
-        if (fsManager().isFlashcart()){
-            autoRunItem++;
-            gs().pico = settingWnd->getItemSelection(3, 4);
-        }
-        
-    } else if (fsManager().isFlashcart()) {
+    
+    if (fsManager().isFlashcart()) {
         autoRunItem++;
         gs().pico = settingWnd->getItemSelection(3, 3);
     }
 
-    gs().autorunWithLastRom = settingWnd->getItemSelection(3, autoRunItem);
-
     // page 5: other
-    gs().cheats = settingWnd->getItemSelection(4, 0);
-    gs().slot2mode = settingWnd->getItemSelection(4, 1);
+    gs().clockSound = settingWnd->getItemSelection(4, 0);
+    gs().cheats = settingWnd->getItemSelection(4, 1);
+    gs().slot2mode = settingWnd->getItemSelection(4, 2);
 
     if (isDSiMode()){
-        gs().hbStrap = settingWnd->getItemSelection(4, 2);
+        gs().hbStrap = settingWnd->getItemSelection(4, 3);
     }
 
     if (uiIndex != uiIndexAfter) {
@@ -683,8 +665,7 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
     if (gs().filePresentationMode != currentfilePresentationMode) {
         _mainList->enterDir("...");
         _mainList->selectRow(0);
-    } else if (gs().fileListType != currentFileListType ||
-        gs().showHiddenFiles != currentShowHiddenFiles) {
+    } else if (gs().fileListType != currentFileListType) {
         _mainList->enterDir(_mainList->getCurrentDir());
     }
 }

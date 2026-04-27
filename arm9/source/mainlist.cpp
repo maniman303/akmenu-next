@@ -187,7 +187,11 @@ static bool hiddenEntryFilter(const std::vector<std::string>& entryNames, std::s
         return true;
     }
 
-    if (!gs().showHiddenFiles && entryName[0] == '.') {
+    if (gs().filePresentationMode == 0) {
+        return false;
+    }
+
+    if (entryName[0] == '.') {
         return true;
     }
 
@@ -195,16 +199,12 @@ static bool hiddenEntryFilter(const std::vector<std::string>& entryNames, std::s
     if (gs().fileListType == 0 && entryName == "saves") {
         return true;
     }
-    
-    if (gs().filePresentationMode == 0) {
-        return false;
-    }
 
     if (entryName[0] == '_') {
         return true;
     }
 
-    for (size_t i = 0; i < entryNames.size(); ++i) {
+    for (size_t i = 0; i < entryNames.size(); i++) {
         if (entryName == entryNames[i]) {
             return true;
         }
@@ -656,7 +656,7 @@ bool cMainList::enterDir(const std::string& dirName) {
             }
 
             bool showThis = (entry->d_type == DT_DIR) ? (lfn != "." && lfn != "..") : extnameFilter(extNames, extName);
-            showThis = showThis && (_showAllFiles || gs().showHiddenFiles || !(FAT_getAttr(filePath.c_str()) & ATTR_HIDDEN));
+            showThis = showThis && (_showAllFiles || !(FAT_getAttr(filePath.c_str()) & ATTR_HIDDEN));
             if (!showThis) {
                 continue;
             }

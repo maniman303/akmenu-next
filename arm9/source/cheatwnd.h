@@ -28,7 +28,7 @@ class cCheatWnd : public akui::cForm, public cCheat {
     cWindow& loadAppearance(const std::string& aFileName);
 
   protected:
-    void onGainedFocus() override;
+    void onFocused() override;
     bool parse(const std::string& aFileName);
     void onItemClicked(u32 index);
     void onSelect(void);

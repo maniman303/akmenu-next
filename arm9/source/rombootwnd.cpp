@@ -90,7 +90,7 @@ void cRomBootWnd::update() {
     gdi().setMainLayerTransparency(transparency, MEL_UP);
 }
 
-void cRomBootWnd::onGainedFocus() {
+void cRomBootWnd::onFocused() {
     gdi().setScreenTransparency(0, GE_SUB);
     if (!_romInfo.isDSRom()) {
         windowManager().removeWindow(this);

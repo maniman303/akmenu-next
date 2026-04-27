@@ -109,8 +109,8 @@ void cCheatWnd::draw() {
     akui::cForm::draw();
 }
 
-void cCheatWnd::onGainedFocus() {
-    akui::cForm::onGainedFocus();
+void cCheatWnd::onFocused() {
+    akui::cForm::onFocused();
     windowManager().setFocusedWindow(&_list);
 }
 

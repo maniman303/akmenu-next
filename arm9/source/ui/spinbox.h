@@ -50,7 +50,7 @@ class cSpinBox : public cForm {
 
     void onMove();
 
-    void onGainedFocus();
+    void onFocused();
 
     void arrangeButton();
 
