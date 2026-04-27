@@ -10,6 +10,7 @@
 #include "calendar.h"
 #include "globalsettings.h"
 #include "cachedinifile.h"
+#include "personaldata.h"
 #include "stringtool.h"
 #include "systemfilenames.h"
 #include "windowmanager.h"
@@ -70,6 +71,11 @@ cWindow& cCalendar::loadAppearance(const std::string& aFileName) {
     _yearPosition.x = ini.GetInt("calendar year", "x", 52);
     _yearPosition.y = ini.GetInt("calendar year", "y", 28);
     _showYear = ini.GetInt("calendar year", "show", _showYear);
+
+    bool colorize = ini.GetInt("calendar day", "colorize", 0);
+    if (colorize) {
+        _dateSelection.colorize(personalData().color());
+    }
 
     return *this;
 }

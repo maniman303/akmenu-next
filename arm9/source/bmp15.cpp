@@ -74,7 +74,7 @@ void cBMP15::colorize(u16 color) {
     u32 size = (pitch() * height()) >> 1;
     u16* mem = (u16*)buffer();
     for (u32 i = 0; i < size; i++) {
-        mem[i] = gdi().colorizeColor(mem[i], color, 16, 16);
+        mem[i] = gdi().colorizeColor(mem[i], color);
     }
 }
 

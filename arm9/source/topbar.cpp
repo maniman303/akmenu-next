@@ -43,7 +43,6 @@ void cTopBar::init() {
     bool colorize = ini.GetInt("topbar", "colorize", 0);
     if (colorize) {
         _background.colorize(personalData().color());
-        logger().info("Finished colorizing.");
     }
 }
 

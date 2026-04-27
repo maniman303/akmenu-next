@@ -474,7 +474,7 @@ void ITCM_FUNC(cGdi::fillRect)(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 
     }
 }
 
-u16 cGdi::colorizeColor(u16 grey, u16 tint, u16 light, u16 dark) {
+u16 cGdi::colorizeColor(u16 grey, u16 tint) {
     if ((grey & 0x8000) == 0 || (tint & 0x8000) == 0) {
         return grey;
     }
@@ -486,22 +486,10 @@ u16 cGdi::colorizeColor(u16 grey, u16 tint, u16 light, u16 dark) {
     const s32 tg = static_cast<s32>((static_cast<u32>(tint) >> 5u)  & 0x1fu);
     const s32 tb = static_cast<s32>((static_cast<u32>(tint) >> 10u) & 0x1fu);
 
-    // sat=16 -> full effect, sat=0 -> flat tint
-    const s32 sat = (lum >= mid)
-        ? static_cast<s32>(light)
-        : static_cast<s32>(dark);
-
     auto colorizeCh = [&](s32 tch) -> u32 {
-        s32 result;
-        if (lum >= mid) {
-            // lerp tint -> white, scaled by sat
-            const s32 full = tch + (((lum - mid) * (31 - tch) + 8) >> 4u);
-            result = tch + (((full - tch) * sat + 8) >> 4u);
-        } else {
-            // lerp tint -> black, scaled by sat
-            const s32 full = (tch * lum + 7) / mid;
-            result = tch + (((full - tch) * sat + 8) >> 4u);
-        }
+        const s32 result = (lum >= mid)
+            ? tch + (((lum - mid) * (31 - tch) + 8) >> 4u)
+            : (tch * lum + 7) / mid;
         if (result <= 0)  return 0u;
         if (result >= 31) return 31u;
         return static_cast<u32>(result);

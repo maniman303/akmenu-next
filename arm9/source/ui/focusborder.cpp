@@ -3,6 +3,7 @@
 #include "systemfilenames.h"
 #include "twin.h"
 #include "../logger.h"
+#include "../personaldata.h"
 
 cFocusBorder::cFocusBorder(cWindow* parent) {
     _parent = parent;
@@ -20,7 +21,7 @@ void cFocusBorder::init() {
 
     CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
     _show = ini.GetInt("focus border", "show", _show);
-    _color = ini.GetInt("focus border", "color", _color) | BIT(15);
+    _color = ini.GetColor("focus border", "color", _color);
     _thickness = ini.GetInt("focus border", "thickness", _thickness);
 
     s32 duration = ini.GetInt("focus border", "duration", 0);
@@ -34,6 +35,18 @@ void cFocusBorder::init() {
     _ftl = createBMP15FromFile(SFN_UI_FOCUS_TL);
     _fbr = createBMP15FromFile(SFN_UI_FOCUS_BR);
     _fbl = createBMP15FromFile(SFN_UI_FOCUS_BL);
+
+    bool colorize = ini.GetInt("focus border", "colorize", 0);
+    if (colorize) {
+        if (_color == 0x8000) {
+            _color = personalData().color();
+        }
+
+        _ftr.colorize(personalData().color());
+        _ftl.colorize(personalData().color());
+        _fbr.colorize(personalData().color());
+        _fbl.colorize(personalData().color());
+    }
 }
 
 void cFocusBorder::update() {
@@ -107,5 +120,5 @@ void cFocusBorder::draw(GRAPHICS_ENGINE engine) {
 }
 
 bool cFocusBorder::busy() const {
-    return _animation.isPlaying();
+    return _animation.isPlaying() && !_animation.isCompleted();
 }
