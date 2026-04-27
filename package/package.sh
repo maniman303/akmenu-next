@@ -9,7 +9,7 @@ cp -r _pico flashcart
 cp boot.nds flashcart/boot.nds
 cp boot.nds flashcart/_nds/akmenunext/launcher.nds
 cd flashcart
-zip -r ../akmenu-next-flashcart.zip *
+zip -r ../akmenu-next-flashcart.zip * --exclude '*.xcf'
 cd ..
 
 #PICO
@@ -20,7 +20,7 @@ cp boot.dsi pico/boot.nds
 cp boot.dsi pico/_picoboot.nds
 cp boot.dsi pico/_nds/akmenunext/launcher.nds
 cd pico
-zip -r ../akmenu-next-pico.zip *
+zip -r ../akmenu-next-pico.zip * --exclude '*.xcf'
 cd ..
 
 #DSI
@@ -32,7 +32,7 @@ cp boot.dsi dsi/akmenu-next.dsi
 cp boot.dsi dsi/_nds/akmenunext/launcher.nds
 rm -f dsi/_nds/akmenunext/PassMeLoader.nds
 cd dsi
-zip -r ../akmenu-next-dsi.zip *
+zip -r ../akmenu-next-dsi.zip * --exclude '*.xcf'
 cd ..
 
 #3DS
@@ -43,7 +43,7 @@ cp akmenu-next.cia 3ds/akmenu-next.cia
 cp boot.dsi 3ds/_nds/akmenunext/launcher.nds
 rm -f 3ds/_nds/akmenunext/PassMeLoader.nds
 cd 3ds
-zip -r ../akmenu-next-3ds.zip *
+zip -r ../akmenu-next-3ds.zip * --exclude '*.xcf'
 cd ..
 
 #Cleanup
