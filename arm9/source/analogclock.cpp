@@ -2,6 +2,7 @@
 #include "globalsettings.h"
 #include "cachedinifile.h"
 #include "datetime.h"
+#include "personaldata.h"
 #include "systemfilenames.h"
 
 cAnalogClock::cAnalogClock() {
@@ -28,11 +29,32 @@ void cAnalogClock::init() {
     _lengthMinutes = ini.GetInt("analog clock", "lengthMinutes", 0);
     _lengthHours = ini.GetInt("analog clock", "lengthHours", 0);
     _lengthAlarm = ini.GetInt("analog clock", "lengthAlarm", 0);
-    _colorSeconds = ini.GetInt("analog clock", "colorSeconds", 0) | BIT(15);
-    _colorMinutes = ini.GetInt("analog clock", "colorMinutes", 0) | BIT(15);
-    _colorHours = ini.GetInt("analog clock", "colorHours", 0) | BIT(15);
-    _colorAlarm = ini.GetInt("analog clock", "colorAlarm", 0) | BIT(15);
-    _colorDot = ini.GetInt("analog clock", "colorDot", 0) | BIT(15);
+    _colorSeconds = ini.GetColor("analog clock", "colorSeconds", 0);
+    _colorMinutes = ini.GetColor("analog clock", "colorMinutes", 0);
+    _colorHours = ini.GetColor("analog clock", "colorHours", 0);
+    _colorAlarm = ini.GetColor("analog clock", "colorAlarm", 0);
+    _colorDot = ini.GetColor("analog clock", "colorDot", 0);
+
+    bool colorize = ini.GetInt("analog clock", "colorize", 0);
+    if (colorize && _colorSeconds == 0x8000) {
+        _colorSeconds = personalData().color();
+    }
+
+    if (colorize && _colorMinutes == 0x8000) {
+        _colorMinutes = personalData().color();
+    }
+
+    if (colorize && _colorHours == 0x8000) {
+        _colorHours = personalData().color();
+    }
+
+    if (colorize && _colorAlarm == 0x8000) {
+        _colorAlarm = personalData().color();
+    }
+
+    if (colorize && _colorDot == 0x8000) {
+        _colorDot = personalData().color();
+    }
 }
 
 void cAnalogClock::draw() {
@@ -43,8 +65,8 @@ void cAnalogClock::draw() {
     s16 degreesSeconds = datetime().seconds() * 6;
     s16 degreesMinutes = datetime().minutes() * 6;
     s16 degreesHours = (datetime().hours() % 12) * 30;
-    s16 degreesAlarm = (PersonalData->alarmHour % 12) * 30;
-    degreesAlarm += (PersonalData->alarmMinute / 2);
+    s16 degreesAlarm = (personalData().alarmHour() % 12) * 30;
+    degreesAlarm += (personalData().alarmMinute() / 2);
 
     gdi().drawRadiusLine(position().x, position().y, 2, _lengthSeconds, degreesSeconds, _colorSeconds, selectedEngine());
     gdi().drawRadiusLine(position().x, position().y, 2, _lengthMinutes, degreesMinutes, _colorMinutes, selectedEngine());

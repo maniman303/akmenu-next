@@ -141,8 +141,16 @@ int CIniFile::GetInt(const std::string& Section, const std::string& Item) {
 }
 
 int CIniFile::GetInt(const std::string& Section, const std::string& Item, int DefaultValue) {
-    int temp;
-    temp = GetInt(Section, Item);
+    int temp = GetInt(Section, Item);
+    if (!m_bLastResult) {
+        SetInt(Section, Item, DefaultValue);
+        temp = DefaultValue;
+    }
+    return temp;
+}
+
+int CIniFile::GetColor(const std::string& Section, const std::string& Item, int DefaultValue) {
+    int temp = GetInt(Section, Item) | BIT(15);
     if (!m_bLastResult) {
         SetInt(Section, Item, DefaultValue);
         temp = DefaultValue;

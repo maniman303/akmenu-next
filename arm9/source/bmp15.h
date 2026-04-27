@@ -26,19 +26,13 @@ class cBMP15 {
 
   public:
     u32 width() const { return _width; }  // width is memory bitmap's width
-
     u32 height() const { return _height; }  // height is memory bitmap's height
-
     u32 pitch() const { return _pitch; }  // pitch returns bytes per line
-
     u32* buffer() { return _buffer.get(); }
-
     const u32* buffer() const { return _buffer.get(); }
-
     bool valid() const { return buffer() != NULL; }
-
+    void colorize(u16 color);
     const std::string& filename() const;
-
     const std::string& filename(std::string filename);
 
   protected:

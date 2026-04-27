@@ -7,16 +7,16 @@
     SPDX-License-Identifier: GPL-3.0-or-later
 */
 
-#include "userwnd.h"
 #include <sys/stat.h>
-#include "../../share/memtool.h"
+#include "userwnd.h"
 #include "globalsettings.h"
 #include "inifile.h"
 #include "fontfactory.h"
+#include "personaldata.h"
 #include "stringtool.h"
 #include "systemfilenames.h"
-#include "unicode.h"
 #include "windowmanager.h"
+#include "../../share/memtool.h"
 
 cUserWindow::cUserWindow() : cWindow(NULL, "UserWindow") {
     _px = _py = 0;
@@ -57,7 +57,7 @@ void cUserWindow::init() {
     _showUserName = ini.GetInt("user name", "show", 0);
     _showCustomText = ini.GetInt("custom text", "show", 0);
     _showCustomPic = ini.GetInt("custom picture", "show", 0);
-    _userName = unicode_to_local_string((u16*)PersonalData->name, PersonalData->nameLen, NULL);
+    _userName = personalData().username();
 }
 
 void cUserWindow::draw() {

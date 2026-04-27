@@ -1,4 +1,7 @@
 #include "topbar.h"
+#include "cachedinifile.h"
+#include "logger.h"
+#include "personaldata.h"
 #include "twin.h"
 #include "systemfilenames.h"
 
@@ -31,6 +34,17 @@ void cTopBar::init() {
     _fpsCounter.init();
     _smallClock.init();
     _smallDate.init();
+
+    if (!_background.valid()) {
+        return;
+    }
+
+    CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
+    bool colorize = ini.GetInt("topbar", "colorize", 0);
+    if (colorize) {
+        _background.colorize(personalData().color());
+        logger().info("Finished colorizing.");
+    }
 }
 
 void cTopBar::update() {

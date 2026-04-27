@@ -14,6 +14,7 @@
 #include "bmp15.h"
 #include "dbgtool.h"
 #include "logger.h"
+#include "gdi.h"
 
 cBMP15::cBMP15() : _width(0), _height(0), _pitch(0), _buffer(NULL), _filename("") {}
 
@@ -50,8 +51,9 @@ cBMP15 createBMP15(u32 width, u32 height) {
     // dbg_printf( "buffer %08x\n", bmp.buffer() );
 
     u32 bufferSize = height * pitch;
-    if (bufferSize & 3)  // 如果 bufferSize 不是按4字节对齐，就把他调整到对齐
+    if (bufferSize & 3) {
         bufferSize += 4 - (bufferSize & 3);
+    }
     bmp._buffer = std::shared_ptr<u32[]>(new u32[bufferSize >> 2]);
     return bmp;
 }
@@ -62,6 +64,18 @@ cBMP15 createBMP15(u32 width, u32 height, u16 color) {
     swiFastCopy((void*)(&wideColor), bmp.buffer(), ((bmp.height() * bmp.pitch()) >> 2) | COPY_MODE_WORD | COPY_MODE_FILL);
 
     return bmp;
+}
+
+void cBMP15::colorize(u16 color) {
+    if (!valid()) {
+        return;
+    }
+
+    u32 size = (pitch() * height()) >> 1;
+    u16* mem = (u16*)buffer();
+    for (u32 i = 0; i < size; i++) {
+        mem[i] = gdi().colorizeColor(mem[i], color, 16);
+    }
 }
 
 typedef std::list<cBMP15> str_bmp_list;

@@ -470,20 +470,32 @@ void ITCM_FUNC(cGdi::fillRect)(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 
     }
 }
 
-u16 cGdi::colorizeColor(u16 grey, u16 tint) {
+u16 cGdi::colorizeColor(u16 grey, u16 tint, u16 brightness) {
     if ((grey & 0x8000) == 0 || (tint & 0x8000) == 0) {
         return grey;
     }
 
-    const u32 lum = (static_cast<u32>(grey) & 0x1fu);
+    const s32 lum = static_cast<s32>(static_cast<u32>(grey) & 0x1fu);
+    const s32 mid = 15;
 
-    const u32 tr = (static_cast<u32>(tint))        & 0x1fu;
-    const u32 tg = (static_cast<u32>(tint) >> 5u)  & 0x1fu;
-    const u32 tb = (static_cast<u32>(tint) >> 10u) & 0x1fu;
+    const s32 tr = static_cast<s32>(static_cast<u32>(tint)        & 0x1fu);
+    const s32 tg = static_cast<s32>((static_cast<u32>(tint) >> 5u)  & 0x1fu);
+    const s32 tb = static_cast<s32>((static_cast<u32>(tint) >> 10u) & 0x1fu);
 
-    const u32 r = (tr * lum) >> 5u;
-    const u32 g = (tg * lum) >> 5u;
-    const u32 b = (tb * lum) >> 5u;
+    const s32 brt = static_cast<s32>(brightness);
+
+    const s32 dev = ((lum - mid) * brt) >> 4u;
+
+    auto blend = [&](s32 ch) -> u32 {
+        const s32 result = ch + dev;
+        if (result <= 0)  return 0u;
+        if (result >= 31) return 31u;
+        return static_cast<u32>(result);
+    };
+
+    const u32 r = blend(tr);
+    const u32 g = blend(tg);
+    const u32 b = blend(tb);
 
     return static_cast<u16>((b << 10u) | (g << 5u) | r | BIT(15));
 }

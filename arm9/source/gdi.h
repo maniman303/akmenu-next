@@ -43,9 +43,9 @@ class cGdi {
     void frameRect(s16 x, s16 y, u16 w, u16 h, u16 thickness, GRAPHICS_ENGINE engine);
     void fillRect(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine);
 
-    inline u16 colorizeColor(u16 grey, u16 tint);
-    inline u16 blendColors(u16 color, u16 dest, u16 src, u16 opacity);
-    inline u32 blendColors32(u32 color, u32 dest, u32 src, u16 opacity);
+    u16 colorizeColor(u16 grey, u16 tint, u16 brightness);
+    u16 blendColors(u16 color, u16 dest, u16 src, u16 opacity);
+    u32 blendColors32(u32 color, u32 dest, u32 src, u16 opacity);
 
     void fillRectBlend(u16 color1, u16 color2, s16 x, s16 y, u16 w, u16 h, GRAPHICS_ENGINE engine, u16 opacity);
     void maskBlt(const void* src, s16 destX, s16 destY, u16 destW, u16 destH, GRAPHICS_ENGINE engine);

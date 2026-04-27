@@ -28,6 +28,7 @@ class CIniFile {
                           const std::string& DefaultValue);
     void SetString(const std::string& Section, const std::string& Item, const std::string& Value);
     int GetInt(const std::string& Section, const std::string& Item, int DefaultValue);
+    int GetColor(const std::string& Section, const std::string& Item, int DefaultValue);
     void SetInt(const std::string& Section, const std::string& Item, int Value);
     void GetStringVector(const std::string& Section, const std::string& Item,
                          std::vector<std::string>& strings, char delimiter = ',');
