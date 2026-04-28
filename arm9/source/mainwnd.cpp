@@ -641,8 +641,12 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
                 gs().langDirectory = langNames[langIndexAfter];
                 gs().saveSettings();
 
+                disableInput();
                 std::string launcherPath = fsManager().resolveSystemPath("/_nds/akmenunext/launcher.nds");
                 HomebrewLauncher* launcher = new HomebrewLauncher();
+                launcher->setOnCompleted([this](){
+                    enableInput();
+                });
                 launcher->launchRom(launcherPath, "", 0, 0, 0, 0);
             },
             {});
@@ -652,8 +656,12 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
                 gs().langDirectory = langNames[langIndexAfter];
                 gs().saveSettings();
 
+                disableInput();
                 std::string launcherPath = fsManager().resolveSystemPath("/_nds/akmenunext/launcher.nds");
                 HomebrewLauncher* launcher = new HomebrewLauncher();
+                launcher->setOnCompleted([this](){
+                    enableInput();
+                });
                 launcher->launchRom(launcherPath, "", 0, 0, 0, 0);
             },
             {});
@@ -721,14 +729,22 @@ void cMainWnd::onFolderChanged() {
             if (mode == cGlobalSettings::ESlot2Ask) {
                 akui::cMessageBox::showModal(LANG("gba settings", "mode"), LANG("gba settings", "modetext"), MB_YES_NO,
                     [this]() {
+                        disableInput();
                         PassMeLauncher* launcher = new PassMeLauncher();
+                        launcher->setOnCompleted([this](){
+                            enableInput();
+                        });
                         launcher->launchRom("slot2:/", "", 0, 0, 0, 0);
                     },
                     [this]() {
                         CGbaLoader::StartGBA();
                     });
             } else if (mode == cGlobalSettings::ESlot2Nds) {
+                disableInput();
                 PassMeLauncher* launcher = new PassMeLauncher();
+                launcher->setOnCompleted([this](){
+                    enableInput();
+                });
                 launcher->launchRom("slot2:/", "", 0, 0, 0, 0);
             } else {
                 CGbaLoader::StartGBA();
@@ -738,8 +754,12 @@ void cMainWnd::onFolderChanged() {
     }
 
     if (_mainList->getRowFullPath(selectedRowId) == "slot1:/") {
+        disableInput();
         WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder}, this, [this](){
             Slot1Launcher* launcher = new Slot1Launcher();
+            launcher->setOnCompleted([this](){
+                enableInput();
+            });
             launcher->launchRom("slot1:/", "", 0, 0, 0, 0);
         });
         task->schedule();

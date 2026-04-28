@@ -152,6 +152,7 @@ void cRomBootWnd::moveToMain() {
 
 void cRomBootWnd::startRom() {
     gdi().setScreenTransparency(0, selectedEngine());
+    disableInput();
     if (launchRom(_romPath, _romInfo, false, "") != ELaunchRomOk) {
         moveToMain();
     }
