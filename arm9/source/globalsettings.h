@@ -30,6 +30,7 @@ class cGlobalSettings {
     void loadSettings();
     void saveSettings();
     void updateSafeMode(void);
+    void fixTheme(void);
     void nextBrightness(void);
     void setBrightness(u32 level);
 

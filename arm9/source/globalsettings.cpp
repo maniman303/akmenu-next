@@ -118,6 +118,7 @@ void cGlobalSettings::loadSettings() {
     CIniFile iniBacklight(SFN_BACKLIGHT);
     brightness = iniBacklight.GetInt("brightness", "brightness", brightness);
     setBrightness(brightness);
+    fixTheme();
     updateSafeMode();
 }
 
@@ -183,6 +184,12 @@ void cGlobalSettings::updateSafeMode(void) {
         fileListType = 0;
         filePresentationMode = 2;
         viewMode = EViewInternal;
+    }
+}
+
+void cGlobalSettings::fixTheme(void) {
+    if (!fsManager().fileExists(SFN_UI_SETTINGS)) {
+        uiName = "Mako";
     }
 }
 

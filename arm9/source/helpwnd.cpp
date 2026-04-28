@@ -58,7 +58,7 @@ cHelpWnd::cHelpWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::strin
     
     char ndsbsBuffer[256];
     _helpText += "https://github.com/maniman303\n";
-    _helpText += formatString("AKMenu-Next %s.%s ", AKMENU_VERSION_MAIN, AKMENU_VERSION_SUB);
+    _helpText += formatString("AKMenu-Mako %s.%s ", AKMENU_VERSION_MAIN, AKMENU_VERSION_SUB);
 
     if(gs().pico){
         _helpText += formatString("\n%s %s ", AKMENU_PICO_NAME, AKMENU_LOADER_VERSION);
