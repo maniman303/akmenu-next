@@ -1,5 +1,6 @@
 #include "vfxmanager.h"
 #include "tick_sound_bin.h"
+#include "select_sound_bin.h"
 
 VfxManager::VfxManager() {
     _init = false;
@@ -8,6 +9,7 @@ VfxManager::VfxManager() {
 
 void VfxManager::init() {
     _entries.push_back(VfxEntry(VFX_EFFECT::TICK, (u8*)tick_sound_bin, tick_sound_bin_size, 20));
+    _entries.push_back(VfxEntry(VFX_EFFECT::SELECT, (u8*)select_sound_bin, select_sound_bin_size, 66));
     _init = true;
     _enabled = true;
 }
@@ -38,6 +40,10 @@ bool VfxManager::busy() const {
     }
 
     return false;
+}
+
+void VfxManager::playEffect(VFX_EFFECT e) {
+    playEffect(e, 127);
 }
 
 void VfxManager::playEffect(VFX_EFFECT e, u16 v) {

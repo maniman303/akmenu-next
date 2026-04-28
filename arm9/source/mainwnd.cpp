@@ -385,7 +385,7 @@ void cMainWnd::launchSelected() {
 
     disableInput();
     tickSound().disable();
-    // TODO: Run launch effect
+    vfxManager().playEffect(VFX_EFFECT::SELECT);
     WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder, &vfxManager()}, this, [this, fullPath, rominfo, isMenu, fileName, savesPath](){
         TLaunchResult launchRes = launchRom(fullPath, rominfo, isMenu, savesPath, [this](){
             enableInput();
@@ -764,7 +764,7 @@ void cMainWnd::onFolderChanged() {
     if (_mainList->getRowFullPath(selectedRowId) == "slot1:/") {
         disableInput();
         tickSound().disable();
-        // TODO: Run launch effect
+        vfxManager().playEffect(VFX_EFFECT::SELECT);
         WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder, &vfxManager()}, this, [this](){
             Slot1Launcher* launcher = new Slot1Launcher();
             launcher->setOnCompleted([this](){

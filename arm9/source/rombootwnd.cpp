@@ -2,6 +2,7 @@
 #include "language.h"
 #include "twin.h"
 #include "logger.h"
+#include "vfxmanager.h"
 #include "../romlauncher.h"
 #include "font/fontfactory.h"
 #include "ui/windowmanager.h"
@@ -153,7 +154,11 @@ void cRomBootWnd::moveToMain() {
 void cRomBootWnd::startRom() {
     gdi().setScreenTransparency(0, selectedEngine());
     disableInput();
-    if (launchRom(_romPath, _romInfo, false, "") != ELaunchRomOk) {
-        moveToMain();
-    }
+    vfxManager().playEffect(VFX_EFFECT::SELECT);
+    WorkIndicatorTask* task = new WorkIndicatorTask({&vfxManager()}, this, [this](){
+        if (launchRom(_romPath, _romInfo, false, "") != ELaunchRomOk) {
+            moveToMain();
+        }
+    });
+    task->schedule();
 }

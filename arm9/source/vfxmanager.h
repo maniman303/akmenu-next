@@ -5,7 +5,7 @@
 #include "singleton.h"
 #include "tasks/workindicator.h"
 
-enum VFX_EFFECT { NONE, TICK };
+enum VFX_EFFECT { NONE, TICK, SELECT };
 
 class VfxManager : public WorkIndicator {
     struct VfxEntry {
@@ -28,6 +28,7 @@ class VfxManager : public WorkIndicator {
     void disable();
     void update();
     bool busy() const override;
+    void playEffect(VFX_EFFECT e);
     void playEffect(VFX_EFFECT e, u16 v);
 
   private:

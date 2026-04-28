@@ -27,6 +27,8 @@ namespace akui {
         modal->onAccepted = onAccepted;
         modal->onRejected = onRejected;
 
+        gdi().setScreenTransparency(100, GE_MAIN);
+
         windowManager().addModal(modal);
     }
 
