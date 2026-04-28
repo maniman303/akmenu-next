@@ -227,7 +227,7 @@ sd save = Save directly to SD
 homebrew reset = Reset in Homebrew
 carddma = Card read DMA
 hbstrap = Homebrew Loader
-default = AKMenu-Next
+default = AKMenu-Mako
 ndshb = nds-bootstrap
 
 [switches]
