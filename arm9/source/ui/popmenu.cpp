@@ -24,7 +24,7 @@ namespace akui {
         setSize(cSize(w, h));
         setRelativePosition(cPoint(x, y));
 
-        _selectedItemIndex = 0;
+        _selectedItemIndex = -1;
         _itemHeight = 0;
         _itemWidth = 0;
         _barLeft = 2;
@@ -76,9 +76,17 @@ namespace akui {
     }
 
     void cPopMenu::drawItems() {
-        for (size_t i = 0; i < _items.size(); ++i) {
+        s16 offsetY = 0;
+
+        for (size_t i = 0; i < _items.size(); i++) {
+            std::string text = _items[i];
+            if (text.empty()) {
+                offsetY -= _itemHeight;
+                continue;
+            }
+
             s16 itemX = position().x + _itemTopLeftPoint.x;
-            s16 itemY = position().y + i * _itemHeight + _itemTopLeftPoint.y;
+            s16 itemY = position().y + i * _itemHeight + _itemTopLeftPoint.y + offsetY;
             if (_selectedItemIndex == (s16)i) {
                 s16 barX = position().x + _barLeft;
                 s16 barY = itemY - 2;
@@ -87,7 +95,8 @@ namespace akui {
             } else {
                 gdi().setPenColor(_textColor, _engine);
             }
-            gdi().textOut(itemX, itemY, _items[i].c_str(), _engine, fontSecondary());
+
+            gdi().textOut(itemX, itemY, text.c_str(), _engine, fontSecondary());
         }
     }
 
@@ -97,7 +106,10 @@ namespace akui {
 
     bool cPopMenu::processKeyMessage(cKeyMessage message) {
         if (message.isKeyUp(KEY_A)) {
-            itemClicked(_selectedItemIndex);
+            if (_selectedItemIndex != -1) {
+                itemClicked(_selectedItemIndex);
+            }
+
             exit();
             return true;
         }
@@ -117,14 +129,12 @@ namespace akui {
 
         u32 tickDiff = timer().getFrame() - gs().scrollTick;
         if (message.isKeyDown(KEY_DOWN) || (message.isKeyHeld(KEY_DOWN) && tickDiff > gs().scrollWait && tickDiff % gs().scrollSpeed == 0)) {
-            _selectedItemIndex += 1;
-            if (_selectedItemIndex > (s16)_items.size() - 1) _selectedItemIndex = 0;
+            selectItem(_selectedItemIndex + 1, false);
             return true;
         }
 
         if (message.isKeyDown(KEY_UP) || (message.isKeyHeld(KEY_UP) && tickDiff > gs().scrollWait && tickDiff % gs().scrollSpeed == 0)) {
-            _selectedItemIndex -= 1;
-            if (_selectedItemIndex < 0) _selectedItemIndex = (s16)_items.size() - 1;
+            selectItem(_selectedItemIndex - 1, false);
             return true;
         }
 
@@ -137,7 +147,10 @@ namespace akui {
             if (windowBelow(pos) == NULL) {
                 exit();
             } else if (!_skipTouch) {
-                itemClicked(_selectedItemIndex);
+                if (_selectedItemIndex != -1) {
+                    itemClicked(_selectedItemIndex);
+                }
+
                 exit();
             }
 
@@ -152,13 +165,57 @@ namespace akui {
                 _skipTouch = true;
             } else {
                 _skipTouch = false;
-                _selectedItemIndex = item;
+                selectItem(item, false);
             }
 
             return true;
         }
 
         return false;
+    }
+
+    void cPopMenu::selectItem(s16 item, bool silent) {
+        if (_items.empty()) {
+            _selectedItemIndex = 0;
+            return;
+        }
+
+        logger().info("Selected: " + std::to_string(item));
+
+        if (item == _selectedItemIndex) {
+            bool allEmpty = true;
+            for (std::string& text : _items) {
+                if (!text.empty()) {
+                    allEmpty = false;
+                    break;
+                }
+            }
+
+            if (!allEmpty && _items[item].empty()) {
+                selectItem(item + 1, silent);
+            }
+
+            return;
+        }
+
+        bool next = item > _selectedItemIndex;
+        if (item < 0) {
+            item = static_cast<s16>(_items.size()) - 1;
+        } else if (item >= static_cast<s16>(_items.size())) {
+            item = 0;
+        }
+
+        if (!_items[item].empty()) {
+            _selectedItemIndex = item;
+            
+            if (!silent) {
+                itemSelected(_selectedItemIndex);
+            }
+
+            return;
+        }
+
+        return selectItem(item + (next ? 1 : -1), silent);
     }
 
     s32 cPopMenu::itemBelowPoint(const cPoint& pt) {
@@ -168,18 +225,26 @@ namespace akui {
 
         if (rect.surrounds(pt)) {
             s32 item = (pt.y - menuPos.y) / _itemHeight;
-            if (item >= (s32)_items.size()) {
-                item = _items.size() - 1;
+
+            s32 itemOffset = 0;
+            for (int i = 0; i <= item; i++) {
+                if (_items[i].empty()) {
+                    itemOffset++;
+                }
             }
 
-            return item;
+            if (item + itemOffset >= (s32)_items.size()) {
+                return -1;
+            }
+
+            return item + itemOffset;
         }
 
         return -1;
     }
 
     void cPopMenu::onShow() {
-        _selectedItemIndex = 0;
+        selectItem(0, true);
     }
 
     void cPopMenu::onExit() {

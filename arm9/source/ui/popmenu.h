@@ -36,11 +36,13 @@ namespace akui {
       void clearItem();
 
       Signal1<s16> itemClicked;
+      Signal1<s16> itemSelected;
       Signal0 menuExit;
 
     protected:
       void onShow() override;
       void onExit() override;
+      void selectItem(s16 item, bool silent);
       s32 itemBelowPoint(const cPoint& pt);
       void drawItems();
       s16 barWidth(void);

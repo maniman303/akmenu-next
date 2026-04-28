@@ -184,6 +184,7 @@ void cMainWnd::init() {
     _startMenu = new cStartMenu(160, 40, 61, 108, NULL, "start menu");
     _startMenu->init();
     _startMenu->itemClicked.connect(this, &cMainWnd::startMenuItemClicked);
+    _startMenu->itemSelected.connect(this, &cMainWnd::startMenuItemSelected);
     _startMenu->menuExit.connect(this, &cMainWnd::startMenuClosed);
 
     dbg_printf("startMenu %08x\n", _startMenu);
@@ -239,6 +240,10 @@ void cMainWnd::startMenuItemClicked(s16 i) {
     }
 }
 
+void cMainWnd::startMenuItemSelected(s16 i) {
+    vfxManager().playEffect(VFX_EFFECT::TICK);
+}
+
 void cMainWnd::startMenuClosed() {
     if (!isFocused() && !_startMenu->isFocused()) {
         return;
@@ -252,7 +257,7 @@ void cMainWnd::startButtonClicked() {
         vfxManager().playEffect(VFX_EFFECT::SELECT);
         WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder}, this, [this]() {
             enableInput();
-            _startMenu->showForFile(_mainList->getRowFullPath(_mainList->selectedRowId()));
+            _startMenu->showForFile(_mainList->isFocused() ? _mainList->getRowFullPath(_mainList->selectedRowId()) : "");
             windowManager().addWindow(_startMenu);
         });
         task->schedule();

@@ -55,9 +55,11 @@ cWindow& cStartMenu::loadAppearance(const std::string& aFileName) {
 cWindow& cStartMenu::showForFile(const std::string& fileName) {
     clearItem();
 
-    if (cFavorites::IsInFavorites(fileName)) {
+    if (fileName.empty()) {
+        addItem(START_MENU_ITEM_FAVORITES, "");
+    } else if (cFavorites::IsInFavorites(fileName)) {
         addItem(START_MENU_ITEM_FAVORITES, LANG("start menu", "Unset favorite"));
-    } else if (fileName != "") {
+    } else {
         addItem(START_MENU_ITEM_FAVORITES, LANG("start menu", "Set favorite"));
     }
 
