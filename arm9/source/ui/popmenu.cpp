@@ -97,14 +97,13 @@ namespace akui {
 
     bool cPopMenu::processKeyMessage(cKeyMessage message) {
         if (message.isKeyUp(KEY_A)) {
-            // logger().info("Selecting pop menu option.");
             itemClicked(_selectedItemIndex);
-            hide();
+            exit();
             return true;
         }
 
         if (message.isKeyUp(KEY_B)) {
-            hide();
+            exit();
             return true;
         }
 
@@ -136,10 +135,10 @@ namespace akui {
         cPoint pos = message.position();
         if (message.up()) {
             if (windowBelow(pos) == NULL) {
-                hide();
+                exit();
             } else if (!_skipTouch) {
                 itemClicked(_selectedItemIndex);
-                hide();
+                exit();
             }
 
             _skipTouch = false;
@@ -183,7 +182,8 @@ namespace akui {
         _selectedItemIndex = 0;
     }
 
-    void cPopMenu::onHide() {
+    void cPopMenu::onExit() {
+        menuExit();
         windowManager().removeWindow(this);
     }
 

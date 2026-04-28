@@ -95,6 +95,10 @@ cWindow& cWindow::hide() {
     return *this;
 }
 
+void cWindow::exit() {
+    onExit();
+}
+
 bool cWindow::doesHierarchyContain(cWindow* aWindow) const {
     while (aWindow != NULL) {
         if (aWindow == this) {

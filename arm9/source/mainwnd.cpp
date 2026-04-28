@@ -104,6 +104,7 @@ void cMainWnd::init() {
     _mainList = new cMainList(this, "main list");
     _mainList->init();
     _mainList->rowClicked.connect(this, &cMainWnd::onMainListSelItemClicked);
+    _mainList->selectChanged.connect(this, &cMainWnd::onMainListSelectionChanged);
     _mainList->directoryChanged.connect(this, &cMainWnd::onFolderChanged);
     addChildWindow(_mainList);
 
@@ -183,6 +184,7 @@ void cMainWnd::init() {
     _startMenu = new cStartMenu(160, 40, 61, 108, NULL, "start menu");
     _startMenu->init();
     _startMenu->itemClicked.connect(this, &cMainWnd::startMenuItemClicked);
+    _startMenu->menuExit.connect(this, &cMainWnd::startMenuClosed);
 
     dbg_printf("startMenu %08x\n", _startMenu);
 
@@ -206,7 +208,7 @@ void cMainWnd::draw() {
 }
 
 void cMainWnd::startMenuItemClicked(s16 i) {
-    dbg_printf("start menu item %d\n", i);
+    vfxManager().playEffect(VFX_EFFECT::CLICK);
 
     if (START_MENU_ITEM_FAVORITES == i) {
         std::string selectedFullPath = _mainList->getRowFullPath(_mainList->selectedRowId());
@@ -237,9 +239,19 @@ void cMainWnd::startMenuItemClicked(s16 i) {
     }
 }
 
+void cMainWnd::startMenuClosed() {
+    if (!isFocused() && !_startMenu->isFocused()) {
+        return;
+    }
+
+    vfxManager().playEffect(VFX_EFFECT::CLOSE);
+}
+
 void cMainWnd::startButtonClicked() {
     if (!gs().safeMode) {
+        vfxManager().playEffect(VFX_EFFECT::SELECT);
         WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder}, this, [this]() {
+            enableInput();
             _startMenu->showForFile(_mainList->getRowFullPath(_mainList->selectedRowId()));
             windowManager().addWindow(_startMenu);
         });
@@ -248,6 +260,7 @@ void cMainWnd::startButtonClicked() {
 }
 
 void cMainWnd::brightnessButtonClicked() {
+    vfxManager().playEffect(VFX_EFFECT::CLICK);
     gs().nextBrightness();
 }
 
@@ -262,7 +275,12 @@ void cMainWnd::clockButtonClicked() {
         return;
     }
 
-    showFileInfo(selectedId);
+    vfxManager().playEffect(VFX_EFFECT::CLICK);
+    WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder}, this, [this, selectedId]() {
+        enableInput();
+        showFileInfo(selectedId);
+    });
+    task->schedule();
 }
 
 cWindow& cMainWnd::loadAppearance(const std::string& aFileName) {
@@ -335,15 +353,17 @@ bool cMainWnd::processTouchMessage(cTouchMessage message) {
     return cForm::processTouchMessage(message);
 }
 
+void cMainWnd::onMainListSelectionChanged(u32 index) {
+    vfxManager().playEffect(VFX_EFFECT::TICK);
+}
+
 void cMainWnd::onMainListSelItemClicked(u32 index) {
-    WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder}, this, [this](){
-        launchSelected();
-    });
-    
-    task->schedule();
+    launchSelected();
 }
 
 void cMainWnd::setFocusedChild(cWindow* child) {
+    vfxManager().playEffect(VFX_EFFECT::TICK);
+
     WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder}, this, [this, child]() {
         windowManager().setFocusedWindow(child);
     });

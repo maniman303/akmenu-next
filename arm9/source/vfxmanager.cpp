@@ -1,6 +1,8 @@
 #include "vfxmanager.h"
 #include "tick_sound_bin.h"
 #include "select_sound_bin.h"
+#include "click_sound_bin.h"
+#include "close_sound_bin.h"
 
 VfxManager::VfxManager() {
     _init = false;
@@ -10,6 +12,8 @@ VfxManager::VfxManager() {
 void VfxManager::init() {
     _entries.push_back(VfxEntry(VFX_EFFECT::TICK, (u8*)tick_sound_bin, tick_sound_bin_size, 20));
     _entries.push_back(VfxEntry(VFX_EFFECT::SELECT, (u8*)select_sound_bin, select_sound_bin_size, 66));
+    _entries.push_back(VfxEntry(VFX_EFFECT::CLICK, (u8*)click_sound_bin, click_sound_bin_size, 10));
+    _entries.push_back(VfxEntry(VFX_EFFECT::CLOSE, (u8*)close_sound_bin, close_sound_bin_size, 10));
     _init = true;
     _enabled = true;
 }

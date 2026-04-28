@@ -89,6 +89,9 @@ class cWindow : public SlotHolder {
     //! makes the window invisible \sa show
     cWindow& hide();
 
+    //! makes the window exit
+    void exit();
+
     //! returns true iff the window is currently visible
     bool isVisible() const { return _isVisible; }
 
@@ -153,6 +156,10 @@ class cWindow : public SlotHolder {
     //! \brief called when the window is hidden, derived classes can override this to
     //! react to the window being hidden
     virtual void onHide() { }
+
+    //! \brief called when the window is exited, derived classes can override this to
+    //! react to the window being exited
+    virtual void onExit() {}
 
     //! Called when the window receives the focus
     virtual void onFocused() { }
