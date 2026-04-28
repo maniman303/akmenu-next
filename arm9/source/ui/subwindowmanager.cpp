@@ -14,13 +14,11 @@ void cSubWindowManager::init() {
     calendar().init();
     analogClock().init();
     bigClock().init();
-
     topbar().init();
 }
 
 void cSubWindowManager::blink() {
     bigClock().blinkColon();
-    
     topbar().blink();
 }
 
@@ -29,10 +27,9 @@ void cSubWindowManager::update() {
 
     topbar().update();
 
-    analogClock().draw();
-    bigClock().draw();
-
-    topbar().draw();
+    analogClock().render();
+    bigClock().render();
+    topbar().render();
 }
 
 void cSubWindowManager::updateBackground() {
@@ -40,6 +37,7 @@ void cSubWindowManager::updateBackground() {
 
     drawBg |= calendarWnd().shouldRenderBackdrop();
     drawBg |= calendar().shouldRenderBackdrop();
+    drawBg |= topbar().shouldRenderBackdrop();
 
     if (!drawBg) {
         return;
@@ -47,10 +45,12 @@ void cSubWindowManager::updateBackground() {
 
     gdi().setSubEngineLayer(SEL_DOWN);
     
-    calendarWnd().drawBackdrop();
+    calendarWnd().renderBackdrop();
     calendarWnd().onRenderBackdrop();
-    calendar().drawBackdrop();
+    calendar().renderBackdrop();
     calendar().onRenderBackdrop();
+    topbar().renderBackdrop();
+    topbar().onRenderBackdrop();
 
     gdi().setSubEngineLayer(SEL_UP);
     gdi().pushSubBackground();
