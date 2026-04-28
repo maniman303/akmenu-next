@@ -180,8 +180,6 @@ namespace akui {
             return;
         }
 
-        logger().info("Selected: " + std::to_string(item));
-
         if (item == _selectedItemIndex) {
             bool allEmpty = true;
             for (std::string& text : _items) {
@@ -198,7 +196,7 @@ namespace akui {
             return;
         }
 
-        bool next = item > _selectedItemIndex;
+        bool next = silent || item > _selectedItemIndex;
         if (item < 0) {
             item = static_cast<s16>(_items.size()) - 1;
         } else if (item >= static_cast<s16>(_items.size())) {

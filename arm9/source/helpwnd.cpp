@@ -15,6 +15,7 @@
 #include "uisettings.h"
 #include "version.h"
 #include "windowmanager.h"
+#include "vfxmanager.h"
 
 void cHelpWnd::showModal(cWindow* parent) {
     CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
@@ -35,7 +36,7 @@ cHelpWnd::cHelpWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::strin
     _buttonOK.setText("\x02 " + LANG("setting window", "cancel"));
     _buttonOK.setTextColor(uis().buttonTextColor);
     _buttonOK.loadAppearance(SFN_BUTTON3);
-    _buttonOK.clicked.connect(this, &cHelpWnd::onOK);
+    _buttonOK.clicked.connect(this, &cHelpWnd::onCancel);
     addChildWindow(&_buttonOK);
 
     s16 nextButtonX = size().x;
@@ -91,7 +92,7 @@ void cHelpWnd::draw() {
 
 bool cHelpWnd::processKeyMessage(cKeyMessage message) {
     if (message.isKeyUp(KEY_A) || message.isKeyUp(KEY_B)) {
-        onOK();
+        onCancel();
         return true;
     }
 
@@ -104,8 +105,9 @@ cWindow& cHelpWnd::loadAppearance(const std::string& aFileName) {
     return *this;
 }
 
-void cHelpWnd::onOK() {
-    cForm::onOK();
+void cHelpWnd::onCancel() {
+    vfxManager().playEffect(VFX_EFFECT::CLOSE);
+    cForm::onCancel();
 }
 
 void cHelpWnd::onShow() {

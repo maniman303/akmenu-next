@@ -301,6 +301,8 @@ bool cMainWnd::processKeyMessage(cKeyMessage message) {
     bool isL = message.isKeyShift(KEY_L);
     bool allow = !gs().safeMode;
     if (message.isKeyUp(KEY_Y)) {
+        vfxManager().playEffect(VFX_EFFECT::CLICK);
+
         if (isL) {
             showSettings();
         } else if (!gs().safeMode) {
@@ -316,10 +318,12 @@ bool cMainWnd::processKeyMessage(cKeyMessage message) {
                 DSRomInfo rominfo;
                 if (_mainList->getRomInfo(_mainList->selectedRowId(), rominfo) &&
                     rominfo.isDSRom() && !rominfo.isHomebrew()) {
+                    vfxManager().playEffect(VFX_EFFECT::CLICK);
                     cRomInfoWnd::showCheats(_mainList->getRowFullPath(_mainList->selectedRowId()));
                 }
             }
         } else {
+            vfxManager().playEffect(VFX_EFFECT::SELECT);
             _mainList->enterDir("favorites:/");
             _mainList->selectRow(0);
         }
@@ -330,17 +334,6 @@ bool cMainWnd::processKeyMessage(cKeyMessage message) {
     if (message.isKeyUp(KEY_START)) {
         startButtonClicked();
         return true;
-    }
-
-    if (message.isKeyUp(KEY_SELECT)) {
-        if (!allow) {
-            return true;
-        }
-
-        if (isL) {
-            _mainList->SwitchShowAllFiles();
-            return true;
-        }
     }
 
     if (message.isKeyUp(KEY_R)) {
@@ -387,7 +380,8 @@ void cMainWnd::launchSelected() {
     // Create the new path by appending "saves/"
     std::string savesPath = formatString("%ssaves/%s", directory.c_str(), fileName.c_str());
 
-    if (fullPath[fullPath.size() - 1] == '/') {
+    if (fullPath.back() == '/') {
+        vfxManager().playEffect(VFX_EFFECT::SELECT);
         _mainList->enterDir(fullPath);
         return;
     }

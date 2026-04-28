@@ -32,7 +32,7 @@ class cHelpWnd : public akui::cForm {
     cWindow& loadAppearance(const std::string& aFileName);
 
   protected:
-    void onOK() override;
+    void onCancel() override;
 
     void onShow() override;
 
