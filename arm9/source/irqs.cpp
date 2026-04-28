@@ -54,7 +54,7 @@ void cIRQ::vBlank() {
 
     if (vBlankCounter++ >= 29) {
         vBlankCounter = 0;
-        
+        subWindowManager().blink();
     }
 
     if (REG_ROMCTRL & CARD_BUSY)
