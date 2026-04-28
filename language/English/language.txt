@@ -205,8 +205,6 @@ low = low
 mid = middle
 high = high
 strength = Rumble strength
-flash to nor = to NOR
-copy to psram = to RAM
 
 [abort save]
 title = Abort save processing

@@ -39,20 +39,16 @@ class cRomInfoWnd : public akui::cForm {
     static void showCheats(const std::string& aFileName);
 
   protected:
-    void pressFlash();
     void pressSaveType();
     void saveSettings(cSettingWnd* settingWnd);
-    void pressCopy();
     void pressCheats();
-    void onOK() override;
+    void onCancel() override;
     void onShow() override;
     void onResize() override;
     void addCode();
 
-    cButton _buttonOK;
+    cButton _buttonCancel;
     cButton _buttonSaveType;
-    cButton _buttonFlash;
-    cButton _buttonCopy;
     cButton _buttonCheats;
     akui::cFormDesc _renderDesc;
     DSRomInfo _romInfo;

@@ -20,6 +20,7 @@
 #include "unicode.h"
 #include "logger.h"
 #include "windowmanager.h"
+#include "vfxmanager.h"
 #include "ui/binaryfind.h"
 
 cRomInfoWnd::cRomInfoWnd(const std::string& text, std::function<void(cRomInfoWnd*)> onSaved) : cRomInfoWnd(0, 0, 0, 0, NULL, text) {
@@ -37,21 +38,19 @@ cRomInfoWnd::cRomInfoWnd(const std::string& text, std::function<void(cRomInfoWnd
 
 cRomInfoWnd::cRomInfoWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
     : cForm(x, y, w, h, parent, text),
-      _buttonOK(0, 0, 46, 18, this, "\x01 OK"),
-      _buttonSaveType(0, 0, 76, 18, this, "\x04 Save Type"),
-      _buttonFlash(0, 0, 46, 18, this, "\x03 to NOR"),
-      _buttonCopy(0, 0, 46, 18, this, "\x05 to RAM"),
+      _buttonCancel(0, 0, 46, 18, this, "\x01 Cancel"),
+      _buttonSaveType(0, 0, 76, 18, this, "\x04 Save"),
       _buttonCheats(0, 0, 46, 18, this, "\x03 Cheats"),
       _saves(NULL) {
     _canRenderBackdrop = true;
     loadAppearance("");
 
-    _buttonOK.setStyle(cButton::press);
-    _buttonOK.setText("\x01 " + LANG("setting window", "ok"));
-    _buttonOK.setTextColor(uis().buttonTextColor);
-    _buttonOK.loadAppearance(SFN_BUTTON3);
-    _buttonOK.clicked.connect(this, &cRomInfoWnd::onOK);
-    addChildWindow(&_buttonOK);
+    _buttonCancel.setStyle(cButton::press);
+    _buttonCancel.setText("\x02 " + LANG("message box", "cancel"));
+    _buttonCancel.setTextColor(uis().buttonTextColor);
+    _buttonCancel.loadAppearance(SFN_BUTTON3);
+    _buttonCancel.clicked.connect(this, &cRomInfoWnd::onCancel);
+    addChildWindow(&_buttonCancel);
 
     _buttonSaveType.setStyle(cButton::press);
     _buttonSaveType.setText("\x04 " + LANG("setting window", "savetype"));
@@ -66,20 +65,6 @@ cRomInfoWnd::cRomInfoWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     _buttonCheats.loadAppearance(SFN_BUTTON3);
     _buttonCheats.clicked.connect(this, &cRomInfoWnd::pressCheats);
     addChildWindow(&_buttonCheats);
-
-    _buttonFlash.setStyle(cButton::press);
-    _buttonFlash.setText("\x03 " + LANG("exp window", "flash to nor"));
-    _buttonFlash.setTextColor(uis().buttonTextColor);
-    _buttonFlash.loadAppearance(SFN_BUTTON3);
-    _buttonFlash.clicked.connect(this, &cRomInfoWnd::pressFlash);
-    addChildWindow(&_buttonFlash);
-
-    _buttonCopy.setStyle(cButton::press);
-    _buttonCopy.setText("\x05 " + LANG("exp window", "copy to psram"));
-    _buttonCopy.setTextColor(uis().buttonTextColor);
-    _buttonCopy.loadAppearance(SFN_BUTTON3);
-    _buttonCopy.clicked.connect(this, &cRomInfoWnd::pressCopy);
-    addChildWindow(&_buttonCopy);
 
     onResize();
 }
@@ -113,7 +98,7 @@ void cRomInfoWnd::drawBackdrop() {
 
 bool cRomInfoWnd::processKeyMessage(cKeyMessage message) {
     if (message.isKeyUp(KEY_A) || message.isKeyUp(KEY_B)) {
-        onOK();
+        onCancel();
         return true;
     }
 
@@ -125,14 +110,8 @@ bool cRomInfoWnd::processKeyMessage(cKeyMessage message) {
     if (message.isKeyUp(KEY_X)) {
         if (_buttonCheats.isVisible()) {
             pressCheats();
-        } else if (_buttonFlash.isVisible()) {
-            pressFlash();
         }
-        return true;
-    }
 
-    if (message.isKeyUp(KEY_L)) {
-        pressCopy();
         return true;
     }
 
@@ -221,8 +200,6 @@ void cRomInfoWnd::setRomInfo(const DSRomInfo& romInfo) {
     _romInfoText = unicode_to_local_string(_romInfo.banner().titles[gs().language], 128, NULL);
 
     _buttonSaveType.hide();
-    _buttonFlash.hide();
-    _buttonCopy.hide();
     _buttonCheats.hide();
     if (_romInfo.isDSRom() && !_romInfo.isHomebrew()) {
         const char* stLangStrings[] = {"Unknown", "No Save", "4K", "64K", "512K", "2M", "4M", "8M",
@@ -236,11 +213,6 @@ void cRomInfoWnd::setRomInfo(const DSRomInfo& romInfo) {
         addCode();
         _buttonSaveType.show();
         if (gs().cheatDB) _buttonCheats.show();
-    } else if (_romInfo.isGbaRom()) {
-        _buttonFlash.show();
-        _buttonSaveType.setText("\x03 " + LANG("exp window", "flash to nor"));
-        if (CGbaLoader::CheckPSRAM(_size)) _buttonCopy.show();
-        addCode();
     }
 }
 
@@ -252,12 +224,14 @@ void cRomInfoWnd::setSaves(const std::vector<std::string>* saves) {
     _saves = saves;
 }
 
-void cRomInfoWnd::onOK() {
+void cRomInfoWnd::onCancel() {
+    vfxManager().playEffect(VFX_EFFECT::CLOSE);
+
     if (onSaved) {
         onSaved(this);
     }
 
-    cForm::onOK();
+    cForm::onCancel();
 }
 
 void cRomInfoWnd::onShow() {
@@ -265,13 +239,13 @@ void cRomInfoWnd::onShow() {
 }
 
 void cRomInfoWnd::onResize() {
-    s16 buttonY = size().y - _buttonOK.size().y - 4;
+    s16 buttonY = size().y - _buttonCancel.size().y - 4;
     s16 nextButtonX = size().x;
 
-    s16 buttonPitch = _buttonOK.size().x + 8;
+    s16 buttonPitch = _buttonCancel.size().x + 8;
     nextButtonX -= buttonPitch;
 
-    _buttonOK.setRelativePosition(cPoint(nextButtonX, buttonY));
+    _buttonCancel.setRelativePosition(cPoint(nextButtonX, buttonY));
 
     buttonPitch = _buttonSaveType.size().x + 8;
     s16 nextButtonXone = nextButtonX - buttonPitch;
@@ -282,16 +256,6 @@ void cRomInfoWnd::onResize() {
     nextButtonXone -= buttonPitch;
 
     _buttonCheats.setRelativePosition(cPoint(nextButtonXone, buttonY));
-
-    buttonPitch = _buttonFlash.size().x + 8;
-    nextButtonX -= buttonPitch;
-
-    _buttonFlash.setRelativePosition(cPoint(nextButtonX, buttonY));
-
-    buttonPitch = _buttonCopy.size().x + 8;
-    nextButtonX -= buttonPitch;
-
-    _buttonCopy.setRelativePosition(cPoint(nextButtonX, buttonY));
 }
 
 #define ITEM_SAVETYPE 0, 0
@@ -301,7 +265,12 @@ void cRomInfoWnd::onResize() {
 #define ITEM_ICON 1, 2
 
 void cRomInfoWnd::pressSaveType(void) {
-    if (!_romInfo.isDSRom() || _romInfo.isHomebrew()) return;
+    if (!_romInfo.isDSRom() || _romInfo.isHomebrew()) {
+        vfxManager().playEffect(VFX_EFFECT::CLOSE);
+        return;
+    }
+
+    vfxManager().playEffect(VFX_EFFECT::TICK);
 
     cSettingWnd* settingWnd = new cSettingWnd(LANG("game settings", "title"), "rom_info", [this](cSettingWnd* wnd) { saveSettings(wnd); });
     
@@ -411,18 +380,6 @@ void cRomInfoWnd::saveSettings(cSettingWnd* settingWnd) {
         loader_choice, nightly_choice);
 
     saveManager().updateCustomSaveList(_romInfo.saveInfo());
-}
-
-void cRomInfoWnd::pressFlash(void) {
-    if (_romInfo.isGbaRom()) {
-        CGbaLoader(_fullName).Load(true, true);
-    }
-}
-
-void cRomInfoWnd::pressCopy(void) {
-    if (_romInfo.isGbaRom() && CGbaLoader::CheckPSRAM(_size)) {
-        CGbaLoader(_fullName).Load(false, true);
-    }
 }
 
 void cRomInfoWnd::pressCheats(void) {
