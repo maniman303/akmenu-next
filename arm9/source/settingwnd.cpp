@@ -18,6 +18,7 @@
 #include "fontfactory.h"
 #include "timer.h"
 #include "logger.h"
+#include "vfxmanager.h"
 
 #define TOP_MARGIN 4
 
@@ -153,17 +154,23 @@ bool cSettingWnd::processKeyMessage(cKeyMessage message) {
 }
 
 void cSettingWnd::onOK(void) {
+    vfxManager().playEffect(VFX_EFFECT::CLICK);
     akui::cMessageBox::showModal(LANG("setting window", "confirm"), _confirmMessage, MB_OK | MB_CANCEL, [this]() {
+        vfxManager().playEffect(VFX_EFFECT::SAVE);
+        
         if (onSaved) {
             onSaved(this);
         }
 
         cForm::onOK();
     },
-    {});
+    [](){
+        vfxManager().playEffect(VFX_EFFECT::CLOSE);
+    });
 }
 
 void cSettingWnd::onCancel(void) {
+    vfxManager().playEffect(VFX_EFFECT::CLOSE);
     cForm::onCancel();
 }
 
@@ -230,6 +237,7 @@ void cSettingWnd::addSettingItem(const std::string& text, const std::vector<std:
     item->hide();
     addChildWindow(item);
     item->selectItem(defaultValue);
+    item->changed.connect(this, &cSettingWnd::onOptionChanged);
 
     cStaticText* label = new cStaticText(0, 0, _maxLabelLength * 6, font().GetHeight(), this, text);
     itemY += (item->windowRectangle().height() - label->windowRectangle().height()) / 2;
@@ -259,12 +267,14 @@ void cSettingWnd::onFocused() {
 }
 
 void cSettingWnd::onUIKeyUP(void) {
+    vfxManager().playEffect(VFX_EFFECT::TICK);
     ssize_t focusItem = focusedItemId();
     if (--focusItem < 0) focusItem = items(_currentTab).size() - 1;
     windowManager().setFocusedWindow(items(_currentTab)[focusItem]._item);
 }
 
 void cSettingWnd::onUIKeyDOWN(void) {
+    vfxManager().playEffect(VFX_EFFECT::TICK);
     ssize_t focusItem = focusedItemId();
     if (++focusItem >= (ssize_t)items(_currentTab).size()) focusItem = 0;
     windowManager().setFocusedWindow(items(_currentTab)[focusItem]._item);
@@ -359,7 +369,12 @@ void cSettingWnd::SwitchTab(size_t oldIndex, size_t newIndex) {
 }
 
 void cSettingWnd::onItemChanged(akui::cSpinBox* item) {
+    vfxManager().playEffect(VFX_EFFECT::UP);
     size_t newTab = item->selectedItemId();
     SwitchTab(_currentTab, newTab);
     _currentTab = newTab;
+}
+
+void cSettingWnd::onOptionChanged(akui::cSpinBox* item) {
+    vfxManager().playEffect(VFX_EFFECT::CLICK);
 }

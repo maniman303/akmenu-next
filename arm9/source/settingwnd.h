@@ -60,6 +60,7 @@ class cSettingWnd : public akui::cForm {
     void onUIKeyL(void);
     void onUIKeyR(void);
     void onItemChanged(akui::cSpinBox* item);
+    void onOptionChanged(akui::cSpinBox* item);
     ssize_t focusedItemId(void);
     akui::cSpinBox* focusedItem(void);
     void colorLabels(void);

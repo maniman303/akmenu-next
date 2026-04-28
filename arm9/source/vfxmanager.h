@@ -5,7 +5,7 @@
 #include "singleton.h"
 #include "tasks/workindicator.h"
 
-enum VFX_EFFECT { NONE, TICK, SELECT, CLICK, CLOSE };
+enum VFX_EFFECT { NONE, TICK, SELECT, CLICK, CLOSE, UP, SAVE };
 
 class VfxManager : public WorkIndicator {
     struct VfxEntry {
