@@ -134,11 +134,11 @@ static u32 SaveSize(SAVE_TYPE st) {
     return result;
 }
 
-TLaunchResult launchRom(const std::string& aFullPath, DSRomInfo& aRomInfo, bool aMenu, const std::string& savesPath) {
+TLaunchResult launchRom(std::string aFullPath, const DSRomInfo& aRomInfo, bool aMenu, std::string savesPath) {
     return launchRom(aFullPath, aRomInfo, aMenu, savesPath, {});
 }
 
-TLaunchResult launchRom(const std::string& aFullPath, DSRomInfo& aRomInfo, bool aMenu, const std::string& savesPath, std::function<void()> onCompleted) {
+TLaunchResult launchRom(std::string aFullPath, const DSRomInfo& aRomInfo, bool aMenu, std::string savesPath, std::function<void()> onCompleted) {
     u32 flags = 0;
     long cheatOffset = 0;
     size_t cheatSize = 0;
@@ -219,7 +219,8 @@ TLaunchResult launchRom(const std::string& aFullPath, DSRomInfo& aRomInfo, bool 
             {
                 if (st_new != st) {
                     st = st_new;
-                    aRomInfo.saveInfo().saveType = st;
+                    SAVE_INFO_EX& mutableSaveInfo = const_cast<SAVE_INFO_EX&>(aRomInfo.saveInfo());
+                    mutableSaveInfo.saveType = st;
                     saveManager().updateCustomSaveList(aRomInfo.saveInfo());
                 }
             }

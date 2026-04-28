@@ -38,6 +38,7 @@
 #include "fpscounter.h"
 #include "image.h"
 
+#include "vfxmanager.h"
 #include "ticksound.h"
 
 #include "smalldate.h"
@@ -144,7 +145,7 @@ void initMainWindow() {
     }
 
     windowManager().addWindow(wnd);
-    tickSound().run();
+    tickSound().enable();
     
     ScreenFadeTask* fadeTask = new ScreenFadeTask();
     fadeTask->schedule();
@@ -183,7 +184,9 @@ int main(int argc, char* argv[]) {
     // setting scripts
     gs().loadSettings();
 
-    saveManager().loadLastInfo()
+    saveManager().loadLastInfo();
+
+    vfxManager().init();
     
     cwl();
 
@@ -197,7 +200,6 @@ int main(int argc, char* argv[]) {
         dbg_printf("WARNING: savelist.bin missed\n");
     }
 
-    tickSound().load(SFN_UI_TICK_SOUND);
     sd().update();
 
     // Backup save data from chip and gba sram save data to flash.

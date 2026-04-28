@@ -5,6 +5,7 @@
 #include "systemdetails.h"
 #include "datetime.h"
 #include "globalsettings.h"
+#include "vfxmanager.h"
 #include "tick_sound_bin.h"
 
 #define TICK_VOLUME 64
@@ -12,117 +13,7 @@
 
 cTickSound::cTickSound() {
     _running = false;
-    _rawData = NULL;
-    _dataSize = 0;
-    _pcmStart = NULL;
-    _sampleRate = 0;
-    _soundFormat = 0;
     _checkpoint = 0;
-    _soundId = 0;
-}
-
-cTickSound::~cTickSound() {
-    unload();
-}
-
-void cTickSound::unload() {
-    if (_rawData) {
-        free(_rawData);
-        _rawData = NULL;
-    }
-
-    if (_pcmStart) {
-        free(_pcmStart);
-        _pcmStart = NULL;
-    }
-
-    _dataSize = 0;
-}
-
-bool cTickSound::load(std::string filepath) {
-    FILE* file = fopen(filepath.c_str(), "rb");
-    if (!file) return false;
-
-    fseek(file, 0, SEEK_END);
-    u32 fileSize = ftell(file);
-    rewind(file);
-
-    if (fileSize < 44) {
-        fclose(file);
-        return false;
-    }
-
-    unload();
-
-    _rawData = (u8*)memalign(32, fileSize);
-    if (!_rawData) {
-        fclose(file);
-        return false;
-    }
-
-    fread(_rawData, 1, fileSize, file);
-    fclose(file);
-
-    _sampleRate = *(u32*)(_rawData + 24);
-
-    u16 bitsPerSample = *(u16*)(_rawData + 34);
-    if (bitsPerSample == 16) {
-        _soundFormat = SoundFormat_16Bit;
-    } else if (bitsPerSample == 8) {
-        _soundFormat = SoundFormat_8Bit;
-    } else {
-        unload();
-        return false;
-    }
-
-    u16 audioFormat = *(u16*)(_rawData + 20);
-    if (audioFormat != 1) {
-        unload();
-        return false;
-    }
-
-    u16 numChannels = *(u16*)(_rawData + 22);
-    if (numChannels != 1) {
-        unload();
-        return false;
-    }
-
-    u8* ptr = _rawData + 12;
-    u8* dataStart = NULL;
-    u32 dataSize = 0;
-
-    while (ptr < _rawData + fileSize) {
-        u32 chunkId = *(u32*)ptr;
-        u32 chunkSize = *(u32*)(ptr + 4);
-
-        if (chunkId == 0x61746164) {
-            dataStart = ptr + 8;
-            dataSize = chunkSize;
-            break;
-        }
-
-        ptr += 8 + chunkSize;
-    }
-
-    if (!dataStart || dataSize == 0) {
-        unload();
-        return false;
-    }
-
-    _pcmStart = (u8*)memalign(32, dataSize);
-    if (!_pcmStart) {
-        unload();
-        return false;
-    }
-
-    memcpy(_pcmStart, dataStart, dataSize);
-    _dataSize = dataSize;
-
-    DC_FlushRange(_pcmStart, _dataSize);
-
-    _checkpoint = datetime().secondsInDay();
-
-    return true;
 }
 
 void cTickSound::play() {
@@ -152,25 +43,13 @@ void cTickSound::play() {
 
     u8 volume = datetime().seconds() == 0 ? TICK_VOLUME_MAX : TICK_VOLUME;
 
-    _soundId = playTickFromWav(volume);
+    vfxManager().playEffect(VFX_EFFECT::TICK, volume);
 }
 
-int cTickSound::playTickFromWav(u8 volume) {
-    const u8* pcmStart = tick_sound_bin;
-    int soundFormat = (int)SoundFormat_16Bit;
-    int dataSize = tick_sound_bin_size;
-    int sampleRate = 32000;
-
-    if (_pcmStart != NULL) {
-        pcmStart = _pcmStart;
-        soundFormat = _soundFormat;
-        dataSize = _dataSize;
-        sampleRate = _sampleRate;
-    }
-
-    return soundPlaySample(pcmStart, (SoundFormat)soundFormat, dataSize, sampleRate, volume, 64, false, 0);
-}
-
-void cTickSound::run() {
+void cTickSound::enable() {
     _running = true;
+}
+
+void cTickSound::disable() {
+    _running = false;
 }

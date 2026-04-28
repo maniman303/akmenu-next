@@ -282,6 +282,10 @@ tNDSBanner& DSRomInfo::banner(void) {
     return _banner;
 }
 
+const SAVE_INFO_EX& DSRomInfo::saveInfo(void) const {
+    return _saveInfo;
+}
+
 SAVE_INFO_EX& DSRomInfo::saveInfo(void) {
     return _saveInfo;
 }
@@ -290,23 +294,23 @@ u8 DSRomInfo::version(void) {
     return _romVersion;
 }
 
-bool DSRomInfo::isDSRom(void) {
+bool DSRomInfo::isDSRom(void) const {
     return (_isDSRom == ETrue) ? true : false;
 }
 
-bool DSRomInfo::isDSiWare(void) {
+bool DSRomInfo::isDSiWare(void) const {
     return (_isDSiWare == ETrue) ? true : false;
 }
 
-bool DSRomInfo::isHomebrew(void) {
+bool DSRomInfo::isHomebrew(void) const {
     return (_isHomebrew == ETrue) ? true : false;
 }
 
-bool DSRomInfo::isModernHomebrew(void) {
+bool DSRomInfo::isModernHomebrew(void) const {
     return (_isModernHomebrew == ETrue) ? true : false;
 }
 
-bool DSRomInfo::isGbaRom(void) {
+bool DSRomInfo::isGbaRom(void) const {
     return (_isGbaRom == ETrue) ? true : false;
 }
 

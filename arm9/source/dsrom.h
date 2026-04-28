@@ -47,15 +47,16 @@ class DSRomInfo {
     void drawDSRomIcon(u8 x, u8 y, bool small, GRAPHICS_ENGINE engine);
     std::string getDsLocTitle();
     tNDSBanner& banner(void);
+    const SAVE_INFO_EX& saveInfo(void) const;
     SAVE_INFO_EX& saveInfo(void);
     u8 version(void);
     void setExtIcon(const std::string& aValue);
     inline bool isExtIcon(void) { return _extIcon >= 0; };
-    bool isDSRom(void);
-    bool isDSiWare(void);
-    bool isHomebrew(void);
-    bool isModernHomebrew(void);
-    bool isGbaRom(void);
+    bool isDSRom(void) const;
+    bool isDSiWare(void) const;
+    bool isHomebrew(void) const;
+    bool isModernHomebrew(void) const;
+    bool isGbaRom(void) const;
     DSRomInfo& operator=(const DSRomInfo& src);
     void mayBeDSRom(const std::string& filename) {
         _isDSRom = EMayBe;

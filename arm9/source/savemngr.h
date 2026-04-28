@@ -93,49 +93,49 @@ typedef struct SAVE_INFO_EX_T {
     u8 flags;
     u32 flags2;
     u32 reserved[2];
-    u8 getRumble(void) { return flags & SAVE_INFO_EX_RUMBLE; };
+    u8 getRumble(void) const { return flags & SAVE_INFO_EX_RUMBLE; };
     u8 getDownloadPlay(void) {
         return getFlag(SAVE_INFO_EX_DOWNLOAD_PLAY, SAVE_INFO_EX_GLOBAL_DOWNLOAD_PLAY, false);
     };
     u8 getSoftReset(void) {
         return getFlag(SAVE_INFO_EX_SOFT_RESET, SAVE_INFO_EX_GLOBAL_SOFT_RESET, false);
     };
-    u8 getCheat(void) { return getFlag(SAVE_INFO_EX_CHEAT, SAVE_INFO_EX_GLOBAL_CHEAT, false); };
-    u8 getSlot(void) { return (flags & SAVE_INFO_EX_SLOT_MASK) >> SAVE_INFO_EX_SLOT_SHIFT; };
-    u8 getDMA(void) { return getFlag(SAVE_INFO_EX_DMA, SAVE_INFO_EX_GLOBAL_DMA, false); };
-    u8 getProtection(void) { return (flags2 & SAVE_INFO_EX_PROTECTION) ? 1 : 0; };
-    u8 getLinkage(void) { return (flags2 & SAVE_INFO_EX_LINKAGE) ? 1 : 0; };
-    u8 getIcon(void) { return (flags2 & SAVE_INFO_EX_ICON_MASK) >> SAVE_INFO_EX_ICON_SHIFT; };
-    u8 getSDSave(void) { return getFlag(SAVE_INFO_EX_SD_SAVE, SAVE_INFO_EX_GLOBAL_SD_SAVE, true); };
-    u8 getLanguage(void) {
+    u8 getCheat(void) const { return getFlag(SAVE_INFO_EX_CHEAT, SAVE_INFO_EX_GLOBAL_CHEAT, false); };
+    u8 getSlot(void) const { return (flags & SAVE_INFO_EX_SLOT_MASK) >> SAVE_INFO_EX_SLOT_SHIFT; };
+    u8 getDMA(void) const { return getFlag(SAVE_INFO_EX_DMA, SAVE_INFO_EX_GLOBAL_DMA, false); };
+    u8 getProtection(void) const { return (flags2 & SAVE_INFO_EX_PROTECTION) ? 1 : 0; };
+    u8 getLinkage(void) const { return (flags2 & SAVE_INFO_EX_LINKAGE) ? 1 : 0; };
+    u8 getIcon(void) const { return (flags2 & SAVE_INFO_EX_ICON_MASK) >> SAVE_INFO_EX_ICON_SHIFT; };
+    u8 getSDSave(void) const { return getFlag(SAVE_INFO_EX_SD_SAVE, SAVE_INFO_EX_GLOBAL_SD_SAVE, true); };
+    u8 getLanguage(void) const {
         return (flags2 & SAVE_INFO_EX_LANGUAGE_MASK) >> SAVE_INFO_EX_LANGUAGE_SHIFT;
     }
-    u8 getLoader(void) {
+    u8 getLoader(void) const {
         return getFlag(SAVE_INFO_EX_LOADER, SAVE_INFO_EX_GLOBAL_LOADER, true);
     };
-    u8 getNightly(void) {
+    u8 getNightly(void) const {
         return getFlag(SAVE_INFO_EX_NIGHTLY, SAVE_INFO_EX_GLOBAL_NIGHTLY, true);
     };
-    bool isDownloadPlay(void) {
+    bool isDownloadPlay(void) const {
         return getState(SAVE_INFO_EX_DOWNLOAD_PLAY, SAVE_INFO_EX_GLOBAL_DOWNLOAD_PLAY, false,
                         false);
     };
-    bool isSoftReset(void) {
+    bool isSoftReset(void) const {
         return getState(SAVE_INFO_EX_SOFT_RESET, SAVE_INFO_EX_GLOBAL_SOFT_RESET, gs().softreset,
                         false);
     };
-    bool isCheat(void) {
+    bool isCheat(void) const {
         return getState(SAVE_INFO_EX_CHEAT, SAVE_INFO_EX_GLOBAL_CHEAT, gs().cheats, false);
     };
-    bool isDMA(void) {
+    bool isDMA(void) const {
         return getState(SAVE_INFO_EX_DMA, SAVE_INFO_EX_GLOBAL_DMA, gs().dma, false);
     };
-    bool isProtection(void) { return (flags2 & SAVE_INFO_EX_PROTECTION) ? true : false; };
-    bool isLinkage(void) { return (flags2 & SAVE_INFO_EX_LINKAGE) ? true : false; };
-    bool isSDSave(void) {
+    bool isProtection(void) const { return (flags2 & SAVE_INFO_EX_PROTECTION) ? true : false; };
+    bool isLinkage(void) const { return (flags2 & SAVE_INFO_EX_LINKAGE) ? true : false; };
+    bool isSDSave(void) const {
         return getState(SAVE_INFO_EX_SD_SAVE, SAVE_INFO_EX_GLOBAL_SD_SAVE, gs().sdsave, true);
     };
-    bool isNdsBootstrap(void) {
+    bool isNdsBootstrap(void) const {
         return getState(SAVE_INFO_EX_LOADER, SAVE_INFO_EX_GLOBAL_LOADER,
                         gs().romLauncher, true);
     };
@@ -156,7 +156,7 @@ typedef struct SAVE_INFO_EX_T {
         setFlag(SAVE_INFO_EX_LOADER, SAVE_INFO_EX_GLOBAL_LOADER, ndsbootstrap, true);
         setFlag(SAVE_INFO_EX_NIGHTLY, SAVE_INFO_EX_GLOBAL_NIGHTLY, nightly, true);
     };
-    u8 getFlag(u32 personal, u32 global, bool style) {
+    u8 getFlag(u32 personal, u32 global, bool style) const {
         return (flags2 & global) ? 2 : ((style ? (flags2 & personal) : (flags & personal)) ? 1 : 0);
     }
     void setFlag(u32 personal, u32 global, u8 value, bool style) {
@@ -175,7 +175,7 @@ typedef struct SAVE_INFO_EX_T {
                 break;
         }
     }
-    bool getState(u32 personal, u32 global, bool globalState, bool style) {
+    bool getState(u32 personal, u32 global, bool globalState, bool style) const {
         switch (getFlag(personal, global, style)) {
             case 0:
                 return false;

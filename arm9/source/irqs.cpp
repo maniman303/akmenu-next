@@ -12,7 +12,8 @@
 #include "timer.h"
 #include "diskicon.h"
 #include "logger.h"
-#include "subwindowmanager.h"
+#include "vfxmanager.h"
+#include "ui/subwindowmanager.h"
 
 bool cIRQ::_vblankStarted(false);
 
@@ -49,6 +50,7 @@ void cIRQ::vBlank() {
     if (!_vblankStarted) return;
 
     timer().updateTimer();
+    vfxManager().update();
 
     static u32 vBlankCounter = 0;
 

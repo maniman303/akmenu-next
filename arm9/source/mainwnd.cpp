@@ -28,6 +28,8 @@
 #include "language.h"
 #include "progresswnd.h"
 #include "romlauncher.h"
+#include "ticksound.h"
+#include "vfxmanager.h"
 
 #include <dirent.h>
 #include <fat.h>
@@ -375,17 +377,26 @@ void cMainWnd::launchSelected() {
         return;
     }
 
-    if (!rominfo.isDSRom()) return;
-
-    dbg_printf("(%s)\n", fullPath.c_str());
-    dbg_printf("%d\n", fullPath[fullPath.size() - 1]);
-
-    TLaunchResult launchRes = launchRom(fullPath, rominfo, rominfo.isHomebrew() && "boot.nds" == toLowerString(fileName), savesPath);
-    if (launchRes != ELaunchNoFreeSpace) {
+    if (!rominfo.isDSRom()) {
         return;
     }
 
-    akui::cMessageBox::showModal(LANG("no free space", "title"), LANG("no free space", "text"), MB_OK);
+    bool isMenu = rominfo.isHomebrew() && "boot.nds" == toLowerString(fileName);
+
+    disableInput();
+    tickSound().disable();
+    // TODO: Run launch effect
+    WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder, &vfxManager()}, this, [this, fullPath, rominfo, isMenu, fileName, savesPath](){
+        TLaunchResult launchRes = launchRom(fullPath, rominfo, isMenu, savesPath, [this](){
+            enableInput();
+            tickSound().enable();
+        });
+
+        if (launchRes == ELaunchNoFreeSpace) {
+            akui::cMessageBox::showModal(LANG("no free space", "title"), LANG("no free space", "text"), MB_OK);
+        }
+    });
+    task->schedule();
 }
 
 void cMainWnd::showSettings(void) {
@@ -618,11 +629,8 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
     gs().languageOverride = settingWnd->getItemSelection(3,2);
     gs().resetHotKey = settingWnd->getItemSelection(3, 3);
 
-    size_t autoRunItem = 3;
-    
     if (fsManager().isFlashcart()) {
-        autoRunItem++;
-        gs().pico = settingWnd->getItemSelection(3, 3);
+        gs().pico = settingWnd->getItemSelection(3, 4);
     }
 
     // page 5: other
@@ -755,10 +763,13 @@ void cMainWnd::onFolderChanged() {
 
     if (_mainList->getRowFullPath(selectedRowId) == "slot1:/") {
         disableInput();
-        WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder}, this, [this](){
+        tickSound().disable();
+        // TODO: Run launch effect
+        WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder, &vfxManager()}, this, [this](){
             Slot1Launcher* launcher = new Slot1Launcher();
             launcher->setOnCompleted([this](){
                 enableInput();
+                tickSound().enable();
             });
             launcher->launchRom("slot1:/", "", 0, 0, 0, 0);
         });
