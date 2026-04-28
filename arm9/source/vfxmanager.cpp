@@ -5,6 +5,7 @@
 #include "close_sound_bin.h"
 #include "up_sound_bin.h"
 #include "save_sound_bin.h"
+#include "next_sound_bin.h"
 
 VfxManager::VfxManager() {
     _init = false;
@@ -18,6 +19,7 @@ void VfxManager::init() {
     _entries.push_back(VfxEntry(VFX_EFFECT::CLOSE, (u8*)close_sound_bin, close_sound_bin_size, 10));
     _entries.push_back(VfxEntry(VFX_EFFECT::UP, (u8*)up_sound_bin, up_sound_bin_size, 10));
     _entries.push_back(VfxEntry(VFX_EFFECT::SAVE, (u8*)save_sound_bin, save_sound_bin_size, 25));
+    _entries.push_back(VfxEntry(VFX_EFFECT::NEXT, (u8*)next_sound_bin, next_sound_bin_size, 10));
     _init = true;
     _enabled = true;
 }
