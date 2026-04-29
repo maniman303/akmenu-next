@@ -46,7 +46,7 @@ cMainWnd::cMainWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::strin
       _startMenu(NULL),
       _startButton(NULL),
       _brightnessButton(NULL),
-      _clockButton(NULL),
+      _fileInfoButton(NULL),
       _folderUpButton(NULL),
       _folderText(NULL),
       _focusBorder(NULL) {}
@@ -148,17 +148,17 @@ void cMainWnd::init() {
     if (!show) _brightnessButton->hide();
     addChildWindow(_brightnessButton);
 
-    x = ini.GetInt("clock btn", "x", 240);
-    y = ini.GetInt("clock btn", "y", 1);
-    focus = ini.GetInt("clock btn", "focus", 0);
-    show = ini.GetInt("clock btn", "show", 0);
-    _clockButton = new cButton(x, y, 0, 0, this, "");
-    _clockButton->setRelativePosition(cPoint(x, y));
-    _clockButton->setIsFocusable(focus);
-    _clockButton->loadAppearance(SFN_CLOCK_BUTTON);
-    _clockButton->clicked.connect(this, &cMainWnd::clockButtonClicked);
-    if (!show) _clockButton->hide();
-    addChildWindow(_clockButton);
+    x = ini.GetInt("file info btn", "x", 240);
+    y = ini.GetInt("file info btn", "y", 1);
+    focus = ini.GetInt("file info btn", "focus", 0);
+    show = ini.GetInt("file info btn", "show", 0);
+    _fileInfoButton = new cButton(x, y, 0, 0, this, "");
+    _fileInfoButton->setRelativePosition(cPoint(x, y));
+    _fileInfoButton->setIsFocusable(focus);
+    _fileInfoButton->loadAppearance(SFN_FILE_INFO_BUTTON);
+    _fileInfoButton->clicked.connect(this, &cMainWnd::fileInfoButtonClicked);
+    if (!show) _fileInfoButton->hide();
+    addChildWindow(_fileInfoButton);
 
     x = ini.GetInt("folderup btn", "x", 0);
     y = ini.GetInt("folderup btn", "y", 2);
@@ -269,13 +269,17 @@ void cMainWnd::brightnessButtonClicked() {
     gs().nextBrightness();
 }
 
-void cMainWnd::clockButtonClicked() {
-    std::string lastFile = saveManager().lastFile();
-    if (lastFile == "..." || lastFile.empty()) {
-        return;
-    }
+void cMainWnd::fileInfoButtonClicked() {
+    u32 selectedId = _mainList->selectedRowId();
+    if (!_mainList->isFocused()) {
+        std::string lastFile = saveManager().lastFile();
+        if (lastFile == "..." || lastFile.empty()) {
+            return;
+        }
 
-    u32 selectedId = _mainList->getRowIdByPath(lastFile);
+        selectedId = _mainList->getRowIdByPath(lastFile);
+    }
+    
     if (selectedId >= UINT16_MAX) {
         return;
     }

@@ -46,7 +46,7 @@ class cMainWnd : public akui::cForm {
     void startMenuClosed();
     void startButtonClicked();
     void brightnessButtonClicked();
-    void clockButtonClicked();
+    void fileInfoButtonClicked();
     void showSettings(void);
     void saveSettings(cSettingWnd* settingWnd);
     void onFolderChanged();
@@ -57,7 +57,7 @@ class cMainWnd : public akui::cForm {
     cStartMenu* _startMenu;
     cButton* _startButton;
     cButton* _brightnessButton;
-    cButton* _clockButton;
+    cButton* _fileInfoButton;
     cButton* _folderUpButton;
     cStaticText* _folderText;
     cFocusBorder* _focusBorder;
