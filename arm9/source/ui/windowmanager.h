@@ -35,9 +35,12 @@ class cWindowManager {
     cWindow* _windowBelowPen;
     cWindow* _capturedWindow;  // process touch for non-focusable window
     std::vector<cWindow*> _modals;
+    u16 _scheduleBackground;
   protected:
     cWindow* windowBelowPen(void) const { return _windowBelowPen; }
+    void scheduleBackground(bool total);
     const cWindowManager& updateBackground(bool includeCurrent);
+    void renderBackground();
 
   public:
     cWindowManager();

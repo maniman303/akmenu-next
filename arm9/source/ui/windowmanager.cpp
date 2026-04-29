@@ -14,7 +14,8 @@ cWindowManager::cWindowManager()
     : _currentWindow(NULL, NULL),
     _focusedWindow(NULL),
     _windowBelowPen(NULL),
-    _capturedWindow(NULL) {}
+    _capturedWindow(NULL),
+    _scheduleBackground(0) {}
 
 cWindowManager::~cWindowManager() {}
 
@@ -70,12 +71,15 @@ cWindowManager& cWindowManager::addWindow(cWindow* aWindow) {
         _currentWindow._focused = focusedWindow();
         _backgroundWindows.push_back(_currentWindow);
     }
+
     _currentWindow = cWindowRec(aWindow);
     setFocusedWindow(aWindow);
     if (aWindow != NULL && aWindow->canRenderBackdrop()) {
         aWindow->scheduleBackdrop();
     }
-    updateBackground(false);
+
+    scheduleBackground(false);
+
     return *this;
 }
 
@@ -105,23 +109,19 @@ cWindowManager& cWindowManager::removeWindow(cWindow* aWindow) {
             }
         }
     } else {
-        for (cWindows::iterator it = _backgroundWindows.begin(); it != _backgroundWindows.end();
-            ++it) {
-            if ((*it).window() == aWindow) {
-                _backgroundWindows.erase(it);
+        for (std::reverse_iterator<cWindows::iterator> it = _backgroundWindows.rbegin(); it != _backgroundWindows.rend(); it++) {
+            if (it->window() == aWindow) {
+                _backgroundWindows.erase(std::prev(it.base()));
                 break;
             }
         }
     }
     
     if (focusedWindow() && aWindow->doesHierarchyContain(focusedWindow())) {
-        // logger().info("Hierarchy includes focused window.");
         _focusedWindow = _currentWindow.window();
     }
 
-    updateBackground(true);
-    gdi().presentMain();
-    updateBackground(false);
+    scheduleBackground(true);
     
     return *this;
 }
@@ -147,6 +147,9 @@ bool cWindowManager::containsWindow(cWindow* aWindow) {
 const cWindowManager& cWindowManager::update(void) {
     if (_currentWindow.window() != NULL) {
         _currentWindow.window()->update();
+
+        renderBackground();
+
         if (_currentWindow.window()->canRenderBackdrop() && _currentWindow.window()->shouldRenderBackdrop()) {
             gdi().setMainEngineLayer(MEL_MIDDLE);
             _currentWindow.window()->renderBackdrop();
@@ -160,6 +163,14 @@ const cWindowManager& cWindowManager::update(void) {
     cleanModals();
     
     return *this;
+}
+
+void cWindowManager::scheduleBackground(bool total) {
+    if (total) {
+        _scheduleBackground = 2;
+    } else if (_scheduleBackground == 0) {
+        _scheduleBackground = 1;
+    }
 }
 
 const cWindowManager& cWindowManager::updateBackground(bool includeCurrent) {
@@ -195,6 +206,24 @@ const cWindowManager& cWindowManager::updateBackground(bool includeCurrent) {
     gdi().setMainEngineLayer(MEL_UP);
 
     return *this;
+}
+
+void cWindowManager::renderBackground() {
+    if (_scheduleBackground == 0) {
+        return;
+    }
+
+    if (_scheduleBackground == 1) {
+        updateBackground(false);
+        _scheduleBackground = 0;
+        return;
+    }
+
+    updateBackground(true);
+    gdi().presentMain();
+    updateBackground(false);
+
+    _scheduleBackground = 0;
 }
 
 bool cWindowManager::processKeyMessage(cKeyMessage message) {
