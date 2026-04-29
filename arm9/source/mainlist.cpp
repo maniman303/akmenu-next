@@ -7,8 +7,6 @@
     SPDX-License-Identifier: GPL-3.0-or-later
 */
 
-//�
-
 #include "mainlist.h"
 #include <fat.h>
 #include <sys/dir.h>
@@ -137,8 +135,8 @@ int cMainList::init() {
 }
 
 static bool itemSortComp(const akui::cListView::itemVector& item1, const akui::cListView::itemVector& item2) {
-    const std::string& fn1 = item1[cMainList::SHOWNAME_COLUMN].text();
-    const std::string& fn2 = item2[cMainList::SHOWNAME_COLUMN].text();
+    const std::string& fn1 = gs().viewMode == 4 ? item1[cMainList::INTERNALNAME_COLUMN].text() : item1[cMainList::SHOWNAME_COLUMN].text();
+    const std::string& fn2 = gs().viewMode == 4 ? item2[cMainList::INTERNALNAME_COLUMN].text() : item2[cMainList::SHOWNAME_COLUMN].text();
 
     if (fn1 == "../" || fn1 == "..") return true;
     if (fn2 == "../" || fn2 == "..") return false;
