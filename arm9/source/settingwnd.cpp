@@ -369,8 +369,11 @@ void cSettingWnd::SwitchTab(size_t oldIndex, size_t newIndex) {
 }
 
 void cSettingWnd::onItemChanged(akui::cSpinBox* item) {
-    vfxManager().playEffect(VFX_EFFECT::NEXT);
     size_t newTab = item->selectedItemId();
+    if (newTab != _currentTab) {
+        vfxManager().playEffect(VFX_EFFECT::NEXT);
+    }
+
     SwitchTab(_currentTab, newTab);
     _currentTab = newTab;
 }
