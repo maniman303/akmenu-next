@@ -38,6 +38,8 @@ namespace akui {
 
         _isFocusable = !namedAppearance;
 
+        _prevButton.setStyle(cButton::Style::press);
+        _nextButton.setStyle(cButton::Style::press);
         _prevButton.clicked.connect(this, &cSpinBox::selectPrev);
         _nextButton.clicked.connect(this, &cSpinBox::selectNext);
 
