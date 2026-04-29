@@ -824,7 +824,7 @@ u32 cMainList::getRowIdByPath(std::string path) {
         }
     }
 
-    return UINT16_MAX;
+    return UINT32_MAX;
 }
 
 bool cMainList::getRomInfo(u32 rowIndex, DSRomInfo& info) const {

@@ -222,6 +222,11 @@ void cMainWnd::startMenuItemClicked(s16 i) {
 
         if (favoritesRes) {
             _mainList->enterDir(_mainList->getCurrentDir());
+            u32 selectedId = _mainList->getRowIdByPath(selectedFullPath);
+            if (selectedId == UINT32_MAX) {
+                selectedId = 0;
+            }
+            _mainList->selectRow(selectedId);
         }
     }
 
@@ -280,7 +285,7 @@ void cMainWnd::fileInfoButtonClicked() {
         selectedId = _mainList->getRowIdByPath(lastFile);
     }
     
-    if (selectedId >= UINT16_MAX) {
+    if (selectedId == UINT32_MAX) {
         return;
     }
 
