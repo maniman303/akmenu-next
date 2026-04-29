@@ -81,12 +81,14 @@ namespace akui {
         if (_items.size() - 1 == _selectedItemId) return;
 
         selectItem(_selectedItemId + 1);
+        _nextButton.setPressed(true);
     }
 
     void cSpinBox::selectPrev() {
         if (0 == _selectedItemId) return;
 
         selectItem(_selectedItemId - 1);
+        _prevButton.setPressed(true);
     }
 
     void cSpinBox::insertItem(const std::string& item, u32 position) {

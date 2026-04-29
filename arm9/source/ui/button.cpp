@@ -18,7 +18,7 @@ cButton::cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string&
 cButton::cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text, bool hasAlpha)
     : cWindow(parent, text) {
     _captured = false;
-    _state = up;
+    _state = 0;
     setSize(cSize(w, h));
     setRelativePosition(cPoint(x, y));
     _textColor = uiSettings().buttonTextColor;  // RGB15(0,0,0) | BIT(15);
@@ -31,8 +31,8 @@ cButton::cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string&
 cButton::~cButton() { }
 
 void cButton::draw() {
-    if (!_background.valid()) {
-        return;
+    if (_state > 0 && !_captured) {
+        _state--;
     }
 
     const cPoint topLeft = position();
@@ -48,7 +48,7 @@ void cButton::draw() {
         if (style() != cButton::single) {
             height /= 2;
 
-            if (state() == cButton::down) {
+            if (_state > 0) {
                 pBuffer += (_background.pitch() * _background.height() / 8);
             }
         }
@@ -81,7 +81,7 @@ void cButton::draw() {
             break;
     }
 
-    if (cButton::down == state()) {
+    if (_state > 0) {
         textX++;
         textY++;
     }
@@ -143,21 +143,26 @@ bool cButton::processTouchMessage(cTouchMessage message) {
         }
 
         _captured = false;
-        _state = up;
 
         if (myRect.surrounds(message.position())) {
             clicked();
         }
 
+        setPressed(false);
+
         return true;
     }
 
-    if (message.down() && myRect.surrounds(message.position())) {
+    if ((message.down() || message.move()) && myRect.surrounds(message.position())) {
         _captured = true;
-        _state = down;
+        setPressed(true);
         
         return true;
     }
 
     return false;
+}
+
+void cButton::setPressed(bool isPressed) {
+    _state = isPressed ? 6 : 0;
 }

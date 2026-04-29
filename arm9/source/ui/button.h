@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <nds.h>
 #include "bmp15.h"
 #include "rectangle.h"
 #include "renderdesc.h"
@@ -16,7 +17,6 @@
 
 class cButton : public cWindow {
   public:
-    enum State { up = 0, down = 1 };
     enum Style { single = 0, press = 1, toggle = 2 };
     enum Alignment { left, center, right };
 
@@ -33,12 +33,12 @@ class cButton : public cWindow {
     void setIsFocusable(bool isFocusable);
     bool processKeyMessage(cKeyMessage message) override;
     bool processTouchMessage(cTouchMessage message) override;
-    State state() { return _state; }
     void setTextColor(COLOR color) { _textColor = color; }
     COLOR textColor() { return _textColor; }
     void setStyle(Style style) { _style = style; }
     Style style() { return _style; }
     void setAlignment(Alignment alignment) { _alignment = alignment; }
+    void setPressed(bool isPressed);
     Alignment alignment() { return _alignment; }
     bool hasAlpha() { return _hasAlpha; }
 
@@ -46,7 +46,7 @@ class cButton : public cWindow {
 
   protected:
     bool _captured;
-    State _state;
+    u16 _state;
     COLOR _textColor;
     cBMP15 _background;
     Style _style;
