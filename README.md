@@ -17,15 +17,14 @@ This fork is a work in progress project aimed to rewrite the UI part of **akmenu
 - Added new settings for minimalistic rom list, auto rom launching.
 - Improved visuals of auto launching last played games with separate screen.
 - Added animated focus border to main screen.
+- Added bmp coloring system with system theme color.
+- Added new default theme.
+- Added VFX sounds for navigation.
 - Many bug fixes.
 
 The end goal is to recreate (with proper theme that's not included yet) the aesthetic and feel of original Nintendo DS bios.
 
 Plans for near future:
-- Clean up settings.
-- Add system for coloring bmps with system color.
-- Add clean theme to repo.
-- Add more vfx sounds.
 - Add support for gbarunner3.
 
 Plans for far future:
@@ -110,8 +109,14 @@ At this point you should be ready to go.
 * The system directory is `_nds/akmenunext` where the akmenu system files should be placed, along with a copy of the nds-bootstrap files in the `_nds` folder.
 * The binary of akmenu-next additionally needs to be in the `_nds/akmenunext` folder as `launcher.nds` for theme & language reboots, this is automatically added if using the package script.
 * Cheats should be placed as `usrcheat.dat` into the `_nds/akmenunext/cheats` folder.
-* Themes go into `_nds/akmenunext/ui`. Acekard & Wood R4 themes are supported.
+* Themes go into `_nds/akmenunext/ui`. More on that bellow.
 * For flashcart related builds, files for the corresponding flashcart for Pico-Loader should go into the `_pico` folder.
+
+### Themes
+
+Due to major changes in rendering, new components, extensions of old components, etc., themes for AK4 and Wood are not really supported.
+
+AKMenu Mako themes are based on AKMenu Next themes, so porting should be easy, but it is still requried.
 
 ## License
 
