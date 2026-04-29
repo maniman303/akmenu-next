@@ -29,7 +29,6 @@ class cRomBootWnd : public cWindow {
     std::string _romPath;
     DSRomInfo _romInfo;
     std::function<void()> _onExit;
-    u16 _timer;
     Animation _pressAnimation;
     cStaticText _launchText;
     cStaticText _nameText;

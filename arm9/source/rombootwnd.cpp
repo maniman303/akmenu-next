@@ -17,7 +17,6 @@ cRomBootWnd::cRomBootWnd(std::string romPath, std::function<void()> onExit) :
     _onExit = onExit;
     _romInfo.mayBeDSRom(romPath);
 
-    _timer = 0;
     _pressAnimation.setDuration(36);
 
     _engine = GE_MAIN;
@@ -66,9 +65,8 @@ bool cRomBootWnd::processTouchMessage(cTouchMessage message) {
 }
 
 void cRomBootWnd::update() {
-    if (_timer < 24) {
+    if (gdi().getScreenTransparency(GE_MAIN) != 100) {
         gdi().setMainLayerTransparency(0, MEL_UP);
-        _timer++;
         return;
     }
 
@@ -85,14 +83,12 @@ void cRomBootWnd::update() {
     }
 
     u16 transparency = (u16)twin().int32(0, 100, _pressAnimation.value(), TWIN_EASE::EASE_OUT);
-    // logger().info("Set transparency to: " + std::to_string(transparency));
-
-    // TODO: Animate "Press START..." fade in and out
     gdi().setMainLayerTransparency(transparency, MEL_UP);
 }
 
 void cRomBootWnd::onFocused() {
     gdi().setScreenTransparency(0, GE_SUB);
+    gdi().setMainLayerTransparency(0, MEL_UP);
     if (!_romInfo.isDSRom()) {
         windowManager().removeWindow(this);
         if (_onExit) {
