@@ -1,4 +1,5 @@
 #include "vfxmanager.h"
+#include "globalsettings.h"
 #include "tick_sound_bin.h"
 #include "select_sound_bin.h"
 #include "click_sound_bin.h"
@@ -57,7 +58,7 @@ void VfxManager::playEffect(VFX_EFFECT e) {
 }
 
 void VfxManager::playEffect(VFX_EFFECT e, u16 v) {
-    if (!_init || !_enabled) {
+    if (!_init || !_enabled || !gs().sound) {
         return;
     }
 

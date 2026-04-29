@@ -23,7 +23,8 @@ cGlobalSettings::cGlobalSettings() {
     startupFolder = "...";
     dateFormat = 0;
     fileListType = 0;
-    clockSound = false;
+    sound = true;
+    clockSound = true;
     filePresentationMode = 0;
     minimalModeRomsCount = 20;
     enterLastDirWhenBoot = true;
@@ -71,6 +72,7 @@ void cGlobalSettings::loadSettings() {
     if ('/' != startupFolder[startupFolder.length() - 1]) startupFolder += '/';
     dateFormat = ini.GetInt("system", "dateFormat", dateFormat);
     fileListType = ini.GetInt("system", "fileListType", fileListType);
+    sound = ini.GetInt("system", "sound", sound);
     clockSound = ini.GetInt("system", "clockSound", clockSound);
     filePresentationMode = ini.GetInt("system", "filePresentationMode", filePresentationMode);
     minimalModeRomsCount = ini.GetInt("system", "minimalModeRomsCount", minimalModeRomsCount);
@@ -130,6 +132,7 @@ void cGlobalSettings::saveSettings() {
     ini.SetString("system", "langDirectory", langDirectory);
     ini.SetInt("system", "dateFormat", dateFormat);
     ini.SetInt("system", "fileListType", fileListType);
+    ini.SetInt("system", "sound", sound);
     ini.SetInt("system", "clockSound", clockSound);
     ini.SetInt("system", "filePresentationMode", filePresentationMode);
     ini.SetInt("system", "gbaSleepHack", gbaSleepHack);

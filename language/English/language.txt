@@ -176,6 +176,9 @@ es = español
 cn = 简体中文
 zh = 繁體中文
 
+[sound]
+text = Sound
+
 [ui style]
 text = System theme
 

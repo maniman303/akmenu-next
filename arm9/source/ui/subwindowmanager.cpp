@@ -37,7 +37,6 @@ void cSubWindowManager::updateBackground() {
 
     drawBg |= calendarWnd().shouldRenderBackdrop();
     drawBg |= calendar().shouldRenderBackdrop();
-    drawBg |= topbar().shouldRenderBackdrop();
 
     if (!drawBg) {
         return;
@@ -49,8 +48,6 @@ void cSubWindowManager::updateBackground() {
     calendarWnd().onRenderBackdrop();
     calendar().renderBackdrop();
     calendar().onRenderBackdrop();
-    topbar().renderBackdrop();
-    topbar().onRenderBackdrop();
 
     gdi().setSubEngineLayer(SEL_UP);
     gdi().pushSubBackground();

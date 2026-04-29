@@ -7,7 +7,6 @@
 
 cTopBar::cTopBar() : cWindow(NULL, "topbar") {
     _firstDraw = false;
-    _backdropState = 0;
 
     _animation.setDuration(12);
 
@@ -56,11 +55,6 @@ void cTopBar::update() {
         _animation.play();
     }
 
-    if (_animation.isCompleted() && _backdropState == 0) {
-        _backdropState = 1;
-        scheduleBackdrop();
-    }
-
     s16 posY = twin().int16(-size().y, 0, _animation.value());
     setRelativePosition(cPoint(0, posY));
 }
@@ -73,16 +67,12 @@ void cTopBar::blink() {
 void cTopBar::draw() {
     _firstDraw = true;
 
-    if (_backdropState < 2 && _background.valid()) {
+    if (_background.valid()) {
         gdi().bitBlt(_background.buffer(), position().x, position().y, _background.width(), _background.height(), selectedEngine());
     }
 
-    if (_backdropState < 2 && _overlay.valid()) {
+    if (_overlay.valid()) {
         gdi().maskBlt(_overlay.buffer(), position().x, position().y, _overlay.width(), _overlay.height(), selectedEngine());
-    }
-
-    if (_backdropState == 1) {
-        _backdropState = 2;
     }
 
     _batteryMeter.draw();
@@ -91,18 +81,4 @@ void cTopBar::draw() {
     _smallClock.draw();
     _smallDate.draw();
     _userWnd.draw();
-}
-
-void cTopBar::drawBackdrop() {
-    if (!_animation.isPlaying() || !_animation.isCompleted()) {
-        return;
-    }
-
-    if (_background.valid()) {
-        gdi().bitBlt(_background.buffer(), position().x, position().y, _background.width(), _background.height(), selectedEngine());
-    }
-
-    if (_overlay.valid()) {
-        gdi().maskBlt(_overlay.buffer(), position().x, position().y, _overlay.width(), _overlay.height(), selectedEngine());
-    }
 }

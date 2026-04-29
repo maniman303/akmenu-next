@@ -452,6 +452,11 @@ void cMainWnd::showSettings(void) {
     _values.clear();
     _values.push_back(LANG("switches", "Disable"));
     _values.push_back(LANG("switches", "Enable"));
+    settingWnd->addSettingItem(LANG("sound", "text"), _values, gs().sound);
+
+    _values.clear();
+    _values.push_back(LANG("switches", "Disable"));
+    _values.push_back(LANG("switches", "Enable"));
     settingWnd->addSettingItem(LANG("quick resume", "text"), _values, gs().autorunWithLastRom);
 
     // page 2: interface
@@ -465,6 +470,24 @@ void cMainWnd::showSettings(void) {
         if (_values[ii] == gs().uiName) uiIndex = ii;
     }
     settingWnd->addSettingItem(LANG("ui style", "text"), _values, uiIndex);
+
+    _values.clear();
+    _values.push_back(LANG("menu style", "full"));
+    _values.push_back(LANG("menu style", "user only"));
+    _values.push_back(LANG("menu style", "games"));
+    settingWnd->addSettingItem(LANG("menu style", "menu"), _values, gs().filePresentationMode);
+
+    _values.clear();
+    _values.push_back(LANG("interface settings", "oldschool"));
+    _values.push_back(LANG("interface settings", "modern"));
+    _values.push_back(LANG("interface settings", "internal"));
+    _values.push_back(LANG("interface settings", "small"));
+    settingWnd->addSettingItem(LANG("menu style", "item"), _values, gs().viewMode);
+
+    _values.clear();
+    _values.push_back(LANG("switches", "Disable"));
+    _values.push_back(LANG("switches", "Enable"));
+    settingWnd->addSettingItem(LANG("interface settings", "clock sound"), _values, gs().clockSound);
 
     size_t scrollSpeed = 0;
     switch (gs().scrollSpeed) {
@@ -483,19 +506,6 @@ void cMainWnd::showSettings(void) {
     _values.push_back(LANG("scrolling", "medium"));
     _values.push_back(LANG("scrolling", "slow"));
     settingWnd->addSettingItem(LANG("interface settings", "scrolling speed"), _values, scrollSpeed);
-
-    _values.clear();
-    _values.push_back(LANG("menu style", "full"));
-    _values.push_back(LANG("menu style", "user only"));
-    _values.push_back(LANG("menu style", "games"));
-    settingWnd->addSettingItem(LANG("menu style", "menu"), _values, gs().filePresentationMode);
-
-    _values.clear();
-    _values.push_back(LANG("interface settings", "oldschool"));
-    _values.push_back(LANG("interface settings", "modern"));
-    _values.push_back(LANG("interface settings", "internal"));
-    _values.push_back(LANG("interface settings", "small"));
-    settingWnd->addSettingItem(LANG("menu style", "item"), _values, gs().viewMode);
 
     // page 3: filesystem
     settingWnd->addSettingTab(LANG("file settings", "title"));
@@ -571,11 +581,6 @@ void cMainWnd::showSettings(void) {
     _values.clear();
     _values.push_back(LANG("switches", "Disable"));
     _values.push_back(LANG("switches", "Enable"));
-    settingWnd->addSettingItem(LANG("interface settings", "clock sound"), _values, gs().clockSound);
-
-    _values.clear();
-    _values.push_back(LANG("switches", "Disable"));
-    _values.push_back(LANG("switches", "Enable"));
     settingWnd->addSettingItem(LANG("patches", "cheating system"), _values, gs().cheats);
 
     _values.clear();
@@ -618,12 +623,16 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
     u32 langIndexAfter = settingWnd->getItemSelection(0, 0);
     gs().dateFormat = settingWnd->getItemSelection(0, 1);
     gs().show12hrClock = settingWnd->getItemSelection(0, 2);
-    gs().autorunWithLastRom = settingWnd->getItemSelection(0, 3);
+    gs().sound = settingWnd->getItemSelection(0, 3);
+    gs().autorunWithLastRom = settingWnd->getItemSelection(0, 4);
 
     // page 2: interface
     u32 uiIndexAfter = settingWnd->getItemSelection(1, 0);
 
-    switch (settingWnd->getItemSelection(1, 1)) {
+    gs().filePresentationMode = settingWnd->getItemSelection(1, 1);
+    gs().viewMode = settingWnd->getItemSelection(1, 2);
+    gs().clockSound = settingWnd->getItemSelection(1, 3);
+    switch (settingWnd->getItemSelection(1, 4)) {
         case 0:
             gs().scrollSpeed = cGlobalSettings::EScrollFast;
             break;
@@ -634,8 +643,6 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
             gs().scrollSpeed = cGlobalSettings::EScrollSlow;
             break;
     }
-    gs().filePresentationMode = settingWnd->getItemSelection(1, 2);
-    gs().viewMode = settingWnd->getItemSelection(1, 3);
 
     // page 3: filesystem
     gs().fileListType = settingWnd->getItemSelection(2, 0);
@@ -653,12 +660,11 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
     }
 
     // page 5: other
-    gs().clockSound = settingWnd->getItemSelection(4, 0);
-    gs().cheats = settingWnd->getItemSelection(4, 1);
-    gs().slot2mode = settingWnd->getItemSelection(4, 2);
+    gs().cheats = settingWnd->getItemSelection(4, 0);
+    gs().slot2mode = settingWnd->getItemSelection(4, 1);
 
     if (isDSiMode()){
-        gs().hbStrap = settingWnd->getItemSelection(4, 3);
+        gs().hbStrap = settingWnd->getItemSelection(4, 2);
     }
 
     if (uiIndex != uiIndexAfter) {
@@ -676,7 +682,9 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
                 });
                 launcher->launchRom(launcherPath, "", 0, 0, 0, 0);
             },
-            {});
+            [this](){
+                vfxManager().playEffect(VFX_EFFECT::CLOSE);
+            });
     } else if (langIndex != langIndexAfter) {
         akui::cMessageBox::showModal(LANG("language changed", "title"), LANG("language changed", "text"), MB_YES | MB_NO,
             [this, langNames, langIndexAfter]() {
@@ -691,7 +699,9 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
                 });
                 launcher->launchRom(launcherPath, "", 0, 0, 0, 0);
             },
-            {});
+            [this](){
+                vfxManager().playEffect(VFX_EFFECT::CLOSE);
+            });
     }
 
     gs().saveSettings();

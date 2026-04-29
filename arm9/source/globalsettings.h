@@ -51,6 +51,7 @@ class cGlobalSettings {
     int romLauncher;
     int viewMode;
     int slot2mode;
+    bool sound;
     bool clockSound;
     int filePresentationMode;
     int minimalModeRomsCount;
