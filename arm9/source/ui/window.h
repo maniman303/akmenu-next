@@ -117,9 +117,8 @@ class cWindow : public SlotHolder {
 
     bool isFocusable() { return _isFocusable; }
 
-    virtual cWindow& disableFocusable(void) {
+    virtual void disableFocusable(void) {
         _isFocusable = false;
-        return *this;
     }
 
     void scheduleBackdrop() { _scheduleBackdrop = true; }

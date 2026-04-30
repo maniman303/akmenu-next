@@ -38,7 +38,6 @@ namespace akui {
       u32 modalRet();
       void centerScreen();
       bool hasFocus() const override;
-      cWindow& disableFocusable(void) override;
 
       std::function<void()> onAccepted;
       std::function<void()> onRejected;
