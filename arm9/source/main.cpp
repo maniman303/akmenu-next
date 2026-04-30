@@ -255,7 +255,11 @@ int main(int argc, char* argv[]) {
         swiWaitForVBlank();
         gdi().present();
 
-        ticks = (++ticks) % 60;
+        if (ticks >= 60) {
+            ticks = 0;
+        } else {
+            ticks++;
+        }
     }
 
     return 0;
