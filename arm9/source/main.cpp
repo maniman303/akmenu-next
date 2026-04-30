@@ -232,11 +232,12 @@ int main(int argc, char* argv[]) {
         swiDelay(100);
     }
 
+    u16 ticks = 0;
     while (true) {
         timer().updateFrames();
         tickSound().play();
 
-        if (timer().getFrame() % 15 == 0) {
+        if (ticks % 15 == 0) {
             sd().update();
         }
 
@@ -253,6 +254,8 @@ int main(int argc, char* argv[]) {
 
         swiWaitForVBlank();
         gdi().present();
+
+        ticks = (++ticks) % 60;
     }
 
     return 0;
