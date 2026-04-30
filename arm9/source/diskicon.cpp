@@ -22,11 +22,11 @@ void cDiskIcon::draw() {
     gdi().maskBlt(_icon.buffer(), position().x, position().y, _icon.width(), _icon.height(), selectedEngine());
 }
 
-cWindow& cDiskIcon::loadAppearance(const std::string& aFileName) {
+void cDiskIcon::loadAppearance(const std::string& aFileName) {
     CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
     _show = ini.GetInt("disk icon", "show", _show);
     if (!_show) {
-        return *this;
+        return;
     }
 
     u16 x = ini.GetInt("disk icon", "x", 238);
@@ -36,8 +36,6 @@ cWindow& cDiskIcon::loadAppearance(const std::string& aFileName) {
     _icon = createBMP15FromFile(aFileName);
 
     _show = _icon.valid();
-
-    return *this;
 }
 
 void cDiskIcon::blink(void) {

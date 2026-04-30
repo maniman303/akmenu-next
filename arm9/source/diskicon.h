@@ -21,14 +21,10 @@ class cDiskIcon : public cWindow {
     ~cDiskIcon() {}
 
   public:
-    void draw();
-
+    void draw() override;
     void turnOn();
-
     void turnOff();
-
-    cWindow& loadAppearance(const std::string& aFileName);
-
+    void loadAppearance(const std::string& aFileName);
     void blink(void);
 
   protected:

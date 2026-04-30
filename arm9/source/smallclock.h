@@ -18,8 +18,6 @@ class cSmallClock : public cWindow {
 
     void flipColon();
 
-    cWindow& loadAppearance(const std::string& aFileName) { return *this; }
-
   protected:
     u16 _textColor;
     bool _show;

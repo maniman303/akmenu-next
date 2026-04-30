@@ -43,10 +43,9 @@ void cProgressBar::draw() {
     }
 }
 
-cWindow& cProgressBar::loadAppearance(const std::string& aFileName) {
+void cProgressBar::loadAppearance(const std::string& aFileName) {
     _barBmp = createBMP15FromFile(aFileName);
     setSize(cSize(_barBmp.width(), _barBmp.height()));
-    return *this;
 }
 
 void cProgressBar::setPercent(u8 percent) {

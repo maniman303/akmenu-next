@@ -43,7 +43,7 @@ cRomInfoWnd::cRomInfoWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
       _buttonCheats(0, 0, 46, 18, this, "\x03 Cheats"),
       _saves(NULL) {
     _canRenderBackdrop = true;
-    loadAppearance("");
+    loadAppearance();
 
     _buttonCancel.setStyle(cButton::press);
     _buttonCancel.setText("\x02 " + LANG("message box", "cancel"));
@@ -118,10 +118,9 @@ bool cRomInfoWnd::processKeyMessage(cKeyMessage message) {
     return false;
 }
 
-cWindow& cRomInfoWnd::loadAppearance(const std::string& aFileName) {
+void cRomInfoWnd::loadAppearance() {
     _renderDesc.loadData(SFN_FORM_TITLE_L, SFN_FORM_TITLE_R, SFN_FORM_TITLE_M);
     _renderDesc.setTitleText(_text);
-    return *this;
 }
 
 static std::string getFriendlyFileSizeString(u64 size) {

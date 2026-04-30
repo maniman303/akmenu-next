@@ -21,8 +21,6 @@ class cBatteryMeter : public cWindow {
 
     void draw() override;
 
-    cWindow& loadAppearance(const std::string& aFileName) override { return *this; }
-
   protected:
     int getBatteryType();
 

@@ -18,21 +18,15 @@
 cCalendarWnd::cCalendarWnd() : akui::cForm(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, "calendar window") {
     _filename = "";
     _lastDate = 0;
+    setEngine(GE_SUB);
 }
 
 cCalendarWnd::~cCalendarWnd() {}
 
 void cCalendarWnd::init() {
-    setEngine(GE_SUB);
-    loadAppearance(SFN_UPPER_SCREEN_BG);
-}
-
-cWindow& cCalendarWnd::loadAppearance(const std::string& aFileName) {
-    _filename = aFileName;
+    _filename = SFN_UPPER_SCREEN_BG;
     setRelativePosition(cPoint(0, 0));
     setSize(cSize(SCREEN_WIDTH, SCREEN_HEIGHT));
-
-    return *this;
 }
 
 static int weeksInCurrentMonth() {

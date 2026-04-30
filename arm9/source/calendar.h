@@ -25,7 +25,6 @@ class cCalendar : public cWindow {
     void drawBackdrop() override;
     bool shouldRenderBackdrop() override;
     void onRenderBackdrop() override;
-    cWindow& loadAppearance(const std::string& aFileName) override;
 
   protected:
     void drawDayNumber(u8 day, u8 weekdDayOfMonthFirstDay, u8 today);

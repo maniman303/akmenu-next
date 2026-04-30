@@ -19,7 +19,6 @@ class cCalendarWnd : public akui::cForm {
     ~cCalendarWnd();
 
   public:
-    cWindow& loadAppearance(const std::string& aFileName);
     void init();
     void drawBackdrop() override;
     bool shouldRenderBackdrop() override;

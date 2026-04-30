@@ -20,15 +20,13 @@ namespace akui {
 
     cImage::~cImage() {}
 
-    cWindow& cImage::loadAppearance(const std::string& aFileName) {
+    void cImage::loadAppearance(const std::string& aFileName) {
         _background = createBMP15FromFile(aFileName);
         if (!_background.valid() && _color != 0) {
             _background = createBMP15(size().x, size().y, _color);
         }
 
         setSize(cSize(_background.width(), _background.height()));
-
-        return *this;
     }
 
     bool cImage::valid() {

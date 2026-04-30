@@ -29,7 +29,6 @@ class cMainWnd : public akui::cForm {
   public:
     bool processKeyMessage(cKeyMessage message) override;
     bool processTouchMessage(cTouchMessage message) override;
-    cWindow& loadAppearance(const std::string& aFileName) override;
     void update() override;
     void init();
     void draw() override;

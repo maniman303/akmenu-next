@@ -34,7 +34,7 @@ bool cStartMenu::processKeyMessage(cKeyMessage message) {
     return cPopMenu::processKeyMessage(message);
 }
 
-cWindow& cStartMenu::loadAppearance(const std::string& aFileName) {
+void cStartMenu::loadAppearance(const std::string& aFileName) {
     cPopMenu::loadAppearance(aFileName);
     setSize(cSize(_background.width(), _background.height()));
 
@@ -49,7 +49,6 @@ cWindow& cStartMenu::loadAppearance(const std::string& aFileName) {
     _itemWidth = ini.GetInt("start menu", "itemWidth", 0);
     _barLeft = ini.GetInt("start menu", "barLeft", 2);
     if (_itemWidth == 0 && _barLeft * 2 > _size.x) _barLeft = 0;
-    return *this;
 }
 
 cWindow& cStartMenu::showForFile(const std::string& fileName) {

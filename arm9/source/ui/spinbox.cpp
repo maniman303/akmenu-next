@@ -60,6 +60,8 @@ namespace akui {
         _nextButton.setRelativePosition(cPoint(cx, 0));
 
         selectItem(0);
+
+        loadAppearance();
     }
 
     cSpinBox::~cSpinBox() {}
@@ -109,7 +111,7 @@ namespace akui {
         _items.erase(_items.begin() + position);
     }
 
-    void cSpinBox::setPrefixIcon(const std::string& filename)  {
+    void cSpinBox::setPrefixIcon(const std::string& filename) {
         if (!_namedAppearance) {
             return;
         }
@@ -147,7 +149,6 @@ namespace akui {
                 _middleBg.draw(x, y, (u16)repeats);
             }
 
-            // logger().info("Right bg size x: " + std::to_string(_rightBg.size().x) + ".");
             x = _nextButton.position().x - _rightBg.size().x;
             _rightBg.draw(x, y);
         } else {
@@ -173,7 +174,7 @@ namespace akui {
         _nextButton.draw();
     }
 
-    cWindow& cSpinBox::loadAppearance(const std::string& aFileName) {
+    void cSpinBox::loadAppearance() {
         if (_namedAppearance) {
             _prevButton.loadAppearance(SFN_SPINBUTTON_L_NAMED);
             _nextButton.loadAppearance(SFN_SPINBUTTON_R_NAMED);
@@ -192,8 +193,6 @@ namespace akui {
         }
 
         setSize(cSize(size().x, std::max(_prevButton.size().y, _nextButton.size().y)));
-
-        return *this;
     }
 
     void cSpinBox::onFocused() {

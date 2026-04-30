@@ -14,7 +14,7 @@ namespace akui {
 
         ~cImage() override;
 
-        cWindow& loadAppearance(const std::string& aFileName) override;
+        void loadAppearance(const std::string& aFileName);
 
         bool valid();
 

@@ -106,8 +106,6 @@ class cListView : public cWindow {
 
     u32 visibleRowCount() { return _visibleRowCount; }
 
-    cWindow& loadAppearance(const std::string& aFileName);
-
     bool processKeyMessage(cKeyMessage message) override;
 
     bool processTouchMessage(cTouchMessage message) override;

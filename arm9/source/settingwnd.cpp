@@ -31,7 +31,6 @@ cSettingWnd::cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
       _tabSwitcher(0, 0, w, 18, true, this, "spin"),
       _buttonOK(0, 0, 46, 18, this, "\x01 OK"),
       _buttonCancel(0, 0, 48, 18, this, "\x02 Cancel") {
-    _tabSwitcher.loadAppearance("");
     _tabSwitcher.changed.connect(this, &cSettingWnd::onItemChanged);
     addChildWindow(&_tabSwitcher);
     _tabSwitcher.selectItem(0);
@@ -72,7 +71,7 @@ cSettingWnd::cSettingWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     _spinBoxWidth = ini.GetInt("setting window", "spinBoxWidth", 108);
     _simpleTabs = ini.GetInt("setting window", "simpleTabs", 0);
 
-    loadAppearance("");
+    loadAppearance();
 
     _currentTab = 0;
     _canRenderBackdrop = true;
@@ -174,12 +173,12 @@ void cSettingWnd::onCancel(void) {
     cForm::onCancel();
 }
 
-cWindow& cSettingWnd::loadAppearance(const std::string& aFileName) {
+void cSettingWnd::loadAppearance() {
     if (_simpleTabs) {
         _renderDesc.loadData("", "", "");
         _renderDesc.setTitleText("");
 
-        return *this;
+        return;
     }
 
     _renderDesc.loadData(SFN_FORM_TITLE_L, SFN_FORM_TITLE_R, SFN_FORM_TITLE_M);
@@ -188,8 +187,6 @@ cWindow& cSettingWnd::loadAppearance(const std::string& aFileName) {
     _titleOffset = _renderDesc.titleSize().y;
 
     _tabSwitcher.setRelativePosition(cPoint(0, _titleOffset));
-
-    return *this;
 }
 
 void cSettingWnd::setConfirmMessage(const std::string& text) {
@@ -231,7 +228,6 @@ void cSettingWnd::addSettingItem(const std::string& text, const std::vector<std:
         item->insertItem(itemTexts[ii], ii);
     }
 
-    item->loadAppearance("");
     item->setSize(cSize(_spinBoxWidth, 18));
     item->setRelativePosition(cPoint(_size.x - _spinBoxWidth - 4, itemY));
     item->hide();

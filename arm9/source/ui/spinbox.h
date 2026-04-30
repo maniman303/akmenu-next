@@ -27,8 +27,6 @@ class cSpinBox : public cForm {
   public:
     void draw();
 
-    cWindow& loadAppearance(const std::string& aFileName);
-
     u32 selectedItemId() { return _selectedItemId; }
 
     void selectItem(u32 id);
@@ -46,6 +44,8 @@ class cSpinBox : public cForm {
     Signal1<cSpinBox*> changed;
 
   protected:
+    void loadAppearance();
+
     void onResize();
 
     void onMove();

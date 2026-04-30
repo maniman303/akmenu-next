@@ -24,8 +24,6 @@ class cUserWindow : public cWindow {
   public:
     void draw();
 
-    cWindow& loadAppearance(const std::string& aFileName) { return *this; }
-
   protected:
     void init();
 

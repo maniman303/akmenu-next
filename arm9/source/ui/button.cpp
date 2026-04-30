@@ -90,7 +90,7 @@ void cButton::draw() {
     gdi().textOutRect(textX, textY, area.size().x, area.size().y, _text.c_str(), selectedEngine());
 }
 
-cWindow& cButton::loadAppearance(const std::string& aFileName) {
+void cButton::loadAppearance(const std::string& aFileName) {
     _background = createBMP15FromFile(aFileName);
     if (_background.valid()) {
         int height = size().y;
@@ -102,8 +102,6 @@ cWindow& cButton::loadAppearance(const std::string& aFileName) {
             
         setSize(cSize(_background.width(), height));
     }
-
-    return *this;
 }
 
 bool cButton::valid() const {

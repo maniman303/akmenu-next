@@ -57,12 +57,12 @@ namespace akui {
 
       bool processTouchMessage(cTouchMessage message) override;
 
-      cWindow& loadAppearance(const std::string& aFileName);
-
     protected:
       void onOK() override;
 
       void onCancel() override;
+
+      void init();
 
       std::string _msg;
 

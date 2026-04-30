@@ -28,8 +28,6 @@ class cBigClock : public cWindow {
 
     void blinkColon();
 
-    cWindow& loadAppearance(const std::string& aFileName);
-
   protected:
     void drawNumber(u8 id, u8 number);
 

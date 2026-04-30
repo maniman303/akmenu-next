@@ -28,7 +28,6 @@ class cSettingWnd : public akui::cForm {
     void draw() override;
     void drawBackdrop() override;
     bool processKeyMessage(cKeyMessage message) override;
-    cWindow& loadAppearance(const std::string& aFileName);
     void addSettingTab(const std::string& text);
     void addSettingItem(const std::string& text, const std::vector<std::string>& itemTexts,
                         size_t defaultValue);
@@ -49,6 +48,7 @@ class cSettingWnd : public akui::cForm {
     };
 
   protected:
+    void loadAppearance();
     void onFocused() override;
     void onOK(void) override;
     void onCancel(void) override;

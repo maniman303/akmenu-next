@@ -61,10 +61,8 @@ namespace akui {
         _items.clear();
     }
 
-    cWindow& cPopMenu::loadAppearance(const std::string& aFileName) {
+    void cPopMenu::loadAppearance(const std::string& aFileName) {
         _background = createBMP15FromFile(aFileName);
-
-        return *this;
     }
 
     void cPopMenu::draw() {

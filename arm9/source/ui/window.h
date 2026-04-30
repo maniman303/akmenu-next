@@ -102,16 +102,10 @@ class cWindow : public SlotHolder {
     //! pass the call on to the children.
     virtual bool doesHierarchyContain(cWindow* aWindow) const;
 
-    //! returns the top level window belonging to this window
-    cWindow* topLevelWindow() const;
-
     //! returns a pointer to this window's parent
     cWindow* parent() const { return _parent; }
 
     void setParent(cWindow* parent) { _parent = parent; }
-
-    //! Loads a descriptor for this individual window instance from an xml file
-    virtual cWindow& loadAppearance(const std::string& aFileName) = 0;
 
     virtual void update() {}
 

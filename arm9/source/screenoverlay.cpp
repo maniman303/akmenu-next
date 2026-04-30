@@ -5,13 +5,11 @@ cScreenOverlay::cScreenOverlay() {
     _background = createBMP15((u16)SCREEN_WIDTH, (u16)SCREEN_HEIGHT, 0xffff);
 }
 
-cWindow& cScreenOverlay::loadAppearance(const std::string& aFileName) {
+void cScreenOverlay::loadAppearance(const std::string& aFileName) {
     _background = createBMP15FromFile(aFileName);
     if (!_background.valid()) {
         _background = createBMP15((u16)SCREEN_WIDTH, (u16)SCREEN_HEIGHT, 0xffff);
     }
-    
-    return *this;
 }
 
 void cScreenOverlay::draw() {

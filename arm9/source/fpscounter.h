@@ -15,8 +15,6 @@ class cFpsCounter : public cWindow {
 
     void draw() override;
 
-    cWindow& loadAppearance(const std::string& aFileName) { return *this; }
-
   protected:
     u16 _textColor;
     bool _show;

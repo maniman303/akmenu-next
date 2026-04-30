@@ -29,10 +29,6 @@ cCalendar::cCalendar() : cWindow(NULL, "calendar") {
 }
 
 void cCalendar::init() {
-    loadAppearance(SFN_UI_SETTINGS);
-}
-
-cWindow& cCalendar::loadAppearance(const std::string& aFileName) {
     _dayNumbers = createBMP15FromFile(SFN_DAY_NUMBERS);
     _dayNumbersSecond = createBMP15FromFile(SFN_DAY_NUMBERS_SECOND);
     if (!_dayNumbersSecond.valid()) {
@@ -43,7 +39,7 @@ cWindow& cCalendar::loadAppearance(const std::string& aFileName) {
 
     _dateSelection = createBMP15FromFile(SFN_DATE_SELECTION);
 
-    CIniFile ini = iniFiles().get(aFileName);
+    CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
     _dayPosition.x = ini.GetInt("calendar day", "x", 134);
     _dayPosition.y = ini.GetInt("calendar day", "y", 34);
     _daySize.x = ini.GetInt("calendar day", "dw", 16);
@@ -76,8 +72,6 @@ cWindow& cCalendar::loadAppearance(const std::string& aFileName) {
     if (colorize) {
         _dateSelection.colorize(personalData().color());
     }
-
-    return *this;
 }
 
 void cCalendar::drawDayNumber(u8 day, u8 weekdDayOfMonthFirstDay, u8 today) {

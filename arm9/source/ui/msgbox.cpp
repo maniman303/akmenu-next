@@ -147,7 +147,7 @@ namespace akui {
             nextButtonX -= buttonPitch;
         }
 
-        loadAppearance("");
+        init();
     }
 
     cMessageBox::~cMessageBox() {
@@ -193,11 +193,10 @@ namespace akui {
         gdi().textOut(_textPoision.x, _textPoision.y + titleOffset, _msg.c_str(), _engine);
     }
 
-    cWindow& cMessageBox::loadAppearance(const std::string& aFileName) {
+    void cMessageBox::init() {
         _renderDesc.loadData(SFN_FORM_TITLE_L, SFN_FORM_TITLE_R, SFN_FORM_TITLE_M);
 
         _renderDesc.setTitleText(_text);
-        return *this;
     }
 
 }  // namespace akui

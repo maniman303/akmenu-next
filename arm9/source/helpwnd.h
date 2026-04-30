@@ -24,21 +24,15 @@ class cHelpWnd : public akui::cForm {
 
   public:
     static void showModal(cWindow* parent);
-
     void draw();
-
     bool processKeyMessage(cKeyMessage message);
 
-    cWindow& loadAppearance(const std::string& aFileName);
-
   protected:
+    void loadAppearance();
     void onCancel() override;
-
     void onShow() override;
 
     cButton _buttonOK;
-
     cFormDesc _renderDesc;
-
     std::string _helpText;
 };

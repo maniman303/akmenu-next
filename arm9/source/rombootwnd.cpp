@@ -29,10 +29,6 @@ cRomBootWnd::cRomBootWnd(std::string romPath, std::function<void()> onExit) :
 
 cRomBootWnd::~cRomBootWnd() { }
 
-cWindow& cRomBootWnd::loadAppearance(const std::string& aFileName) {
-    return *this;
-}
-
 bool cRomBootWnd::processKeyMessage(cKeyMessage message) {
     if (message.isKeyDown(KEY_START) || message.isKeyDown(KEY_A)) {
         disableInput();

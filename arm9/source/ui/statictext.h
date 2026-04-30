@@ -21,7 +21,6 @@ class cStaticText : public cWindow {
 
   public:
     void draw() override;
-    cWindow& loadAppearance(const std::string& aFileName);
     void setTextColor(COLOR color);
     void setFont(bool primary);
     void setCentered(bool centered);

@@ -89,7 +89,6 @@ cExpWnd::cExpWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string&
     }
     CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
     u32 spinBoxWidth = ini.GetInt("setting window", "spinBoxWidth", 108);
-    _Rumble.loadAppearance("");
     _Rumble.setSize(cSize(spinBoxWidth, 18));
 
     _Rumble.setRelativePosition(cPoint(_size.x - spinBoxWidth - 4, itemY));
@@ -103,7 +102,7 @@ cExpWnd::cExpWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string&
     _Label.setSize(cSize(_size.x / 2 + 8, 12));
     addChildWindow(&_Label);
 
-    loadAppearance("");
+    loadAppearance();
 
     CIniFile f;
     _romName = f.LoadIniFile(SFN_LAST_GBA_SAVEINFO) ? f.GetString("Save Info", "lastLoadedNOR", "") : "";
@@ -154,10 +153,9 @@ bool cExpWnd::processKeyMessage(cKeyMessage message) {
     return false;
 }
 
-cWindow& cExpWnd::loadAppearance(const std::string& aFileName) {
+void cExpWnd::loadAppearance() {
     _renderDesc.loadData(SFN_FORM_TITLE_L, SFN_FORM_TITLE_R, SFN_FORM_TITLE_M);
     _renderDesc.setTitleText(_text);
-    return *this;
 }
 
 void cExpWnd::onOK() {

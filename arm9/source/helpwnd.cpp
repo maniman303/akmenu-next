@@ -46,7 +46,7 @@ cHelpWnd::cHelpWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::strin
     nextButtonX -= buttonPitch;
     _buttonOK.setRelativePosition(cPoint(nextButtonX, buttonY));
 
-    loadAppearance("");
+    loadAppearance();
 
     for (size_t i = 0; i < 8; ++i) {
         std::string textIndex = formatString("item%d", i);
@@ -99,10 +99,9 @@ bool cHelpWnd::processKeyMessage(cKeyMessage message) {
     return false;
 }
 
-cWindow& cHelpWnd::loadAppearance(const std::string& aFileName) {
+void cHelpWnd::loadAppearance() {
     _renderDesc.loadData(SFN_FORM_TITLE_L, SFN_FORM_TITLE_R, SFN_FORM_TITLE_M);
     _renderDesc.setTitleText(_text);
-    return *this;
 }
 
 void cHelpWnd::onCancel() {

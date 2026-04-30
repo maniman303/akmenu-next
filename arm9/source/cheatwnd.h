@@ -25,9 +25,9 @@ class cCheatWnd : public akui::cForm, public cCheat {
   protected:
     void draw();
     bool processKeyMessage(cKeyMessage message) override;
-    cWindow& loadAppearance(const std::string& aFileName);
 
   protected:
+    void loadAppearance();
     void onFocused() override;
     bool parse(const std::string& aFileName);
     void onItemClicked(u32 index);

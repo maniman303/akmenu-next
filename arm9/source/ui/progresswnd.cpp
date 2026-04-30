@@ -23,7 +23,9 @@ namespace akui {
     cProgressWnd::~cProgressWnd() {}
 
     void cProgressWnd::init() {
-        loadAppearance(SFN_PROGRESS_WND_BG);
+        _background = createBMP15FromFile(SFN_PROGRESS_WND_BG);
+        _bar.loadAppearance(SFN_PROGRESS_BAR_BG);
+
         addChildWindow(&_bar);
         _bar.setRelativePosition(cPoint(4, 9));
         _bar.setPercent(0);
@@ -48,13 +50,6 @@ namespace akui {
 
     bool cProgressWnd::processKeyMessage(cKeyMessage message) {
         return false;
-    }
-
-    cWindow& cProgressWnd::loadAppearance(const std::string& aFileName) {
-        _background = createBMP15FromFile(aFileName);
-        _bar.loadAppearance(SFN_PROGRESS_BAR_BG);
-
-        return *this;
     }
 
     void cProgressWnd::setPercent(u8 percent) {

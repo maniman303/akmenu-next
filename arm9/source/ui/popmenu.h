@@ -26,7 +26,7 @@ namespace akui {
 
     public:
       void draw() override;
-      cWindow& loadAppearance(const std::string& aFileName) override;
+      void loadAppearance(const std::string& aFileName);
       bool processKeyMessage(cKeyMessage message) override;
       bool processTouchMessage(cTouchMessage message) override;
       void popup();

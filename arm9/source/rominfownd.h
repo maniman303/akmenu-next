@@ -29,7 +29,6 @@ class cRomInfoWnd : public akui::cForm {
     void draw() override;
     void drawBackdrop() override;
     bool processKeyMessage(cKeyMessage message) override;
-    cWindow& loadAppearance(const std::string& aFileName);
     void setFileInfo(const std::string& fullName, const std::string& showName);
     void setRomInfo(const DSRomInfo& romInfo);
     const DSRomInfo& getRomInfo();
@@ -39,6 +38,7 @@ class cRomInfoWnd : public akui::cForm {
     static void showCheats(const std::string& aFileName);
 
   protected:
+    void loadAppearance();
     void pressSaveType();
     void saveSettings(cSettingWnd* settingWnd);
     void pressCheats();

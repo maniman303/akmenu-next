@@ -52,10 +52,6 @@ void cStaticText::draw() {
     }
 }
 
-cWindow& cStaticText::loadAppearance(const std::string& aFileName) {
-    return *this;
-}
-
 void cStaticText::setTextColor(COLOR color) {
     _textColor = color;
 }

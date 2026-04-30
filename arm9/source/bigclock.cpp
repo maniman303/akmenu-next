@@ -25,15 +25,11 @@ cBigClock::cBigClock() : cWindow(NULL, "big clock") {
 }
 
 void cBigClock::init() {
-    loadAppearance(SFN_UI_SETTINGS);
-}
-
-cWindow& cBigClock::loadAppearance(const std::string& aFileName) {
-    CIniFile ini = iniFiles().get(aFileName);
+    CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
     _show = ini.GetInt("big clock", "show", _show);
 
     if (!_show) {
-        return *this;
+        return;
     }
 
     int x = ini.GetInt("big clock", "x", 8);
@@ -47,8 +43,6 @@ cWindow& cBigClock::loadAppearance(const std::string& aFileName) {
 
     _numbers = createBMP15FromFile(SFN_CLOCK_NUMBERS);
     _colon = createBMP15FromFile(SFN_CLOCK_COLON);
-
-    return *this;
 }
 
 void cBigClock::drawNumber(u8 id, u8 number) {

@@ -99,7 +99,7 @@ cCheatWnd::cCheatWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::str
     _list.ownerDraw.connect(this, &cCheatWnd::onDraw);
     addChildWindow(&_list);
 
-    loadAppearance("");
+    loadAppearance();
 }
 
 cCheatWnd::~cCheatWnd() {}
@@ -180,10 +180,9 @@ bool cCheatWnd::processKeyMessage(cKeyMessage message) {
     return false;
 }
 
-cWindow& cCheatWnd::loadAppearance(const std::string& aFileName) {
+void cCheatWnd::loadAppearance() {
     _renderDesc.loadData(SFN_FORM_TITLE_L, SFN_FORM_TITLE_R, SFN_FORM_TITLE_M);
     _renderDesc.setTitleText(_text);
-    return *this;
 }
 
 void cCheatWnd::onItemClicked(u32 index) {

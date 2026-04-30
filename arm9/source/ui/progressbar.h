@@ -23,7 +23,7 @@ class cProgressBar : public cWindow {
   public:
     void draw();
 
-    cWindow& loadAppearance(const std::string& aFileName);
+    void loadAppearance(const std::string& aFileName);
 
     void setPercent(u8 percent);
 

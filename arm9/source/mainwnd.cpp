@@ -95,10 +95,6 @@ void cMainWnd::init() {
     std::string text("");
     CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
 
-    // self init
-    dbg_printf("mainwnd init() %08x\n", this);
-    loadAppearance(SFN_LOWER_SCREEN_BG);
-
     // init game file list
     // waitMs( 2000 );
     _mainList = new cMainList(this, "main list");
@@ -295,10 +291,6 @@ void cMainWnd::fileInfoButtonClicked() {
         showFileInfo(selectedId);
     });
     task->schedule();
-}
-
-cWindow& cMainWnd::loadAppearance(const std::string& aFileName) {
-    return *this;
 }
 
 void cMainWnd::onFocused() {

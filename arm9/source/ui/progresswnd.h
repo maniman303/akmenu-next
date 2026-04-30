@@ -26,7 +26,6 @@ namespace akui {
       void init();
       void draw();
       bool processKeyMessage(cKeyMessage message) override;
-      cWindow& loadAppearance(const std::string& aFileName);
       void setPercent(u8 percent);
       void setTipText(const std::string& tipText);
 

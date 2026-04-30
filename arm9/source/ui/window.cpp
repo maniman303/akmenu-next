@@ -110,17 +110,8 @@ bool cWindow::doesHierarchyContain(cWindow* aWindow) const {
 
     return false;
 }
-// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-cWindow* cWindow::topLevelWindow() const {
-    cWindow* ret = (cWindow*)(this);
-    cWindow* test = ret;
-    while (test != 0) {
-        ret = test;
-        test = ret->parent();
-    }
-    return ret;
-}
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 bool cWindow::processKeyMessage(cKeyMessage message) {
     return false;

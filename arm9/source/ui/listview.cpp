@@ -260,10 +260,6 @@ namespace akui {
         return true;
     }
 
-    cWindow& cListView::loadAppearance(const std::string& aFileName) {
-        return *this;
-    }
-
     s32 cListView::rowBelowPoint(const cPoint& pt) {
         if (windowRectangle().surrounds(pt)) {
             s32 row = _firstVisibleRowId + (pt.y - position().y) / _rowHeight;

@@ -25,9 +25,9 @@ class cExpWnd : public akui::cForm {
     static void showModal(cWindow* parent);
     void draw();
     bool processKeyMessage(cKeyMessage message) override;
-    cWindow& loadAppearance(const std::string& aFileName);
 
   protected:
+    void loadAppearance();
     void onOK() override;
     void onCancel() override;
     void onRAM();

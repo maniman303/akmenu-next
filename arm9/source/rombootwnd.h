@@ -13,7 +13,6 @@ class cRomBootWnd : public cWindow {
     cRomBootWnd(std::string romPath, std::function<void()> onExit);
     ~cRomBootWnd() override;
 
-    cWindow& loadAppearance(const std::string& aFileName) override;
     bool processKeyMessage(cKeyMessage message) override;
     bool processTouchMessage(cTouchMessage message) override;
     void update() override;

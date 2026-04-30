@@ -16,10 +16,7 @@ class cBootIcon : public cWindow {
 
   public:
     void init();
-
     void draw() override;
-
-    cWindow& loadAppearance(const std::string& aFileName) override { return *this; }
 
   protected:
     bool _show;

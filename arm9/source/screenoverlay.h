@@ -10,7 +10,7 @@ class cScreenOverlay : public cWindow {
   public:
     void draw() override;
 
-    cWindow& loadAppearance(const std::string& aFileName) override;
+    void loadAppearance(const std::string& aFileName);
 
   protected:
     cBMP15 _background;

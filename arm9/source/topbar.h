@@ -23,7 +23,6 @@ class cTopBar : public cWindow {
     void blink();
     void update() override;
     void draw() override;
-    cWindow& loadAppearance(const std::string& aFileName) override { return *this; }
 
   private:
     bool _firstDraw;
