@@ -26,11 +26,28 @@ cButton::cButton(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string&
     _alignment = center;
     _isFocusable = false;
     _hasAlpha = hasAlpha;
+    _backdrop = false;
 }
 
 cButton::~cButton() { }
 
 void cButton::draw() {
+    if (_backdrop) {
+        return;
+    }
+
+    drawInternal();
+}
+
+void cButton::drawBackdrop() {
+    if (!_backdrop) {
+        return;
+    }
+
+    drawInternal();
+}
+
+void cButton::drawInternal() {
     if (_state > 0 && !_captured) {
         _state--;
     }
@@ -88,6 +105,19 @@ void cButton::draw() {
 
     gdi().setPenColor(textColor(), selectedEngine());
     gdi().textOutRect(textX, textY, area.size().x, area.size().y, _text.c_str(), selectedEngine());
+}
+
+void cButton::setBackdrop(bool backdrop) {
+    if (backdrop) {
+        _backdrop = true;
+        _canRenderBackdrop = true;
+        _scheduleBackdrop = true;
+        return;
+    }
+
+    _backdrop = false;
+    _canRenderBackdrop = false;
+    _scheduleBackdrop = true;
 }
 
 void cButton::loadAppearance(const std::string& aFileName) {

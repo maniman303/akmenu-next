@@ -26,6 +26,8 @@ class cButton : public cWindow {
 
   public:
     void draw() override;
+    void drawBackdrop() override;
+    void setBackdrop(bool backdrop);
     void loadAppearance(const std::string& aFileName);
     bool valid() const;
     bool isTouchFocusable() override;
@@ -44,11 +46,14 @@ class cButton : public cWindow {
     Signal0 clicked;
 
   protected:
+    void drawInternal();
+
     bool _captured;
-    u16 _state;
+    u8 _state;
     COLOR _textColor;
     cBMP15 _background;
     Style _style;
     Alignment _alignment;
     bool _hasAlpha;
+    bool _backdrop;
 };

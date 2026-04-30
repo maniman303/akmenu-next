@@ -141,7 +141,10 @@ void cMainWnd::init() {
     _brightnessButton->setIsFocusable(focus);
     _brightnessButton->loadAppearance(SFN_BRIGHTNESS_BUTTON);
     _brightnessButton->clicked.connect(this, &cMainWnd::brightnessButtonClicked);
-    if (!show) _brightnessButton->hide();
+    _brightnessButton->setBackdrop(true);
+    if (!show) {
+        _brightnessButton->hide();
+    }
     addChildWindow(_brightnessButton);
 
     x = ini.GetInt("file info btn", "x", 240);
@@ -153,18 +156,26 @@ void cMainWnd::init() {
     _fileInfoButton->setIsFocusable(focus);
     _fileInfoButton->loadAppearance(SFN_FILE_INFO_BUTTON);
     _fileInfoButton->clicked.connect(this, &cMainWnd::fileInfoButtonClicked);
-    if (!show) _fileInfoButton->hide();
+    _fileInfoButton->setBackdrop(true);
+    if (!show) {
+        _fileInfoButton->hide();
+    }
     addChildWindow(_fileInfoButton);
 
     x = ini.GetInt("folderup btn", "x", 0);
     y = ini.GetInt("folderup btn", "y", 2);
     w = ini.GetInt("folderup btn", "w", 32);
     h = ini.GetInt("folderup btn", "h", 16);
+    show = ini.GetInt("folderup btn", "show", 0);
     _folderUpButton = new cButton(x, y, w, h, this, "");
     _folderUpButton->setRelativePosition(cPoint(x, y));
     _folderUpButton->loadAppearance(SFN_FOLDERUP_BUTTON);
     _folderUpButton->setSize(cSize(w, h));
     _folderUpButton->clicked.connect(_mainList, &cMainList::backParentDir);
+    _folderUpButton->setBackdrop(true);
+    if (!show) {
+        _folderUpButton->hide();
+    }
     addChildWindow(_folderUpButton);
 
     x = ini.GetInt("folder text", "x", 20);
@@ -182,8 +193,6 @@ void cMainWnd::init() {
     _startMenu->itemClicked.connect(this, &cMainWnd::startMenuItemClicked);
     _startMenu->itemSelected.connect(this, &cMainWnd::startMenuItemSelected);
     _startMenu->menuExit.connect(this, &cMainWnd::startMenuClosed);
-
-    dbg_printf("startMenu %08x\n", _startMenu);
 
     _focusBorder = new cFocusBorder(this);
     _focusBorder->init();
