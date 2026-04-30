@@ -9,6 +9,7 @@ class Animation {
 
     void play();
     void reverse();
+    void complete();
     void reset();
     bool isCompleted() const;
     bool isPlaying() const;

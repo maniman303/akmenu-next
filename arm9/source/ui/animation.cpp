@@ -21,6 +21,11 @@ void Animation::reverse() {
     start();
 }
 
+void Animation::complete() {
+    _isPlaying = true;
+    _startTick = timer().getTick() - _duration;
+}
+
 void Animation::start() {
     _isPlaying = true;
     _startTick = timer().getTick();
