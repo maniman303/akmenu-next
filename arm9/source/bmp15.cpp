@@ -12,6 +12,7 @@
 #include <list>
 #include <string>
 #include "bmp15.h"
+#include "binaryfind.h"
 #include "dbgtool.h"
 #include "logger.h"
 #include "gdi.h"
@@ -81,15 +82,25 @@ void cBMP15::colorize(u16 color) {
 typedef std::list<cBMP15> str_bmp_list;
 static str_bmp_list _bmpPool;
 
-cBMP15 createBMP15FromFile(const std::string& filename) {
-    // dbg_printf( "createBMP15FromFile (%s)\n", filename );
+static bool comp(const cBMP15& item1, const cBMP15& item2) {
+    return strcasecmp(item1.filename().c_str(), item2.filename().c_str()) < 0;
+}
 
-    str_bmp_list::iterator it;
-    for (it = _bmpPool.begin(); it != _bmpPool.end(); ++it) {
-        if (it->valid() && it->filename() == filename) {
-            return *it;
-        }
+cBMP15 createBMP15FromFile(const std::string& filename) {
+    cBMP15 searchItem;
+    searchItem.filename(filename);
+    str_bmp_list::iterator it = akui::binary_find(_bmpPool.begin(), _bmpPool.end(), searchItem, comp);
+
+    if (it != _bmpPool.end() && (*it).valid()) {
+        return *it;
     }
+
+    // str_bmp_list::iterator it;
+    // for (it = _bmpPool.begin(); it != _bmpPool.end(); ++it) {
+    //     if (it->valid() && it->filename() == filename) {
+    //         return *it;
+    //     }
+    // }
 
     FILE* f = fopen(filename.c_str(), "rb");
     if (NULL == f) {
@@ -100,7 +111,7 @@ cBMP15 createBMP15FromFile(const std::string& filename) {
     fseek(f, 0, SEEK_END);
     int fileSize = ftell(f);
 
-    if (-1 == fileSize) {
+    if (fileSize == -1) {
         fclose(f);
         return cBMP15();
     }

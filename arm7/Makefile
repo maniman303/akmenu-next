@@ -24,11 +24,11 @@ DATA     :=
 #---------------------------------------------------------------------------------
 ARCH := -mthumb-interwork
 
-CFLAGS   := -g -Wall -O3\
+CFLAGS   := -Wall -Os\
             $(ARCH) $(INCLUDE) -DARM7
 CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions
-ASFLAGS  := -g $(ARCH)
-LDFLAGS   = -specs=ds_arm7.specs -g $(ARCH) -Wl,--nmagic -Wl,-Map,$(notdir $*).map
+ASFLAGS  := $(ARCH)
+LDFLAGS   = -specs=ds_arm7.specs $(ARCH) -Wl,--nmagic -Wl,-Map,$(notdir $*).map
 
 LIBS := -ldswifi7 -lmm7 -lnds7
 

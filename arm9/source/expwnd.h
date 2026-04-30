@@ -39,6 +39,6 @@ class cExpWnd : public akui::cForm {
     cButton _buttonSRAM;
     akui::cSpinBox _Rumble;
     cStaticText _Label;
-    akui::cFormDesc _renderDesc;
+    cFormDesc _renderDesc;
     std::string _romName;
 };

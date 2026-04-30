@@ -38,7 +38,7 @@ class cHelpWnd : public akui::cForm {
 
     cButton _buttonOK;
 
-    akui::cFormDesc _renderDesc;
+    cFormDesc _renderDesc;
 
     std::string _helpText;
 };

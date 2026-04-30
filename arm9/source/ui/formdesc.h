@@ -11,11 +11,11 @@
 
 #include <string>
 #include "bmp15.h"
-#include "renderdesc.h"
+#include "gdi.h"
+#include "point.h"
+#include "rectangle.h"
 
-namespace akui {
-
-class cFormDesc : public cRenderDesc {
+class cFormDesc {
   public:
     cFormDesc();
 
@@ -45,5 +45,3 @@ class cFormDesc : public cRenderDesc {
     std::string _titleText;
     bool _centerTitle;
 };
-
-}  // namespace akui

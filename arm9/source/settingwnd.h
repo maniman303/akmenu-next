@@ -86,5 +86,5 @@ class cSettingWnd : public akui::cForm {
     akui::cSpinBox _tabSwitcher;
     cButton _buttonOK;
     cButton _buttonCancel;
-    akui::cFormDesc _renderDesc;
+    cFormDesc _renderDesc;
 };

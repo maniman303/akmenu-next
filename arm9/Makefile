@@ -27,15 +27,15 @@ GRAPHICS :=
 #---------------------------------------------------------------------------------
 ARCH := -marm -mthumb-interwork -march=armv5te -mtune=arm946e-s
 
-CFLAGS   := -g -Wall -O3\
+CFLAGS   := -Wall -Os\
 			-Wno-address-of-packed-member \
             $(ARCH) $(INCLUDE) -DARM9
 
 CFLAGS   += -D_NO_BOOTSTUB_
 
 CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions
-ASFLAGS  := -g $(ARCH) $(INCLUDE) -DARM9
-LDFLAGS   = -specs=ds_arm9.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
+ASFLAGS  := $(ARCH) $(INCLUDE) -DARM9
+LDFLAGS   = -specs=ds_arm9.specs $(ARCH) -Wl,-Map,$(notdir $*.map)
 
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project

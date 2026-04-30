@@ -12,7 +12,6 @@
 #include <nds.h>
 #include "bmp15.h"
 #include "rectangle.h"
-#include "renderdesc.h"
 #include "window.h"
 
 class cButton : public cWindow {

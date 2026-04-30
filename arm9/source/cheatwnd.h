@@ -43,7 +43,7 @@ class cCheatWnd : public akui::cForm, public cCheat {
     cButton _buttonInfo;
     cButton _buttonGenerate;
     cButton _buttonCancel;
-    akui::cFormDesc _renderDesc;
+    cFormDesc _renderDesc;
     akui::cListView _list;
 
   private:

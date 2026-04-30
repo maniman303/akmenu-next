@@ -50,7 +50,7 @@ class cRomInfoWnd : public akui::cForm {
     cButton _buttonCancel;
     cButton _buttonSaveType;
     cButton _buttonCheats;
-    akui::cFormDesc _renderDesc;
+    cFormDesc _renderDesc;
     DSRomInfo _romInfo;
     std::string _romInfoText;
     std::string _filenameText;

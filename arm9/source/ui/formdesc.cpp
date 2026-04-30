@@ -11,15 +11,6 @@
 #include "fontfactory.h"
 #include "uisettings.h"
 
-//#include "globalsettings.h"
-
-namespace akui {
-
-// 边框颜色：b5c71f
-//    23, 25, 4
-// 框内背景色：eeebae
-// 30, 29, 22
-
 cFormDesc::cFormDesc() {
     _bodyColor = uiSettings().formBodyColor;    // RGB15(30,29,22);
     _bodyColor2 = uiSettings().formBodyColor2;
@@ -93,5 +84,3 @@ void cFormDesc::setTitleText(const std::string& text, bool centerTitle) {
     _titleText = text;
     _centerTitle = centerTitle;
 }
-
-}  // namespace akui
