@@ -12,6 +12,7 @@ class cFocusBorder : public WorkIndicator {
     cFocusBorder(cWindow* parent);
 
     void init();
+    void reset();
     void update();
     void draw(GRAPHICS_ENGINE engine);
     bool busy() const override;

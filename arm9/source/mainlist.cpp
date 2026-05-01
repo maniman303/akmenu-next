@@ -555,6 +555,7 @@ bool cMainList::setupGameDir() {
 }
 
 void cMainList::onDirectoryChanged() {
+    updateInternalNames();
     scheduleBackdrop();
     directoryChanged();
 }
@@ -567,19 +568,22 @@ bool cMainList::enterDir(const std::string& dirName) {
         _romInfoList.clear();
 
         if (gs().filePresentationMode < 2) {
+            bool res = setupDefaultDir(false, false);
             onDirectoryChanged();
-            return setupDefaultDir(false, false);
+            return res;
         }
 
         bool skipSdCards = setupGameDir();
 
         std::sort(_rows.begin(), _rows.end(), itemSortComp);
 
+        bool res = setupDefaultDir(skipSdCards, true);
+
         processDirIcons();
 
         onDirectoryChanged();
 
-        return setupDefaultDir(skipSdCards, true);
+        return res;
     }
 
     if ("slot2:/" == dirName) {
@@ -707,6 +711,11 @@ std::string cMainList::processItemText(std::string text, int column) {
 
     if (!text.empty() && text.back() == '/') {
         text.pop_back();
+
+        if (text == "saves") {
+            return "Saves";
+        }
+
         return text;
     }
 
@@ -852,7 +861,6 @@ void cMainList::selectRom(const std::string& romPath){
 }
 
 void cMainList::draw() {
-    updateInternalNames();
     cListView::draw();
     drawIcons();
 }
@@ -944,15 +952,14 @@ std::string cMainList::getCurrentDir() {
 
 void cMainList::updateInternalNames(void) {
     if (_viewMode == VM_INTERNAL) {
-        size_t total = _visibleRowCount;
-        if (total > _rows.size() - _firstVisibleRowId) total = _rows.size() - _firstVisibleRowId;
+        size_t total = _rows.size();
         for (size_t ii = 0; ii < total; ++ii) {
-            if (0 == _rows[_firstVisibleRowId + ii][INTERNALNAME_COLUMN].text().length()) {
-                if (_romInfoList[_firstVisibleRowId + ii].isDSRom()) {
-                    _rows[_firstVisibleRowId + ii][INTERNALNAME_COLUMN].setText(_romInfoList[_firstVisibleRowId + ii].getDsLocTitle());
+            if (0 == _rows[ii][INTERNALNAME_COLUMN].text().length()) {
+                if (_romInfoList[ii].isDSRom()) {
+                    _rows[ii][INTERNALNAME_COLUMN].setText(_romInfoList[ii].getDsLocTitle());
                 } else {
-                    _rows[_firstVisibleRowId + ii][INTERNALNAME_COLUMN].setText(
-                            _rows[_firstVisibleRowId + ii][SHOWNAME_COLUMN].text());
+                    _rows[ii][INTERNALNAME_COLUMN].setText(
+                            _rows[ii][SHOWNAME_COLUMN].text());
                 }
             }
         }

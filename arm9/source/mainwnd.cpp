@@ -49,7 +49,9 @@ cMainWnd::cMainWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::strin
       _fileInfoButton(NULL),
       _folderUpButton(NULL),
       _folderText(NULL),
-      _focusBorder(NULL) {}
+      _focusBorder(NULL) {
+    _scheduleListFocus = true;
+}
 
 cMainWnd::~cMainWnd() {
     if (_folderText != NULL) {
@@ -300,6 +302,14 @@ void cMainWnd::fileInfoButtonClicked() {
         showFileInfo(selectedId);
     });
     task->schedule();
+}
+
+void cMainWnd::onDisplayed() {
+    if (_scheduleListFocus) {
+        windowManager().setFocusedWindow(_mainList);
+        _focusBorder->reset();
+        _scheduleListFocus = false;
+    }
 }
 
 void cMainWnd::onFocused() {
@@ -720,6 +730,7 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
     if (gs().filePresentationMode != currentfilePresentationMode) {
         _mainList->enterDir("...");
         _mainList->selectRow(0);
+        _scheduleListFocus = true;
     } else if (gs().fileListType != currentFileListType) {
         _mainList->enterDir(_mainList->getCurrentDir());
     }

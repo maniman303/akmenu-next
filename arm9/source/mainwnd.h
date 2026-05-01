@@ -32,11 +32,12 @@ class cMainWnd : public akui::cForm {
     void update() override;
     void init();
     void draw() override;
+    void onDisplayed() override;
+    void onFocused() override;
 
     cMainList* _mainList;
 
   protected:
-    void onFocused() override;
     void onMainListSelectionChanged(u32 index);
     void onMainListSelItemClicked(u32 index);
     void setFocusedChild(cWindow* child) override;
@@ -53,6 +54,7 @@ class cMainWnd : public akui::cForm {
     void saveFileInfo(cRomInfoWnd* romInfoWnd);
     void launchSelected();
 
+    bool _scheduleListFocus;
     cStartMenu* _startMenu;
     cButton* _startButton;
     cButton* _brightnessButton;

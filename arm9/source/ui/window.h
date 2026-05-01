@@ -59,12 +59,6 @@ class cWindow : public SlotHolder {
 
     virtual bool hasFocus() const;
 
-    //! sets the focus to this window
-    cWindow& enableFocused();
-
-    //! removes the focus from this window
-    cWindow& disableFocused();
-
     //! enables input processing
     cWindow& enableInput();
 
@@ -129,6 +123,15 @@ class cWindow : public SlotHolder {
 
     virtual void onRenderBackdrop() { _scheduleBackdrop = false; }
 
+    //! Called when the window receives the focus
+    virtual void onFocused() { }
+
+    //! Called when the window loses the focus
+    virtual void onLostFocus() { }
+
+    //! Called when screen is displayed in window manager
+    virtual void onDisplayed() { }
+
     void render();
 
     void renderBackdrop();
@@ -153,12 +156,6 @@ class cWindow : public SlotHolder {
     //! \brief called when the window is exited, derived classes can override this to
     //! react to the window being exited
     virtual void onExit() {}
-
-    //! Called when the window receives the focus
-    virtual void onFocused() { }
-
-    //! Called when the window loses the focus
-    virtual void onLostFocus() { }
 
     //! \brief called when the window is resized, derived classes can override this to
     //! react to the window size changing

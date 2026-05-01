@@ -51,16 +51,6 @@ bool cWindow::hasFocus() const {
     return isFocused();
 }
 
-cWindow& cWindow::enableFocused() {
-    onFocused();
-    return *this;
-}
-
-cWindow& cWindow::disableFocused() {
-    onLostFocus();
-    return *this;
-}
-
 cWindow& cWindow::enableInput() {
     _inputState = true;
     return *this;

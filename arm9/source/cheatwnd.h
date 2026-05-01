@@ -22,13 +22,14 @@ class cCheatWnd : public akui::cForm, public cCheat {
     cCheatWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text);
     ~cCheatWnd();
 
+    void onFocused() override;
+
   protected:
     void draw();
     bool processKeyMessage(cKeyMessage message) override;
 
   protected:
     void loadAppearance();
-    void onFocused() override;
     bool parse(const std::string& aFileName);
     void onItemClicked(u32 index);
     void onSelect(void);

@@ -49,6 +49,10 @@ void cFocusBorder::init() {
     }
 }
 
+void cFocusBorder::reset() {
+    _currentFocus = cRect(cPoint(0, 0), cPoint(0, 0), false);
+}
+
 void cFocusBorder::update() {
     if (!_init || _parent == NULL) {
         return;

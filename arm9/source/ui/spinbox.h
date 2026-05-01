@@ -41,6 +41,8 @@ class cSpinBox : public cForm {
 
     void setPrefixIcon(const std::string& filename);
 
+        void onFocused();
+
     Signal1<cSpinBox*> changed;
 
   protected:
@@ -49,8 +51,6 @@ class cSpinBox : public cForm {
     void onResize();
 
     void onMove();
-
-    void onFocused();
 
     void arrangeButton();
 

@@ -16,9 +16,9 @@ class cRomBootWnd : public cWindow {
     bool processKeyMessage(cKeyMessage message) override;
     bool processTouchMessage(cTouchMessage message) override;
     void update() override;
+    void onFocused() override;
 
   protected:
-    void onFocused() override;
     void draw() override;
     void drawBackdrop() override;
 

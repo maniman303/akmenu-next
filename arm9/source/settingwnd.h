@@ -33,6 +33,7 @@ class cSettingWnd : public akui::cForm {
                         size_t defaultValue);
     ssize_t getItemSelection(size_t tabId, size_t itemId);
     void setConfirmMessage(const std::string& text);
+    void onFocused() override;
 
   protected:
     struct sSettingItem {
@@ -49,7 +50,6 @@ class cSettingWnd : public akui::cForm {
 
   protected:
     void loadAppearance();
-    void onFocused() override;
     void onOK(void) override;
     void onCancel(void) override;
     void onShow() override;

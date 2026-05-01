@@ -57,12 +57,12 @@ void cWindowManager::setFocusedWindow(cWindow* aWindow, bool isTouch) {
     }
 
     if (focusedWindow() != NULL) {
-        focusedWindow()->disableFocused();
+        focusedWindow()->onLostFocus();
     }
     
     _focusedWindow = aWindow;
     if (aWindow) {
-        aWindow->enableFocused();
+        aWindow->onFocused();
     }
 }
 
@@ -74,6 +74,7 @@ cWindowManager& cWindowManager::addWindow(cWindow* aWindow) {
 
     _currentWindow = cWindowRec(aWindow);
     setFocusedWindow(aWindow);
+    aWindow->onDisplayed();
     if (aWindow != NULL && aWindow->canRenderBackdrop()) {
         aWindow->scheduleBackdrop();
     }
@@ -104,6 +105,7 @@ cWindowManager& cWindowManager::removeWindow(cWindow* aWindow) {
             _currentWindow = _backgroundWindows.back();
             _backgroundWindows.pop_back();
             setFocusedWindow(_currentWindow._focused);
+            _currentWindow.window()->onDisplayed();
             if (_currentWindow.window()->canRenderBackdrop()) {
                 _currentWindow.window()->scheduleBackdrop();
             }
@@ -118,7 +120,7 @@ cWindowManager& cWindowManager::removeWindow(cWindow* aWindow) {
     }
     
     if (focusedWindow() && aWindow->doesHierarchyContain(focusedWindow())) {
-        _focusedWindow = _currentWindow.window();
+        setFocusedWindow(_currentWindow.window());
     }
 
     scheduleBackground(true);
