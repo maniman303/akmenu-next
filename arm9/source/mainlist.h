@@ -81,6 +81,8 @@ class cMainList : public akui::cListView {
     void onSelectChanged(u32 index);
     void onScrolled(u32 index);
     std::string processItemText(std::string text, int column);
+    u32 slotSDCard();
+    u32 slotFavorites();
 
   protected:
     int _iconPrefix;
@@ -96,17 +98,4 @@ class cMainList : public akui::cListView {
     std::vector<DSRomInfo> _romInfoList;
     bool _showAllFiles;
     std::vector<std::string> _saves;
-
-  protected:
-    u32 _topCount;
-    u32 _topuSD;
-    u32 _topuDSiSD;
-    u32 _topFavorites;
-    u32 _topSlot1;
-    u32 _topSlot2;
-
-  public:
-    u32 Slot1();
-    u32 Slot2();
-    u32 SDCard();
 };

@@ -36,14 +36,8 @@
 #include "../../share/memtool.h"
 
 cMainList::cMainList(cWindow* parent, const std::string& text)
-    : cListView(4, 20, 248, 152, parent, text),
-      _showAllFiles(false),
-      _topCount(5),
-      _topuSD(0),
-      _topuDSiSD(1),
-      _topFavorites(4),
-      _topSlot1(2),
-      _topSlot2(3) {
+    : cListView(4, 20, 248, 152, parent, text) {
+    _showAllFiles = false;
     _textPrefix = 0;
     _textSufix = 0;
     _iconPrefix = 1;
@@ -53,40 +47,6 @@ cMainList::cMainList(cWindow* parent, const std::string& text)
     _viewMode = VM_LIST;
     _canRenderBackdrop = true;
     _scheduleBackdrop = true;
-
-    if (!isDSiMode()) {
-        _topCount = 3;
-        _topuSD = 0;
-        _topSlot2 = 1;
-        _topFavorites = 2;
-        _topuDSiSD = 3;
-        _topSlot1 = 4;
-    } else {
-        if (fsManager().isFlashcart()) {
-            if (fsManager().isSDInserted()) {
-                _topCount = 3;
-                _topuSD = 0;
-                _topuDSiSD = 1;
-                _topFavorites = 2;
-                _topSlot2 = 3;               
-                _topSlot1 = 4;
-            } else {
-                _topCount = 2;
-                _topuSD = 0;
-                _topFavorites = 1;
-                _topSlot2 = 2;
-                _topuDSiSD = 3;
-                _topSlot1 = 4;
-            }
-        } else {
-                _topCount = 3;      
-                _topuDSiSD = 0;
-                _topFavorites = 1;
-                _topSlot1 = 2;
-                _topuSD = 3;
-                _topSlot2 = 4;
-        }
-    }
 }
 
 cMainList::~cMainList() {
@@ -307,59 +267,68 @@ bool cMainList::setupDefaultDir(bool skipCards, bool skipFavorites) {
     std::string gba = getIconPath("gba_banner.bin");
     std::string folder = getIconPath("folder_banner.bin");
 
-    for (size_t i = 0; i < _topCount; ++i) {
-        std::vector<std::string> a_row;
-        a_row.push_back("");  // make a space for icon
+    if (!skipCards && fsManager().isFlashcart()) {
         DSRomInfo rominfo;
-        if (_topuSD == i) {
-            if (skipCards) {
-                continue;
-            }
+        std::vector<std::string> a_row;
+        a_row.push_back("");
+        a_row.push_back(LANG("mainlist", "microsd card"));
+        a_row.push_back("");
+        a_row.push_back("fat:/");
 
-            a_row.push_back(LANG("mainlist", "microsd card"));
-            a_row.push_back("");
-            a_row.push_back("fat:/");
+        rominfo.setBannerFromFile("folder", microsd, microsd_banner_bin);
 
-            rominfo.setBannerFromFile("folder", microsd, microsd_banner_bin);
-        } else if (_topuDSiSD == i) {
-            if (skipCards) {
-                continue;
-            }
+        insertEntryRow(a_row, rominfo);
+    }
 
-            a_row.push_back("DSi SD");
-            a_row.push_back("");
-            a_row.push_back("sd:/");
-            
-            rominfo.setBannerFromFile("folder", microsd, microsd_banner_bin);
-        } else if (_topSlot1 == i) {
-            a_row.push_back(LANG("mainlist", "slot1 card"));
-            a_row.push_back("");
-            a_row.push_back("slot1:/");
-            
-            rominfo.setBannerFromFile("folder", nand, nand_banner_bin);
-        } else if (_topSlot2 == i) {
-            u8 chk = CGbaLoader::GetGbaHeader();
-            if (chk != GBA_HEADER.complement) {
-                continue;
-            }
-
-            a_row.push_back(LANG("mainlist", "slot2 card"));
-            a_row.push_back("");
-            a_row.push_back("slot2:/");
-            
-            rominfo.setBannerFromFile("folder", gba, gba_banner_bin);
-        } else if (_topFavorites == i) {
-            if (skipFavorites) {
-                continue;
-            }
-
-            a_row.push_back(LANG("mainlist", "favorites"));
-            a_row.push_back("");
-            a_row.push_back("favorites:/");
-            
-            rominfo.setBannerFromFile("folder", folder, folder_banner_bin);
-        }
+    if (!skipCards && isDSiMode() && fsManager().isSDInserted()) {
+        DSRomInfo rominfo;
+        std::vector<std::string> a_row;
+        a_row.push_back("");
+        a_row.push_back("DSi SD");
+        a_row.push_back("");
+        a_row.push_back("sd:/");
         
+        rominfo.setBannerFromFile("folder", microsd, microsd_banner_bin);
+
+        insertEntryRow(a_row, rominfo);
+    }
+
+    if (!skipFavorites) {
+        DSRomInfo rominfo;
+        std::vector<std::string> a_row;
+        a_row.push_back("");
+        a_row.push_back(LANG("mainlist", "favorites"));
+        a_row.push_back("");
+        a_row.push_back("favorites:/");
+        
+        rominfo.setBannerFromFile("folder", folder, folder_banner_bin);
+
+        insertEntryRow(a_row, rominfo);
+    }
+
+    if (isDSiMode() && !fsManager().isFlashcart()) {
+        DSRomInfo rominfo;
+        std::vector<std::string> a_row;
+        a_row.push_back("");
+        a_row.push_back(LANG("mainlist", "slot1 card"));
+        a_row.push_back("");
+        a_row.push_back("slot1:/");
+        
+        rominfo.setBannerFromFile("folder", nand, nand_banner_bin);
+
+        insertEntryRow(a_row, rominfo);
+    }
+
+    if (!isDSiMode() && CGbaLoader::GetGbaHeader() == GBA_HEADER.complement) {
+        DSRomInfo rominfo;
+        std::vector<std::string> a_row;
+        a_row.push_back("");
+        a_row.push_back(LANG("mainlist", "slot2 card"));
+        a_row.push_back("");
+        a_row.push_back("slot2:/");
+        
+        rominfo.setBannerFromFile("folder", gba, gba_banner_bin);
+
         insertEntryRow(a_row, rominfo);
     }
 
@@ -443,7 +412,7 @@ std::vector<std::vector<std::string>> cMainList::getGameRows(int rowsToLoad) {
     std::queue<std::string> paths;
     paths.push("fat:/");
 
-    if (_topuDSiSD < _topCount) {
+    if (isDSiMode() && fsManager().isSDInserted()) {
         paths.push("sd:/");
     }
 
@@ -765,9 +734,9 @@ void cMainList::backParentDir() {
     if (_currentDir == "fat:/" || _currentDir == "sd:/" || fat1 || favorites || _currentDir == "/") {
         enterDir("...");
         if (fat1) {
-            selectRow(SDCard());
+            selectRow(slotSDCard());
         } else if (favorites) {
-            selectRow(gs().filePresentationMode < 2 ? _topFavorites : 0);
+            selectRow(slotFavorites());
         }
 
         return;
@@ -995,29 +964,7 @@ void cMainList::SwitchShowAllFiles(void) {
     enterDir(getCurrentDir());
 }
 
-u32 cMainList::Slot1() {
-    std::string slotName = LANG("mainlist", "slot1 card");
-    for (size_t i = 0; i < getRowCount(); i++) {
-        if (_rows[i][SHOWNAME_COLUMN].text() == slotName) {
-            return i;
-        }
-    }
-
-    return _topSlot1;
-}
-
-u32 cMainList::Slot2() {
-    std::string slotName = LANG("mainlist", "slot2 card");
-    for (size_t i = 0; i < getRowCount(); i++) {
-        if (_rows[i][SHOWNAME_COLUMN].text() == slotName) {
-            return i;
-        }
-    }
-
-    return _topSlot2;
-}
-
-u32 cMainList::SDCard() {
+u32 cMainList::slotSDCard() {
     std::string slotName = LANG("mainlist", "microsd card");
     for (size_t i = 0; i < getRowCount(); i++) {
         if (_rows[i][SHOWNAME_COLUMN].text() == slotName) {
@@ -1025,5 +972,16 @@ u32 cMainList::SDCard() {
         }
     }
 
-    return _topuSD;
+    return 0;
+}
+
+u32 cMainList::slotFavorites() {
+    std::string slotName = LANG("mainlist", "favorites");
+    for (size_t i = 0; i < getRowCount(); i++) {
+        if (_rows[i][SHOWNAME_COLUMN].text() == slotName) {
+            return i;
+        }
+    }
+
+    return 0;
 }
