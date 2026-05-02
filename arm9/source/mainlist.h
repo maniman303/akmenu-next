@@ -29,7 +29,8 @@ class cMainList : public akui::cListView {
         REALNAME_COLUMN = 3,
         SAVETYPE_COLUMN = 4,
         FILESIZE_COLUMN = 5,
-        IS_FAVORITE_COLUMN = 6
+        IS_FAVORITE_COLUMN = 6,
+        ROMINFO_COLUMN = 7
     };
 
   public:
@@ -67,7 +68,7 @@ class cMainList : public akui::cListView {
     void drawIcons();
     void drawItemBackgrounds();
     void updateInternalNames(void);
-    bool insertEntryRow(size_t index, const std::vector<std::string>& texts, const DSRomInfo& romInfo);
+    bool insertEntryRow(const std::vector<std::string>& texts, const DSRomInfo& romInfo);
     void processDirIcons();
     bool setupDefaultDir(bool skipCards, bool skipFavorites);
     bool setupGameDir();

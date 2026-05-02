@@ -128,6 +128,7 @@ int cMainList::init() {
     insertColumn(SAVETYPE_COLUMN, "saveType", 0);
     insertColumn(FILESIZE_COLUMN, "fileSize", 0);
     insertColumn(IS_FAVORITE_COLUMN, "isFavorite", 0);
+    insertColumn(ROMINFO_COLUMN, "romInfo", 0);
 
     setViewMode((cMainList::VIEW_MODE)gs().viewMode);
 
@@ -135,8 +136,8 @@ int cMainList::init() {
 }
 
 static bool itemSortComp(const akui::cListView::itemVector& item1, const akui::cListView::itemVector& item2) {
-    const std::string& fn1 = gs().viewMode == 4 ? item1[cMainList::INTERNALNAME_COLUMN].text() : item1[cMainList::SHOWNAME_COLUMN].text();
-    const std::string& fn2 = gs().viewMode == 4 ? item2[cMainList::INTERNALNAME_COLUMN].text() : item2[cMainList::SHOWNAME_COLUMN].text();
+    const std::string& fn1 = gs().viewMode == cGlobalSettings::EViewInternal ? item1[cMainList::INTERNALNAME_COLUMN].text() : item1[cMainList::SHOWNAME_COLUMN].text();
+    const std::string& fn2 = gs().viewMode == cGlobalSettings::EViewInternal ? item2[cMainList::INTERNALNAME_COLUMN].text() : item2[cMainList::SHOWNAME_COLUMN].text();
 
     if (fn1 == "../" || fn1 == "..") return true;
     if (fn2 == "../" || fn2 == "..") return false;
@@ -146,6 +147,12 @@ static bool itemSortComp(const akui::cListView::itemVector& item1, const akui::c
 
     if (realFn1.back() == '/' && realFn2.back() != '/') return true;
     if (realFn1.back() != '/' && realFn2.back() == '/') return false;
+
+    if (realFn1 == "fat:/") return true;
+    if (realFn2 == "fat:/") return false;
+
+    if (realFn1 == "sd:/") return true;
+    if (realFn2 == "sd:/") return false;
 
     if (realFn1 == "slot1:/") return true;
     if (realFn2 == "slot1:/") return false;
@@ -222,10 +229,21 @@ static std::string getIconPath(std::string iconName) {
     return formatString("%sicons/%s", basePath.c_str(), iconName.c_str());
 }
 
-bool cMainList::insertEntryRow(size_t index, const std::vector<std::string>& texts, const DSRomInfo& romInfo) {
+bool cMainList::insertEntryRow(const std::vector<std::string>& texts, const DSRomInfo& romInfo) {
+    size_t index = getRowCount();
     std::vector<std::string> copy(texts);
+    while (copy.size() < IS_FAVORITE_COLUMN) {
+        copy.push_back("");
+    }
+
     if (copy.size() <= IS_FAVORITE_COLUMN) {
         copy.push_back("false");
+    }
+
+    if (copy.size() <= ROMINFO_COLUMN) {
+        copy.push_back(std::to_string(index));
+    } else {
+        copy[ROMINFO_COLUMN] = std::to_string(index);
     }
     
     if (!insertRow(index, copy)) {
@@ -342,7 +360,7 @@ bool cMainList::setupDefaultDir(bool skipCards, bool skipFavorites) {
             rominfo.setBannerFromFile("folder", folder, folder_banner_bin);
         }
         
-        insertEntryRow(getRowCount(), a_row, rominfo);
+        insertEntryRow(a_row, rominfo);
     }
 
     _currentDir = "";
@@ -505,12 +523,12 @@ std::vector<std::vector<std::string>> cMainList::getGameRows(int rowsToLoad) {
 bool cMainList::setupGameDir() {
     std::vector<std::string> lastPlayedRow = getLastPlayedRow();
     if (lastPlayedRow.size() > 0) {
-        insertEntryRow(getRowCount(), lastPlayedRow, DSRomInfo());
+        insertEntryRow(lastPlayedRow, DSRomInfo());
     }
 
     std::vector<std::vector<std::string>> favoriteRows = getFavoriteRows(true);
     for (size_t i = 0; i < favoriteRows.size(); i++) {
-        insertEntryRow(getRowCount(), favoriteRows[i], DSRomInfo());
+        insertEntryRow(favoriteRows[i], DSRomInfo());
     }
 
     int rowsToLoad = std::max(gs().minimalModeRomsCount, 0);
@@ -522,7 +540,7 @@ bool cMainList::setupGameDir() {
     std::vector<std::vector<std::string>> rows = getGameRows(rowsToLoad);
     int rowsCount = static_cast<int>(rows.size());
     for (int i = 0; i < std::min(rowsCount, rowsToLoad); i++) {
-        insertEntryRow(getRowCount(), rows[i], DSRomInfo());
+        insertEntryRow(rows[i], DSRomInfo());
     }
 
     if (isDSiMode() && !fsManager().isFlashcart()) {
@@ -535,7 +553,7 @@ bool cMainList::setupGameDir() {
         DSRomInfo romInfo;
         romInfo.setBannerFromFile("folder", nand, nand_banner_bin);
 
-        insertEntryRow(getRowCount(), slotRow, romInfo);
+        insertEntryRow(slotRow, romInfo);
     }
     
     if (CGbaLoader::GetGbaHeader() == GBA_HEADER.complement) {
@@ -548,14 +566,17 @@ bool cMainList::setupGameDir() {
         DSRomInfo romInfo;
         romInfo.setBannerFromFile("folder", gba, gba_banner_bin);
 
-        insertEntryRow(getRowCount(), slotRow, romInfo);
+        insertEntryRow(slotRow, romInfo);
     }
 
     return rowsCount <= rowsToLoad;
 }
 
 void cMainList::onDirectoryChanged() {
+    processDirIcons();
     updateInternalNames();
+    std::sort(_rows.begin(), _rows.end(), itemSortComp);
+    std::sort(_saves.begin(), _saves.end(), stringComp);
     scheduleBackdrop();
     directoryChanged();
 }
@@ -575,11 +596,7 @@ bool cMainList::enterDir(const std::string& dirName) {
 
         bool skipSdCards = setupGameDir();
 
-        std::sort(_rows.begin(), _rows.end(), itemSortComp);
-
         bool res = setupDefaultDir(skipSdCards, true);
-
-        processDirIcons();
 
         onDirectoryChanged();
 
@@ -605,7 +622,7 @@ bool cMainList::enterDir(const std::string& dirName) {
 
         std::vector<std::vector<std::string>> favoriteRows = getFavoriteRows(false);
         for (size_t i = 0; i < favoriteRows.size(); i++) {
-            insertEntryRow(getRowCount(), favoriteRows[i], DSRomInfo());
+            insertEntryRow(favoriteRows[i], DSRomInfo());
         }
     } else {
         struct dirent* entry;
@@ -663,7 +680,6 @@ bool cMainList::enterDir(const std::string& dirName) {
                 continue;
             }
 
-            u32 row_count = getRowCount();
             std::vector<std::string> a_row;
             a_row.push_back("");   // make a space for icon
             a_row.push_back(lfn);  // show name
@@ -675,17 +691,11 @@ bool cMainList::enterDir(const std::string& dirName) {
                 a_row[REALNAME_COLUMN] += "/";
             }
 
-            size_t insertPos(row_count);
-            insertEntryRow(insertPos, a_row, DSRomInfo());
+            insertEntryRow(a_row, DSRomInfo());
         }
 
         closedir(dir);
     }
-
-    std::sort(_rows.begin(), _rows.end(), itemSortComp);
-    std::sort(_saves.begin(), _saves.end(), stringComp);
-
-    processDirIcons();
 
     _currentDir = dirName;
 
@@ -897,9 +907,17 @@ void cMainList::drawIcons() {
     int prefix = small ? 0 : _iconPrefix;
 
     for (size_t i = 0; i < total; ++i) {
+        itemVector item = _rows[_firstVisibleRowId + i];
+        if (item.size() <= ROMINFO_COLUMN) {
+            continue;
+        }
+
+        int romId = std::stoi(item[ROMINFO_COLUMN].text());
+
         s32 itemX = position().x + prefix;
         s32 itemY = position().y + i * _rowHeight + ((_rowHeight - iconHeight) >> 1) - 1;
-        _romInfoList[_firstVisibleRowId + i].drawDSRomIcon(itemX, itemY, small, _engine);
+        
+        _romInfoList[romId].drawDSRomIcon(itemX, itemY, small, _engine);
     }
 }
 
@@ -954,13 +972,11 @@ void cMainList::updateInternalNames(void) {
     if (_viewMode == VM_INTERNAL) {
         size_t total = _rows.size();
         for (size_t ii = 0; ii < total; ++ii) {
-            if (0 == _rows[ii][INTERNALNAME_COLUMN].text().length()) {
-                if (_romInfoList[ii].isDSRom()) {
-                    _rows[ii][INTERNALNAME_COLUMN].setText(_romInfoList[ii].getDsLocTitle());
-                } else {
-                    _rows[ii][INTERNALNAME_COLUMN].setText(
-                            _rows[ii][SHOWNAME_COLUMN].text());
-                }
+            if (_romInfoList[ii].isDSRom()) {
+                _rows[ii][INTERNALNAME_COLUMN].setText(_romInfoList[ii].getDsLocTitle());
+            } else {
+                _rows[ii][INTERNALNAME_COLUMN].setText(
+                        _rows[ii][SHOWNAME_COLUMN].text());
             }
         }
     }
