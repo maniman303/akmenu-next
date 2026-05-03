@@ -188,6 +188,10 @@ namespace akui {
     }
 
     bool cListView::selectRow(int id) {
+        return selectRow(id, false);
+    }
+
+    bool cListView::selectRow(int id, bool silent) {
         if (_rows.size() == 0) {
             return false;
         }
@@ -219,8 +223,11 @@ namespace akui {
         }
 
         _selectedRowId = id;
-        onSelectChanged(_selectedRowId);
-        selectChanged(_selectedRowId);
+        
+        if (!silent) {
+            onSelectChanged(_selectedRowId);
+            selectChanged(_selectedRowId);
+        }
 
         return true;
     }

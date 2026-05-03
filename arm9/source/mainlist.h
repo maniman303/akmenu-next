@@ -41,13 +41,14 @@ class cMainList : public akui::cListView {
   public:
     int init();
     bool enterDir(const std::string& dirName);
-    void backParentDir();
+    bool backParentDir();
     bool processKeyMessage(cKeyMessage message) override;
     cRect focusRectangle() const override;
     std::string getCurrentDir();
     bool getRomInfo(u32 rowIndex, DSRomInfo& info) const;
     void setRomInfo(u32 rowIndex, const DSRomInfo& info);
     void selectRom(const std::string& romPath);
+    void selectRom(const std::string& romPath, bool silent);
     void setViewMode(VIEW_MODE mode);
     std::string getRowFullPath(u32 id);
     std::string getRowShowName(u32 id);
@@ -56,6 +57,7 @@ class cMainList : public akui::cListView {
     VIEW_MODE getViewMode() { return _viewMode; }
 
     Signal0 directoryChanged;
+    Signal0 directoryReturned;
 
   public:
     bool IsFavorites(void);
@@ -72,7 +74,7 @@ class cMainList : public akui::cListView {
     void processDirIcons();
     bool setupDefaultDir(bool skipCards, bool skipFavorites);
     bool setupGameDir();
-    void onDirectoryChanged();
+    void onDirectoryChanged(bool changed);
     std::vector<std::string> getLastPlayedRow();
     std::vector<std::vector<std::string>> getFavoriteRows(bool exclusive);
     std::vector<std::vector<std::string>> getGameRows(int rowsToLoad);

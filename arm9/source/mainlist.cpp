@@ -333,9 +333,6 @@ bool cMainList::setupDefaultDir(bool skipCards, bool skipFavorites) {
         insertEntryRow(a_row, rominfo);
     }
 
-    _currentDir = "";
-    directoryChanged();
-
     return true;
 }
 
@@ -540,46 +537,52 @@ bool cMainList::setupGameDir() {
     return rowsCount <= rowsToLoad;
 }
 
-void cMainList::onDirectoryChanged() {
+void cMainList::onDirectoryChanged(bool changed) {
     processDirIcons();
     updateInternalNames();
     std::sort(_rows.begin(), _rows.end(), itemSortComp);
     std::sort(_saves.begin(), _saves.end(), stringComp);
     scheduleBackdrop();
-    directoryChanged();
+    
+    if (changed) {
+        directoryChanged();
+    }
 }
 
 bool cMainList::enterDir(const std::string& dirName) {
     _saves.clear();
+    std::string oldDir = _currentDir;
     if (startsWithString(dirName, "...") || dirName.empty())  // select RPG or SD card
     {
         removeAllRows();
         _romInfoList.clear();
+        _currentDir = "...";
 
         if (gs().filePresentationMode < 2) {
             bool res = setupDefaultDir(false, false);
-            onDirectoryChanged();
+
+            onDirectoryChanged(_currentDir != oldDir);
+
             return res;
         }
 
         bool skipSdCards = setupGameDir();
-
         bool res = setupDefaultDir(skipSdCards, true);
 
-        onDirectoryChanged();
+        onDirectoryChanged(_currentDir != oldDir);
 
         return res;
     }
 
     if ("slot2:/" == dirName) {
         _currentDir = "";
-        onDirectoryChanged();
+        onDirectoryChanged(true);
         return true;
     }
 
     if ("slot1:/" == dirName) {
         _currentDir = "";
-        onDirectoryChanged();
+        onDirectoryChanged(true);
         return true;
     }
 
@@ -667,7 +670,7 @@ bool cMainList::enterDir(const std::string& dirName) {
 
     _currentDir = dirName;
 
-    onDirectoryChanged();
+    onDirectoryChanged(_currentDir != oldDir);
 
     return true;
 }
@@ -725,26 +728,26 @@ void cMainList::onScrolled(u32 index) {
     
 }
 
-void cMainList::backParentDir() {
-    if ("..." == _currentDir) return;
+bool cMainList::backParentDir() {
+    if (_currentDir == "...") {
+        return false;
+    }
 
-    bool fat1 = (fsManager().getFSRoot() == _currentDir);
-    bool favorites = ("favorites:/" == _currentDir);
+    bool fat1 = fsManager().getFSRoot() == _currentDir;
+    bool favorites = "favorites:/" == _currentDir;
     if (_currentDir == "fat:/" || _currentDir == "sd:/" || fat1 || favorites || _currentDir == "/") {
         enterDir("...");
         if (fat1) {
-            selectRow(slotSDCard());
+            selectRow(slotSDCard(), true);
         } else if (favorites) {
-            selectRow(slotFavorites());
+            selectRow(slotFavorites(), true);
         }
 
-        return;
+        return true;
     }
 
     size_t pos = _currentDir.rfind("/", _currentDir.size() - 2);
     std::string parentDir = _currentDir.substr(0, pos + 1);
-    dbg_printf("%s->%s\n", _currentDir.c_str(), parentDir.c_str());
-
     std::string oldCurrentDir = _currentDir;
 
     if (enterDir(parentDir)) {  // select last entered director
@@ -753,12 +756,19 @@ void cMainList::backParentDir() {
                 selectRow(i);
             }
         }
+
+        return true;
     }
+
+    return false;
 }
 
 bool cMainList::processKeyMessage(cKeyMessage message) {
     if (message.isKeyUp(KEY_B)) {
-        backParentDir();
+        if (backParentDir()) {
+            directoryReturned();
+        }
+
         return true;
     }
 
@@ -829,10 +839,14 @@ void cMainList::setRomInfo(u32 rowIndex, const DSRomInfo& info) {
     }
 }
 
-void cMainList::selectRom(const std::string& romPath){
+void cMainList::selectRom(const std::string& romPath) {
+    selectRom(romPath, false);
+}
+
+void cMainList::selectRom(const std::string& romPath, bool silent) {
     for (size_t row = 0; row < _rows.size(); row++) {
         if (romPath == _rows[row][REALNAME_COLUMN].text()) {
-            selectRow(row);
+            selectRow(row, silent);
             break;
         }
     }

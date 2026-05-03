@@ -92,6 +92,8 @@ class cListView : public cWindow {
 
     bool selectRow(int id);
 
+    bool selectRow(int id, bool silent);
+
     u32 firstVisibleRowId(void) { return _firstVisibleRowId; }
 
     u32 selectedRowId(void) { return _selectedRowId; }

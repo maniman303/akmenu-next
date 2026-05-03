@@ -40,6 +40,8 @@ class cMainWnd : public akui::cForm {
   protected:
     void onMainListSelectionChanged(u32 index);
     void onMainListSelItemClicked(u32 index);
+    void onMainListDirectoryChanged();
+    void onMainListDirectoryReturned();
     void setFocusedChild(cWindow* child) override;
     void startMenuItemClicked(s16 i);
     void startMenuItemSelected(s16 i);
@@ -47,9 +49,9 @@ class cMainWnd : public akui::cForm {
     void startButtonClicked();
     void brightnessButtonClicked();
     void fileInfoButtonClicked();
+    void folderUpButtonClicked();
     void showSettings(void);
     void saveSettings(cSettingWnd* settingWnd);
-    void onFolderChanged();
     void showFileInfo(u32 id);
     void saveFileInfo(cRomInfoWnd* romInfoWnd);
     void launchSelected();

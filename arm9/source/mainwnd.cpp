@@ -103,7 +103,8 @@ void cMainWnd::init() {
     _mainList->init();
     _mainList->rowClicked.connect(this, &cMainWnd::onMainListSelItemClicked);
     _mainList->selectChanged.connect(this, &cMainWnd::onMainListSelectionChanged);
-    _mainList->directoryChanged.connect(this, &cMainWnd::onFolderChanged);
+    _mainList->directoryChanged.connect(this, &cMainWnd::onMainListDirectoryChanged);
+    _mainList->directoryReturned.connect(this, &cMainWnd::onMainListDirectoryReturned);
     addChildWindow(_mainList);
 
     // waitMs( 1000 );
@@ -173,7 +174,7 @@ void cMainWnd::init() {
     _folderUpButton->setRelativePosition(cPoint(x, y));
     _folderUpButton->loadAppearance(SFN_FOLDERUP_BUTTON);
     _folderUpButton->setSize(cSize(w, h));
-    _folderUpButton->clicked.connect(_mainList, &cMainList::backParentDir);
+    _folderUpButton->clicked.connect(this, &cMainWnd::folderUpButtonClicked);
     _folderUpButton->setBackdrop(true);
     if (!show) {
         _folderUpButton->hide();
@@ -233,7 +234,7 @@ void cMainWnd::startMenuItemClicked(s16 i) {
             if (selectedId == UINT32_MAX) {
                 selectedId = 0;
             }
-            _mainList->selectRow(selectedId);
+            _mainList->selectRow(selectedId, true);
         }
     }
 
@@ -308,6 +309,10 @@ void cMainWnd::fileInfoButtonClicked() {
     task->schedule();
 }
 
+void cMainWnd::folderUpButtonClicked() {
+    _mainList->backParentDir();
+}
+
 void cMainWnd::onDisplayed() {
     if (_scheduleListFocus) {
         windowManager().setFocusedWindow(_mainList);
@@ -376,6 +381,10 @@ bool cMainWnd::processTouchMessage(cTouchMessage message) {
 }
 
 void cMainWnd::onMainListSelectionChanged(u32 index) {
+    if (index >= UINT32_MAX) {
+        return;
+    }
+    
     vfxManager().playEffect(VFX_EFFECT::TICK);
 }
 
@@ -766,7 +775,7 @@ void cMainWnd::saveFileInfo(cRomInfoWnd* romInfoWnd) {
     _mainList->setRomInfo(_mainList->selectedRowId(), rominfo);
 }
 
-void cMainWnd::onFolderChanged() {
+void cMainWnd::onMainListDirectoryChanged() {
     std::string dirShowName = _mainList->getCurrentDir();
     if (dirShowName == "favorites:/") {
         _folderText->setText(dirShowName);
@@ -812,9 +821,7 @@ void cMainWnd::onFolderChanged() {
             }
         });
         task->schedule();
-    }
-
-    if (_mainList->getRowFullPath(selectedRowId) == "slot1:/") {
+    } else if (_mainList->getRowFullPath(selectedRowId) == "slot1:/") {
         disableInput();
         tickSound().disable();
         vfxManager().playEffect(VFX_EFFECT::SELECT);
@@ -830,4 +837,8 @@ void cMainWnd::onFolderChanged() {
     }
 
     _folderText->setText(dirShowName);
+}
+
+void cMainWnd::onMainListDirectoryReturned() {
+    vfxManager().playEffect(VFX_EFFECT::CLOSE);
 }
