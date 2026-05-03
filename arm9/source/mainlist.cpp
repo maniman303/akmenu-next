@@ -720,14 +720,6 @@ std::string cMainList::processItemText(std::string text, int column) {
     return text.substr(0, lastdot);
 }
 
-void cMainList::onSelectChanged(u32 index) {
-    dbg_printf("%s\n", _rows[index][REALNAME_COLUMN].text().c_str());
-}
-
-void cMainList::onScrolled(u32 index) {
-    
-}
-
 bool cMainList::backParentDir() {
     if (_currentDir == "...") {
         return false;
@@ -866,7 +858,13 @@ void cMainList::drawItemBackgrounds() {
         return;
     }
 
+    if (!_itemBg->valid()) {
+        return;
+    }
+
     size_t total = std::min(_visibleRowCount, _rows.size() - _firstVisibleRowId);
+
+    _itemBg->setAlpha(gdi().getMainEngineLayer() == MEL_DOWN);
 
     for (size_t i = 0; i < total; i++) {
         s32 itemX = 0;

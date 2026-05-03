@@ -80,8 +80,6 @@ class cMainList : public akui::cListView {
     std::vector<std::vector<std::string>> getGameRows(int rowsToLoad);
 
   protected:
-    void onSelectChanged(u32 index);
-    void onScrolled(u32 index);
     std::string processItemText(std::string text, int column);
     u32 slotSDCard();
     u32 slotFavorites();

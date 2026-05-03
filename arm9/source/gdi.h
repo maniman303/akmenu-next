@@ -82,6 +82,10 @@ class cGdi {
     s16  textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine);
     s16  textOutRect(s16 x, s16 y, u16 w, u16 h, const char* text, GRAPHICS_ENGINE engine, const cFont& textFont);
 
+    MAIN_ENGINE_LAYER getMainEngineLayer() {
+        return _mainEngineLayer;
+    }
+
     void setMainEngineLayer(MAIN_ENGINE_LAYER layer) {
         if (layer == MEL_MIDDLE) {
             _scheduleMainBackdrop = true;

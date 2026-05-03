@@ -835,14 +835,6 @@ void ITCM_FUNC(cGdi::maskBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s1
 
                 length++;
 
-                if (k == 0) {
-                    u16 lastPixel = *(pSrc + srcOffset + destW - 1);
-                    if (lastPixel & 0x8000) {
-                        length = destW;
-                        break;
-                    }
-                }
-
                 continue;
             }
 
@@ -880,7 +872,7 @@ void ITCM_FUNC(cGdi::maskBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s1
         } else if (((srcOffset + start) & 1) || ((destOffset + start) & 1) || (length & 1)) {
             swiCopy(pSrc + srcOffset + start, pDest + destOffset + start, COPY_MODE_COPY | length);
         } else if (length <= 32) {
-                swiCopy(pSrc + srcOffset + start, pDest + destOffset + start, COPY_MODE_WORD | length >> 1);
+            swiCopy(pSrc + srcOffset + start, pDest + destOffset + start, COPY_MODE_WORD | length >> 1);
         } else {
             swiFastCopy(pSrc + srcOffset + start, pDest + destOffset + start, COPY_MODE_WORD | COPY_MODE_COPY | length >> 1);
         }
