@@ -27,7 +27,7 @@ void cStartMenu::init() {
 
 bool cStartMenu::processKeyMessage(cKeyMessage message) {
     if (message.isKeyUp(KEY_START)) {
-        exit();
+        close(false);
         return true;
     }
 

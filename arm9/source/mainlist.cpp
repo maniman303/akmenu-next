@@ -34,6 +34,7 @@
 #include "logger.h"
 #include "ui/msgbox.h"
 #include "../../share/memtool.h"
+#include "favorites.h"
 
 cMainList::cMainList(cWindow* parent, const std::string& text)
     : cListView(4, 20, 248, 152, parent, text) {
@@ -293,7 +294,7 @@ bool cMainList::setupDefaultDir(bool skipCards, bool skipFavorites) {
         insertEntryRow(a_row, rominfo);
     }
 
-    if (!skipFavorites) {
+    if (!skipFavorites && cFavorites::GetFavorites().size() > 0) {
         DSRomInfo rominfo;
         std::vector<std::string> a_row;
         a_row.push_back("");
@@ -366,9 +367,7 @@ std::vector<std::string> cMainList::getLastPlayedRow() {
 std::vector<std::vector<std::string>> cMainList::getFavoriteRows(bool exclusive) {
     std::vector<std::vector<std::string>> favoriteRows;
 
-    CIniFile ini(SFN_FAVORITES);
-    std::vector<std::string> favoriteItems;
-    ini.GetStringVector("main", "list", favoriteItems, '|');
+    std::vector<std::string> favoriteItems = cFavorites::GetFavorites();
     for (size_t i = 0; i < favoriteItems.size(); i++) {
         std::string item = favoriteItems[i];
 

@@ -228,7 +228,7 @@ void cMainWnd::startMenuItemClicked(s16 i) {
         }
 
         if (favoritesRes) {
-            _mainList->enterDir(_mainList->getCurrentDir());
+            _mainList->enterDir(cFavorites::GetFavorites().size() == 0 && _mainList->getCurrentDir() == "favorites:/" ? "..." : _mainList->getCurrentDir());
             u32 selectedId = _mainList->getRowIdByPath(selectedFullPath);
             if (selectedId == UINT32_MAX) {
                 selectedId = 0;
@@ -256,8 +256,12 @@ void cMainWnd::startMenuItemSelected(s16 i) {
     vfxManager().playEffect(VFX_EFFECT::TICK);
 }
 
-void cMainWnd::startMenuClosed() {
+void cMainWnd::startMenuClosed(bool selected) {
     if (!isFocused() && !_startMenu->isFocused()) {
+        return;
+    }
+
+    if (selected) {
         return;
     }
 

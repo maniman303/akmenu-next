@@ -11,6 +11,14 @@
 #include "inifile.h"
 #include "systemfilenames.h"
 
+std::vector<std::string> cFavorites::GetFavorites() {
+    CIniFile ini(SFN_FAVORITES);
+    std::vector<std::string> favoriteItems;
+    ini.GetStringVector("main", "list", favoriteItems, '|');
+    
+    return favoriteItems;
+}
+
 bool cFavorites::AddToFavorites(const std::string& aFileName) {
     CIniFile ini(SFN_FAVORITES);
     std::vector<std::string> items;

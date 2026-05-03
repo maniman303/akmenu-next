@@ -108,12 +108,12 @@ namespace akui {
                 itemClicked(_selectedItemIndex);
             }
 
-            exit();
+            close(_selectedItemIndex != -1);
             return true;
         }
 
         if (message.isKeyUp(KEY_B)) {
-            exit();
+            close(false);
             return true;
         }
 
@@ -143,13 +143,13 @@ namespace akui {
         cPoint pos = message.position();
         if (message.up()) {
             if (windowBelow(pos) == NULL) {
-                exit();
+                close(false);
             } else if (!_skipTouch) {
                 if (_selectedItemIndex != -1) {
                     itemClicked(_selectedItemIndex);
                 }
 
-                exit();
+                close(_selectedItemIndex != -1);
             }
 
             _skipTouch = false;
@@ -239,12 +239,16 @@ namespace akui {
         return -1;
     }
 
+    void cPopMenu::close(bool selected) {
+        menuExit(selected);
+        exit();
+    }
+
     void cPopMenu::onShow() {
         selectItem(0, true);
     }
 
     void cPopMenu::onExit() {
-        menuExit();
         windowManager().removeWindow(this);
     }
 
