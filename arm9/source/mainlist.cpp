@@ -97,17 +97,22 @@ int cMainList::init() {
 }
 
 static bool itemSortComp(const akui::cListView::itemVector& item1, const akui::cListView::itemVector& item2) {
-    const std::string& fn1 = gs().viewMode == cGlobalSettings::EViewInternal ? item1[cMainList::INTERNALNAME_COLUMN].text() : item1[cMainList::SHOWNAME_COLUMN].text();
-    const std::string& fn2 = gs().viewMode == cGlobalSettings::EViewInternal ? item2[cMainList::INTERNALNAME_COLUMN].text() : item2[cMainList::SHOWNAME_COLUMN].text();
-
-    if (fn1 == "../" || fn1 == "..") return true;
-    if (fn2 == "../" || fn2 == "..") return false;
-
     const std::string& realFn1 = item1[cMainList::REALNAME_COLUMN].text();
     const std::string& realFn2 = item2[cMainList::REALNAME_COLUMN].text();
 
-    if (realFn1.back() == '/' && realFn2.back() != '/') return true;
-    if (realFn1.back() != '/' && realFn2.back() == '/') return false;
+    if (realFn1 == "slot1:/") return true;
+    if (realFn2 == "slot1:/") return false;
+
+    if (realFn1 == "slot2:/" && realFn2 != "slot1:/") return true;
+    if (realFn1 != "slot1:/" && realFn2 == "slot2:/") return false;
+
+    if (gs().filePresentationMode >= 2) {
+        if (realFn1 == "fat:/" && realFn2.back() != '/') return false;
+        if (realFn2 == "fat:/" && realFn1.back() != '/') return true;
+
+        if (realFn1 == "sd:/" && realFn2.back() != '/') return false;
+        if (realFn2 == "sd:/" && realFn1.back() != '/') return true;
+    }
 
     if (realFn1 == "fat:/") return true;
     if (realFn2 == "fat:/") return false;
@@ -115,11 +120,8 @@ static bool itemSortComp(const akui::cListView::itemVector& item1, const akui::c
     if (realFn1 == "sd:/") return true;
     if (realFn2 == "sd:/") return false;
 
-    if (realFn1 == "slot1:/") return true;
-    if (realFn2 == "slot1:/") return false;
-
-    if (realFn1 == "slot2:/" && realFn2 != "slot1:/") return true;
-    if (realFn1 != "slot1:/" && realFn2 == "slot2:/") return false;
+    if (realFn1.back() == '/' && realFn2.back() != '/') return true;
+    if (realFn1.back() != '/' && realFn2.back() == '/') return false;
 
     const bool isLastFn1 = (item1.size() > cMainList::IS_FAVORITE_COLUMN) && (item1[cMainList::IS_FAVORITE_COLUMN].text() == "last");
     const bool isLastFn2 = (item2.size() > cMainList::IS_FAVORITE_COLUMN) && (item2[cMainList::IS_FAVORITE_COLUMN].text() == "last");
@@ -132,6 +134,9 @@ static bool itemSortComp(const akui::cListView::itemVector& item1, const akui::c
 
     if (isFavFn1 && !isFavFn2) return true;
     if (!isFavFn1 && isFavFn2) return false;
+
+    const std::string& fn1 = gs().viewMode == cGlobalSettings::EViewInternal ? item1[cMainList::INTERNALNAME_COLUMN].text() : item1[cMainList::SHOWNAME_COLUMN].text();
+    const std::string& fn2 = gs().viewMode == cGlobalSettings::EViewInternal ? item2[cMainList::INTERNALNAME_COLUMN].text() : item2[cMainList::SHOWNAME_COLUMN].text();
 
     return fn1 < fn2;
 }
