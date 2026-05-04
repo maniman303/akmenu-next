@@ -610,7 +610,7 @@ bool cMainList::enterDir(const std::string& dirName) {
                 std::string sdError = LANG("sd card error", "text");
                 akui::cMessageBox::showModal(title, sdError, MB_OK);
             }
-            dbg_printf("Unable to open directory<%s>.\n", dirName.c_str());
+
             return false;
         }
 

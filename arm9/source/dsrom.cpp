@@ -54,15 +54,14 @@ bool DSRomInfo::loadDSRomInfo(const std::string& filename, bool loadBanner) {
     _isDSiWare = EFalse;
     _isModernHomebrew = EFalse;
     FILE* f = fopen(filename.c_str(), "rb");
-    if (NULL == f)  // 锟斤拷锟侥硷拷失锟斤拷
+    if (f == NULL)
     {
         return false;
     }
 
     tNDSHeader header;
-    if (512 != fread(&header, 1, 512, f))  // 锟斤拷锟侥硷拷头失锟斤拷
+    if (512 != fread(&header, 1, 512, f))
     {
-        dbg_printf("read rom header fail\n");
         memcpy(&_banner, unknown_nds_banner_bin, sizeof(_banner));
         fclose(f);
         return false;
@@ -74,11 +73,12 @@ bool DSRomInfo::loadDSRomInfo(const std::string& filename, bool loadBanner) {
 
     ///////// ROM Header /////////
     u16 crc = swiCRC16(0xFFFF, &header, 0x15E);
-    if (crc != header.headerCRC16)  // 锟侥硷拷头 CRC 锟斤拷锟襟，诧拷锟斤拷nds锟斤拷戏
+    if (crc != header.headerCRC16)
     {
         dbg_printf("%s rom header crc error\n", filename.c_str());
         memcpy(&_banner, unknown_nds_banner_bin, sizeof(_banner));
         fclose(f);
+
         return true;
     } else {
         _isDSRom = ETrue;
@@ -185,9 +185,9 @@ bool DSRomInfo::loadDSRomInfo(const std::string& filename, bool loadBanner) {
 
     fclose(f);
 
-    _buffer = std::shared_ptr<u32[]>(new u32[_lastSize ? 16 * 8 : 32 * 16]);
+    // _buffer = std::shared_ptr<u32[]>(new u32[_lastSize ? 16 * 8 : 32 * 16]);
 
-    drawDSRomIconMem((u16*)_buffer.get(), _lastSize);
+    // drawDSRomIconMem((u16*)_buffer.get(), _lastSize);
 
     return true;
 }
