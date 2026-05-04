@@ -25,6 +25,7 @@ namespace akui {
     public:
       cForm& addChildWindow(cWindow* aWindow);
       cForm& removeChildWindow(cWindow* aWindow);
+      void update() override;
       void onFocused() override;
       bool canRenderBackdrop() override;
       bool shouldRenderBackdrop() override;

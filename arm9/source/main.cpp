@@ -132,7 +132,7 @@ void initMainWindow() {
 
     if (gs().filePresentationMode < 2) {
         if (wnd->_mainList->enterDir(lastDirectory != "..." ? lastDirectory : gs().startupFolder)) {
-            wnd->_mainList->selectRom(lastFile, true);
+            wnd->_mainList->scheduleRomSelection(lastFile);
         } else {
             wnd->_mainList->enterDir("...");
         }
@@ -140,7 +140,7 @@ void initMainWindow() {
         wnd->_mainList->enterDir("...");
 
         if (lastFile != "..." && !lastFile.empty()) {
-            wnd->_mainList->selectRom(lastFile, true);
+            wnd->_mainList->scheduleRomSelection(lastFile);
         }
     }
 

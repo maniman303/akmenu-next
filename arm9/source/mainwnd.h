@@ -53,7 +53,6 @@ class cMainWnd : public akui::cForm {
     void showSettings(void);
     void saveSettings(cSettingWnd* settingWnd);
     void showFileInfo(u32 id);
-    void saveFileInfo(cRomInfoWnd* romInfoWnd);
     void launchSelected();
 
     bool _scheduleListFocus;

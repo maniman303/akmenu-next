@@ -41,25 +41,21 @@ class cMainList : public akui::cListView {
     int init();
     bool enterDir(const std::string& dirName);
     bool backParentDir();
+    void update() override;
     bool processKeyMessage(cKeyMessage message) override;
     cRect focusRectangle() const override;
     std::string getCurrentDir();
-    bool getRomInfo(u32 rowIndex, DSRomInfo& info) const;
-    void setRomInfo(u32 rowIndex, const DSRomInfo& info);
-    void selectRom(const std::string& romPath);
-    void selectRom(const std::string& romPath, bool silent);
+    bool getRomInfo(u32 rowIndex, DSRomInfo& info);
+    void scheduleRomSelection(const std::string& romPath);
     void setViewMode(VIEW_MODE mode);
-    std::string getRowFullPath(u32 id);
-    std::string getRowShowName(u32 id);
-    std::string getRowFileName(u32 id);
+    std::string getRowFullPath(u32 id) const;
+    std::string getRowShowName(u32 id) const;
+    std::string getRowFileName(u32 id) const;
     u32 getRowIdByPath(std::string path);
     VIEW_MODE getViewMode() { return _viewMode; }
 
     Signal0 directoryChanged;
     Signal0 directoryReturned;
-
-  public:
-    bool IsFavorites(void);
 
   protected:
     void draw() override;
@@ -72,6 +68,8 @@ class cMainList : public akui::cListView {
     void validateDirIcons();
     void onScrolled(u32 index) override;
     void onDirectoryChanged(bool changed);
+    void selectRom(const std::string& romPath);
+    void selectRom(const std::string& romPath, bool silent);
     std::vector<std::vector<std::string>> setupDefaultDir(bool skipCards, bool skipFavorites);
     std::vector<std::vector<std::string>> setupGameDir();
     std::vector<std::vector<std::string>> prepareDir(const std::string& dirName);
@@ -96,4 +94,6 @@ class cMainList : public akui::cListView {
     std::string _currentDir;
     std::vector<std::string> _extnameFilter;
     std::vector<DSRomInfo> _romInfoList;
+    bool _busy;
+    std::string _scheduledRom;
 };

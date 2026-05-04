@@ -30,11 +30,11 @@
 #include "unknown_banner_bin.h"
 #include "windowmanager.h"
 #include "fsmngr.h"
+#include "favorites.h"
 #include "savemngr.h"
 #include "logger.h"
 #include "ui/msgbox.h"
 #include "../../share/memtool.h"
-#include "favorites.h"
 
 cMainList::cMainList(cWindow* parent, const std::string& text)
     : cListView(4, 20, 248, 152, parent, text) {
@@ -45,6 +45,8 @@ cMainList::cMainList(cWindow* parent, const std::string& text)
     _tallRowHeight = 38;
     _centerInternalColumn = false;
     _viewMode = VM_LIST;
+    _busy = false;
+    _scheduledRom = "";
     _canRenderBackdrop = true;
     _scheduleBackdrop = true;
 }
@@ -140,7 +142,7 @@ static bool itemSortComp(const akui::cListView::itemVector& item1, const akui::c
 }
 
 static bool extnameFilter(const std::vector<std::string>& extNames, std::string extName) {
-    if (0 == extNames.size()) return true;
+    if (extNames.size() == 0) return true;
 
     extName = toLowerString(extName);
     for (size_t i = 0; i < extNames.size(); ++i) {
@@ -630,6 +632,7 @@ std::vector<std::vector<std::string>> cMainList::prepareDir(const std::string& d
 
             // Don't show system or hidden files and dirs
             if (hiddenEntryFilter(entryNames, lfn)) {
+                // logger().info("Hiding: " + lfn);
                 continue;
             }
 
@@ -641,8 +644,7 @@ std::vector<std::vector<std::string>> cMainList::prepareDir(const std::string& d
 
             std::string filePath = dirName + lfn;
 
-            bool showThis = (entry->d_type == DT_DIR) ? (lfn != "." && lfn != "..") : extnameFilter(extNames, extName);
-            showThis = showThis && !(FAT_getAttr(filePath.c_str()) & ATTR_HIDDEN);
+            bool showThis = (entry->d_type == DT_DIR || extnameFilter(extNames, extName)) && !(FAT_getAttr(filePath.c_str()) & ATTR_HIDDEN); 
             if (!showThis) {
                 continue;
             }
@@ -661,11 +663,10 @@ std::vector<std::vector<std::string>> cMainList::prepareDir(const std::string& d
             std::vector<std::string> a_row;
             a_row.push_back("");   // make a space for icon
             a_row.push_back(lfn);  // show name
-            a_row.push_back(internalName);   // internal name
+            a_row.push_back(internalName);  // internal name
             a_row.push_back(filePath);  // real name
 
             if (entry->d_type == DT_DIR) {
-                a_row[SHOWNAME_COLUMN] += "/";
                 a_row[REALNAME_COLUMN] += "/";
             }
 
@@ -673,6 +674,16 @@ std::vector<std::vector<std::string>> cMainList::prepareDir(const std::string& d
         }
 
         closedir(dir);
+    }
+
+    if (res.size() == 0) {
+        std::vector<std::string> a_row;
+        a_row.push_back("");   // make a space for icon
+        a_row.push_back(LANG("mainlist", "empty"));  // show name
+        a_row.push_back(LANG("mainlist", "empty"));  // internal name
+        a_row.push_back("...");  // real name
+
+        res.push_back(a_row);
     }
 
     return res;
@@ -725,24 +736,17 @@ bool cMainList::enterDir(const std::string& dirName) {
 }
 
 std::string cMainList::processItemText(std::string text, int column) {
-    if (column != SHOWNAME_COLUMN) {
+    if (column != SHOWNAME_COLUMN && column != INTERNALNAME_COLUMN) {
         return text;
     }
-
-    text = replaceInString(text, "; ", ": ");
 
     if (gs().filePresentationMode == 0) {
         return text;
     }
 
-    if (!text.empty() && text.back() == '/') {
-        text.pop_back();
-
-        if (text == "saves") {
-            return "Saves";
-        }
-
-        return text;
+    text = replaceInString(text, "; ", ": ");
+    if (text == "saves") {
+        return "Saves";
     }
 
     size_t lastdot = text.find_last_of(".");
@@ -750,14 +754,11 @@ std::string cMainList::processItemText(std::string text, int column) {
         return text;
     }
 
-    std::string extName;
+    std::string extName = "";
     if (text.npos != lastdot) {
-        extName = text.substr(lastdot);
-    } else {
-        extName = "";
+        extName = toLowerString(text.substr(lastdot));
     }
 
-    extName = toLowerString(extName);
     if (extName != ".nds" && extName != ".sav" && extName != ".gba") {
         return text;
     }
@@ -788,16 +789,23 @@ bool cMainList::backParentDir() {
     std::string oldCurrentDir = _currentDir;
 
     if (enterDir(parentDir)) {  // select last entered director
-        for (size_t i = 0; i < _rows.size(); ++i) {
-            if (parentDir + _rows[i][REALNAME_COLUMN].text() == oldCurrentDir) {
-                selectRow(i);
-            }
-        }
+        scheduleRomSelection(oldCurrentDir);
 
         return true;
     }
 
     return false;
+}
+
+void cMainList::update() {
+    if (_busy) {
+        return;
+    }
+
+    if (!_scheduledRom.empty()) {
+        selectRom(_scheduledRom, true);
+        _scheduledRom = "";
+    }
 }
 
 bool cMainList::processKeyMessage(cKeyMessage message) {
@@ -813,6 +821,10 @@ bool cMainList::processKeyMessage(cKeyMessage message) {
 }
 
 cRect cMainList::focusRectangle() const {
+    if (_rows.size() == 0) {
+        return cRect(position(), size(), false);
+    }
+
     u32 visibleRowId = _selectedRowId - _firstVisibleRowId;
     cPoint rowPos = position() + cPoint(0, (visibleRowId * _rowHeight) - 1);
     cSize rowSize = cSize(size().x, _rowHeight + 1);
@@ -820,7 +832,7 @@ cRect cMainList::focusRectangle() const {
     return cRect(rowPos, rowSize, false);
 }
 
-std::string cMainList::getRowFullPath(u32 id) {
+std::string cMainList::getRowFullPath(u32 id) const {
     if (!_rows.size() || id >= (u32)_rows.size()) {
         return std::string("");
     }
@@ -828,7 +840,7 @@ std::string cMainList::getRowFullPath(u32 id) {
     return _rows[id][REALNAME_COLUMN].text();
 }
 
-std::string cMainList::getRowShowName(u32 id) {
+std::string cMainList::getRowShowName(u32 id) const {
     if (!_rows.size() || id >= (u32)_rows.size()) {
         return std::string("");
     }
@@ -836,7 +848,7 @@ std::string cMainList::getRowShowName(u32 id) {
     return _rows[id][SHOWNAME_COLUMN].text();
 }
 
-std::string cMainList::getRowFileName(u32 id) {
+std::string cMainList::getRowFileName(u32 id) const {
     if (!_rows.size() || id >= (u32)_rows.size()) {
         return std::string("");
     }
@@ -859,21 +871,20 @@ u32 cMainList::getRowIdByPath(std::string path) {
     return UINT32_MAX;
 }
 
-bool cMainList::getRomInfo(u32 rowIndex, DSRomInfo& info) const {
+bool cMainList::getRomInfo(u32 rowIndex, DSRomInfo& info) {
     if (rowIndex < _romInfoList.size()) {
-        info = _romInfoList[rowIndex];
+        std::string fullPath = getRowFullPath(rowIndex);
+        info = DSRomInfo();
+        processDirIcon(info, fullPath);
+
         return true;
     } else {
         return false;
     }
 }
 
-void cMainList::setRomInfo(u32 rowIndex, const DSRomInfo& info) {
-    if (!_romInfoList[rowIndex].isDSRom()) return;
-
-    if (rowIndex < _romInfoList.size()) {
-        _romInfoList[rowIndex] = info;
-    }
+void cMainList::scheduleRomSelection(const std::string& romPath) {
+    _scheduledRom = romPath;
 }
 
 void cMainList::selectRom(const std::string& romPath) {
@@ -881,6 +892,8 @@ void cMainList::selectRom(const std::string& romPath) {
 }
 
 void cMainList::selectRom(const std::string& romPath, bool silent) {
+    logger().info("Looking for rom: " + romPath);
+
     for (size_t row = 0; row < _rows.size(); row++) {
         if (romPath == _rows[row][REALNAME_COLUMN].text()) {
             selectRow(row, silent);
@@ -990,10 +1003,6 @@ void cMainList::setViewMode(VIEW_MODE mode) {
 
 std::string cMainList::getCurrentDir() {
     return _currentDir;
-}
-
-bool cMainList::IsFavorites(void) {
-    return ("favorites:/" == _currentDir);
 }
 
 u32 cMainList::slotSDCard() {

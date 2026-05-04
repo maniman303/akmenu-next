@@ -40,6 +40,13 @@ namespace akui {
         return *this;
     }
 
+    void cForm::update() {
+        std::list<cWindow*>::iterator it;
+        for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
+            (*it)->update();
+        }
+    }
+
     void cForm::onFocused() {
         gs().scrollTick = 0;
     }

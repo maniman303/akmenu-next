@@ -209,6 +209,7 @@ void cMainWnd::init() {
 
 void cMainWnd::update() {
     _focusBorder->update();
+    cForm::update();
 }
 
 void cMainWnd::draw() {
@@ -230,7 +231,7 @@ void cMainWnd::startMenuItemClicked(s16 i) {
 
         if (favoritesRes) {
             _mainList->enterDir(cFavorites::GetFavorites().size() == 0 && _mainList->getCurrentDir() == "favorites:/" ? "..." : _mainList->getCurrentDir());
-            _mainList->selectRom(selectedFullPath, true);
+            _mainList->scheduleRomSelection(selectedFullPath);
         }
     }
 
@@ -350,7 +351,7 @@ bool cMainWnd::processKeyMessage(cKeyMessage message) {
         } else {
             vfxManager().playEffect(VFX_EFFECT::SELECT);
             _mainList->enterDir("favorites:/");
-            _mainList->selectRom("...", true);
+            _mainList->scheduleRomSelection("...");
         }
 
         return true;
@@ -406,16 +407,16 @@ void cMainWnd::launchSelected() {
     size_t lastSlashPos = fullPath.find_last_of("/\\");
     std::string directory = fullPath.substr(0, lastSlashPos + 1);
 
-    if (fullPath.back() == '/') {
-        vfxManager().playEffect(VFX_EFFECT::SELECT);
+    if (fullPath.back() == '/' || fullPath == "...") {
+        vfxManager().playEffect(fullPath == "..." ? VFX_EFFECT::CLOSE : VFX_EFFECT::SELECT);
         _mainList->enterDir(fullPath);
         return;
     }
 
     DSRomInfo rominfo;
-    if (!_mainList->getRomInfo(_mainList->selectedRowId(), rominfo)) return;
-
-    // rominfo.loadDSRomInfo( fullPath, false );
+    if (!_mainList->getRomInfo(_mainList->selectedRowId(), rominfo)) {
+        return;
+    }
 
     if (rominfo.isGbaRom()) {
         CGbaLoader(fullPath).Load(false, false);
@@ -735,7 +736,7 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
 
     if (gs().filePresentationMode != currentfilePresentationMode) {
         _mainList->enterDir("...");
-        _mainList->selectRom("...", true);
+        _mainList->scheduleRomSelection("...");
         _scheduleListFocus = true;
     } else if (gs().fileListType != currentFileListType) {
         _mainList->enterDir(_mainList->getCurrentDir());
@@ -751,20 +752,11 @@ void cMainWnd::showFileInfo(u32 id) {
 
     std::string showName = _mainList->getRowShowName(selectedRomId);
     std::string fullPath = _mainList->getRowFullPath(selectedRomId);
-    cRomInfoWnd* romInfoWnd = new cRomInfoWnd(LANG("rom info", "title"), [this](cRomInfoWnd* wnd) { saveFileInfo(wnd); });
+    cRomInfoWnd* romInfoWnd = new cRomInfoWnd(LANG("rom info", "title"), [this](cRomInfoWnd* wnd) { });
     romInfoWnd->setFileInfo(fullPath, showName);
     romInfoWnd->setRomInfo(rominfo);
     
     windowManager().addModal(romInfoWnd);
-}
-
-void cMainWnd::saveFileInfo(cRomInfoWnd* romInfoWnd) {
-    if (romInfoWnd == NULL) {
-        return;
-    }
-
-    DSRomInfo rominfo = romInfoWnd->getRomInfo();
-    _mainList->setRomInfo(_mainList->selectedRowId(), rominfo);
 }
 
 void cMainWnd::onMainListDirectoryChanged() {
