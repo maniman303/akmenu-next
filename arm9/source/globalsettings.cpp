@@ -26,7 +26,7 @@ cGlobalSettings::cGlobalSettings() {
     sound = true;
     clockSound = true;
     filePresentationMode = 0;
-    minimalModeRomsCount = 20;
+    minimalModeRomsCount = 40;
     enterLastDirWhenBoot = true;
     scrollSpeed = EScrollFast;
     scrollWait = 9;
@@ -75,7 +75,7 @@ void cGlobalSettings::loadSettings() {
     sound = ini.GetInt("system", "sound", sound);
     clockSound = ini.GetInt("system", "clockSound", clockSound);
     filePresentationMode = ini.GetInt("system", "filePresentationMode", filePresentationMode);
-    minimalModeRomsCount = ini.GetInt("system", "minimalModeRomsCount", minimalModeRomsCount);
+    minimalModeRomsCount = std::max(0, ini.GetInt("system", "minimalModeRomsCount", minimalModeRomsCount));
     enterLastDirWhenBoot = ini.GetInt("system", "enterLastDirWhenBoot", enterLastDirWhenBoot);
     gbaSleepHack = ini.GetInt("system", "gbaSleepHack", gbaSleepHack);
     gbaAutoSave = ini.GetInt("system", "gbaAutoSave", gbaAutoSave);
