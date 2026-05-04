@@ -230,11 +230,7 @@ void cMainWnd::startMenuItemClicked(s16 i) {
 
         if (favoritesRes) {
             _mainList->enterDir(cFavorites::GetFavorites().size() == 0 && _mainList->getCurrentDir() == "favorites:/" ? "..." : _mainList->getCurrentDir());
-            u32 selectedId = _mainList->getRowIdByPath(selectedFullPath);
-            if (selectedId == UINT32_MAX) {
-                selectedId = 0;
-            }
-            _mainList->selectRow(selectedId, true);
+            _mainList->selectRom(selectedFullPath, true);
         }
     }
 
@@ -354,7 +350,7 @@ bool cMainWnd::processKeyMessage(cKeyMessage message) {
         } else {
             vfxManager().playEffect(VFX_EFFECT::SELECT);
             _mainList->enterDir("favorites:/");
-            _mainList->selectRow(0);
+            _mainList->selectRom("...", true);
         }
 
         return true;
@@ -739,7 +735,7 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
 
     if (gs().filePresentationMode != currentfilePresentationMode) {
         _mainList->enterDir("...");
-        _mainList->selectRow(0);
+        _mainList->selectRom("...", true);
         _scheduleListFocus = true;
     } else if (gs().fileListType != currentFileListType) {
         _mainList->enterDir(_mainList->getCurrentDir());
