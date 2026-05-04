@@ -9,7 +9,6 @@
 
 #include "dsrom.h"
 #include "dbgtool.h"
-#include "fileicons.h"
 #include "gamecode.h"
 #include "gbarom_banner_bin.h"
 #include "icon_bg_bin.h"
@@ -25,7 +24,6 @@ DSRomInfo::DSRomInfo() {
     _isHomebrew = EFalse;
     _isModernHomebrew = EFalse;
     _isGbaRom = EFalse;
-    _extIcon = -1;
     _romVersion = 0;
     _buffer = NULL;
     _lastSize = false;
@@ -44,7 +42,7 @@ DSRomInfo& DSRomInfo::operator=(const DSRomInfo& src) {
     _isGbaRom = src._isGbaRom;
     _fileName = src._fileName;
     _romVersion = src._romVersion;
-    _extIcon = src._extIcon;
+    _buffer = src._buffer;
     return *this;
 }
 
@@ -185,19 +183,12 @@ bool DSRomInfo::loadDSRomInfo(const std::string& filename, bool loadBanner) {
 
     fclose(f);
 
-    // _buffer = std::shared_ptr<u32[]>(new u32[_lastSize ? 16 * 8 : 32 * 16]);
-
-    // drawDSRomIconMem((u16*)_buffer.get(), _lastSize);
+    _buffer = NULL;
 
     return true;
 }
 
 void DSRomInfo::drawDSRomIcon(u8 x, u8 y, bool small, GRAPHICS_ENGINE engine) {
-    if (_extIcon >= 0) {
-        fileIcons().Draw(_extIcon, x, y, engine);
-        return;
-    }
-
     u16 iconSize = small ? 16 : 32;
     if (_saveInfo.getIcon() == SAVE_INFO_EX_ICON_FIRMWARE) {
         gdi().maskBlt(icon_bg_bin, x, y, iconSize, iconSize, engine);
@@ -314,21 +305,15 @@ bool DSRomInfo::isGbaRom(void) const {
     return (_isGbaRom == ETrue) ? true : false;
 }
 
-void DSRomInfo::setExtIcon(const std::string& aValue) {
-    _extIcon = fileIcons().Icon(aValue);
-};
-
-bool DSRomInfo::setBannerFromFile(const std::string& anExtIcon, const std::string& path, const u8* aBanner)
+bool DSRomInfo::setBannerFromFile(const std::string& path, const u8* aBanner)
 {
     bool res = false;
 
     if (!gs().icon) {
-        setExtIcon(anExtIcon);
         memcpy(&banner(), aBanner, sizeof(tNDSBanner));
         
         res = true;
     } else {
-        setExtIcon(anExtIcon);
         FILE* f = fopen(path.c_str(), "rb");
         if (!f) return false;
         size_t read = fread(&banner(), 1, sizeof(tNDSBanner), f);

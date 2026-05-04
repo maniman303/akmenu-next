@@ -28,7 +28,6 @@ class DSRomInfo {
     TBool _isModernHomebrew;
     TBool _isGbaRom;
     std::string _fileName;
-    s32 _extIcon;
     u8 _romVersion;
     std::shared_ptr<u32[]> _buffer;
     bool _lastSize;
@@ -50,8 +49,6 @@ class DSRomInfo {
     const SAVE_INFO_EX& saveInfo(void) const;
     SAVE_INFO_EX& saveInfo(void);
     u8 version(void);
-    void setExtIcon(const std::string& aValue);
-    inline bool isExtIcon(void) { return _extIcon >= 0; };
     bool isDSRom(void) const;
     bool isDSiWare(void) const;
     bool isHomebrew(void) const;
@@ -71,6 +68,12 @@ class DSRomInfo {
         _fileName = filename;
         load();
     };
-    bool setBannerFromFile(const std::string& anExtIcon, const std::string& path, const u8* aBanner);
+    void setFileName(const std::string& filename) {
+      _fileName = filename;
+    };
+    bool setBannerFromFile(const std::string& path, const u8* aBanner);
+    std::string fileName() {
+      return _fileName;
+    };
     bool lastSize();
 };

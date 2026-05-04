@@ -204,8 +204,6 @@ namespace akui {
             id = 0;
         }
 
-        // if( (int)_selectedRowId == id ) return;
-
         size_t lastVisibleRowId = _firstVisibleRowId + _visibleRowCount - 1;
         if (lastVisibleRowId > _rows.size() - 1) lastVisibleRowId = _rows.size() - 1;
         if (id < (int)_firstVisibleRowId) {

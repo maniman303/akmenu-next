@@ -88,7 +88,6 @@ int cMainList::init() {
     insertColumn(SAVETYPE_COLUMN, "saveType", 0);
     insertColumn(FILESIZE_COLUMN, "fileSize", 0);
     insertColumn(IS_FAVORITE_COLUMN, "isFavorite", 0);
-    insertColumn(ROMINFO_COLUMN, "romInfo", 0);
 
     setViewMode((cMainList::VIEW_MODE)gs().viewMode);
 
@@ -183,7 +182,7 @@ static bool hiddenEntryFilter(const std::vector<std::string>& entryNames, std::s
     return false;
 }
 
-bool cMainList::insertEntryRow(const std::vector<std::string>& texts, const DSRomInfo& romInfo) {
+bool cMainList::insertEntryRow(const std::vector<std::string>& texts) {
     size_t index = getRowCount();
     std::vector<std::string> copy(texts);
     while (copy.size() < IS_FAVORITE_COLUMN) {
@@ -193,85 +192,100 @@ bool cMainList::insertEntryRow(const std::vector<std::string>& texts, const DSRo
     if (copy.size() <= IS_FAVORITE_COLUMN) {
         copy.push_back("false");
     }
-
-    if (copy.size() <= ROMINFO_COLUMN) {
-        copy.push_back(std::to_string(index));
-    } else {
-        copy[ROMINFO_COLUMN] = std::to_string(index);
-    }
     
     if (!insertRow(index, copy)) {
         return false;
     }
 
-    _romInfoList.push_back(romInfo);
-
     return true;
 }
 
-void cMainList::processDirIcons() {
-    std::string microsd = fsManager().getIconPath("microsd_banner.bin");
-    std::string nand = fsManager().getIconPath("nand_banner.bin");
-    std::string gba = fsManager().getIconPath("gba_banner.bin");
-    std::string folder = fsManager().getIconPath("folder_banner.bin");
-    for (size_t ii = 0; ii < _rows.size(); ++ii) {
-        DSRomInfo& rominfo = _romInfoList[ii];
-        std::string filename = _rows[ii][REALNAME_COLUMN].text();
-
-        if (filename == "fat:/" || filename == "sd:/") {
-            rominfo.setBannerFromFile("folder", microsd, microsd_banner_bin);
-            continue;
-        }
-
-        if (filename == "favorites:/") {
-            rominfo.setBannerFromFile("folder", folder, folder_banner_bin);
-            continue;
-        }
-
-        if (filename == "slot1:/") {
-            rominfo.setBannerFromFile("folder", nand, nand_banner_bin);
-            continue;
-        }
-
-        if (filename == "slot2:/") {
-            rominfo.setBannerFromFile("folder", gba, gba_banner_bin);
-            continue;
-        }
-
-        std::string extName = "";
-        size_t lastDotPos = filename.find_last_of('.');
-        if (filename.npos != lastDotPos) {
-            extName = filename.substr(lastDotPos);
-        }
-
-        extName = toLowerString(extName);
-        if ('/' == filename.back()) {
-            rominfo.setBannerFromFile("folder", folder, folder_banner_bin);
-        } else {
-            bool allowExt = true, allowUnknown = false;
-            if (".sav" == extName) {
-                memcpy(&rominfo.banner(), nds_save_banner_bin, sizeof(tNDSBanner));
-            } else if (".gba" == extName) {
-                rominfo.mayBeGbaRom(filename);
-            } else if (".nds" != extName && ".dsi" != extName && ".srl" != extName) {
-                memcpy(&rominfo.banner(), unknown_banner_bin, sizeof(tNDSBanner));
-                allowUnknown = true;
-            } else {
-                rominfo.mayBeDSRom(filename);
-                allowExt = false;
-            }
-
-            rominfo.setExtIcon(_rows[ii][SHOWNAME_COLUMN].text());
-            
-            if (allowExt && extName.length() && !rominfo.isExtIcon()) {
-                rominfo.setExtIcon(extName.substr(1));
-            }
-                
-            if (allowUnknown && !rominfo.isExtIcon()) {
-                rominfo.setExtIcon("unknown");
-            }
-        }
+void cMainList::processDirIcon(DSRomInfo& romInfo, const std::string fileName) {
+    if (fileName == "fat:/" || fileName == "sd:/") {
+        romInfo.setFileName(fileName);
+        romInfo.setBannerFromFile(fsManager().getIconPath("microsd_banner.bin"), microsd_banner_bin);
+        return;
     }
+
+    if (fileName == "favorites:/") {
+        romInfo.setFileName(fileName);
+        romInfo.setBannerFromFile(fsManager().getIconPath("folder_banner.bin"), folder_banner_bin);
+        return;
+    }
+
+    if (fileName == "slot1:/") {
+        romInfo.setFileName(fileName);
+        romInfo.setBannerFromFile(fsManager().getIconPath("nand_banner.bin"), nand_banner_bin);
+        return;
+    }
+
+    if (fileName == "slot2:/") {
+        romInfo.setFileName(fileName);
+        romInfo.setBannerFromFile(fsManager().getIconPath("gba_banner.bin"), gba_banner_bin);
+        return;
+    }
+
+    if (fileName.back() == '/') {
+        romInfo.setFileName(fileName);
+        romInfo.setBannerFromFile(fsManager().getIconPath("folder_banner.bin"), folder_banner_bin);
+        return;
+    }
+
+    std::string extName = "";
+    size_t lastDotPos = fileName.find_last_of('.');
+    if (fileName.npos != lastDotPos) {
+        extName = toLowerString(fileName.substr(lastDotPos));
+    }
+
+    if (extName == ".sav") {
+        romInfo.setFileName(fileName);
+        romInfo.setBannerFromFile(fsManager().getIconPath("nds_save_banner.bin"), nds_save_banner_bin);
+        return;
+    }
+
+    if (extName == ".nds") {
+        romInfo.mayBeDSRom(fileName);
+        return;
+    }
+    
+    if (extName == ".gba") {
+        romInfo.mayBeGbaRom(fileName);
+        return;
+    }
+    
+    romInfo.setFileName(fileName);
+    romInfo.setBannerFromFile(fsManager().getIconPath("unknown_banner.bin"), unknown_banner_bin);
+}
+
+void cMainList::processDirIcons() {
+    _romInfoList.clear();
+    _romInfoList.resize(_visibleRowCount);
+
+    for (size_t i = 0; i < _visibleRowCount; i++) {
+        DSRomInfo& romInfo = _romInfoList[(_firstVisibleRowId + i) % _visibleRowCount];
+        std::string fileName = _rows[_firstVisibleRowId + i][REALNAME_COLUMN].text();
+        
+        processDirIcon(romInfo, fileName);
+    }
+}
+
+void cMainList::validateDirIcons() {
+    for (size_t i = 0; i < _visibleRowCount; i++) {
+        DSRomInfo& romInfo = _romInfoList[(_firstVisibleRowId + i) % _visibleRowCount];
+        std::string fileName = _rows[_firstVisibleRowId + i][REALNAME_COLUMN].text();
+        
+        if (romInfo.fileName() == fileName) {
+            continue;
+        }
+
+        _romInfoList[(_firstVisibleRowId + i) % _visibleRowCount] = DSRomInfo();
+        romInfo = _romInfoList[(_firstVisibleRowId + i) % _visibleRowCount];
+        processDirIcon(romInfo, fileName);
+    }
+}
+
+void cMainList::onScrolled(u32 index) {
+    validateDirIcons();
 }
 
 std::vector<std::vector<std::string>> cMainList::setupDefaultDir(bool skipCards, bool skipFavorites) {
@@ -349,9 +363,26 @@ std::vector<std::string> cMainList::getLastPlayedRow() {
         showName = showName.substr(pos + 1, showName.npos);
     }
 
+    std::string extName = "";
+    size_t lastDotPos = showName.find_last_of('.');
+    if (showName.npos != lastDotPos) {
+        extName = toLowerString(showName.substr(lastDotPos));
+    }
+
+    std::string internalName = showName;
+    if (extName == ".nds") {
+        DSRomInfo romInfo;
+        romInfo.mayBeDSRom(lastPlayedPath);
+        if (!romInfo.isDSRom()) {
+            return res;
+        }
+
+        internalName = romInfo.getDsLocTitle();
+    }
+
     res.push_back("");  // make a space for icon
     res.push_back(showName);  // show name
-    res.push_back("");  // make a space for internal name
+    res.push_back(internalName);  // internal name
     res.push_back(lastPlayedPath);  // real name
     res.push_back(""); // space for save type
     res.push_back(""); // space for file size
@@ -381,10 +412,27 @@ std::vector<std::vector<std::string>> cMainList::getFavoriteRows(bool exclusive)
             showName = showName.substr(pos + 1, showName.npos);
         }
 
+        std::string extName = "";
+        size_t lastDotPos = showName.find_last_of('.');
+        if (showName.npos != lastDotPos) {
+            extName = toLowerString(showName.substr(lastDotPos));
+        }
+
+        std::string internalName = showName;
+        if (extName == ".nds") {
+            DSRomInfo romInfo;
+            romInfo.mayBeDSRom(item);
+            if (!romInfo.isDSRom()) {
+                continue;
+            }
+
+            internalName = romInfo.getDsLocTitle();
+        }
+
         std::vector<std::string> a_row;
         a_row.push_back("");  // make a space for icon
         a_row.push_back(showName);  // show name
-        a_row.push_back("");  // make a space for internal name
+        a_row.push_back(internalName);  // internal name
         a_row.push_back(item);  // real name
         a_row.push_back(""); // space for save type
         a_row.push_back(""); // space for file size
@@ -464,12 +512,21 @@ std::vector<std::vector<std::string>> cMainList::getGameRows(int rowsToLoad) {
                 continue;
             }
 
-            std::string showName(lfn);
+            std::string internalName = lfn;
+            if (extName == ".nds") {
+                DSRomInfo romInfo;
+                romInfo.mayBeDSRom(fullFilePath);
+                if (!romInfo.isDSRom()) {
+                    continue;
+                }
+
+                internalName = romInfo.getDsLocTitle();
+            }
 
             std::vector<std::string> a_row;
             a_row.push_back("");  // make a space for icon
-            a_row.push_back(showName);  // show name
-            a_row.push_back("");  // make a space for internal name
+            a_row.push_back(lfn);  // show name
+            a_row.push_back(internalName);  // internal name
             a_row.push_back(fullFilePath);  // real name
             a_row.push_back(""); // space for save type
             a_row.push_back(""); // space for file size
@@ -512,9 +569,8 @@ std::vector<std::vector<std::string>> cMainList::setupGameDir() {
 }
 
 void cMainList::onDirectoryChanged(bool changed) {
-    processDirIcons();
-    updateInternalNames();
     std::sort(_rows.begin(), _rows.end(), itemSortComp);
+    processDirIcons();
     scheduleBackdrop();
     
     if (changed) {
@@ -580,7 +636,7 @@ std::vector<std::vector<std::string>> cMainList::prepareDir(const std::string& d
             std::string extName = "";
             size_t lastDotPos = lfn.find_last_of('.');
             if (lfn.npos != lastDotPos) {
-                extName = lfn.substr(lastDotPos);
+                extName = toLowerString(lfn.substr(lastDotPos));
             }
 
             std::string filePath = dirName + lfn;
@@ -591,10 +647,21 @@ std::vector<std::vector<std::string>> cMainList::prepareDir(const std::string& d
                 continue;
             }
 
+            std::string internalName = lfn;
+            if (extName == ".nds") {
+                DSRomInfo romInfo;
+                romInfo.mayBeDSRom(filePath);
+                if (!romInfo.isDSRom()) {
+                    continue;
+                }
+
+                internalName = romInfo.getDsLocTitle();
+            }
+
             std::vector<std::string> a_row;
             a_row.push_back("");   // make a space for icon
             a_row.push_back(lfn);  // show name
-            a_row.push_back("");   // make a space for internal name
+            a_row.push_back(internalName);   // internal name
             a_row.push_back(filePath);  // real name
 
             if (entry->d_type == DT_DIR) {
@@ -648,7 +715,7 @@ bool cMainList::enterDir(const std::string& dirName) {
     _romInfoList.clear();
 
     for (std::vector<std::string>& entry : entries) {
-        insertEntryRow(entry, DSRomInfo());
+        insertEntryRow(entry);
     }
 
     _currentDir = tempDirName;
@@ -868,13 +935,8 @@ void cMainList::drawIcons() {
     int iconHeight = small ? 16 : 32;
     int prefix = small ? 0 : _iconPrefix;
 
-    for (size_t i = 0; i < total; ++i) {
-        itemVector item = _rows[_firstVisibleRowId + i];
-        if (item.size() <= ROMINFO_COLUMN) {
-            continue;
-        }
-
-        int romId = std::stoi(item[ROMINFO_COLUMN].text());
+    for (size_t i = 0; i < total; i++) {
+        int romId = (_firstVisibleRowId + i) % _visibleRowCount;
 
         s32 itemX = position().x + prefix;
         s32 itemY = position().y + i * _rowHeight + ((_rowHeight - iconHeight) >> 1) - 1;
@@ -928,20 +990,6 @@ void cMainList::setViewMode(VIEW_MODE mode) {
 
 std::string cMainList::getCurrentDir() {
     return _currentDir;
-}
-
-void cMainList::updateInternalNames(void) {
-    if (_viewMode == VM_INTERNAL) {
-        size_t total = _rows.size();
-        for (size_t ii = 0; ii < total; ++ii) {
-            if (_romInfoList[ii].isDSRom()) {
-                _rows[ii][INTERNALNAME_COLUMN].setText(_romInfoList[ii].getDsLocTitle());
-            } else {
-                _rows[ii][INTERNALNAME_COLUMN].setText(
-                        _rows[ii][SHOWNAME_COLUMN].text());
-            }
-        }
-    }
 }
 
 bool cMainList::IsFavorites(void) {
