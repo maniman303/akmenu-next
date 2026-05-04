@@ -62,7 +62,6 @@ class cMainList : public akui::cListView {
   public:
     bool IsFavorites(void);
     void SwitchShowAllFiles(void);
-    const std::vector<std::string>* Saves(void);
 
   protected:
     void draw() override;
@@ -72,7 +71,7 @@ class cMainList : public akui::cListView {
     void updateInternalNames(void);
     bool insertEntryRow(const std::vector<std::string>& texts, const DSRomInfo& romInfo);
     void processDirIcons();
-    bool setupDefaultDir(bool skipCards, bool skipFavorites);
+    void setupDefaultDir(bool skipCards, bool skipFavorites);
     bool setupGameDir();
     void onDirectoryChanged(bool changed);
     std::vector<std::string> getLastPlayedRow();

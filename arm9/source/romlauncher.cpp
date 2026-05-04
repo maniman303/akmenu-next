@@ -182,28 +182,16 @@ TLaunchResult launchRom(std::string aFullPath, const DSRomInfo& aRomInfo, bool a
             }
         }
 
-        //if saveDir is set to true, use saves dir
-        if (gs().saveDir) {
-            useSavesPath = savesPath;
-            if (useSavesPath.empty()) {
-                useSavesPath = aFullPath;
-                useSavesPath.insert(aFullPath.find_last_of("/\\") + 1, "saves/");
-            }
-            
-            size_t lastSlashPos = useSavesPath.find_last_of("/\\");
-            std::string directory = useSavesPath.substr(0, lastSlashPos + 1);
-
-            // Create the saves folder if it doesn't exist
-            std::string cleanPath = (directory.find("fat:") == 0) ? directory.substr(4) : directory;
-            cleanPath.pop_back();
-            if (access(cleanPath.c_str(), F_OK) != 0) {
-                mkdir(cleanPath.c_str(), 0777);
-            }
-        } else {
-            useSavesPath = aFullPath;
-        }
-
         saveName = cSaveManager::generateSaveName(useSavesPath, aRomInfo.saveInfo().getSlot());
+        size_t lastSlashPos = saveName.find_last_of("/\\");
+        std::string directory = saveName.substr(0, lastSlashPos + 1);
+
+        // Create the saves folder if it doesn't exist
+        std::string cleanPath = (directory.find("fat:") == 0) ? directory.substr(4) : directory;
+        cleanPath.pop_back();
+        if (access(cleanPath.c_str(), F_OK) != 0) {
+            mkdir(cleanPath.c_str(), 0777);
+        }
 
         if (isBigSave) {
             isBigSave = cSaveManager::initializeSaveFile(useSavesPath, aRomInfo.saveInfo().getSlot(),

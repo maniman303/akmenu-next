@@ -409,9 +409,6 @@ void cMainWnd::launchSelected() {
     std::string fileName = _mainList->getRowFileName(selectedRowId);
     size_t lastSlashPos = fullPath.find_last_of("/\\");
     std::string directory = fullPath.substr(0, lastSlashPos + 1);
-    
-    // Create the new path by appending "saves/"
-    std::string savesPath = formatString("%ssaves/%s", directory.c_str(), fileName.c_str());
 
     if (fullPath.back() == '/') {
         vfxManager().playEffect(VFX_EFFECT::SELECT);
@@ -438,8 +435,8 @@ void cMainWnd::launchSelected() {
     disableInput();
     tickSound().disable();
     vfxManager().playEffect(VFX_EFFECT::SELECT);
-    WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder, &vfxManager()}, this, [this, fullPath, rominfo, isMenu, fileName, savesPath](){
-        TLaunchResult launchRes = launchRom(fullPath, rominfo, isMenu, savesPath, [this](){
+    WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder, &vfxManager()}, this, [this, fullPath, rominfo, isMenu, fileName](){
+        TLaunchResult launchRes = launchRom(fullPath, rominfo, isMenu, "", [this](){
             enableInput();
             tickSound().enable();
         });
@@ -761,7 +758,6 @@ void cMainWnd::showFileInfo(u32 id) {
     cRomInfoWnd* romInfoWnd = new cRomInfoWnd(LANG("rom info", "title"), [this](cRomInfoWnd* wnd) { saveFileInfo(wnd); });
     romInfoWnd->setFileInfo(fullPath, showName);
     romInfoWnd->setRomInfo(rominfo);
-    romInfoWnd->setSaves(_mainList->Saves());
     
     windowManager().addModal(romInfoWnd);
 }

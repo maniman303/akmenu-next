@@ -234,14 +234,21 @@ bool cSaveManager::initializeSaveFile(const std::string& romFilename, u8 slot, u
 
 std::string cSaveManager::generateSaveName(const std::string& romFilename, u8 slot) {
     std::string saveFilename(romFilename);
+
+    if (gs().saveDir) {
+        saveFilename.insert(saveFilename.find_last_of("/\\") + 1, "saves/");
+    }
+
     if (gs().saveExt && saveFilename.length() > 3) {
         size_t nameLength = saveFilename.length() - 4;
         if (saveFilename[nameLength] == '.') saveFilename = saveFilename.substr(0, nameLength);
     }
-    if (slot) {
+
+    if (slot > 0) {
         saveFilename += ".";
         saveFilename += (slot + '0');
     }
+
     saveFilename += ".sav";
     return saveFilename;
 }

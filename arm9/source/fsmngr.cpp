@@ -128,6 +128,17 @@ std::string cFSManager::getFSRoot() const {
     return _fsRoot + "/";
 }
 
+std::string cFSManager::getIconPath(std::string iconName) const {
+    std::string basePath = SFN_SYSTEM_DIR;
+    std::string uiIconPath = formatString("%sui/%s/icons/%s", basePath.c_str(), gs().uiName.c_str(), iconName.c_str());
+
+    if (fsManager().fileExists(uiIconPath)) {
+        return uiIconPath;
+    }
+
+    return formatString("%sicons/%s", basePath.c_str(), iconName.c_str());
+}
+
 bool cFSManager::checkSDInserted() const {
     fifoSendValue32(FIFO_USER_01, MENU_MSG_IS_SD_INSERTED);
 

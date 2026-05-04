@@ -40,8 +40,7 @@ cRomInfoWnd::cRomInfoWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     : cForm(x, y, w, h, parent, text),
       _buttonCancel(0, 0, 46, 18, this, "\x01 Cancel"),
       _buttonSaveType(0, 0, 76, 18, this, "\x04 Save"),
-      _buttonCheats(0, 0, 46, 18, this, "\x03 Cheats"),
-      _saves(NULL) {
+      _buttonCheats(0, 0, 46, 18, this, "\x03 Cheats") {
     _canRenderBackdrop = true;
     loadAppearance();
 
@@ -217,10 +216,6 @@ void cRomInfoWnd::setRomInfo(const DSRomInfo& romInfo) {
 
 const DSRomInfo& cRomInfoWnd::getRomInfo() {
     return _romInfo;
-}
-
-void cRomInfoWnd::setSaves(const std::vector<std::string>* saves) {
-    _saves = saves;
 }
 
 void cRomInfoWnd::onCancel() {
@@ -403,13 +398,10 @@ void cRomInfoWnd::addCode(void) {
 
 bool cRomInfoWnd::SlotExists(u8 slot) {
     std::string save = cSaveManager::generateSaveName(_fullName, slot);
-    if (_saves) {
-        if (_saves->size() &&
-            akui::binary_find(_saves->begin(), _saves->end(), save, stringComp) != _saves->end())
-            return true;
-    } else {
-        struct stat st;
-        if (0 == stat(save.c_str(), &st)) return true;
+    struct stat st;
+    if (stat(save.c_str(), &st) == 0) {
+        return true;
     }
+
     return false;
 }
