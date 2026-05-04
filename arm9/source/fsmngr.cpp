@@ -128,7 +128,7 @@ std::string cFSManager::getFSRoot() const {
     return _fsRoot + "/";
 }
 
-std::string cFSManager::getIconPath(std::string iconName) {
+const std::string& cFSManager::getIconPath(std::string iconName) {
     if (_lastTheme != gs().uiName) {
         _lastTheme = gs().uiName;
         _iconMap.clear();
@@ -147,7 +147,7 @@ std::string cFSManager::getIconPath(std::string iconName) {
     }
 
     _iconMap[iconName] = uiIconPath;
-    return uiIconPath;
+    return _iconMap[iconName];
 }
 
 bool cFSManager::checkSDInserted() const {
