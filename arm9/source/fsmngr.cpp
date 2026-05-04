@@ -9,7 +9,7 @@
 #include "globalsettings.h"
 #include "savemngr.h"
 
-cFSManager::cFSManager() : _isSDInserted(false), _isFlashcart(false), _isRebooted(false), _fsRoot() {}
+cFSManager::cFSManager() : _isSDInserted(false), _isFlashcart(false), _isRebooted(false), _fsRoot(""), _lastTheme("") {}
 
 void cFSManager::init(int argc, char* argv[]) {
     _isSDInserted = checkSDInserted();
@@ -128,15 +128,26 @@ std::string cFSManager::getFSRoot() const {
     return _fsRoot + "/";
 }
 
-std::string cFSManager::getIconPath(std::string iconName) const {
+std::string cFSManager::getIconPath(std::string iconName) {
+    if (_lastTheme != gs().uiName) {
+        _lastTheme = gs().uiName;
+        _iconMap.clear();
+    }
+
+    std::unordered_map<std::string, std::string>::iterator it = _iconMap.find(iconName);
+    if (it != _iconMap.end()) {
+        return it->second;
+    }
+
     std::string basePath = SFN_SYSTEM_DIR;
     std::string uiIconPath = formatString("%sui/%s/icons/%s", basePath.c_str(), gs().uiName.c_str(), iconName.c_str());
 
-    if (fsManager().fileExists(uiIconPath)) {
-        return uiIconPath;
+    if (!fsManager().fileExists(uiIconPath)) {
+        uiIconPath = formatString("%sicons/%s", basePath.c_str(), iconName.c_str());
     }
 
-    return formatString("%sicons/%s", basePath.c_str(), iconName.c_str());
+    _iconMap[iconName] = uiIconPath;
+    return uiIconPath;
 }
 
 bool cFSManager::checkSDInserted() const {

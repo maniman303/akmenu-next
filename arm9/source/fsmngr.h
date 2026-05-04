@@ -4,8 +4,8 @@
 #include <fat.h>
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include "singleton.h"
-
 
 class cFSManager {
 public:
@@ -20,7 +20,7 @@ public:
     std::vector<std::string> getLangNames() const;
     std::string resolveSystemPath(const char* path) const;
     std::string getFSRoot() const;
-    std::string getIconPath(std::string iconName) const;
+    std::string getIconPath(std::string iconName);
 
 private:
     bool checkSDInserted() const;
@@ -28,6 +28,8 @@ private:
     bool _isFlashcart;
     bool _isRebooted;
     std::string _fsRoot;
+    std::string _lastTheme;
+    std::unordered_map<std::string, std::string> _iconMap;
 };
 
 
