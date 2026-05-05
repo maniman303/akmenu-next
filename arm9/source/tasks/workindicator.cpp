@@ -1,6 +1,6 @@
 #include "workindicator.h"
 #include "taskcruncher.h"
-#include "logger.h"
+#include "../logger.h"
 
 WorkIndicatorTask::WorkIndicatorTask(std::vector<WorkIndicator*> indicators, cWindow* window, std::function<void()> onCompleted) {
     _indicators = indicators;

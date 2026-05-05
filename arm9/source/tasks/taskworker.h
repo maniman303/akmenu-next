@@ -7,7 +7,7 @@ class TaskWorker {
   public:
     void onCompleted();
 
-    void setOnCompleted(std::function<void()> onCompleted);
+    virtual void setOnCompleted(std::function<void()> onCompleted);
 
     virtual s16 process(s16 iter);
 

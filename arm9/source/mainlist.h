@@ -10,6 +10,7 @@
 #pragma once
 
 #include <nds.h>
+#include <deque>
 #include "dsrom.h"
 #include "keymessage.h"
 #include "listview.h"
@@ -67,7 +68,7 @@ class cMainList : public akui::cListView {
     void processDirIcons();
     void validateDirIcons();
     void onScrolled(u32 index) override;
-    void onDirectoryChanged(bool changed);
+    void onDirectoryChanged(std::deque<std::vector<std::string>>& rows, std::string dirName);
     void selectRom(const std::string& romPath);
     void selectRom(const std::string& romPath, bool silent);
     std::vector<std::vector<std::string>> setupDefaultDir(bool skipCards, bool skipFavorites);

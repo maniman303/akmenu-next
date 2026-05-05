@@ -34,6 +34,7 @@
 #include "savemngr.h"
 #include "logger.h"
 #include "ui/msgbox.h"
+#include "tasks/directoryload.h"
 #include "../../share/memtool.h"
 
 cMainList::cMainList(cWindow* parent, const std::string& text)
@@ -570,8 +571,25 @@ std::vector<std::vector<std::string>> cMainList::setupGameDir() {
     return res;
 }
 
-void cMainList::onDirectoryChanged(bool changed) {
-    std::sort(_rows.begin(), _rows.end(), itemSortComp);
+void cMainList::onDirectoryChanged(std::deque<std::vector<std::string>>& rows, std::string dirName) {
+    bool changed = _currentDir != dirName;
+
+    if (_parent != NULL) {
+        _parent->enableInput();
+    }
+    
+    _currentDir = dirName;
+    _busy = false;
+
+    removeAllRows();
+    _romInfoList.clear();
+
+    while (!rows.empty()) {
+        std::vector<std::string> row = rows.front();
+        rows.pop_front();
+        insertEntryRow(row);
+    }
+
     processDirIcons();
     scheduleBackdrop();
     
@@ -599,10 +617,12 @@ std::vector<std::vector<std::string>> cMainList::prepareDir(const std::string& d
             res.push_back(entry);
         }
 
+        std::sort(_rows.begin(), _rows.end(), itemSortComp);
+
         return res;
     }
 
-    bool favorites = ("favorites:/" == dirName);
+    bool favorites = (dirName == "favorites:/");
     if (favorites) {
         std::vector<std::vector<std::string>> favoriteRows = getFavoriteRows(false);
         for (size_t i = 0; i < favoriteRows.size(); i++) {
@@ -686,19 +706,21 @@ std::vector<std::vector<std::string>> cMainList::prepareDir(const std::string& d
         res.push_back(a_row);
     }
 
+    std::sort(_rows.begin(), _rows.end(), itemSortComp);
+
     return res;
 }
 
 bool cMainList::enterDir(const std::string& dirName) {
     if (dirName == "slot2:/") {
         _currentDir = "";
-        onDirectoryChanged(true);
+        directoryChanged();
         return true;
     }
 
     if (dirName == "slot1:/") {
         _currentDir = "";
-        onDirectoryChanged(true);
+        directoryChanged();
         return true;
     }
 
@@ -719,18 +741,17 @@ bool cMainList::enterDir(const std::string& dirName) {
         }
     }
 
-    std::vector<std::vector<std::string>> entries = prepareDir(tempDirName);
-
-    std::string oldDir = _currentDir;
-    removeAllRows();
-    _romInfoList.clear();
-
-    for (std::vector<std::string>& entry : entries) {
-        insertEntryRow(entry);
+    if (_parent != NULL) {
+        _parent->disableInput();
     }
 
-    _currentDir = tempDirName;
-    onDirectoryChanged(_currentDir != oldDir);
+    _busy = true;
+
+    DirectoryLoadTask* task = new DirectoryLoadTask(tempDirName, [this, tempDirName](std::deque<std::vector<std::string>> rows) {
+        onDirectoryChanged(rows, tempDirName);
+    });
+
+    task->schedule();
 
     return true;
 }
@@ -776,9 +797,11 @@ bool cMainList::backParentDir() {
     if (_currentDir == "fat:/" || _currentDir == "sd:/" || fat1 || favorites || _currentDir == "/") {
         enterDir("...");
         if (fat1) {
-            selectRow(slotSDCard(), true);
+            scheduleRomSelection("fat:/");
         } else if (favorites) {
-            selectRow(slotFavorites(), true);
+            scheduleRomSelection("favorites:/");
+        } else {
+            scheduleRomSelection("...");
         }
 
         return true;
