@@ -71,17 +71,7 @@ class cMainList : public akui::cListView {
     void onDirectoryChanged(std::deque<std::vector<std::string>>& rows, std::string dirName);
     void selectRom(const std::string& romPath);
     void selectRom(const std::string& romPath, bool silent);
-    std::vector<std::vector<std::string>> setupDefaultDir(bool skipCards, bool skipFavorites);
-    std::vector<std::vector<std::string>> setupGameDir();
-    std::vector<std::vector<std::string>> prepareDir(const std::string& dirName);
-    std::vector<std::string> getLastPlayedRow();
-    std::vector<std::vector<std::string>> getFavoriteRows(bool exclusive);
-    std::vector<std::vector<std::string>> getGameRows(int rowsToLoad);
-
-  protected:
     std::string processItemText(std::string text, int column);
-    u32 slotSDCard();
-    u32 slotFavorites();
 
   protected:
     int _iconPrefix;
