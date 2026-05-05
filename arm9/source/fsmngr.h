@@ -20,7 +20,7 @@ public:
     std::vector<std::string> getLangNames() const;
     std::string resolveSystemPath(const char* path) const;
     std::string getFSRoot() const;
-    const std::string& getIconPath(std::string iconName);
+    const std::string& getIconPath(const std::string& iconName);
 
 private:
     bool checkSDInserted() const;

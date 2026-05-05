@@ -18,6 +18,7 @@
 #include "sigslot.h"
 #include "touchmessage.h"
 #include "image.h"
+#include "tasks/directoryload.h"
 
 class cMainList : public akui::cListView {
   public:
@@ -28,10 +29,7 @@ class cMainList : public akui::cListView {
         ICON_COLUMN = 0,
         SHOWNAME_COLUMN = 1,
         INTERNALNAME_COLUMN = 2,
-        REALNAME_COLUMN = 3,
-        SAVETYPE_COLUMN = 4,
-        FILESIZE_COLUMN = 5,
-        IS_FAVORITE_COLUMN = 6
+        REALNAME_COLUMN = 3
     };
 
   public:
@@ -54,7 +52,7 @@ class cMainList : public akui::cListView {
     std::string getRowFullPath(u32 id) const;
     std::string getRowShowName(u32 id) const;
     std::string getRowFileName(u32 id) const;
-    u32 getRowIdByPath(std::string path);
+    u32 getRowIdByPath(const std::string& path) const;
     VIEW_MODE getViewMode() { return _viewMode; }
 
     Signal0 directoryChanged;
@@ -65,15 +63,15 @@ class cMainList : public akui::cListView {
     void drawBackdrop() override;
     void drawIcons();
     void drawItemBackgrounds();
-    bool insertEntryRow(const std::vector<std::string>& texts);
+    bool insertEntryRow(const std::vector<std::string>& entry);
     void processDirIcon(DSRomInfo& romInfo, const std::string fileName);
     void processDirIcons();
     void validateDirIcons();
     void onScrolled(u32 index) override;
-    void onDirectoryChanged(std::deque<std::vector<std::string>>& rows, std::string dirName);
+    void onDirectoryChanged(std::deque<DirectoryLoadTask::DirEntry>& rows, std::string dirName);
     void selectRom(const std::string& romPath);
     void selectRom(const std::string& romPath, bool silent);
-    std::string processItemText(std::string text, int column);
+    void processItemText(std::string& text, int column) override;
 
   protected:
     int _iconPrefix;

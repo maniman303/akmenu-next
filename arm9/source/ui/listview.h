@@ -111,7 +111,7 @@ class cListView : public cWindow {
     virtual void onRowClicked(u32 index) {}
     virtual void onScrolled(u32 index) {}
     virtual void onResize() override;
-    virtual std::string processItemText(std::string text, int column);
+    virtual void processItemText(std::string& text, int column) {}
 
   protected:
     void drawSelectionBar();

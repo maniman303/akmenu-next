@@ -11,7 +11,27 @@
 
 class DirectoryLoadTask : public TaskWorker {
   public:
-    DirectoryLoadTask(std::string dirName, std::function<void(std::deque<std::vector<std::string>>&)> onLoadCompleted);
+    struct DirEntry {
+      enum DIR_STATE { NORMAL = 0, FAVORITE = 1, LAST = 2 };
+
+      std::string showName;
+      std::string internalName;
+      std::string fullPath;
+      DIR_STATE state;
+
+      DirEntry(const std::string& s, const std::string& i, const std::string& f, const DIR_STATE& d) {
+        showName = s;
+        internalName = i;
+        fullPath = f;
+        state = d;
+      }
+
+      DirEntry(const std::string& s, const std::string& i, const std::string& f) : DirEntry(s, i, f, DIR_STATE::NORMAL) {}
+
+      DirEntry() : DirEntry("", "", "", DIR_STATE::NORMAL) {}
+    };
+
+    DirectoryLoadTask(std::string dirName, std::function<void(std::deque<DirEntry>&)> onLoadCompleted);
     ~DirectoryLoadTask();
 
     s16 process(s16 iter) override;
@@ -31,9 +51,9 @@ class DirectoryLoadTask : public TaskWorker {
     std::queue<s16> _plan;
     std::unordered_set<s16> _completed;
     std::string _dirName;
-    std::function<void(std::deque<std::vector<std::string>>&)> _onLoadCompleted;
+    std::function<void(std::deque<DirEntry>&)> _onLoadCompleted;
     std::function<void()> _extraOnCompleted;
-    std::deque<std::vector<std::string>> _data;
+    std::deque<DirEntry> _data;
     std::unordered_set<std::string> _favorites;
     std::unordered_set<std::string>::iterator _favoritesIter;
     std::queue<std::string> _pathsToScan;

@@ -33,7 +33,7 @@ class cBMP15 {
     bool valid() const { return buffer() != NULL; }
     void colorize(u16 color);
     const std::string& filename() const;
-    const std::string& filename(std::string filename);
+    const std::string& filename(const std::string& filename);
 
   protected:
     u32 _width;

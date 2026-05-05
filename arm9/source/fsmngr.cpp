@@ -128,7 +128,7 @@ std::string cFSManager::getFSRoot() const {
     return _fsRoot + "/";
 }
 
-const std::string& cFSManager::getIconPath(std::string iconName) {
+const std::string& cFSManager::getIconPath(const std::string& iconName) {
     if (_lastTheme != gs().uiName) {
         _lastTheme = gs().uiName;
         _iconMap.clear();

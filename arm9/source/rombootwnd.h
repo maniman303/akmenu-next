@@ -10,7 +10,7 @@
 
 class cRomBootWnd : public cWindow {
   public:
-    cRomBootWnd(std::string romPath, std::function<void()> onExit);
+    cRomBootWnd(const std::string& romPath, std::function<void()> onExit);
     ~cRomBootWnd() override;
 
     bool processKeyMessage(cKeyMessage message) override;

@@ -66,10 +66,6 @@ namespace akui {
         return true;
     }
 
-    std::string cListView::processItemText(std::string text, int column) {
-        return text;
-    }
-
     bool cListView::insertRow(size_t index, const std::vector<std::string>& texts) {
         size_t columnCount = _columns.size();
         if (0 == columnCount || index > _rows.size()) return false;
@@ -85,7 +81,7 @@ namespace akui {
 
             cListItem aItem;
 
-            itemText = processItemText(itemText, col);
+            processItemText(itemText, col);
             aItem.setText(itemText);
 
             _rows[index].insert(_rows[index].begin() + col, aItem);

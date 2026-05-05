@@ -34,7 +34,6 @@
 #include "savemngr.h"
 #include "logger.h"
 #include "ui/msgbox.h"
-#include "tasks/directoryload.h"
 #include "../../share/memtool.h"
 
 cMainList::cMainList(cWindow* parent, const std::string& text)
@@ -87,28 +86,15 @@ int cMainList::init() {
     insertColumn(ICON_COLUMN, "icon", 0);
     insertColumn(SHOWNAME_COLUMN, "showName", 0);
     insertColumn(INTERNALNAME_COLUMN, "internalName", 0, _centerInternalColumn);
-    insertColumn(REALNAME_COLUMN, "realName", 0);  // hidden column for contain real filename
-    insertColumn(SAVETYPE_COLUMN, "saveType", 0);
-    insertColumn(FILESIZE_COLUMN, "fileSize", 0);
-    insertColumn(IS_FAVORITE_COLUMN, "isFavorite", 0);
+    insertColumn(REALNAME_COLUMN, "realName", 0);  // hidden column for real file path
 
     setViewMode((cMainList::VIEW_MODE)gs().viewMode);
 
     return 1;
 }
 
-bool cMainList::insertEntryRow(const std::vector<std::string>& texts) {
-    size_t index = getRowCount();
-    std::vector<std::string> copy(texts);
-    while (copy.size() < IS_FAVORITE_COLUMN) {
-        copy.push_back("");
-    }
-
-    if (copy.size() <= IS_FAVORITE_COLUMN) {
-        copy.push_back("false");
-    }
-    
-    if (!insertRow(index, copy)) {
+bool cMainList::insertEntryRow(const std::vector<std::string>& entry) {
+    if (!insertRow(getRowCount(), entry)) {
         return false;
     }
 
@@ -207,7 +193,7 @@ void cMainList::onScrolled(u32 index) {
     validateDirIcons();
 }
 
-void cMainList::onDirectoryChanged(std::deque<std::vector<std::string>>& rows, std::string dirName) {
+void cMainList::onDirectoryChanged(std::deque<DirectoryLoadTask::DirEntry>& rows, std::string dirName) {
     bool changed = _currentDir != dirName;
 
     if (_parent != NULL) {
@@ -220,9 +206,16 @@ void cMainList::onDirectoryChanged(std::deque<std::vector<std::string>>& rows, s
     removeAllRows();
     _romInfoList.clear();
 
+    std::vector<std::string> texts(4);
+    texts[0] = ""; // space for icon
     while (!rows.empty()) {
-        std::vector<std::string>& row = rows.front();
-        insertEntryRow(row);
+        DirectoryLoadTask::DirEntry& entry = rows.front();
+        texts[1] = entry.showName;
+        texts[2] = entry.internalName;
+        texts[3] = entry.fullPath;
+
+        insertEntryRow(texts);
+        
         rows.pop_front();
     }
 
@@ -276,7 +269,7 @@ bool cMainList::enterDir(const std::string& dirName, std::function<void()> onCom
 
     _busy = true;
 
-    DirectoryLoadTask* task = new DirectoryLoadTask(tempDirName, [this, tempDirName](std::deque<std::vector<std::string>> rows) {
+    DirectoryLoadTask* task = new DirectoryLoadTask(tempDirName, [this, tempDirName](std::deque<DirectoryLoadTask::DirEntry>& rows) {
         onDirectoryChanged(rows, tempDirName);
     });
 
@@ -286,23 +279,24 @@ bool cMainList::enterDir(const std::string& dirName, std::function<void()> onCom
     return true;
 }
 
-std::string cMainList::processItemText(std::string text, int column) {
+void cMainList::processItemText(std::string& text, int column) {
     if (column != SHOWNAME_COLUMN && column != INTERNALNAME_COLUMN) {
-        return text;
+        return;
     }
 
     if (gs().filePresentationMode == 0) {
-        return text;
+        return;
     }
 
     text = replaceInString(text, "; ", ": ");
     if (text == "saves") {
-        return "Saves";
+        text = "Saves";
+        return;
     }
 
     size_t lastdot = text.find_last_of(".");
     if (lastdot == std::string::npos) {
-        return text;
+        return;
     }
 
     std::string extName = "";
@@ -311,10 +305,10 @@ std::string cMainList::processItemText(std::string text, int column) {
     }
 
     if (extName != ".nds" && extName != ".sav" && extName != ".gba") {
-        return text;
+        return;
     }
 
-    return text.substr(0, lastdot);
+    text = text.substr(0, lastdot);
 }
 
 bool cMainList::backParentDir() {
@@ -412,11 +406,10 @@ std::string cMainList::getRowFileName(u32 id) const {
     return fullPath.substr(lastSlashPos + 1);
 }
 
-u32 cMainList::getRowIdByPath(std::string path) {
-    path = toLowerString(path);
+u32 cMainList::getRowIdByPath(const std::string& path) const {
     for (size_t i = 0; i < _rows.size(); i++) {
         std::string fullPath = _rows[i][REALNAME_COLUMN].text();
-        if (toLowerString(fullPath) == path) {
+        if (strcasecmp(fullPath.c_str(), path.c_str()) == 0) {
             return i;
         }
     }

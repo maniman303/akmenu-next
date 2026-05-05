@@ -8,7 +8,7 @@
 #include "ui/windowmanager.h"
 #include "tasks/screenfade.h"
 
-cRomBootWnd::cRomBootWnd(std::string romPath, std::function<void()> onExit) :
+cRomBootWnd::cRomBootWnd(const std::string& romPath, std::function<void()> onExit) :
  cWindow(NULL, "rom boot"),
  _launchText(this),
  _nameText(this),

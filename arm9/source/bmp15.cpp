@@ -38,7 +38,7 @@ const std::string& cBMP15::filename() const {
     return _filename;
 }
 
-const std::string& cBMP15::filename(std::string filename) {
+const std::string& cBMP15::filename(const std::string& filename) {
     _filename = filename;
 
     return _filename;
