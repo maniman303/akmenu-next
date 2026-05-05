@@ -235,6 +235,10 @@ void cMainList::onDirectoryChanged(std::deque<std::vector<std::string>>& rows, s
 }
 
 bool cMainList::enterDir(const std::string& dirName) {
+    return enterDir(dirName, {});
+}
+
+bool cMainList::enterDir(const std::string& dirName, std::function<void()> onCompleted) {
     if (dirName == "slot2:/") {
         _currentDir = "";
         directoryChanged();
@@ -276,6 +280,7 @@ bool cMainList::enterDir(const std::string& dirName) {
         onDirectoryChanged(rows, tempDirName);
     });
 
+    task->setOnCompleted(onCompleted);
     task->schedule();
 
     return true;

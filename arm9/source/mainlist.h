@@ -11,6 +11,7 @@
 
 #include <nds.h>
 #include <deque>
+#include <functional>
 #include "dsrom.h"
 #include "keymessage.h"
 #include "listview.h"
@@ -41,6 +42,7 @@ class cMainList : public akui::cListView {
   public:
     int init();
     bool enterDir(const std::string& dirName);
+    bool enterDir(const std::string& dirName, std::function<void()> onCompleted);
     bool backParentDir();
     void update() override;
     bool processKeyMessage(cKeyMessage message) override;

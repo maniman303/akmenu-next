@@ -129,15 +129,25 @@ void initMainWindow() {
 
     std::string lastDirectory = saveManager().lastDirectory();
     std::string lastFile = saveManager().lastFile();
+    ScreenFadeTask* fadeTask = new ScreenFadeTask();
+    fadeTask->init();
 
     if (gs().filePresentationMode < 2) {
-        if (wnd->_mainList->enterDir(lastDirectory != "..." ? lastDirectory : gs().startupFolder)) {
+        bool res = wnd->_mainList->enterDir(lastDirectory != "..." ? lastDirectory : gs().startupFolder, [fadeTask]() {
+            fadeTask->schedule();
+        });
+
+        if (res) {
             wnd->_mainList->scheduleRomSelection(lastFile);
         } else {
-            wnd->_mainList->enterDir("...");
+            wnd->_mainList->enterDir("...", [fadeTask]() {
+                fadeTask->schedule();
+            });
         }
     } else {
-        wnd->_mainList->enterDir("...");
+        wnd->_mainList->enterDir("...", [fadeTask]() {
+            fadeTask->schedule();
+        });
 
         if (lastFile != "..." && !lastFile.empty()) {
             wnd->_mainList->scheduleRomSelection(lastFile);
@@ -146,9 +156,6 @@ void initMainWindow() {
 
     windowManager().addWindow(wnd);
     tickSound().enable();
-    
-    ScreenFadeTask* fadeTask = new ScreenFadeTask();
-    fadeTask->schedule();
 }
 
 int main(int argc, char* argv[]) {

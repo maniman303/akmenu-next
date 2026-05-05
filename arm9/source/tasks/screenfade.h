@@ -11,6 +11,7 @@ class ScreenFadeTask : public TaskWorker {
     ScreenFadeTask(bool fadeIn);
     ScreenFadeTask(bool main, bool sub, bool fadeIn);
 
+    void init();
     s16 process(s16 iter) override;
     void schedule();
   private:

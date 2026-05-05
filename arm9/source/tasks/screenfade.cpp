@@ -13,6 +13,16 @@ ScreenFadeTask::ScreenFadeTask(bool main, bool sub, bool fadeIn) {
     _animation.setDuration(20);
 }
 
+void ScreenFadeTask::init() {
+    if (_main) {
+        gdi().setScreenTransparency(_fadeIn ? 0 : 100, GE_MAIN);
+    }
+
+    if (_sub) {
+        gdi().setScreenTransparency(_fadeIn ? 0 : 100, GE_SUB);
+    }
+}
+
 s16 ScreenFadeTask::process(s16 iter) {
     if (iter == 0 && !_animation.isPlaying()) {
         _animation.play();
@@ -36,13 +46,7 @@ s16 ScreenFadeTask::process(s16 iter) {
 }
 
 void ScreenFadeTask::schedule() {
-    if (_main) {
-        gdi().setScreenTransparency(_fadeIn ? 0 : 100, GE_MAIN);
-    }
-
-    if (_sub) {
-        gdi().setScreenTransparency(_fadeIn ? 0 : 100, GE_SUB);
-    }
+    init();
 
     taskCruncher().push(this);
 }
