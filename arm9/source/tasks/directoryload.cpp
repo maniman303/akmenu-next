@@ -105,6 +105,7 @@ DirectoryLoadTask::DirectoryLoadTask(std::string dirName, std::function<void(std
     _onLoadCompleted = onLoadCompleted;
     _favoritesIter = _favorites.end();
     _scanDir = NULL;
+    _pathDir = NULL;
     _extraOnCompleted = {};
     _onCompleted = [this]() {
         if (_onLoadCompleted) {
@@ -120,6 +121,10 @@ DirectoryLoadTask::DirectoryLoadTask(std::string dirName, std::function<void(std
 DirectoryLoadTask::~DirectoryLoadTask() {
     if (_scanDir != NULL) {
         closedir(_scanDir);
+    }
+
+    if (_pathDir != NULL) {
+        closedir(_pathDir);
     }
 }
 
@@ -508,11 +513,12 @@ bool DirectoryLoadTask::setupGameScan() {
 }
 
 bool DirectoryLoadTask::setupPath() {
-    struct dirent* entry;
-    DIR* dir = opendir(_dirName.c_str());
-
-    if (dir == NULL) {
-        return true;
+    struct dirent* entry = NULL;
+    if (_pathDir == NULL) {
+        _pathDir = opendir(_dirName.c_str());;
+        if (_pathDir == NULL) {
+            return true;
+        }
     }
 
     std::vector<std::string> extNames;
@@ -526,7 +532,8 @@ bool DirectoryLoadTask::setupPath() {
     std::vector<std::string> entryNames;
     entryNames.push_back("boot.nds");
 
-    while ((entry = readdir(dir)) != NULL) {
+    u16 rows = 0;
+    while (rows < 40 && (entry = readdir(_pathDir)) != NULL) {
         std::string lfn(entry->d_name);
 
         // Don't show system or hidden files and dirs
@@ -547,6 +554,7 @@ bool DirectoryLoadTask::setupPath() {
             continue;
         }
 
+        rows += 2;
         std::string internalName = lfn;
         if (extName == ".nds") {
             DSRomInfo romInfo;
@@ -565,13 +573,17 @@ bool DirectoryLoadTask::setupPath() {
         a_row.push_back(filePath);  // real name
 
         if (entry->d_type == DT_DIR) {
+            rows--;
             a_row[cMainList::REALNAME_COLUMN] += "/";
         }
 
         _data.push_back(a_row);
     }
 
-    closedir(dir);
+    if (entry == NULL) {
+        closedir(_pathDir);
+        _pathDir = NULL;
+    }
 
-    return true;
+    return entry == NULL;
 }
