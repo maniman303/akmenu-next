@@ -1,5 +1,4 @@
 #include <unordered_set>
-#include <dirent.h>
 #include "directoryload.h"
 #include "taskcruncher.h"
 #include "../dsrom.h"
@@ -105,6 +104,7 @@ DirectoryLoadTask::DirectoryLoadTask(std::string dirName, std::function<void(std
     _dirName = dirName;
     _onLoadCompleted = onLoadCompleted;
     _favoritesIter = _favorites.end();
+    _scanDir = NULL;
     _extraOnCompleted = {};
     _onCompleted = [this]() {
         if (_onLoadCompleted) {
@@ -115,6 +115,12 @@ DirectoryLoadTask::DirectoryLoadTask(std::string dirName, std::function<void(std
             _extraOnCompleted();
         }
     };
+}
+
+DirectoryLoadTask::~DirectoryLoadTask() {
+    if (_scanDir != NULL) {
+        closedir(_scanDir);
+    }
 }
 
 void DirectoryLoadTask::schedule() {
@@ -396,32 +402,35 @@ bool DirectoryLoadTask::setupDefaultDir() {
 }
 
 bool DirectoryLoadTask::setupGameScan() {
-    s16 rowsToLoad = gs().minimalModeRomsCount;
-    rowsToLoad = rowsToLoad - _data.size();
+    s16 rowsToLoad = gs().minimalModeRomsCount - _data.size();
     if (rowsToLoad <= 0) {
         return true;
     }
 
     std::unordered_set<std::string>& favoriteItems = getFavorites();
-    std::queue<std::string> paths;
-    paths.push("fat:/");
+    
+    if (_pathsToScan.empty()) {
+        _pathsToScan.push("fat:/");
 
-    if (isDSiMode() && fsManager().isSDInserted()) {
-        paths.push("sd:/");
+        if (isDSiMode() && fsManager().isSDInserted()) {
+            _pathsToScan.push("sd:/");
+        }
     }
 
     s16 rows = 0;
-    while (rows <= rowsToLoad && !paths.empty()) {
-        std::string path = paths.front();
-        paths.pop();
+    while (rows < rowsToLoad && rows < 20 && !_pathsToScan.empty()) {
+        std::string path = _pathsToScan.front();
 
-        struct dirent* entry;
-        DIR* dir = opendir(path.c_str());
-        if (dir == NULL) {
-            continue;
+        struct dirent* entry = NULL;
+        if (_scanDir == NULL) {
+            _scanDir = opendir(path.c_str());
+            if (_scanDir == NULL) {
+                _pathsToScan.pop();
+                continue;
+            }
         }
 
-        while ((entry = readdir(dir)) != NULL) {
+        while (rows < 20 && rows < rowsToLoad && (entry = readdir(_scanDir)) != NULL) {
             std::string lfn(entry->d_name);
 
             if (lfn.empty() || lfn[0] == '.' || lfn[0] == '_') {
@@ -436,7 +445,7 @@ bool DirectoryLoadTask::setupGameScan() {
                 }
 
                 std::string newPath = formatString("%s%s/", path.c_str(), lfn.c_str());
-                paths.push(newPath);
+                _pathsToScan.push(newPath);
                 continue;
             }
 
@@ -488,10 +497,14 @@ bool DirectoryLoadTask::setupGameScan() {
             _data.push_back(a_row);
         }
 
-        closedir(dir);
+        if (entry == NULL || rows >= rowsToLoad) {
+            closedir(_scanDir);
+            _scanDir = NULL;
+            _pathsToScan.pop();
+        }
     }
 
-    return true;
+    return rows >= rowsToLoad || _pathsToScan.empty();
 }
 
 bool DirectoryLoadTask::setupPath() {
