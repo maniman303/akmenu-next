@@ -73,47 +73,26 @@ class cListView : public cWindow {
 
   public:
     void draw() override;
-
     bool insertColumn(size_t index, const std::string& text, u8 width);
-
     bool insertColumn(size_t index, const std::string& text, u8 width, bool center);
-
     bool insertRow(size_t index, const std::vector<std::string>& text);
-
     void removeRow(size_t index);  // return id of the item next to the removed item
-
     void removeAllRows();
-
     u32 getRowCount();
-
     void setRowHeight(u16 height);
-
     void arangeColumnsSize();
-
     bool selectRow(int id);
-
     bool selectRow(int id, bool silent);
-
     u32 firstVisibleRowId(void) { return _firstVisibleRowId; }
-
     u32 selectedRowId(void) { return _selectedRowId; }
-
     bool selectNext() { return selectRow(_selectedRowId + 1); }
-
     bool selectPrev() { return selectRow(_selectedRowId - 1); }
-
     s32 rowBelowPoint(const cPoint& pt);
-
     bool scrollTo(int id);
-
     u32 visibleRowCount() { return _visibleRowCount; }
-
     bool processKeyMessage(cKeyMessage message) override;
-
     bool processTouchMessage(cTouchMessage message) override;
-
-    inline void setColors(u16 textColor, u16 textColorHilight, u16 selectionBarColor1,
-                          u16 selectionBarColor2) {
+    inline void setColors(u16 textColor, u16 textColorHilight, u16 selectionBarColor1, u16 selectionBarColor2) {
         _textColor = textColor;
         _textColorHilight = textColorHilight;
         _selectionBarColor1 = selectionBarColor1;
@@ -123,28 +102,21 @@ class cListView : public cWindow {
     void setFirstVisibleIdAndSelectRow(u32 first, u32 row);
 
     Signal1<u32> rowClicked;
-
     Signal1<u32> selectChanged;
-
     Signal1<u32> scrolled;
-
     Signal1<const cOwnerDraw&> ownerDraw;
 
   protected:
     virtual void onSelectChanged(u32 index) {}
-
     virtual void onRowClicked(u32 index) {}
-
     virtual void onScrolled(u32 index) {}
-
     virtual void onResize() override;
-
     virtual std::string processItemText(std::string text, int column);
 
   protected:
     void drawSelectionBar();
-
     void drawText();
+    inline u32 onScreenRowCount() { return std::min(_visibleRowCount, (u32)_rows.size()); }
 
   protected:
     std::string _text;

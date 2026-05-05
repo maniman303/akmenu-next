@@ -104,9 +104,15 @@ static bool hiddenEntryFilter(const std::vector<std::string>& entryNames, std::s
 DirectoryLoadTask::DirectoryLoadTask(std::string dirName, std::function<void(std::deque<std::vector<std::string>>&)> onLoadCompleted) {
     _dirName = dirName;
     _onLoadCompleted = onLoadCompleted;
+    _favoritesIter = _favorites.end();
+    _extraOnCompleted = {};
     _onCompleted = [this]() {
         if (_onLoadCompleted) {
             _onLoadCompleted(_data);
+        }
+
+        if (_extraOnCompleted) {
+            _extraOnCompleted();
         }
     };
 }
@@ -166,45 +172,53 @@ s16 DirectoryLoadTask::process(s16 iter) {
     s16 stage = _plan.front();
     switch (stage)
     {
-    case STAGE::DEF:
+    case (s16)STAGE::DEF:
         if (setupDefaultDir()) {
             _plan.pop();
         }
         break;
-    case STAGE::SCAN:
+    case (s16)STAGE::SCAN:
         if (setupGameScan()) {
             _plan.pop();
         }
         break;
-    case STAGE::FAV:
+    case (s16)STAGE::FAV:
         if (setupFavorites()) {
             _plan.pop();
         }
         break;
-    case STAGE::PATH:
+    case (s16)STAGE::PATH:
         if (setupPath()) {
             _plan.pop();
         }
         break;
-    case STAGE::LAST:
+    case (s16)STAGE::LAST:
         if (setupLastPlayed()) {
             _plan.pop();
         }
         break;
     default:
+        logger().error("Stage default.");
         break;
+    }
+
+    if (_plan.empty()) {
+        return 303;
     }
 
     return 1;
 }
 
-void DirectoryLoadTask::setOnCompleted(std::function<void()> onCompleted) { }
+void DirectoryLoadTask::setOnCompleted(std::function<void()> onCompleted) {
+    _extraOnCompleted = onCompleted;
+}
 
-const std::unordered_set<std::string>& DirectoryLoadTask::getFavorites() {
+std::unordered_set<std::string>& DirectoryLoadTask::getFavorites() {
     if (_favorites.empty()) {
         std::vector<std::string> favoriteList = cFavorites::GetFavorites();
         _favorites = std::unordered_set<std::string>(favoriteList.begin(), favoriteList.end());
         _favorites.emplace("marker");
+        _favoritesIter = _favorites.end();
     }
 
     return _favorites;
@@ -257,8 +271,15 @@ bool DirectoryLoadTask::setupLastPlayed() {
 bool DirectoryLoadTask::setupFavorites() {
     bool exclusive = _data.size() > 0;
 
-    std::unordered_set<std::string> favoriteItems = getFavorites();
-    for (const std::string& item : favoriteItems) {
+    std::unordered_set<std::string>& favorites = getFavorites();
+    if (_favoritesIter == favorites.end()) {
+        _favoritesIter = favorites.begin();
+    }
+
+    s16 iter = 0;
+    while (_favoritesIter != favorites.end() && iter < 20) {
+        const std::string& item = *(_favoritesIter++);
+
         if (item.empty() || (item.back() == '/' && exclusive)) {
             continue;
         }
@@ -271,6 +292,7 @@ bool DirectoryLoadTask::setupFavorites() {
             continue;
         }
         
+        iter++;
         std::string showName(item);
         size_t pos = showName.rfind('/', showName.length() - 2);
         if (pos != showName.npos) {
@@ -306,7 +328,7 @@ bool DirectoryLoadTask::setupFavorites() {
         _data.push_back(a_row);
     }
 
-    return true;
+    return _favoritesIter == favorites.end();
 }
 
 bool DirectoryLoadTask::setupDefaultDir() {
@@ -380,7 +402,7 @@ bool DirectoryLoadTask::setupGameScan() {
         return true;
     }
 
-    std::unordered_set<std::string> favoriteItems = getFavorites();
+    std::unordered_set<std::string>& favoriteItems = getFavorites();
     std::queue<std::string> paths;
     paths.push("fat:/");
 

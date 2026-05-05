@@ -14,26 +14,21 @@ void cLogger::init() {
 }
 
 void cLogger::info(std::string message) {
-    if (!isInit) {
-        return;
-    }
-
-    FILE* file = fopen("flashcart.log", "a");
-    if (file) {
-        std::string content = formatString("[info] %s\n", message.c_str());
-        fwrite(content.c_str(), content.length(), 1, file);
-        fclose(file);
-    }
+    write("info", message);
 }
 
 void cLogger::error(std::string message) {
+    write("error", message);
+}
+
+void cLogger::write(std::string prefix, std::string message) {
     if (!isInit) {
         return;
     }
 
     FILE* file = fopen("flashcart.log", "a");
     if (file) {
-        std::string content = formatString("[error] %s\n", message.c_str());
+        std::string content = formatString("[%s] %s\n", prefix.c_str(), message.c_str());
         fwrite(content.c_str(), content.length(), 1, file);
         fclose(file);
     }

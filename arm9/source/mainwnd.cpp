@@ -208,8 +208,8 @@ void cMainWnd::init() {
 }
 
 void cMainWnd::update() {
-    _focusBorder->update();
     cForm::update();
+    _focusBorder->update();
 }
 
 void cMainWnd::draw() {

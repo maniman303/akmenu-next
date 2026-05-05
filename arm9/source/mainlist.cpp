@@ -173,11 +173,13 @@ void cMainList::processDirIcon(DSRomInfo& romInfo, const std::string fileName) {
 }
 
 void cMainList::processDirIcons() {
-    _romInfoList.clear();
-    _romInfoList.resize(_visibleRowCount);
+    u32 total = onScreenRowCount();
 
-    for (size_t i = 0; i < _visibleRowCount; i++) {
-        DSRomInfo& romInfo = _romInfoList[(_firstVisibleRowId + i) % _visibleRowCount];
+    _romInfoList.clear();
+    _romInfoList.resize(total);
+
+    for (size_t i = 0; i < total; i++) {
+        DSRomInfo& romInfo = _romInfoList[(_firstVisibleRowId + i) % total];
         std::string fileName = _rows[_firstVisibleRowId + i][REALNAME_COLUMN].text();
         
         processDirIcon(romInfo, fileName);
@@ -185,16 +187,18 @@ void cMainList::processDirIcons() {
 }
 
 void cMainList::validateDirIcons() {
-    for (size_t i = 0; i < _visibleRowCount; i++) {
-        DSRomInfo& romInfo = _romInfoList[(_firstVisibleRowId + i) % _visibleRowCount];
+    u32 total = onScreenRowCount();
+
+    for (size_t i = 0; i < total; i++) {
+        DSRomInfo& romInfo = _romInfoList[(_firstVisibleRowId + i) % total];
         std::string fileName = _rows[_firstVisibleRowId + i][REALNAME_COLUMN].text();
         
         if (romInfo.fileName() == fileName) {
             continue;
         }
 
-        _romInfoList[(_firstVisibleRowId + i) % _visibleRowCount] = DSRomInfo();
-        romInfo = _romInfoList[(_firstVisibleRowId + i) % _visibleRowCount];
+        _romInfoList[(_firstVisibleRowId + i) % total] = DSRomInfo();
+        romInfo = _romInfoList[(_firstVisibleRowId + i) % total];
         processDirIcon(romInfo, fileName);
     }
 }
@@ -217,9 +221,9 @@ void cMainList::onDirectoryChanged(std::deque<std::vector<std::string>>& rows, s
     _romInfoList.clear();
 
     while (!rows.empty()) {
-        std::vector<std::string> row = rows.front();
-        rows.pop_front();
+        std::vector<std::string>& row = rows.front();
         insertEntryRow(row);
+        rows.pop_front();
     }
 
     processDirIcons();
@@ -258,6 +262,8 @@ bool cMainList::enterDir(const std::string& dirName) {
 
             return false;
         }
+
+        closedir(dir);
     }
 
     if (_parent != NULL) {
@@ -434,8 +440,6 @@ void cMainList::selectRom(const std::string& romPath) {
 }
 
 void cMainList::selectRom(const std::string& romPath, bool silent) {
-    logger().info("Looking for rom: " + romPath);
-
     for (size_t row = 0; row < _rows.size(); row++) {
         if (romPath == _rows[row][REALNAME_COLUMN].text()) {
             selectRow(row, silent);
@@ -466,7 +470,7 @@ void cMainList::drawItemBackgrounds() {
         return;
     }
 
-    size_t total = std::min(_visibleRowCount, _rows.size() - _firstVisibleRowId);
+    size_t total = onScreenRowCount();
 
     _itemBg->setAlpha(gdi().getMainEngineLayer() == MEL_DOWN);
 
@@ -484,14 +488,14 @@ void cMainList::drawIcons() {
         return;
     }
 
-    size_t total = std::min(_visibleRowCount, _rows.size() - _firstVisibleRowId);
+    size_t total = onScreenRowCount();
 
     bool small = (_viewMode == VM_LIST_ICON) ? true : false;
     int iconHeight = small ? 16 : 32;
     int prefix = small ? 0 : _iconPrefix;
 
     for (size_t i = 0; i < total; i++) {
-        int romId = (_firstVisibleRowId + i) % _visibleRowCount;
+        int romId = (_firstVisibleRowId + i) % total;
 
         s32 itemX = position().x + prefix;
         s32 itemY = position().y + i * _rowHeight + ((_rowHeight - iconHeight) >> 1) - 1;
@@ -540,7 +544,7 @@ void cMainList::setViewMode(VIEW_MODE mode) {
             break;
     }
 
-    scrollTo(_selectedRowId - _visibleRowCount + 1);
+    scrollTo(_selectedRowId - onScreenRowCount() + 1);
 }
 
 std::string cMainList::getCurrentDir() {

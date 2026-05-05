@@ -19,7 +19,7 @@ class DirectoryLoadTask : public TaskWorker {
   private:
     enum STAGE { DEF = 0, SCAN = 1, FAV = 2, PATH = 3, LAST = 4 };
 
-    const std::unordered_set<std::string>& getFavorites();
+    std::unordered_set<std::string>& getFavorites();
     bool setupLastPlayed();
     bool setupFavorites();
     bool setupDefaultDir();
@@ -30,6 +30,8 @@ class DirectoryLoadTask : public TaskWorker {
     std::unordered_set<s16> _completed;
     std::string _dirName;
     std::function<void(std::deque<std::vector<std::string>>&)> _onLoadCompleted;
+    std::function<void()> _extraOnCompleted;
     std::deque<std::vector<std::string>> _data;
     std::unordered_set<std::string> _favorites;
+    std::unordered_set<std::string>::iterator _favoritesIter;
 };
