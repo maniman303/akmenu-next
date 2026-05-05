@@ -193,7 +193,7 @@ void cMainList::onScrolled(u32 index) {
     validateDirIcons();
 }
 
-void cMainList::onDirectoryChanged(std::deque<DirectoryLoadTask::DirEntry>& rows, std::string dirName) {
+void cMainList::onDirectoryChanged(std::deque<std::vector<std::string>>& rows, std::string dirName) {
     bool changed = _currentDir != dirName;
 
     if (_parent != NULL) {
@@ -206,16 +206,9 @@ void cMainList::onDirectoryChanged(std::deque<DirectoryLoadTask::DirEntry>& rows
     removeAllRows();
     _romInfoList.clear();
 
-    std::vector<std::string> texts(4);
-    texts[0] = ""; // space for icon
     while (!rows.empty()) {
-        DirectoryLoadTask::DirEntry& entry = rows.front();
-        texts[1] = entry.showName;
-        texts[2] = entry.internalName;
-        texts[3] = entry.fullPath;
-
+        std::vector<std::string>& texts = rows.front();
         insertEntryRow(texts);
-        
         rows.pop_front();
     }
 
@@ -269,7 +262,7 @@ bool cMainList::enterDir(const std::string& dirName, std::function<void()> onCom
 
     _busy = true;
 
-    DirectoryLoadTask* task = new DirectoryLoadTask(tempDirName, [this, tempDirName](std::deque<DirectoryLoadTask::DirEntry>& rows) {
+    DirectoryLoadTask* task = new DirectoryLoadTask(tempDirName, [this, tempDirName](std::deque<std::vector<std::string>>& rows) {
         onDirectoryChanged(rows, tempDirName);
     });
 

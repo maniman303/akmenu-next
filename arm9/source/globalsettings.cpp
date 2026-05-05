@@ -26,7 +26,7 @@ cGlobalSettings::cGlobalSettings() {
     sound = true;
     clockSound = true;
     filePresentationMode = 0;
-    minimalModeRomsCount = 40;
+    minimalModeRomsCount = 20;
     enterLastDirWhenBoot = true;
     scrollSpeed = EScrollFast;
     scrollWait = 9;

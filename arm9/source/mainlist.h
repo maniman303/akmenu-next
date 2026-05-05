@@ -68,7 +68,7 @@ class cMainList : public akui::cListView {
     void processDirIcons();
     void validateDirIcons();
     void onScrolled(u32 index) override;
-    void onDirectoryChanged(std::deque<DirectoryLoadTask::DirEntry>& rows, std::string dirName);
+    void onDirectoryChanged(std::deque<std::vector<std::string>>& rows, std::string dirName);
     void selectRom(const std::string& romPath);
     void selectRom(const std::string& romPath, bool silent);
     void processItemText(std::string& text, int column) override;

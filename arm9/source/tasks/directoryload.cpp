@@ -12,9 +12,11 @@
 #include "../savemngr.h"
 #include "../stringtool.h"
 
-static bool itemSortComp(const DirectoryLoadTask::DirEntry& item1, const DirectoryLoadTask::DirEntry& item2) {
-    const std::string& realFn1 = item1.fullPath;
-    const std::string& realFn2 = item2.fullPath;
+#define MAX_ROWS 2
+
+static bool itemSortComp(const std::vector<std::string>& item1, const std::vector<std::string>& item2) {
+    const std::string& realFn1 = item1[3];
+    const std::string& realFn2 = item2[3];
 
     if (realFn1 == "slot1:/") return true;
     if (realFn2 == "slot1:/") return false;
@@ -39,20 +41,20 @@ static bool itemSortComp(const DirectoryLoadTask::DirEntry& item1, const Directo
     if (realFn1.back() == '/' && realFn2.back() != '/') return true;
     if (realFn1.back() != '/' && realFn2.back() == '/') return false;
 
-    const bool isLastFn1 = item1.state == DirectoryLoadTask::DirEntry::DIR_STATE::LAST;
-    const bool isLastFn2 = item2.state == DirectoryLoadTask::DirEntry::DIR_STATE::LAST;
+    const bool isLastFn1 = (item1.size() > 4) && (item1[4] == "last");
+    const bool isLastFn2 = (item2.size() > 4) && (item2[4] == "last");
 
     if (isLastFn1 && !isLastFn2) return true;
     if (!isLastFn1 && isLastFn2) return false;
 
-    const bool isFavFn1 = item1.state == DirectoryLoadTask::DirEntry::DIR_STATE::FAVORITE;
-    const bool isFavFn2 = item2.state == DirectoryLoadTask::DirEntry::DIR_STATE::FAVORITE;
+    const bool isFavFn1 = (item1.size() > 4) && (item1[4] == "true");
+    const bool isFavFn2 = (item2.size() > 4) && (item2[4] == "true");
 
     if (isFavFn1 && !isFavFn2) return true;
     if (!isFavFn1 && isFavFn2) return false;
 
-    const std::string& fn1 = gs().viewMode == cGlobalSettings::EViewInternal ? item1.internalName : item1.showName;
-    const std::string& fn2 = gs().viewMode == cGlobalSettings::EViewInternal ? item2.internalName : item2.showName;
+    const std::string& fn1 = gs().viewMode == cGlobalSettings::EViewInternal ? item1[2] : item1[1];
+    const std::string& fn2 = gs().viewMode == cGlobalSettings::EViewInternal ? item2[2] : item2[1];
 
     return fn1 < fn2;
 }
@@ -68,12 +70,12 @@ static bool extnameFilter(const std::vector<std::string>& extNames, const std::s
     return false;
 }
 
-static bool hiddenEntryFilter(const std::vector<std::string>& entryNames, std::string entryName) {
+static bool hiddenEntryFilter(const std::vector<std::string>& entryNames, const std::string& entryName) {
     if (entryName.empty()) {
         return true;
     }
 
-    if (gs().filePresentationMode == 0) {
+    if (gs().filePresentationMode == 0 && entryName != "." && entryName != "..") {
         return false;
     }
 
@@ -81,8 +83,7 @@ static bool hiddenEntryFilter(const std::vector<std::string>& entryNames, std::s
         return true;
     }
 
-    entryName = toLowerString(entryName);
-    if (gs().fileListType == 0 && entryName == "saves") {
+    if (gs().fileListType == 0 && strcasecmp(entryName.c_str(), "saves") == 0) {
         return true;
     }
 
@@ -91,7 +92,7 @@ static bool hiddenEntryFilter(const std::vector<std::string>& entryNames, std::s
     }
 
     for (size_t i = 0; i < entryNames.size(); i++) {
-        if (entryName == entryNames[i]) {
+        if (strcasecmp(entryName.c_str(), entryNames[i].c_str()) == 0) {
             return true;
         }
     }
@@ -99,7 +100,7 @@ static bool hiddenEntryFilter(const std::vector<std::string>& entryNames, std::s
     return false;
 }
 
-DirectoryLoadTask::DirectoryLoadTask(std::string dirName, std::function<void(std::deque<DirEntry>&)> onLoadCompleted) {
+DirectoryLoadTask::DirectoryLoadTask(std::string dirName, std::function<void(std::deque<std::vector<std::string>>&)> onLoadCompleted) {
     _dirName = dirName;
     _onLoadCompleted = onLoadCompleted;
     _favoritesIter = _favorites.end();
@@ -135,7 +136,7 @@ s16 DirectoryLoadTask::process(s16 iter) {
     if (iter == 303) {
         if (_data.size() == 0) {
             std::string name = LANG("mainlist", "empty");
-            _data.emplace_back(name, name, "...", DirEntry::DIR_STATE::NORMAL);
+            _data.push_back({"", name, name, "..."});
         }
 
         std::sort(_data.begin(), _data.end(), itemSortComp);
@@ -251,7 +252,7 @@ bool DirectoryLoadTask::setupLastPlayed() {
         internalName = romInfo.getDsLocTitle();
     }
 
-    _data.emplace_back(showName, internalName, lastPlayedPath, DirEntry::DIR_STATE::LAST);
+    _data.push_back({"", showName, internalName, lastPlayedPath, "last"});
 
     return true;
 }
@@ -265,7 +266,7 @@ bool DirectoryLoadTask::setupFavorites() {
     }
 
     s16 iter = 0;
-    while (_favoritesIter != favorites.end() && iter < 20) {
+    while (_favoritesIter != favorites.end() && iter < MAX_ROWS) {
         const std::string& item = *(_favoritesIter++);
 
         if (item.empty() || (item.back() == '/' && exclusive)) {
@@ -304,7 +305,7 @@ bool DirectoryLoadTask::setupFavorites() {
             internalName = romInfo.getDsLocTitle();
         }
 
-        _data.emplace_back(showName, internalName, item, DirEntry::DIR_STATE::FAVORITE);
+        _data.push_back({"", showName, internalName, item, "true"});
     }
 
     return _favoritesIter == favorites.end();
@@ -321,27 +322,27 @@ bool DirectoryLoadTask::setupDefaultDir() {
 
     if (!skipCards && fsManager().isFlashcart()) {
         std::string name = LANG("mainlist", "microsd card");
-        _data.emplace_back(name, name, "fat:/", DirEntry::DIR_STATE::NORMAL);
+        _data.push_back({"", name, name, "fat:/"});
     }
 
     if (!skipCards && isDSiMode() && fsManager().isSDInserted()) {
         std::string name = "DSi SD";
-        _data.emplace_back(name, name, "sd:/", DirEntry::DIR_STATE::NORMAL);
+        _data.push_back({"", name, name, "sd:/"});
     }
 
     if (!skipFavorites && cFavorites::GetFavorites().size() > 0) {
         std::string name = LANG("mainlist", "favorites");
-        _data.emplace_back(name, name, "favorites:/", DirEntry::DIR_STATE::NORMAL);
+        _data.push_back({"", name, name, "favorites:/"});
     }
 
     if (isDSiMode() && !fsManager().isFlashcart()) {
         std::string name = LANG("mainlist", "slot1 card");
-        _data.emplace_back(name, name, "slot1:/", DirEntry::DIR_STATE::NORMAL);
+        _data.push_back({"", name, name, "slot1:/"});
     }
 
     if (!isDSiMode() && CGbaLoader::GetGbaHeader() == GBA_HEADER.complement) {
         std::string name = LANG("mainlist", "slot2 card");
-        _data.emplace_back(name, name, "slot2:/", DirEntry::DIR_STATE::NORMAL);
+        _data.push_back({"", name, name, "slot2:/"});
     }
 
     return true;
@@ -364,7 +365,7 @@ bool DirectoryLoadTask::setupGameScan() {
     }
 
     s16 rows = 0;
-    while (rows < rowsToLoad && rows < 20 && !_pathsToScan.empty()) {
+    while (rows < rowsToLoad && rows < MAX_ROWS && !_pathsToScan.empty()) {
         std::string path = _pathsToScan.front();
 
         struct dirent* entry = NULL;
@@ -376,7 +377,7 @@ bool DirectoryLoadTask::setupGameScan() {
             }
         }
 
-        while (rows < 20 && rows < rowsToLoad && (entry = readdir(_scanDir)) != NULL) {
+        while (rows < MAX_ROWS && rows < rowsToLoad && (entry = readdir(_scanDir)) != NULL) {
             std::string lfn(entry->d_name);
 
             if (lfn.empty() || lfn[0] == '.' || lfn[0] == '_') {
@@ -431,7 +432,7 @@ bool DirectoryLoadTask::setupGameScan() {
             }
 
             rows++;
-            _data.emplace_back(lfn, internalName, fullFilePath, DirEntry::DIR_STATE::NORMAL);
+            _data.push_back({"", lfn, internalName, fullFilePath});
         }
 
         if (entry == NULL || rows >= rowsToLoad) {
@@ -465,7 +466,7 @@ bool DirectoryLoadTask::setupPath() {
     entryNames.push_back("boot.nds");
 
     u16 rows = 0;
-    while (rows < 40 && (entry = readdir(_pathDir)) != NULL) {
+    while (rows < MAX_ROWS * 2 && (entry = readdir(_pathDir)) != NULL) {
         std::string lfn(entry->d_name);
 
         // Don't show system or hidden files and dirs
@@ -503,7 +504,7 @@ bool DirectoryLoadTask::setupPath() {
             filePath += "/";
         }
 
-        _data.emplace_back(lfn, internalName, filePath, DirEntry::DIR_STATE::NORMAL);
+        _data.push_back({"", lfn, internalName, filePath});
     }
 
     if (entry == NULL) {
