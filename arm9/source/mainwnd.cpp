@@ -407,6 +407,8 @@ void cMainWnd::launchSelected() {
     size_t lastSlashPos = fullPath.find_last_of("/\\");
     std::string directory = fullPath.substr(0, lastSlashPos + 1);
 
+    _focusBorder->click();
+
     if (fullPath.back() == '/' || fullPath == "...") {
         vfxManager().playEffect(fullPath == "..." ? VFX_EFFECT::CLOSE : VFX_EFFECT::SELECT);
         _mainList->enterDir({_focusBorder}, fullPath, {});
@@ -825,4 +827,5 @@ void cMainWnd::onMainListDirectoryChanged() {
 
 void cMainWnd::onMainListDirectoryReturned() {
     vfxManager().playEffect(VFX_EFFECT::CLOSE);
+    _focusBorder->click();
 }

@@ -419,15 +419,14 @@ u32 cMainList::getRowIdByPath(const std::string& path) const {
 }
 
 bool cMainList::getRomInfo(u32 rowIndex, DSRomInfo& info) {
-    if (rowIndex < _romInfoList.size()) {
-        std::string fullPath = getRowFullPath(rowIndex);
-        info = DSRomInfo();
-        processDirIcon(info, fullPath);
-
-        return true;
-    } else {
+    if (rowIndex >= _rows.size()) {
         return false;
     }
+
+    std::string fullPath = getRowFullPath(rowIndex);
+    processDirIcon(info, fullPath);
+
+    return true;
 }
 
 void cMainList::scheduleRomSelection(const std::string& romPath) {

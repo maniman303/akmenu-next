@@ -13,6 +13,7 @@ class cFocusBorder : public WorkIndicator {
 
     void init();
     void reset();
+    void click();
     void update();
     void draw(GRAPHICS_ENGINE engine);
     bool busy() const override;
@@ -26,7 +27,9 @@ class cFocusBorder : public WorkIndicator {
     cRect _currentFocus;
     cRect _prevFocus;
     cRect _nextFocus;
-    Animation _animation;
+    s16 _clickOffset;
+    Animation _moveController;
+    Animation _clickController;
     cBMP15 _ftr;
     cBMP15 _ftl;
     cBMP15 _fbr;

@@ -11,6 +11,7 @@ cFocusBorder::cFocusBorder(cWindow* parent) {
     _show = false;
     _color = 0x0;
     _thickness = 2;
+    _clickOffset = 0;
     _currentFocus = cRect(cPoint(0, 0), cSize(0, 0), false);
     _prevFocus = cRect(cPoint(0, 0), cSize(0, 0), false);
     _nextFocus = cRect(cPoint(0, 0), cSize(0, 0), false);
@@ -25,7 +26,8 @@ void cFocusBorder::init() {
     _thickness = ini.GetInt("focus border", "thickness", _thickness);
 
     s32 duration = ini.GetInt("focus border", "duration", 0);
-    _animation.setDuration(duration);
+    _moveController.setDuration(duration);
+    _clickController.setDuration(6);
 
     if (!_show) {
         return;
@@ -53,10 +55,24 @@ void cFocusBorder::reset() {
     _currentFocus = cRect(cPoint(0, 0), cPoint(0, 0), false);
 }
 
+void cFocusBorder::click() {
+    if (_clickController.isPlaying() && !_clickController.isCompleted()) {
+        return;
+    }
+
+    _clickController.play();
+}
+
 void cFocusBorder::update() {
     if (!_init || _parent == NULL) {
         return;
     }
+
+    if (_clickController.isCompleted() && !_clickController.isReversed()) {
+        _clickController.reverse();
+    }
+
+    _clickOffset = twin().int16(0, 2, _clickController.value(), TWIN_EASE::EASE_OUT);
 
     cRect focus = _parent->focusRectangle();
     if (_currentFocus == focus) {
@@ -64,8 +80,8 @@ void cFocusBorder::update() {
     }
 
     if (_nextFocus == focus) {
-        cPoint pos = twin().point(_prevFocus.position(), _nextFocus.position(), _animation.value(), TWIN_EASE::EASE_OUT);
-        cSize size = twin().point(_prevFocus.size(), _nextFocus.size(), _animation.value(), TWIN_EASE::EASE_OUT);
+        cPoint pos = twin().point(_prevFocus.position(), _nextFocus.position(), _moveController.value(), TWIN_EASE::EASE_OUT);
+        cSize size = twin().point(_prevFocus.size(), _nextFocus.size(), _moveController.value(), TWIN_EASE::EASE_OUT);
         _currentFocus = cRect(pos, size, false);
         return;
     }
@@ -77,7 +93,7 @@ void cFocusBorder::update() {
 
     _prevFocus = _currentFocus;
     _nextFocus = focus;
-    _animation.play();
+    _moveController.play();
 }
 
 void cFocusBorder::draw(GRAPHICS_ENGINE engine) {
@@ -97,32 +113,32 @@ void cFocusBorder::draw(GRAPHICS_ENGINE engine) {
     if (_ftl.width() + _ftr.width() <= (u32)width && _ftl.height() + _fbl.height() <= (u32)height) {
         if (_ftl.valid()) {
             drawRect = false;
-            gdi().maskBlt(_ftl.buffer(), startX, startY, _ftl.width(), _ftl.height(), engine);
+            gdi().maskBlt(_ftl.buffer(), startX + _clickOffset, startY + _clickOffset, _ftl.width(), _ftl.height(), engine);
         }
 
         if (_ftr.valid()) {
             drawRect = false;
-            gdi().maskBlt(_ftr.buffer(), startX + width - _ftr.width(), startY, _ftr.width(), _ftr.height(), engine);
+            gdi().maskBlt(_ftr.buffer(), startX + width - _ftr.width() - _clickOffset, startY + _clickOffset, _ftr.width(), _ftr.height(), engine);
         }
 
         if (_fbl.valid()) {
             drawRect = false;
-            gdi().maskBlt(_fbl.buffer(), startX, startY + height - _fbl.height(), _fbl.width(), _fbl.height(), engine);
+            gdi().maskBlt(_fbl.buffer(), startX + _clickOffset, startY + height - _fbl.height() - _clickOffset, _fbl.width(), _fbl.height(), engine);
         }
 
         if (_fbr.valid()) {
             drawRect = false;
-            gdi().maskBlt(_fbr.buffer(), startX + width - _fbr.width(), startY + height - _fbr.height(), _fbr.width(), _fbr.height(), engine);
+            gdi().maskBlt(_fbr.buffer(), startX + width - _fbr.width() - _clickOffset, startY + height - _fbr.height() - _clickOffset, _fbr.width(), _fbr.height(), engine);
         }
     }
 
     if (drawRect) {
         gdi().setPenColor(_color, engine);
-        gdi().frameRect(startX, startY, width, height, _thickness, engine);
+        gdi().frameRect(startX, startY, width, height, _thickness + _clickOffset, engine);
         return;
     }
 }
 
 bool cFocusBorder::busy() const {
-    return _animation.isPlaying() && !_animation.isCompleted();
+    return (_moveController.isPlaying() && !_moveController.isCompleted()) || (_clickController.isPlaying() && !_clickController.isCompleted());
 }
