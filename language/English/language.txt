@@ -145,10 +145,10 @@ title = Notify
 text = There is no device in Slot 2.
 
 [filelist type]
-text = File extension filter
-item0 = NDS
-item1 = NDS + SAV
-item2 = ALL
+text = File type filter
+item0 = Roms
+item1 = Roms + Saves
+item2 = All
 
 [quick resume]
 text = Quick resume
@@ -279,15 +279,8 @@ internal = Internal
 custom icons = Custom Icons
 clock sound = Clock sound
 
-[gba settings]
+[other settings]
 title = Other Settings
-sleephack = Universal sleep
-autosave = Backup save at startup
-mode = Slot-2 mode
-modegba = GBA
-modends = NDS
-modeask = Ask
-modetext = Launch slot-2 in NDS mode?
 
 [icon]
 icon = Show icon

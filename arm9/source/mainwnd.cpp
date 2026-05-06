@@ -606,7 +606,7 @@ void cMainWnd::showSettings(void) {
 #endif
 
     // page 5: other
-    settingWnd->addSettingTab(LANG("gba settings", "title"));
+    settingWnd->addSettingTab(LANG("other settings", "title"));
     _values.clear();
     _values.push_back(LANG("switches", "Disable"));
     _values.push_back(LANG("switches", "Enable"));
