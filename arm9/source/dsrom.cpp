@@ -22,7 +22,7 @@
 // 0x8840 covers the NDS header (0x200) + the typical retail banner location
 // (~0x8000–0x8140) in one shot.  Made static so it lives in BSS, not the
 // ARM9 stack (which is tiny on DS).
-static const u32 ROM_READ_SIZE = 0x8840;
+static const u32 ROM_READ_SIZE = 0x200;
 static u8 sRomReadBuf[ROM_READ_SIZE] __attribute__((aligned(4)));
 
 DSRomInfo::DSRomInfo() {
@@ -175,30 +175,16 @@ bool DSRomInfo::loadDSRomInfo(const std::string& filename, bool loadBanner) {
     _romVersion = header->romversion;
 
     ///////// banner /////////
-    // Read banner from buffer when it fits, no extra seek/read
+    // Read banner from file
     if (header->bannerOffset != 0) {
-        u32 bannerEnd = header->bannerOffset + 0x840;
-        if (bannerEnd <= bytesRead) {
-            // Banner is inside our already-read window.
-            tNDSBanner* bannerPtr = (tNDSBanner*)(sRomReadBuf + header->bannerOffset);
-            crc = swiCRC16(0xffff, bannerPtr->icon, 0x840 - 32);
-            if (crc != bannerPtr->crc) {
-                swiCopy(nds_banner_bin, &_banner, COPY_MODE_WORD | (sizeof(_banner) / 4));
-            } else {
-                swiCopy(bannerPtr, &_banner, COPY_MODE_WORD | (sizeof(_banner) / 4));
-            }
+        fseek(f, header->bannerOffset, SEEK_SET);
+        u32 readed = (u32)fread(&_banner, 1, 0x840, f);
+        if (sizeof(tNDSBanner) != readed) {
+            swiCopy(nds_banner_bin, &_banner, COPY_MODE_WORD | (sizeof(_banner) / 4));
         } else {
-            // Banner sits past our read window (unusual ROM layout).
-            // Fall back to a targeted seek+read for this case only.
-            fseek(f, header->bannerOffset, SEEK_SET);
-            u32 readed = (u32)fread(&_banner, 1, 0x840, f);
-            if (sizeof(tNDSBanner) != readed) {
+            crc = swiCRC16(0xffff, _banner.icon, 0x840 - 32);
+            if (crc != _banner.crc) {
                 swiCopy(nds_banner_bin, &_banner, COPY_MODE_WORD | (sizeof(_banner) / 4));
-            } else {
-                crc = swiCRC16(0xffff, _banner.icon, 0x840 - 32);
-                if (crc != _banner.crc) {
-                    swiCopy(nds_banner_bin, &_banner, COPY_MODE_WORD | (sizeof(_banner) / 4));
-                }
             }
         }
     } else {
