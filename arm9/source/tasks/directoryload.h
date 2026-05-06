@@ -37,6 +37,7 @@ class DirectoryLoadTask : public TaskWorker {
     std::unordered_set<std::string> _favorites;
     std::unordered_set<std::string>::iterator _favoritesIter;
     std::queue<std::string> _pathsToScan;
+    std::unordered_set<std::string> _extNames;
     DIR* _scanDir;
     DIR* _pathDir;
 };

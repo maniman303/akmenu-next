@@ -59,14 +59,13 @@ static bool itemSortComp(const std::vector<std::string>& item1, const std::vecto
     return fn1 < fn2;
 }
 
-static bool extnameFilter(const std::vector<std::string>& extNames, const std::string& extName) {
+static bool extnameFilter(const std::unordered_set<std::string>& extNames, const std::string& extName) {
     if (extNames.size() == 0) return true;
 
-    for (size_t i = 0; i < extNames.size(); ++i) {
-        if (strcasecmp(extName.c_str(), extNames[i].c_str()) == 0) {
-            return true;
-        }
+    if (extNames.find(extName) != extNames.end()) {
+        return true;
     }
+
     return false;
 }
 
@@ -452,16 +451,16 @@ bool DirectoryLoadTask::setupPath() {
         }
     }
 
-    std::vector<std::string> extNames;
-    extNames.push_back(".nds");
-    extNames.push_back(".dsi");
-    extNames.push_back(".srl");
-    if (gs().showGbaRoms > 0) extNames.push_back(".gba");
-    if (gs().fileListType > 0) extNames.push_back(".sav");
-    if (gs().fileListType > 1) extNames.clear();
+    if (gs().fileListType <= 1 && _extNames.size() == 0) {
+        _extNames.emplace(".nds");
+        _extNames.emplace(".dsi");
+        _extNames.emplace(".sri");
+        if (gs().showGbaRoms > 0) _extNames.emplace(".gba");
+        if (gs().fileListType > 0) _extNames.emplace(".sav");
+    } 
 
     u16 rows = 0;
-    while (rows < MAX_ROWS && (entry = readdir(_pathDir)) != NULL) {
+    while (rows < MAX_ROWS * 2 && (entry = readdir(_pathDir)) != NULL) {
         std::string lfn(entry->d_name);
 
         // Don't show system or hidden files and dirs
@@ -477,25 +476,23 @@ bool DirectoryLoadTask::setupPath() {
 
         std::string filePath = _dirName + lfn;
 
-        rows++;
-        bool showThis = entry->d_type == DT_DIR || extnameFilter(extNames, extName); 
+        rows += 2;
+        bool showThis = (entry->d_type == DT_DIR || extnameFilter(_extNames, extName)) && (entry->d_type != DT_DIR || !(FAT_getAttr(filePath.c_str()) & ATTR_HIDDEN)); 
         if (!showThis) {
+            rows--;
             continue;
         }
 
         std::string internalName = lfn;
-        if (extName == ".nds") {
+        if (entry->d_type == DT_DIR) {
+            rows--;
+            filePath += "/";
+        } else if (extName == ".nds") {
             DSRomInfo romInfo;
             romInfo.mayBeDSRom(filePath);
-            if (!romInfo.isDSRom()) {
-                continue;
+            if (romInfo.isDSRom()) {
+                internalName = romInfo.getDsLocTitle();
             }
-
-            internalName = romInfo.getDsLocTitle();
-        }
-
-        if (entry->d_type == DT_DIR) {
-            filePath += "/";
         }
 
         _data.push_back({"", lfn, internalName, filePath});
