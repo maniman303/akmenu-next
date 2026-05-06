@@ -146,11 +146,19 @@ void cMainList::processDirIcon(DSRomInfo& romInfo, const std::string fileName) {
 
     if (extName == ".nds") {
         romInfo.mayBeDSRom(fileName);
+        if (!romInfo.isDSRom()) {
+            romInfo.setBannerFromFile(fsManager().getIconPath("unknown_banner.bin"), unknown_banner_bin);
+        }
+
         return;
     }
     
     if (extName == ".gba") {
         romInfo.mayBeGbaRom(fileName);
+        if (!romInfo.isGbaRom()) {
+            romInfo.setBannerFromFile(fsManager().getIconPath("unknown_banner.bin"), unknown_banner_bin);
+        }
+
         return;
     }
     
