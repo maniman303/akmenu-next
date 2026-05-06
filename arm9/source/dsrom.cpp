@@ -16,7 +16,14 @@
 #include "nds_banner_bin.h"
 #include "unknown_nds_banner_bin.h"
 #include "unicode.h"
+#include "logger.h"
 #include "../../share/memtool.h"
+
+// 0x8840 covers the NDS header (0x200) + the typical retail banner location
+// (~0x8000–0x8140) in one shot.  Made static so it lives in BSS, not the
+// ARM9 stack (which is tiny on DS).
+static const u32 ROM_READ_SIZE = 0x8840;
+static u8 sRomReadBuf[ROM_READ_SIZE] __attribute__((aligned(4)));
 
 DSRomInfo::DSRomInfo() {
     _isDSRom = EFalse;
@@ -34,8 +41,8 @@ DSRomInfo::DSRomInfo() {
 DSRomInfo::~DSRomInfo() { }
 
 DSRomInfo& DSRomInfo::operator=(const DSRomInfo& src) {
-    memcpy(&_banner, &src._banner, sizeof(_banner));
-    memcpy(&_saveInfo, &src._saveInfo, sizeof(_saveInfo));
+    swiCopy(&src._banner, &_banner, COPY_MODE_WORD | (sizeof(_banner) / 4));
+    swiCopy(&src._saveInfo, &_saveInfo, COPY_MODE_WORD | (sizeof(_saveInfo) / 4));
     _isDSRom = src._isDSRom;
     _isHomebrew = src._isHomebrew;
     _isModernHomebrew = src._isModernHomebrew;
@@ -51,51 +58,62 @@ bool DSRomInfo::loadDSRomInfo(const std::string& filename, bool loadBanner) {
     _isHomebrew = EFalse;
     _isDSiWare = EFalse;
     _isModernHomebrew = EFalse;
+
     FILE* f = fopen(filename.c_str(), "rb");
-    if (f == NULL)
-    {
+    if (f == NULL) {
         return false;
     }
 
-    tNDSHeader header;
-    if (512 != fread(&header, 1, 512, f))
-    {
-        memcpy(&_banner, unknown_nds_banner_bin, sizeof(_banner));
+    u32 bytesRead = (u32)fread(sRomReadBuf, 1, ROM_READ_SIZE, f);
+
+    if (bytesRead < 512) {
+        swiCopy(unknown_nds_banner_bin, &_banner, COPY_MODE_WORD | (sizeof(_banner) / 4));
         fclose(f);
         return false;
     }
 
-    if (header.unitCode == 0x03) {
+    tNDSHeader* header = (tNDSHeader*)sRomReadBuf;
+    if (header->unitCode == 0x03) {
         _isDSiWare = ETrue;
     }
 
     ///////// ROM Header /////////
-    u16 crc = swiCRC16(0xFFFF, &header, 0x15E);
-    if (crc != header.headerCRC16)
-    {
-        dbg_printf("%s rom header crc error\n", filename.c_str());
-        memcpy(&_banner, unknown_nds_banner_bin, sizeof(_banner));
+    u16 crc = swiCRC16(0xFFFF, header, 0x15E);
+    if (crc != header->headerCRC16) {
+        swiCopy(unknown_nds_banner_bin, &_banner, COPY_MODE_WORD | (sizeof(_banner) / 4));
         fclose(f);
-
         return true;
+    }
+
+    _isDSRom = ETrue;
+
+    // Check for modern homebrew
+    // Assume homebrew until proven otherwise
+    _isHomebrew = ETrue;
+    _isModernHomebrew = ETrue;
+    u32 arm9StartSig[4] = {0};
+
+    // ARM9 sig from buffer when possible, seek only as fallback
+    // "Battle/Combat of Giants: Mutant Insects" (TID: BIG) has code that is
+    // run before the actual SDK boot code.
+    u32 arm9SigOffset = (u32)header->arm9romOffset +
+        ((strncmp(header->gameCode, "BIG", 3) == 0)
+            ? 0x02000800
+            : (u32)header->arm9executeAddress)
+        - (u32)header->arm9destination;
+
+    if (arm9SigOffset + sizeof(arm9StartSig) <= bytesRead) {
+        // Happy path: already in our buffer — no I/O at all.
+        memcpy(arm9StartSig, sRomReadBuf + arm9SigOffset, sizeof(arm9StartSig));
     } else {
-        _isDSRom = ETrue;
-
-        //check for modern homebrew
-        //Assume homebrew until proven otherwise
-        _isHomebrew = ETrue;
-        _isModernHomebrew = ETrue;
-        u32 arm9StartSig[4] = {0};
-        //Seek to ARM9 entry point and read first 4 instructions
-        // "Battle/Combat of Giants: Mutant Insects" (TID: BIG) has code that is run before the actual SDK boot code
-        fseek(f, (u32)header.arm9romOffset + ((strncmp(header.gameCode, "BIG", 3) == 0) ? 0x02000800 : (u32)header.arm9executeAddress) - (u32)header.arm9destination, SEEK_SET);
+        // Fallback: the ROM is unusual and the sig lives past our read window.
+        fseek(f, arm9SigOffset, SEEK_SET);
         fread(arm9StartSig, sizeof(u32), 4, f);
+    }
 
-         //Check for Nintendo SDK style retail builds
-        if ((arm9StartSig[0] == 0xE3A0C301 || (arm9StartSig[0] >= 0xEA000000 && arm9StartSig[0] < 0xEC000000))
-        && arm9StartSig[1] == 0xE58CC208) {
-        if ((arm9StartSig[2] >= 0xEB000000 && arm9StartSig[2] < 0xEC000000)
-        && (arm9StartSig[3] >= 0xE3A00000 && arm9StartSig[3] < 0xE3A01000)) {
+    // Check for Nintendo SDK style retail builds
+    if ((arm9StartSig[0] == 0xE3A0C301 || (arm9StartSig[0] >= 0xEA000000 && arm9StartSig[0] < 0xEC000000)) && arm9StartSig[1] == 0xE58CC208) {
+        if ((arm9StartSig[2] >= 0xEB000000 && arm9StartSig[2] < 0xEC000000) && (arm9StartSig[3] >= 0xE3A00000 && arm9StartSig[3] < 0xE3A01000)) {
             _isHomebrew = EFalse;
             _isModernHomebrew = EFalse;
         } else if (arm9StartSig[2] == 0xE1DC00B6 && arm9StartSig[3] == 0xE3500000) {
@@ -105,85 +123,91 @@ bool DSRomInfo::loadDSRomInfo(const std::string& filename, bool loadBanner) {
             _isHomebrew = EFalse;
             _isModernHomebrew = EFalse;
         }
-        } else if (strncmp(header.gameCode, "HNA", 3) == 0) {
-            //Modcrypted retail game
-            _isHomebrew = EFalse;
-            _isModernHomebrew = EFalse;
-        }
-
-        //If still homebrew, check for old vs modern
-        if (_isHomebrew) {
-            if (arm9StartSig[0] == 0xE3A00301
-            && arm9StartSig[1] == 0xE5800208
-            && arm9StartSig[2] == 0xE3A00013
-            && arm9StartSig[3] == 0xE129F000) {
-                //Modern hb signature, but check some known old cases
-                if ((u32)header.arm7executeAddress >= 0x037F0000 && (u32)header.arm7destination >= 0x037F0000) {
-                    if ((header.arm9binarySize == 0xC9F68 && header.arm7binarySize == 0x12814) ||   // Colors! v1.1
-                        (header.arm9binarySize == 0x1B0864 && header.arm7binarySize == 0xDB50) ||  // Mario Paint Composer DS v2
-                        (header.arm9binarySize == 0xE78FC && header.arm7binarySize == 0xF068) ||   // SnowBros v2.2
-                        (header.arm9binarySize == 0xD45C0 && header.arm7binarySize == 0x2B7C) ||   // ikuReader v0.058
-                        (header.arm9binarySize == 0x7A124 && header.arm7binarySize == 0xEED0) ||   // PPSEDS r11
-                        (header.arm9binarySize == 0x54620 && header.arm7binarySize == 0x1538) ||   // XRoar 0.24fp3
-                        (header.arm9binarySize == 0x2C9A8 && header.arm7binarySize == 0xFB98) ||   // NitroGrafx v0.7
-                        (header.arm9binarySize == 0x22AE4 && header.arm7binarySize == 0xA764)) {   // It's 1975...
-                        _isModernHomebrew = EFalse;
-                    }
-                }
-            } else if ((header.unitCode == 0) &&
-                ((memcmp(header.gameTitle, "NMP4BOOT", 8) == 0) ||
-                    ((u32)header.arm7executeAddress >= 0x037F0000 && (u32)header.arm7destination >= 0x037F0000))) {
-                _isModernHomebrew = EFalse; // Old hb requiring DLDI
-            }
-
-            u8 accessControl = 0;
-            fseek(f, 0x1BF, SEEK_SET);
-            fread(&accessControl, 1, 1, f);
-
-            if (!_isHomebrew && (header.unitCode != 0) && (accessControl & BIT(4))) {
-                _isDSiWare = ETrue;
-            }
+    } else if (strncmp(header->gameCode, "HNA", 3) == 0) {
+        // Modcrypted retail game
+        _isHomebrew = EFalse;
+        _isModernHomebrew = EFalse;
     }
-        if ((u32)(header.arm7destination) >= 0x037F8000 ||
-            0x23232323 == gamecode(header.gameCode)) {  // 23->'#'
-            _isHomebrew = ETrue;
+
+    if (_isHomebrew) {
+        if (arm9StartSig[0] == 0xE3A00301
+        && arm9StartSig[1] == 0xE5800208
+        && arm9StartSig[2] == 0xE3A00013
+        && arm9StartSig[3] == 0xE129F000) {
+            // Modern hb signature, but check some known old cases
+            if ((u32)header->arm7executeAddress >= 0x037F0000 && (u32)header->arm7destination >= 0x037F0000) {
+                switch (header->arm9binarySize) {
+                    case 0xC9F68:  if (header->arm7binarySize == 0x12814) _isModernHomebrew = EFalse; break; // Colors! v1.1
+                    case 0x1B0864: if (header->arm7binarySize == 0xDB50)  _isModernHomebrew = EFalse; break; // Mario Paint Composer DS v2
+                    case 0xE78FC:  if (header->arm7binarySize == 0xF068)  _isModernHomebrew = EFalse; break; // SnowBros v2.2
+                    case 0xD45C0:  if (header->arm7binarySize == 0x2B7C)  _isModernHomebrew = EFalse; break; // ikuReader v0.058
+                    case 0x7A124:  if (header->arm7binarySize == 0xEED0)  _isModernHomebrew = EFalse; break; // PPSEDS r11
+                    case 0x54620:  if (header->arm7binarySize == 0x1538)  _isModernHomebrew = EFalse; break; // XRoar 0.24fp3
+                    case 0x2C9A8:  if (header->arm7binarySize == 0xFB98)  _isModernHomebrew = EFalse; break; // NitroGrafx v0.7
+                    case 0x22AE4:  if (header->arm7binarySize == 0xA764)  _isModernHomebrew = EFalse; break; // It's 1975...
+                    default: break;
+                }
+            }
+        } else if ((header->unitCode == 0) &&
+            ((memcmp(header->gameTitle, "NMP4BOOT", 8) == 0) ||
+                ((u32)header->arm7executeAddress >= 0x037F0000 && (u32)header->arm7destination >= 0x037F0000))) {
+            _isModernHomebrew = EFalse; // Old hb requiring DLDI
         }
+
+        // 0x1BF is within the first 512 bytes we already read
+        u8 accessControl = sRomReadBuf[0x1BF];
+
+        if (!_isHomebrew && (header->unitCode != 0) && (accessControl & BIT(4))) {
+            _isDSiWare = ETrue;
+        }
+    }
+    
+    if ((u32)(header->arm7destination) >= 0x037F8000 ||
+        0x23232323 == gamecode(header->gameCode)) {  // 23->'#'
+        _isHomebrew = ETrue;
     }
 
     ///////// saveInfo /////////
-    memcpy(_saveInfo.gameTitle, header.gameTitle, 12);
-    memcpy(_saveInfo.gameCode, header.gameCode, 4);
-    _saveInfo.gameCRC = header.headerCRC16;
+    swiCopy(header->gameTitle, _saveInfo.gameTitle, COPY_MODE_WORD | 3);
+    swiCopy(header->gameCode, _saveInfo.gameCode, COPY_MODE_WORD | 1);
+    _saveInfo.gameCRC = header->headerCRC16;
     saveManager().updateSaveInfoByInfo(_saveInfo);
-    _romVersion = header.romversion;
-
-    // dbg_printf( "save type %d\n", _saveInfo.saveType );
+    _romVersion = header->romversion;
 
     ///////// banner /////////
-    if (header.bannerOffset != 0) {
-        fseek(f, header.bannerOffset, SEEK_SET);
-        tNDSBanner banner;
-        u32 readed = fread(&banner, 1, 0x840, f);
-        if (sizeof(tNDSBanner) != readed) {
-            memcpy(&_banner, nds_banner_bin, sizeof(_banner));
-        } else {
-            crc = swiCRC16(0xffff, banner.icon, 0x840 - 32);
-
-            if (crc != banner.crc) {
-                dbg_printf("banner crc error, %04x/%04x\n", banner.crc, crc);
-                memcpy(&_banner, nds_banner_bin, sizeof(_banner));
+    // Read banner from buffer when it fits, no extra seek/read
+    if (header->bannerOffset != 0) {
+        u32 bannerEnd = header->bannerOffset + 0x840;
+        if (bannerEnd <= bytesRead) {
+            // Banner is inside our already-read window.
+            tNDSBanner* bannerPtr = (tNDSBanner*)(sRomReadBuf + header->bannerOffset);
+            crc = swiCRC16(0xffff, bannerPtr->icon, 0x840 - 32);
+            if (crc != bannerPtr->crc) {
+                swiCopy(nds_banner_bin, &_banner, COPY_MODE_WORD | (sizeof(_banner) / 4));
             } else {
-                memcpy(&_banner, &banner, sizeof(_banner));
+                swiCopy(bannerPtr, &_banner, COPY_MODE_WORD | (sizeof(_banner) / 4));
+            }
+        } else {
+            // Banner sits past our read window (unusual ROM layout).
+            // Fall back to a targeted seek+read for this case only.
+            fseek(f, header->bannerOffset, SEEK_SET);
+            u32 readed = (u32)fread(&_banner, 1, 0x840, f);
+            if (sizeof(tNDSBanner) != readed) {
+                swiCopy(nds_banner_bin, &_banner, COPY_MODE_WORD | (sizeof(_banner) / 4));
+            } else {
+                crc = swiCRC16(0xffff, _banner.icon, 0x840 - 32);
+                if (crc != _banner.crc) {
+                    swiCopy(nds_banner_bin, &_banner, COPY_MODE_WORD | (sizeof(_banner) / 4));
+                }
             }
         }
     } else {
-        // dbg_printf( "%s has no banner\n", filename );
-        memcpy(&_banner, nds_banner_bin, sizeof(_banner));
+        swiCopy(nds_banner_bin, &_banner, COPY_MODE_WORD | (sizeof(_banner) / 4));
     }
 
-    fclose(f);
-
     _buffer = NULL;
+    fclose(f);
+    f = NULL;
 
     return true;
 }
@@ -252,7 +276,7 @@ bool DSRomInfo::loadGbaRomInfo(const std::string& filename) {
             _isGbaRom = ETrue;
             memcpy(_saveInfo.gameCode, header.gamecode, 4);
             _romVersion = header.version;
-            memcpy(&_banner, gbarom_banner_bin, sizeof(tNDSBanner));
+            swiCopy(gbarom_banner_bin, &_banner, COPY_MODE_WORD | (sizeof(tNDSBanner) / 4));
             return true;
         }
     }
@@ -310,7 +334,7 @@ bool DSRomInfo::setBannerFromFile(const std::string& path, const u8* aBanner)
     bool res = false;
 
     if (!gs().icon) {
-        memcpy(&banner(), aBanner, sizeof(tNDSBanner));
+        swiCopy(aBanner, &banner(), COPY_MODE_WORD | (sizeof(tNDSBanner) / 4));
         
         res = true;
     } else {

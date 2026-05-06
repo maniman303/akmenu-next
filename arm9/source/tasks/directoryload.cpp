@@ -70,7 +70,7 @@ static bool extnameFilter(const std::vector<std::string>& extNames, const std::s
     return false;
 }
 
-static bool hiddenEntryFilter(const std::vector<std::string>& entryNames, const std::string& entryName) {
+static bool hiddenEntryFilter(const std::string& entryName) {
     if (entryName.empty()) {
         return true;
     }
@@ -83,18 +83,16 @@ static bool hiddenEntryFilter(const std::vector<std::string>& entryNames, const 
         return true;
     }
 
-    if (gs().fileListType == 0 && strcasecmp(entryName.c_str(), "saves") == 0) {
-        return true;
-    }
-
     if (entryName[0] == '_') {
         return true;
     }
 
-    for (size_t i = 0; i < entryNames.size(); i++) {
-        if (strcasecmp(entryName.c_str(), entryNames[i].c_str()) == 0) {
-            return true;
-        }
+    if (strcasecmp(entryName.c_str(), "boot.nds") == 0) {
+        return true;
+    }
+
+    if (gs().fileListType == 0 && strcasecmp(entryName.c_str(), "saves") == 0) {
+        return true;
     }
 
     return false;
@@ -462,15 +460,12 @@ bool DirectoryLoadTask::setupPath() {
     if (gs().fileListType > 0) extNames.push_back(".sav");
     if (gs().fileListType > 1) extNames.clear();
 
-    std::vector<std::string> entryNames;
-    entryNames.push_back("boot.nds");
-
     u16 rows = 0;
-    while (rows < MAX_ROWS * 2 && (entry = readdir(_pathDir)) != NULL) {
+    while (rows < MAX_ROWS && (entry = readdir(_pathDir)) != NULL) {
         std::string lfn(entry->d_name);
 
         // Don't show system or hidden files and dirs
-        if (hiddenEntryFilter(entryNames, lfn)) {
+        if (hiddenEntryFilter(lfn)) {
             continue;
         }
 
@@ -482,8 +477,8 @@ bool DirectoryLoadTask::setupPath() {
 
         std::string filePath = _dirName + lfn;
 
-        rows += 2;
-        bool showThis = (entry->d_type == DT_DIR || extnameFilter(extNames, extName)) && !(FAT_getAttr(filePath.c_str()) & ATTR_HIDDEN); 
+        rows++;
+        bool showThis = entry->d_type == DT_DIR || extnameFilter(extNames, extName); 
         if (!showThis) {
             continue;
         }
@@ -500,7 +495,6 @@ bool DirectoryLoadTask::setupPath() {
         }
 
         if (entry->d_type == DT_DIR) {
-            rows--;
             filePath += "/";
         }
 
@@ -510,7 +504,8 @@ bool DirectoryLoadTask::setupPath() {
     if (entry == NULL) {
         closedir(_pathDir);
         _pathDir = NULL;
+        return true;
     }
 
-    return entry == NULL;
+    return false;
 }
