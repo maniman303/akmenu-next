@@ -18,7 +18,6 @@ class cGlobalSettings {
   public:
     enum TScrollSpeed { EScrollFast = 2, EScrollMedium = 3, EScrollSlow = 4 };
     enum TViewMode { EViewList = 0, EViewIcon = 1, EViewInternal = 2, EViewSmall = 3 };
-    enum TSlot2Mode { ESlot2Ask = 0, ESlot2Gba = 1, ESlot2Nds = 2 };
     enum TROMLauncher { EKernelLauncher = 0, ENdsBootstrapLauncher = 1 };
 
   public:
@@ -50,14 +49,12 @@ class cGlobalSettings {
     u32 scrollTick;
     int romLauncher;
     int viewMode;
-    int slot2mode;
     bool sound;
     bool clockSound;
     int filePresentationMode;
     int minimalModeRomsCount;
     bool enterLastDirWhenBoot;
     bool showGbaRoms;
-    bool gbaSleepHack;
     bool gbaAutoSave;
     bool cheats;
     bool softreset;

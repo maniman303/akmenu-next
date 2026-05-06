@@ -421,7 +421,7 @@ void cMainWnd::launchSelected() {
     }
 
     if (rominfo.isGbaRom()) {
-        CGbaLoader(fullPath).Load(false, false);
+        // TODO: Run gbarunner3 here
         return;
     }
 
@@ -612,12 +612,6 @@ void cMainWnd::showSettings(void) {
     _values.push_back(LANG("switches", "Enable"));
     settingWnd->addSettingItem(LANG("patches", "cheating system"), _values, gs().cheats);
 
-    _values.clear();
-    _values.push_back(LANG("gba settings", "modeask"));
-    _values.push_back(LANG("gba settings", "modegba"));
-    _values.push_back(LANG("gba settings", "modends"));
-    settingWnd->addSettingItem(LANG("gba settings", "mode"), _values, gs().slot2mode);
-
     if (isDSiMode()) {
         _values.clear(); 
         _values.push_back(LANG("patches", "default"));
@@ -690,10 +684,9 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
 
     // page 5: other
     gs().cheats = settingWnd->getItemSelection(4, 0);
-    gs().slot2mode = settingWnd->getItemSelection(4, 1);
 
     if (isDSiMode()){
-        gs().hbStrap = settingWnd->getItemSelection(4, 2);
+        gs().hbStrap = settingWnd->getItemSelection(4, 1);
     }
 
     if (uiIndex != uiIndexAfter) {
@@ -781,30 +774,7 @@ void cMainWnd::onMainListDirectoryChanged() {
         }
 
         WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder}, this, [this]() {
-            int mode = gs().slot2mode;
-            if (mode == cGlobalSettings::ESlot2Ask) {
-                akui::cMessageBox::showModal(LANG("gba settings", "mode"), LANG("gba settings", "modetext"), MB_YES_NO,
-                    [this]() {
-                        disableInput();
-                        PassMeLauncher* launcher = new PassMeLauncher();
-                        launcher->setOnCompleted([this](){
-                            enableInput();
-                        });
-                        launcher->launchRom("slot2:/", "", 0, 0, 0, 0);
-                    },
-                    [this]() {
-                        CGbaLoader::StartGBA();
-                    });
-            } else if (mode == cGlobalSettings::ESlot2Nds) {
-                disableInput();
-                PassMeLauncher* launcher = new PassMeLauncher();
-                launcher->setOnCompleted([this](){
-                    enableInput();
-                });
-                launcher->launchRom("slot2:/", "", 0, 0, 0, 0);
-            } else {
-                CGbaLoader::StartGBA();
-            }
+            CGbaLoader::StartGBA();
         });
         task->schedule();
     } else if (_mainList->getRowFullPath(selectedRowId) == "slot1:/") {

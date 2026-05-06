@@ -33,14 +33,12 @@ cGlobalSettings::cGlobalSettings() {
     scrollTick = 0;
     showGbaRoms = true;
     viewMode = EViewInternal;
-    gbaSleepHack = false;
     gbaAutoSave = false;
     cheats = false;
     softreset = true;
     dma = true;
     sdsave = true;
     cheatDB = false;
-    slot2mode = ESlot2Ask;
     saveExt = true;
     saveDir = false;
     dsOnly = false;
@@ -77,7 +75,6 @@ void cGlobalSettings::loadSettings() {
     filePresentationMode = ini.GetInt("system", "filePresentationMode", filePresentationMode);
     minimalModeRomsCount = std::max(0, ini.GetInt("system", "minimalModeRomsCount", minimalModeRomsCount));
     enterLastDirWhenBoot = ini.GetInt("system", "enterLastDirWhenBoot", enterLastDirWhenBoot);
-    gbaSleepHack = ini.GetInt("system", "gbaSleepHack", gbaSleepHack);
     gbaAutoSave = ini.GetInt("system", "gbaAutoSave", gbaAutoSave);
     cheats = ini.GetInt("system", "cheats", cheats);
     softreset = ini.GetInt("system", "softreset", softreset);
@@ -109,10 +106,6 @@ void cGlobalSettings::loadSettings() {
             : (temp == "small") ? EViewSmall
             : (temp == "internal") ? EViewInternal
             : EViewInternal;
-    temp = ini.GetString("system", "slot2mode", "ask");
-    slot2mode = (temp == "gba") ? ESlot2Gba
-            : (temp == "nds") ? ESlot2Nds
-            : ESlot2Ask;
 
     struct stat st;
     if (0 == stat((SFN_CHEATS).c_str(), &st)) cheatDB = true;
@@ -135,11 +128,8 @@ void cGlobalSettings::saveSettings() {
     ini.SetInt("system", "sound", sound);
     ini.SetInt("system", "clockSound", clockSound);
     ini.SetInt("system", "filePresentationMode", filePresentationMode);
-    ini.SetInt("system", "gbaSleepHack", gbaSleepHack);
-    ini.SetInt("system", "gbaAutoSave", gbaAutoSave);
     ini.SetInt("system", "cheats", cheats);
     ini.SetInt("system", "softreset", softreset);
-    ini.SetInt("system", "dma", dma);
     ini.SetInt("system", "sdsave", sdsave);
     ini.SetInt("system", "safemode", safeMode);
     ini.SetInt("system", "savedir", saveDir);
@@ -153,7 +143,6 @@ void cGlobalSettings::saveSettings() {
     ini.SetInt("system", "hbstrap", hbStrap);
     ini.SetInt("system", "pico", pico);
     ini.SetInt("system", "icon", icon);
-    ini.SetInt("system", "phatCol", phatCol);
     ini.SetString(
         "system", "saveext",
         saveExt ? ".sav" 
@@ -171,12 +160,6 @@ void cGlobalSettings::saveSettings() {
         : (viewMode == EViewSmall) ? "small" 
         : (viewMode == EViewInternal) ? "internal"
         : "internal");
-    ini.SetString(
-        "system", "slot2mode",
-        (slot2mode == ESlot2Gba) ? "gba"
-        : (slot2mode == ESlot2Nds) ? "nds"
-        : (slot2mode == ESlot2Ask) ? "ask"
-        : "ask" );
 
     ini.SaveIniFile(SFN_GLOBAL_SETTINGS);
     updateSafeMode();
