@@ -310,6 +310,8 @@ s16 NdsBootstrapLauncher::process(s16 iter) {
             remove("/_nds/nds-bootstrap/nds-bootstrap.ini");
         }
 
+        // logger().info("Launching rom with save path: " + _savePath);
+
         // Setup nds-bootstrap INI parameters
         if (!prepareIni(_romPath, _savePath, _hb)) {
             progressWnd().hide();

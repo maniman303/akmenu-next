@@ -435,7 +435,7 @@ void cMainWnd::launchSelected() {
     tickSound().disable();
     vfxManager().playEffect(VFX_EFFECT::SELECT);
     WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder, &vfxManager()}, this, [this, fullPath, rominfo, isMenu, fileName](){
-        TLaunchResult launchRes = launchRom(fullPath, rominfo, isMenu, "", [this](){
+        TLaunchResult launchRes = launchRom(fullPath, rominfo, isMenu, [this](){
             enableInput();
             tickSound().enable();
         });

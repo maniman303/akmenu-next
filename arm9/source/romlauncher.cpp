@@ -134,16 +134,15 @@ static u32 SaveSize(SAVE_TYPE st) {
     return result;
 }
 
-TLaunchResult launchRom(std::string aFullPath, const DSRomInfo& aRomInfo, bool aMenu, std::string savesPath) {
-    return launchRom(aFullPath, aRomInfo, aMenu, savesPath, {});
+TLaunchResult launchRom(std::string aFullPath, const DSRomInfo& aRomInfo, bool aMenu) {
+    return launchRom(aFullPath, aRomInfo, aMenu, {});
 }
 
-TLaunchResult launchRom(std::string aFullPath, const DSRomInfo& aRomInfo, bool aMenu, std::string savesPath, std::function<void()> onCompleted) {
+TLaunchResult launchRom(std::string aFullPath, const DSRomInfo& aRomInfo, bool aMenu, std::function<void()> onCompleted) {
     u32 flags = 0;
     long cheatOffset = 0;
     size_t cheatSize = 0;
     std::string saveName;
-    std::string useSavesPath;
     Launcher* launcher = nullptr;
     bool isDsiWare;
     bool hb = false;
@@ -182,7 +181,7 @@ TLaunchResult launchRom(std::string aFullPath, const DSRomInfo& aRomInfo, bool a
             }
         }
 
-        saveName = cSaveManager::generateSaveName(useSavesPath, aRomInfo.saveInfo().getSlot());
+        saveName = cSaveManager::generateSaveName(aFullPath, aRomInfo.saveInfo().getSlot());
         size_t lastSlashPos = saveName.find_last_of("/\\");
         std::string directory = saveName.substr(0, lastSlashPos + 1);
 
@@ -194,8 +193,7 @@ TLaunchResult launchRom(std::string aFullPath, const DSRomInfo& aRomInfo, bool a
         }
 
         if (isBigSave) {
-            isBigSave = cSaveManager::initializeSaveFile(useSavesPath, aRomInfo.saveInfo().getSlot(),
-                                                         bigSaveSize);
+            isBigSave = cSaveManager::initializeSaveFile(aFullPath, aRomInfo.saveInfo().getSlot(), bigSaveSize);
             if (!isBigSave) return ELaunchNoFreeSpace;
             flags |= PATCH_SD_SAVE | (bigSaveMask << PATCH_SAVE_SHIFT);
             saveManager().saveLastInfo(aFullPath);
@@ -214,7 +212,7 @@ TLaunchResult launchRom(std::string aFullPath, const DSRomInfo& aRomInfo, bool a
             }
 
             if(!isDsiWare){
-                if (cSaveManager::initializeSaveFile(useSavesPath, aRomInfo.saveInfo().getSlot(),
+                if (cSaveManager::initializeSaveFile(aFullPath, aRomInfo.saveInfo().getSlot(),
                 SaveSize(st))) {
                 flags |= PATCH_SD_SAVE | (SaveMask(st) << PATCH_SAVE_SHIFT);
                 saveManager().saveLastInfo(aFullPath);
@@ -291,6 +289,6 @@ void autoLaunchRom(const std::string& aFullPath, std::function<void()> onComplet
     DSRomInfo rominfo;
     rominfo.mayBeDSRom(aFullPath);
     if (rominfo.isDSRom()) {
-        launchRom(aFullPath, rominfo, false, "");
+        launchRom(aFullPath, rominfo, false);
     }
 }

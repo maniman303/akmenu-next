@@ -233,7 +233,7 @@ bool cSaveManager::initializeSaveFile(const std::string& romFilename, u8 slot, u
 }
 
 std::string cSaveManager::generateSaveName(const std::string& romFilename, u8 slot) {
-    std::string saveFilename(romFilename);
+    std::string saveFilename = romFilename;
 
     if (gs().saveDir) {
         saveFilename.insert(saveFilename.find_last_of("/\\") + 1, "saves/");

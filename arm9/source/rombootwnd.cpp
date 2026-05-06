@@ -148,7 +148,7 @@ void cRomBootWnd::startRom() {
     disableInput();
     vfxManager().playEffect(VFX_EFFECT::SELECT);
     WorkIndicatorTask* task = new WorkIndicatorTask({&vfxManager()}, this, [this](){
-        if (launchRom(_romPath, _romInfo, false, "") != ELaunchRomOk) {
+        if (launchRom(_romPath, _romInfo, false) != ELaunchRomOk) {
             moveToMain();
         }
     });
