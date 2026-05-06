@@ -230,7 +230,7 @@ void cMainWnd::startMenuItemClicked(s16 i) {
         }
 
         if (favoritesRes) {
-            _mainList->enterDir(cFavorites::GetFavorites().size() == 0 && _mainList->getCurrentDir() == "favorites:/" ? "..." : _mainList->getCurrentDir());
+            _mainList->enterDir({_focusBorder}, cFavorites::GetFavorites().size() == 0 && _mainList->getCurrentDir() == "favorites:/" ? "..." : _mainList->getCurrentDir(), {});
             _mainList->scheduleRomSelection(selectedFullPath);
         }
     }
@@ -350,7 +350,7 @@ bool cMainWnd::processKeyMessage(cKeyMessage message) {
             }
         } else {
             vfxManager().playEffect(VFX_EFFECT::SELECT);
-            _mainList->enterDir("favorites:/");
+            _mainList->enterDir({_focusBorder}, "favorites:/", {});
             _mainList->scheduleRomSelection("...");
         }
 
@@ -409,7 +409,7 @@ void cMainWnd::launchSelected() {
 
     if (fullPath.back() == '/' || fullPath == "...") {
         vfxManager().playEffect(fullPath == "..." ? VFX_EFFECT::CLOSE : VFX_EFFECT::SELECT);
-        _mainList->enterDir(fullPath);
+        _mainList->enterDir({_focusBorder}, fullPath, {});
         return;
     }
 
@@ -739,7 +739,7 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
         _mainList->scheduleRomSelection("...");
         _scheduleListFocus = true;
     } else if (gs().fileListType != currentFileListType) {
-        _mainList->enterDir(_mainList->getCurrentDir());
+        _mainList->enterDir({_focusBorder}, _mainList->getCurrentDir(), {});
     }
 }
 

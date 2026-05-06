@@ -133,19 +133,19 @@ void initMainWindow() {
     fadeTask->init();
 
     if (gs().filePresentationMode < 2) {
-        bool res = wnd->_mainList->enterDir(lastDirectory != "..." ? lastDirectory : gs().startupFolder, [fadeTask]() {
+        bool res = wnd->_mainList->enterDir({}, lastDirectory != "..." ? lastDirectory : gs().startupFolder, [fadeTask]() {
             fadeTask->schedule();
         });
 
         if (res) {
             wnd->_mainList->scheduleRomSelection(lastFile);
         } else {
-            wnd->_mainList->enterDir("...", [fadeTask]() {
+            wnd->_mainList->enterDir({}, "...", [fadeTask]() {
                 fadeTask->schedule();
             });
         }
     } else {
-        wnd->_mainList->enterDir("...", [fadeTask]() {
+        wnd->_mainList->enterDir({}, "...", [fadeTask]() {
             fadeTask->schedule();
         });
 

@@ -229,10 +229,10 @@ void cMainList::onDirectoryChanged(std::deque<std::vector<std::string>>& rows, s
 }
 
 bool cMainList::enterDir(const std::string& dirName) {
-    return enterDir(dirName, {});
+    return enterDir({}, dirName, {});
 }
 
-bool cMainList::enterDir(const std::string& dirName, std::function<void()> onCompleted) {
+bool cMainList::enterDir(std::vector<WorkIndicator*> indicators, const std::string& dirName, std::function<void()> onCompleted) {
     if (dirName == "slot2:/") {
         _currentDir = "";
         directoryChanged();
@@ -270,7 +270,7 @@ bool cMainList::enterDir(const std::string& dirName, std::function<void()> onCom
 
     _busy = true;
 
-    DirectoryLoadTask* task = new DirectoryLoadTask(tempDirName, [this, tempDirName](std::deque<std::vector<std::string>>& rows) {
+    DirectoryLoadTask* task = new DirectoryLoadTask(indicators, tempDirName, [this, tempDirName](std::deque<std::vector<std::string>>& rows) {
         onDirectoryChanged(rows, tempDirName);
     });
 

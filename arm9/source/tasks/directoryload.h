@@ -8,10 +8,11 @@
 #include <string>
 #include <dirent.h>
 #include "taskworker.h"
+#include "workindicator.h"
 
 class DirectoryLoadTask : public TaskWorker {
   public:
-    DirectoryLoadTask(std::string dirName, std::function<void(std::deque<std::vector<std::string>>&)> onLoadCompleted);
+    DirectoryLoadTask(std::vector<WorkIndicator*> indicators, std::string dirName, std::function<void(std::deque<std::vector<std::string>>&)> onLoadCompleted);
     ~DirectoryLoadTask();
 
     s16 process(s16 iter) override;
@@ -21,6 +22,7 @@ class DirectoryLoadTask : public TaskWorker {
   private:
     enum STAGE { DEF = 0, SCAN = 1, FAV = 2, PATH = 3, LAST = 4 };
 
+    bool isBusy();
     std::unordered_set<std::string>& getFavorites();
     bool setupLastPlayed();
     bool setupFavorites();
@@ -28,6 +30,7 @@ class DirectoryLoadTask : public TaskWorker {
     bool setupGameScan();
     bool setupPath();
 
+    std::vector<WorkIndicator*> _indicators;
     std::queue<s16> _plan;
     std::unordered_set<s16> _completed;
     std::string _dirName;

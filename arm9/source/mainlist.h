@@ -40,7 +40,7 @@ class cMainList : public akui::cListView {
   public:
     int init();
     bool enterDir(const std::string& dirName);
-    bool enterDir(const std::string& dirName, std::function<void()> onCompleted);
+    bool enterDir(std::vector<WorkIndicator*> indicators, const std::string& dirName, std::function<void()> onCompleted);
     bool backParentDir();
     void update() override;
     bool processKeyMessage(cKeyMessage message) override;

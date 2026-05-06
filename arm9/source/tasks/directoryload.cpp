@@ -12,6 +12,7 @@
 #include "../savemngr.h"
 #include "../stringtool.h"
 
+#define MIN_ROWS 1
 #define MAX_ROWS 2
 
 static bool itemSortComp(const std::vector<std::string>& item1, const std::vector<std::string>& item2) {
@@ -97,7 +98,8 @@ static bool hiddenEntryFilter(const std::string& entryName) {
     return false;
 }
 
-DirectoryLoadTask::DirectoryLoadTask(std::string dirName, std::function<void(std::deque<std::vector<std::string>>&)> onLoadCompleted) {
+DirectoryLoadTask::DirectoryLoadTask(std::vector<WorkIndicator*> indicators, std::string dirName, std::function<void(std::deque<std::vector<std::string>>&)> onLoadCompleted) {
+    _indicators = indicators;
     _dirName = dirName;
     _onLoadCompleted = onLoadCompleted;
     _favoritesIter = _favorites.end();
@@ -131,6 +133,10 @@ void DirectoryLoadTask::schedule() {
 
 s16 DirectoryLoadTask::process(s16 iter) {
     if (iter == 303) {
+        if (isBusy()) {
+            return iter;
+        }
+
         if (_data.size() == 0) {
             std::string name = LANG("mainlist", "empty");
             _data.push_back({"", name, name, "..."});
@@ -209,6 +215,16 @@ void DirectoryLoadTask::setOnCompleted(std::function<void()> onCompleted) {
     _extraOnCompleted = onCompleted;
 }
 
+bool DirectoryLoadTask::isBusy() {
+    for (const WorkIndicator* indicator : _indicators) {
+        if (indicator->busy()) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 std::unordered_set<std::string>& DirectoryLoadTask::getFavorites() {
     if (_favorites.empty()) {
         std::vector<std::string> favoriteList = cFavorites::GetFavorites();
@@ -263,7 +279,8 @@ bool DirectoryLoadTask::setupFavorites() {
     }
 
     s16 iter = 0;
-    while (_favoritesIter != favorites.end() && iter < MAX_ROWS) {
+    s16 total = isBusy() ? MIN_ROWS : MAX_ROWS;
+    while (_favoritesIter != favorites.end() && iter < total) {
         const std::string& item = *(_favoritesIter++);
 
         if (item.empty() || (item.back() == '/' && exclusive)) {
@@ -362,7 +379,8 @@ bool DirectoryLoadTask::setupGameScan() {
     }
 
     s16 rows = 0;
-    while (rows < rowsToLoad && rows < MAX_ROWS && !_pathsToScan.empty()) {
+    s16 total = isBusy() ? MIN_ROWS : MAX_ROWS;
+    while (rows < rowsToLoad && rows < total && !_pathsToScan.empty()) {
         std::string path = _pathsToScan.front();
 
         struct dirent* entry = NULL;
@@ -374,7 +392,7 @@ bool DirectoryLoadTask::setupGameScan() {
             }
         }
 
-        while (rows < MAX_ROWS && rows < rowsToLoad && (entry = readdir(_scanDir)) != NULL) {
+        while (rows < total && rows < rowsToLoad && (entry = readdir(_scanDir)) != NULL) {
             std::string lfn(entry->d_name);
 
             if (lfn.empty() || lfn[0] == '.' || lfn[0] == '_') {
@@ -460,7 +478,8 @@ bool DirectoryLoadTask::setupPath() {
     } 
 
     u16 rows = 0;
-    while (rows < MAX_ROWS * 2 && (entry = readdir(_pathDir)) != NULL) {
+    s16 total = isBusy() ? MIN_ROWS : MAX_ROWS;
+    while (rows < total * 2 && (entry = readdir(_pathDir)) != NULL) {
         std::string lfn(entry->d_name);
 
         // Don't show system or hidden files and dirs
