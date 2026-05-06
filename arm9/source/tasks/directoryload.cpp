@@ -329,11 +329,6 @@ bool DirectoryLoadTask::setupDefaultDir() {
     bool skipCards = gs().filePresentationMode >= 2 && _data.size() < (size_t)gs().minimalModeRomsCount;
     bool skipFavorites = gs().filePresentationMode >= 2;
 
-    std::string microsd = fsManager().getIconPath("microsd_banner.bin");
-    std::string nand = fsManager().getIconPath("nand_banner.bin");
-    std::string gba = fsManager().getIconPath("gba_banner.bin");
-    std::string folder = fsManager().getIconPath("folder_banner.bin");
-
     if (!skipCards && fsManager().isFlashcart()) {
         std::string name = LANG("mainlist", "microsd card");
         _data.push_back({"", name, name, "fat:/"});
@@ -473,7 +468,7 @@ bool DirectoryLoadTask::setupPath() {
         _extNames.emplace(".nds");
         _extNames.emplace(".dsi");
         _extNames.emplace(".sri");
-        if (gs().showGbaRoms > 0) _extNames.emplace(".gba");
+        _extNames.emplace(".gba");
         if (gs().fileListType > 0) _extNames.emplace(".sav");
     } 
 

@@ -54,7 +54,6 @@ class cGlobalSettings {
     int filePresentationMode;
     int minimalModeRomsCount;
     bool enterLastDirWhenBoot;
-    bool showGbaRoms;
     bool gbaAutoSave;
     bool cheats;
     bool softreset;
@@ -72,7 +71,6 @@ class cGlobalSettings {
     bool phatCol;
     bool hbStrap;
     bool pico;
-    bool icon;
 };
 
 typedef t_singleton<cGlobalSettings> globalSettings_s;

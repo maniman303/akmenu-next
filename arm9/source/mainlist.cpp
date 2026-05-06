@@ -155,7 +155,9 @@ void cMainList::processDirIcon(DSRomInfo& romInfo, const std::string fileName) {
     
     if (extName == ".gba") {
         romInfo.mayBeGbaRom(fileName);
-        if (!romInfo.isGbaRom()) {
+        if (romInfo.isGbaRom()) {
+            // TODO: Try load bmp icon
+        } else {
             romInfo.setBannerFromFile(fsManager().getIconPath("unknown_banner.bin"), unknown_banner_bin);
         }
 

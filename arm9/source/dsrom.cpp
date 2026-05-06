@@ -17,6 +17,7 @@
 #include "unknown_nds_banner_bin.h"
 #include "unicode.h"
 #include "logger.h"
+#include "fsmngr.h"
 #include "../../share/memtool.h"
 
 // 0x8840 covers the NDS header (0x200) + the typical retail banner location
@@ -180,15 +181,15 @@ bool DSRomInfo::loadDSRomInfo(const std::string& filename, bool loadBanner) {
         fseek(f, header->bannerOffset, SEEK_SET);
         u32 readed = (u32)fread(&_banner, 1, 0x840, f);
         if (sizeof(tNDSBanner) != readed) {
-            swiCopy(nds_banner_bin, &_banner, COPY_MODE_WORD | (sizeof(_banner) / 4));
+            setBannerFromFile(fsManager().getIconPath("nds_banner.bin"), nds_banner_bin);
         } else {
             crc = swiCRC16(0xffff, _banner.icon, 0x840 - 32);
             if (crc != _banner.crc) {
-                swiCopy(nds_banner_bin, &_banner, COPY_MODE_WORD | (sizeof(_banner) / 4));
+                setBannerFromFile(fsManager().getIconPath("nds_banner.bin"), nds_banner_bin);
             }
         }
     } else {
-        swiCopy(nds_banner_bin, &_banner, COPY_MODE_WORD | (sizeof(_banner) / 4));
+        setBannerFromFile(fsManager().getIconPath("nds_banner.bin"), nds_banner_bin);
     }
 
     _buffer = NULL;
@@ -262,7 +263,7 @@ bool DSRomInfo::loadGbaRomInfo(const std::string& filename) {
             _isGbaRom = ETrue;
             memcpy(_saveInfo.gameCode, header.gamecode, 4);
             _romVersion = header.version;
-            swiCopy(gbarom_banner_bin, &_banner, COPY_MODE_WORD | (sizeof(tNDSBanner) / 4));
+            setBannerFromFile(fsManager().getIconPath("gbarom_banner.bin"), gbarom_banner_bin);
             return true;
         }
     }
@@ -318,17 +319,14 @@ bool DSRomInfo::isGbaRom(void) const {
 bool DSRomInfo::setBannerFromFile(const std::string& path, const u8* aBanner)
 {
     bool res = false;
-
-    if (!gs().icon) {
-        swiCopy(aBanner, &banner(), COPY_MODE_WORD | (sizeof(tNDSBanner) / 4));
-        
-        res = true;
-    } else {
-        FILE* f = fopen(path.c_str(), "rb");
-        if (!f) return false;
+    FILE* f = fopen(path.c_str(), "rb");
+    if (f != NULL) {
         size_t read = fread(&banner(), 1, sizeof(tNDSBanner), f);
         fclose(f);
         res = read == sizeof(tNDSBanner);
+    } else {
+        swiCopy(aBanner, &banner(), COPY_MODE_WORD | (sizeof(tNDSBanner) / 4));
+        res = true;
     }
 
     if (!res) {

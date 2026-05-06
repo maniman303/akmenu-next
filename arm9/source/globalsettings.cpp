@@ -31,7 +31,6 @@ cGlobalSettings::cGlobalSettings() {
     scrollSpeed = EScrollFast;
     scrollWait = 9;
     scrollTick = 0;
-    showGbaRoms = true;
     viewMode = EViewInternal;
     gbaAutoSave = false;
     cheats = false;
@@ -52,7 +51,6 @@ cGlobalSettings::cGlobalSettings() {
     languageOverride = 0;
     hbStrap = 0;
     pico = 0;
-    icon = 1;
 #ifndef __KERNEL_LAUNCHER_SUPPORT__
     romLauncher = EKernelLauncher;
 #else
@@ -92,8 +90,6 @@ void cGlobalSettings::loadSettings() {
     languageOverride = ini.GetInt("system", "languageOverride", languageOverride);
     hbStrap = ini.GetInt("system", "hbstrap", hbStrap);
     pico = ini.GetInt("system", "pico", pico);
-    icon = ini.GetInt("system", "icon", icon);
-    
     temp = ini.GetString("system", "saveext", ".sav");
     saveExt = (temp == ".sav");
     temp = ini.GetString("system", "scrollSpeed", "fast");
@@ -142,7 +138,6 @@ void cGlobalSettings::saveSettings() {
     ini.SetInt("system", "languageOverride", languageOverride);
     ini.SetInt("system", "hbstrap", hbStrap);
     ini.SetInt("system", "pico", pico);
-    ini.SetInt("system", "icon", icon);
     ini.SetString(
         "system", "saveext",
         saveExt ? ".sav" 
