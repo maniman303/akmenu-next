@@ -18,59 +18,88 @@ cFont::cFont() {}
 cFont::~cFont() {}
 
 std::string cFont::BreakLine(const std::string& text, u32 maxLineWidth) {
-    if (text.empty() || maxLineWidth == 0) {
-        return text;
-    }
+    if (text.empty() || maxLineWidth == 0) return text;
 
     std::string ret;
+    ret.reserve(text.size() + text.size() / 20);
 
     const char* p = text.c_str();
-    bool hasSpace = false;
-    u32 tempWidth = 0;
-    u32 lastTempWidth = 0;
+    const size_t len = text.size();
 
-    while (*p != 0) {
+    size_t lineStart = 0;
+    size_t i = 0;
+
+    u32 lineWidth = 0;
+
+    struct BreakPoint {
+        size_t posInText;
+        size_t posInRet;
+        u32 widthAfter;
+        int priority;
+        bool valid;
+    };
+    BreakPoint bp = { 0, 0, 0, 0, false };
+
+    auto flushUpTo = [&](size_t end) {
+        ret.append(p + lineStart, p + end);
+        lineStart = end;
+    };
+
+    while (i < len) {
         u32 ww, add;
-        Info(p, &ww, &add);
-        tempWidth += ww;
+        Info(p + i, &ww, &add);
 
-        if (*p == '\n') {
-            ret.push_back('\n');
-            hasSpace = false;
-            tempWidth = 0;
-            lastTempWidth = 0;
-            p++;
+        if (*(p + i) == '\n') {
+            flushUpTo(i + 1);
+            lineWidth = 0;
+            bp.valid = false;
+            i++;
             continue;
         }
 
-        if (ww == 0 || *p == '\r') {
-            p++;
+        if (ww == 0 || *(p + i) == '\r') {
+            i++;
             continue;
         }
 
-        if (*p == ' ') {
-            hasSpace = true;
-            lastTempWidth = tempWidth;
+        lineWidth += ww;
+
+        if (*(p + i) == ' ' && (!bp.valid || bp.priority <= 1)) {
+            bp = { i, ret.size() + (i - lineStart), lineWidth, 1, true };
+        } else if (*(p + i) == ':' && (!bp.valid || bp.priority <= 2)) {
+            bp = { i, ret.size() + (i - lineStart), lineWidth, 2, true };
         }
-        
-        if (tempWidth > maxLineWidth) {
-            if (hasSpace) {
-                u32 lastSpacePos = ret.find_last_of(' ');
-                ret[lastSpacePos] = '\n';
-                tempWidth = tempWidth - lastTempWidth - 1;
-                hasSpace = false;
+
+        if (lineWidth > maxLineWidth) {
+            if (bp.valid) {
+                flushUpTo(bp.posInText);
+
+                if (bp.priority == 1) {
+                    ret.push_back('\n');
+                    lineStart = bp.posInText + 1;
+                } else {
+                    ret.append(p + lineStart, p + lineStart + add);
+                    ret.push_back('\n');
+                    lineStart = bp.posInText + add;
+                }
+
+                lineWidth = lineWidth - bp.widthAfter;
+                bp.valid = false;
             } else {
+                flushUpTo(i);
                 ret.push_back('\n');
-                tempWidth = 0;
+                lineWidth = ww;
+                bp.valid = false;
             }
         }
 
-        for (u32 ii = 0; ii < add; ii++) ret.push_back(*p++);
+        i += add;
     }
 
-    if (ret.back() == '\n') {
-        ret = ret.substr(0, ret.length() - 1);
-    }
+    flushUpTo(len);
+
+    if (!ret.empty() && ret.back() == '\n')
+        ret.pop_back();
 
     return ret;
 }

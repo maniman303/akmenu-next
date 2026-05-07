@@ -91,6 +91,10 @@ static bool hiddenEntryFilter(const std::string& entryName) {
         return true;
     }
 
+    if (strcasecmp(entryName.c_str(), "GBARunner3.nds") == 0) {
+        return true;
+    }
+
     if (gs().fileListType == 0 && strcasecmp(entryName.c_str(), "saves") == 0) {
         return true;
     }
