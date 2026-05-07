@@ -64,7 +64,7 @@ bool DSRomInfo::loadDSRomInfo(const std::string& filename, bool loadBanner) {
 
     u32 bytesRead = (u32)fread(sRomReadBuf, 1, ROM_READ_SIZE, f);
 
-    if (bytesRead < 512) {
+    if (bytesRead < ROM_READ_SIZE) {
         swiCopy(unknown_nds_banner_bin, &_banner, COPY_MODE_WORD | (sizeof(_banner) / 4));
         fclose(f);
         return false;
@@ -91,7 +91,6 @@ bool DSRomInfo::loadDSRomInfo(const std::string& filename, bool loadBanner) {
     _isModernHomebrew = ETrue;
     u32 arm9StartSig[4] = {0};
 
-    // ARM9 sig from buffer when possible, seek only as fallback
     // "Battle/Combat of Giants: Mutant Insects" (TID: BIG) has code that is
     // run before the actual SDK boot code.
     u32 arm9SigOffset = (u32)header->arm9romOffset +
@@ -100,14 +99,8 @@ bool DSRomInfo::loadDSRomInfo(const std::string& filename, bool loadBanner) {
             : (u32)header->arm9executeAddress)
         - (u32)header->arm9destination;
 
-    if (arm9SigOffset + sizeof(arm9StartSig) <= bytesRead) {
-        // Happy path: already in our buffer — no I/O at all.
-        memcpy(arm9StartSig, sRomReadBuf + arm9SigOffset, sizeof(arm9StartSig));
-    } else {
-        // Fallback: the ROM is unusual and the sig lives past our read window.
-        fseek(f, arm9SigOffset, SEEK_SET);
-        fread(arm9StartSig, sizeof(u32), 4, f);
-    }
+    fseek(f, arm9SigOffset, SEEK_SET);
+    fread(arm9StartSig, sizeof(u32), 4, f);
 
     // Check for Nintendo SDK style retail builds
     if ((arm9StartSig[0] == 0xE3A0C301 || (arm9StartSig[0] >= 0xEA000000 && arm9StartSig[0] < 0xEC000000)) && arm9StartSig[1] == 0xE58CC208) {

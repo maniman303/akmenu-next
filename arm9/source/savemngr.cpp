@@ -124,12 +124,15 @@ bool cSaveManager::exportCustomSaveList(const std::string& filename) {
 void cSaveManager::updateCustomSaveList(const SAVE_INFO_EX& aSaveInfo) {
     size_t i = 0;
     for (i = 0; i < _customSaveList.size(); ++i) {
-        if (0 == memcmp(&_customSaveList[i], &aSaveInfo, SAVE_INFO_EX_COMPARE_SIZE)) {
+        if (memcmp(&_customSaveList[i], &aSaveInfo, SAVE_INFO_EX_COMPARE_SIZE) == 0) {
             _customSaveList[i] = aSaveInfo;
             break;
         }
     }
-    if (i == _customSaveList.size()) _customSaveList.push_back(aSaveInfo);
+    
+    if (i == _customSaveList.size()) {
+        _customSaveList.push_back(aSaveInfo);
+    }
 
     exportCustomSaveList(SFN_CUSTOM_SAVELIST);
 }
@@ -263,7 +266,7 @@ SAVE_TYPE MelonDSROMListToSaveType[] = {ST_NOSAVE, ST_4K, ST_64K, ST_512K, ST_1M
 void cSaveManager::updateSaveInfoByInfo(SAVE_INFO_EX& gameInfo) {
     size_t saveCount = _customSaveList.size();
     for (size_t i = 0; i < saveCount; ++i) {
-        if (0 == memcmp(&gameInfo, &_customSaveList[i], SAVE_INFO_EX_COMPARE_SIZE)) {
+        if (memcmp(&gameInfo, &_customSaveList[i], SAVE_INFO_EX_COMPARE_SIZE) == 0) {
             gameInfo = _customSaveList[i];
             return;
         }
@@ -273,16 +276,16 @@ void cSaveManager::updateSaveInfoByInfo(SAVE_INFO_EX& gameInfo) {
     u32 gameCode;
     memcpy(&gameCode, gameInfo.gameCode, sizeof(gameCode));  // because alignment
 
-    for (size_t i = 0; i < ROMListEntryCount; i++) {
-        const ROMListEntry* entry = &ROMList[i];
-        if (gameCode == entry->GameCode) {
-            if (entry->SaveMemType == 0xFFFFFFFF)
-                gameInfo.saveType = ST_AUTO;
-            else
-                gameInfo.saveType = MelonDSROMListToSaveType[entry->SaveMemType];
-            break;
+    const ROMListEntry* entry = FindROMEntry(gameCode);
+    if (entry != NULL) {
+        if (entry->SaveMemType == 0xFFFFFFFF) {
+            gameInfo.saveType = ST_AUTO;
+        }
+        else {
+            gameInfo.saveType = MelonDSROMListToSaveType[entry->SaveMemType];
         }
     }
+
     return;
 }
 

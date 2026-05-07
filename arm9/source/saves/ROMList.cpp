@@ -18,14 +18,37 @@
 
 /* clang-format off */
 
+#include <algorithm>
 #include "ROMList.h"
 
-/* AKMENU CHANGES START - don't namespace ROMList */
-/*
-namespace melonDS
+const ROMListEntry* FindROMEntry(u32 gameCode)
 {
-*/
-/* AKMENU CHANGES END - don't namespace ROMList */
+    size_t left = 0;
+    size_t right = ROMListEntryCount;
+
+    while (left < right)
+    {
+        size_t mid = left + (right - left) / 2;
+
+        const ROMListEntry& entry = ROMList[mid];
+
+        if (gameCode < entry.GameCode)
+        {
+            right = mid;
+        }
+        else if (gameCode > entry.GameCode)
+        {
+            left = mid + 1;
+        }
+        else
+        {
+            return &entry;
+        }
+    }
+
+    return NULL;
+}
+
 const ROMListEntry ROMList[] =
 {
 	{0x41464141, 0x00800000, 0x00000004},
@@ -6809,9 +6832,3 @@ const ROMListEntry ROMList[] =
 };
 
 const size_t ROMListEntryCount = sizeof(ROMList) / sizeof(ROMListEntry);
-
-/* AKMENU CHANGES START - don't namespace ROMList */
-/*
-}
-*/
-/* AKMENU CHANGES END - don't namespace ROMList */

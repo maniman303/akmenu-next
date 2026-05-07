@@ -18,19 +18,10 @@
 
 /* clang-format off */
 
-#ifndef ROMLIST_H
-#define ROMLIST_H
-
 #include <stddef.h>
 
 #include <nds/ndstypes.h>
 
-/* AKMENU CHANGES START - don't namespace ROMList */
-/*
-namespace melonDS
-{
-*/
-/* AKMENU CHANGES END - don't namespace ROMList */
 struct ROMListEntry
 {
 	u32 GameCode;
@@ -38,15 +29,9 @@ struct ROMListEntry
 	u32 SaveMemType;
 };
 
+const ROMListEntry* FindROMEntry(u32 gameCode);
 
 extern const ROMListEntry ROMList[];
 
 /// The number of elements in \c ROMList.
 extern const size_t ROMListEntryCount;
-
-/* AKMENU CHANGES START - don't namespace ROMList */
-/*
-}
-*/
-/* AKMENU CHANGES END - don't namespace ROMList */
-#endif // ROMLIST_H
