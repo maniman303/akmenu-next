@@ -415,13 +415,12 @@ bool DirectoryLoadTask::setupGameScan() {
             }
 
             std::string extName = "";
-            size_t lastDotPos = lfn.find_last_of('.');
-            if (lfn.npos != lastDotPos) {
-                extName = lfn.substr(lastDotPos);
+            size_t lastDotPos = llfn.find_last_of('.');
+            if (lastDotPos != llfn.npos) {
+                extName = llfn.substr(lastDotPos);
             }
 
-            extName = toLowerString(extName);
-            if (extName != ".nds" || llfn == "boot.nds") {
+            if ((extName != ".nds" && extName != ".gba") || llfn == "boot.nds" || llfn == "gbarunner3.nds") {
                 continue;
             }
 

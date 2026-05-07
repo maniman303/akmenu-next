@@ -13,6 +13,7 @@
 #include <string>
 #include <memory>
 #include "gdi.h"
+#include "bmp15.h"
 #include "savemngr.h"
 
 class DSRomInfo {
@@ -37,12 +38,15 @@ class DSRomInfo {
     bool loadGbaRomInfo(const std::string& filename);
     bool loadDSRomInfo(const std::string& filename, bool loadBanner);
     void drawDSRomIconMem(u16* mem, bool small);
+    bool drawDSRomIconBmp(const cBMP15& icon, bool small);
+    bool tryLoadGbaIcon(bool size);
 
   public:
     DSRomInfo();
     ~DSRomInfo();
 
   public:
+    DSRomInfo& operator=(const DSRomInfo& src);
     void drawDSRomIcon(u8 x, u8 y, bool small, GRAPHICS_ENGINE engine);
     std::string getDsLocTitle();
     tNDSBanner& banner(void);
@@ -54,7 +58,6 @@ class DSRomInfo {
     bool isHomebrew(void) const;
     bool isModernHomebrew(void) const;
     bool isGbaRom(void) const;
-    DSRomInfo& operator=(const DSRomInfo& src);
     void mayBeDSRom(const std::string& filename) {
         _isDSRom = EMayBe;
         _isHomebrew = EMayBe;

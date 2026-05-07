@@ -20,9 +20,6 @@
 #include "fsmngr.h"
 #include "../../share/memtool.h"
 
-// 0x8840 covers the NDS header (0x200) + the typical retail banner location
-// (~0x8000–0x8140) in one shot.  Made static so it lives in BSS, not the
-// ARM9 stack (which is tiny on DS).
 static const u32 ROM_READ_SIZE = 0x200;
 static u8 sRomReadBuf[ROM_READ_SIZE] __attribute__((aligned(4)));
 
@@ -208,7 +205,9 @@ void DSRomInfo::drawDSRomIcon(u8 x, u8 y, bool small, GRAPHICS_ENGINE engine) {
     if (small != _lastSize || !_buffer) {
         _buffer = std::shared_ptr<u32[]>(new u32[small ? 16 * 8 : 32 * 16]);
         _lastSize = small;
-        drawDSRomIconMem((u16*)_buffer.get(), small);
+        if (!isGbaRom() || !tryLoadGbaIcon(small)) {
+            drawDSRomIconMem((u16*)_buffer.get(), small);
+        }
     }
 
     gdi().maskBlt(_buffer.get(), x, y, iconSize, iconSize, engine);
@@ -242,6 +241,27 @@ void DSRomInfo::drawDSRomIconMem(u16* mem, bool small) {
             }
         }
     }
+}
+
+bool DSRomInfo::drawDSRomIconBmp(const cBMP15& icon, bool small) {
+    if (!icon.valid() || icon.width() != 32 || icon.height() != 32) {
+        return false;
+    }
+
+    if (!small) {
+        swiCopy(icon.buffer(), _buffer.get(), 32 * 32);
+        return true;
+    }
+
+    for (u16 i = 0; i < 16; i++) {
+        for (u16 k = 0; k < 16; k++) {
+            u16* srcPos = (u16*)icon.buffer() + i * 64 + k * 2;
+            u16* dstPos = (u16*)_buffer.get() + i * 16 + k;
+            *dstPos = *srcPos;
+        }
+    }
+
+    return true;
 }
 
 std::string DSRomInfo::getDsLocTitle() {
@@ -333,13 +353,33 @@ bool DSRomInfo::setBannerFromFile(const std::string& path, const u8* aBanner)
         return false;
     }
 
-    _buffer = std::shared_ptr<u32[]>(new u32[_lastSize ? 16 * 8 : 32 * 16]);
-
-    drawDSRomIconMem((u16*)_buffer.get(), _lastSize);
+    _buffer = NULL;
 
     return true;
 }
 
 bool DSRomInfo::lastSize() {
     return _lastSize;
+}
+
+bool DSRomInfo::tryLoadGbaIcon(bool size) {
+    if (!isGbaRom()) {
+        return false;
+    }
+
+    std::string iconFileName = _fileName;
+    std::size_t dotPos = iconFileName.find_last_of('.');
+    if (dotPos == std::string::npos) {
+        return false;
+    }
+
+    std::size_t slashPos = iconFileName.find_last_of("/\\");
+    if (slashPos != std::string::npos && dotPos < slashPos) {
+        return false;
+    }
+
+    iconFileName.replace(dotPos, std::string::npos, ".bmp");
+    cBMP15 icon = createBMP15FromFile(iconFileName);
+
+    return drawDSRomIconBmp(icon, size);
 }
