@@ -13,8 +13,6 @@
 cWindowManager::cWindowManager()
     : _currentWindow(NULL, NULL),
     _focusedWindow(NULL),
-    _windowBelowPen(NULL),
-    _capturedWindow(NULL),
     _scheduleBackground(0) {}
 
 cWindowManager::~cWindowManager() {}
