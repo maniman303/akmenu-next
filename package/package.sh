@@ -30,7 +30,6 @@ cp -r title dsi
 cp boot.dsi dsi/boot.nds
 cp boot.dsi dsi/akmenu-next.dsi
 cp boot.dsi dsi/_nds/akmenunext/launcher.nds
-rm -f dsi/_nds/akmenunext/PassMeLoader.nds
 cd dsi
 zip -r ../akmenu-next-dsi.zip * --exclude '*.xcf'
 cd ..
@@ -41,7 +40,6 @@ cp -r _nds 3ds
 cp boot.dsi 3ds/boot.nds
 cp akmenu-next.cia 3ds/akmenu-next.cia
 cp boot.dsi 3ds/_nds/akmenunext/launcher.nds
-rm -f 3ds/_nds/akmenunext/PassMeLoader.nds
 cd 3ds
 zip -r ../akmenu-next-3ds.zip * --exclude '*.xcf'
 cd ..

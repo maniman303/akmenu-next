@@ -10,7 +10,6 @@ staging
 *.dldi
 *.zip
 *.cia
-!PassMeLoader.nds
 !slot1launch.nds
 !redist/**/*.zip
 /package/_nds/akmenunext/language

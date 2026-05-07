@@ -10,8 +10,9 @@
 
 #include <nds.h>
 #include <string>
+#include "singleton.h"
 
-class CGbaLoader {
+class cGbaLoader {
   public:
     static void StartGBA(void);
     static u8 GetGbaHeader();
@@ -20,3 +21,8 @@ class CGbaLoader {
     static void LoadBorder(void);
     static void BootGBA(void);
 };
+
+typedef t_singleton<cGbaLoader> GbaLoader_s;
+inline cGbaLoader& gbaLoader() {
+    return GbaLoader_s::instance();
+}

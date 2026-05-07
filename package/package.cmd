@@ -25,7 +25,6 @@ cp -r title dsi
 cp boot.dsi dsi\boot.nds
 cp boot.dsi dsi\akmenu-next.dsi
 cp boot.dsi dsi\_nds\akmenunext\launcher.nds
-rm dsi\_nds\akmenunext\PassMeLoader.nds
 "C:\Program Files\7-Zip\7z.exe" -tzip a -r akmenu-next-dsi.zip ./dsi/*
 
 :3DS
@@ -34,7 +33,6 @@ cp -r _nds 3ds
 cp boot.dsi 3ds\boot.nds
 cp akmenu-next.cia 3ds\akmenu-next.cia
 cp boot.dsi 3ds\_nds\akmenunext\launcher.nds
-rm 3ds\_nds\akmenunext\PassMeLoader.nds
 "C:\Program Files\7-Zip\7z.exe" -tzip a -r akmenu-next-3ds.zip ./3ds/*
 
 :CLEANUP

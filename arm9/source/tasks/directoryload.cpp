@@ -353,7 +353,7 @@ bool DirectoryLoadTask::setupDefaultDir() {
         _data.push_back({"", name, name, "slot1:/"});
     }
 
-    if (!isDSiMode() && CGbaLoader::GetGbaHeader() == GBA_HEADER.complement) {
+    if (!isDSiMode() && cGbaLoader::GetGbaHeader() == GBA_HEADER.complement) {
         std::string name = LANG("mainlist", "slot2 card");
         _data.push_back({"", name, name, "slot2:/"});
     }

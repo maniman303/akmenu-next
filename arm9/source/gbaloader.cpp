@@ -14,13 +14,13 @@
 #include "sram.h"
 #include "../../share/fifotool.h"
 
-void CGbaLoader::StartGBA(void) {
+void cGbaLoader::StartGBA(void) {
     LoadBorder();
     BootGBA();
     while (true) swiWaitForVBlank();
 }
 
-void CGbaLoader::LoadBorder(void) {
+void cGbaLoader::LoadBorder(void) {
     videoSetMode(MODE_5_2D | DISPLAY_BG3_ACTIVE);
     videoSetModeSub(MODE_5_2D | DISPLAY_BG3_ACTIVE);
     vramSetPrimaryBanks(VRAM_A_MAIN_BG_0x06000000, VRAM_B_MAIN_BG_0x06020000,
@@ -47,7 +47,7 @@ void CGbaLoader::LoadBorder(void) {
     }
 }
 
-void CGbaLoader::BootGBA(void) {
+void cGbaLoader::BootGBA(void) {
     sysSetBusOwners(BUS_OWNER_ARM7, BUS_OWNER_ARM7);
     if (PersonalData->gbaScreen)
         REG_POWERCNT = 1;
@@ -56,7 +56,7 @@ void CGbaLoader::BootGBA(void) {
     fifoSendValue32(FIFO_USER_01, MENU_MSG_GBA);
 }
 
-u8 CGbaLoader::GetGbaHeader() {
+u8 cGbaLoader::GetGbaHeader() {
     u8 chk = 0;
     for (u32 i = 0xA0; i < 0xBD; ++i) {
         chk = chk - *(u8*)(0x8000000 + i);

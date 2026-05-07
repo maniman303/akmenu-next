@@ -37,7 +37,6 @@
 
 #include "launcher/HomebrewLauncher.h"
 #include "launcher/NdsBootstrapLauncher.h"
-#include "launcher/PassMeLauncher.h"
 #include "launcher/Slot1Launcher.h"
 
 cMainWnd::cMainWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::string& text)
@@ -764,7 +763,7 @@ void cMainWnd::onMainListDirectoryChanged() {
 
     u32 selectedRowId = _mainList->selectedRowId();
     if (_mainList->getRowFullPath(selectedRowId) == "slot2:/") {
-        u8 chk = CGbaLoader::GetGbaHeader();
+        u8 chk = cGbaLoader::GetGbaHeader();
         if (chk != GBA_HEADER.complement) {
             std::string title = LANG("no gba card", "title");
             std::string text = LANG("no gba card", "text");
@@ -774,7 +773,7 @@ void cMainWnd::onMainListDirectoryChanged() {
         }
 
         WorkIndicatorTask* task = new WorkIndicatorTask({_focusBorder}, this, [this]() {
-            CGbaLoader::StartGBA();
+            cGbaLoader::StartGBA();
         });
         task->schedule();
     } else if (_mainList->getRowFullPath(selectedRowId) == "slot1:/") {

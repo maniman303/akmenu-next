@@ -40,16 +40,7 @@ u32 cTimer::updateFrames() {
     u32 diff = _ticks - _fpsCounter;
     _fpsCounter = _ticks;
 
-    u16 fps = 60 / diff;
-    if (_fps == _prevFps && fps != _fps && fps != _prevFps) {
-        _prevFps = fps;
-        return _frames;
-    }
-
-    _prevFps = _fps;
-    _fps = fps;
-
-    // nocashMessage(formatString("FPS: %2d", _fps).c_str());
+    _fps = 60 / diff;
 
     return _frames;
 }
