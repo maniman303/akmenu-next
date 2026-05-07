@@ -35,13 +35,13 @@ namespace akui {
     }
 
     cForm& cForm::removeChildWindow(cWindow* aWindow) {
-        _childWindows.remove(aWindow);
-        // layouter_->removeWindow(aWindow);
+        _childWindows.erase(std::remove(_childWindows.begin(), _childWindows.end(), aWindow), _childWindows.end());
+
         return *this;
     }
 
     void cForm::update() {
-        std::list<cWindow*>::iterator it;
+        std::vector<cWindow*>::iterator it;
         for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
             (*it)->update();
         }
@@ -56,7 +56,7 @@ namespace akui {
             return true;
         }
 
-        std::list<cWindow*>::iterator it;
+        std::vector<cWindow*>::iterator it;
         for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
             if ((*it)->canRenderBackdrop()) {
                 return true;
@@ -71,7 +71,7 @@ namespace akui {
             return true;
         }
 
-        std::list<cWindow*>::iterator it;
+        std::vector<cWindow*>::iterator it;
         for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
             if ((*it)->shouldRenderBackdrop()) {
                 return true;
@@ -84,21 +84,21 @@ namespace akui {
     void cForm::onRenderBackdrop() {
         _scheduleBackdrop = false;
 
-        std::list<cWindow*>::iterator it;
+        std::vector<cWindow*>::iterator it;
         for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
             (*it)->onRenderBackdrop();
         }
     }
 
     void cForm::draw() {
-        std::list<cWindow*>::iterator it;
+        std::vector<cWindow*>::iterator it;
         for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
             (*it)->render();
         }
     }
 
     void cForm::drawBackdrop() {
-        std::list<cWindow*>::iterator it;
+        std::vector<cWindow*>::iterator it;
         for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
             if ((*it)->canRenderBackdrop()) {
                 (*it)->renderBackdrop();
@@ -206,7 +206,7 @@ namespace akui {
             return false;
         }
 
-        std::list<cWindow*>::iterator it;
+        std::vector<cWindow*>::iterator it;
         for (it = _childWindows.begin(); it != _childWindows.end(); ++it) {
             cWindow* window = *it;
             if (window->isVisible() && window->processTouchMessage(message)) {
@@ -236,7 +236,7 @@ namespace akui {
             return NULL;
         }
 
-        std::list<cWindow*>::reverse_iterator it;
+        std::vector<cWindow*>::reverse_iterator it;
         for (it = _childWindows.rbegin(); it != _childWindows.rend(); ++it) {
             cWindow* window = *it;
             cWindow* cw = window->windowBelow(p);
@@ -286,7 +286,7 @@ namespace akui {
             return true;
         }
 
-        for (std::list<cWindow*>::const_iterator it = _childWindows.begin(); it != _childWindows.end(); it++) {
+        for (std::vector<cWindow*>::const_iterator it = _childWindows.begin(); it != _childWindows.end(); it++) {
             if ((*it)->isFocused()) {
                 return true;
             }

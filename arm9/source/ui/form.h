@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <list>
+#include <vector>
 #include <functional>
 #include "rectangle.h"
 #include "window.h"
@@ -49,7 +49,7 @@ namespace akui {
       virtual void setFocusedChild(cWindow* child);
       cWindow* findChildXAxis(cPoint current, s16 direction);
       cWindow* findChildYAxis(cPoint current, s16 direction);
-      std::list<cWindow*> _childWindows;
+      std::vector<cWindow*> _childWindows;
 
       u32 _modalRet;
   };

@@ -9,7 +9,7 @@
 
 //�
 
-#include <list>
+#include <unordered_map>
 #include <string>
 #include "bmp15.h"
 #include "binaryfind.h"
@@ -79,28 +79,13 @@ void cBMP15::colorize(u16 color) {
     }
 }
 
-typedef std::list<cBMP15> str_bmp_list;
-static str_bmp_list _bmpPool;
-
-static bool comp(const cBMP15& item1, const cBMP15& item2) {
-    return strcasecmp(item1.filename().c_str(), item2.filename().c_str()) < 0;
-}
+static std::unordered_map<std::string, cBMP15> _bmpPool;
 
 cBMP15 createBMP15FromFile(const std::string& filename) {
-    cBMP15 searchItem;
-    searchItem.filename(filename);
-    str_bmp_list::iterator it = akui::binary_find(_bmpPool.begin(), _bmpPool.end(), searchItem, comp);
-
-    if (it != _bmpPool.end() && (*it).valid()) {
-        return *it;
+    std::unordered_map<std::string, cBMP15>::iterator it = _bmpPool.find(filename);
+    if (it != _bmpPool.end() && it->second.valid()) {
+        return it->second;
     }
-
-    // str_bmp_list::iterator it;
-    // for (it = _bmpPool.begin(); it != _bmpPool.end(); ++it) {
-    //     if (it->valid() && it->filename() == filename) {
-    //         return *it;
-    //     }
-    // }
 
     FILE* f = fopen(filename.c_str(), "rb");
     if (NULL == f) {
@@ -132,8 +117,8 @@ cBMP15 createBMP15FromFile(const std::string& filename) {
     fseek(f, 0x16, SEEK_SET);
     fread(&height, 1, 4, f);
 
-    _bmpPool.push_back(createBMP15(width, height));
-    cBMP15& bmp = _bmpPool.back();
+    _bmpPool.emplace(filename, createBMP15(width, height));
+    cBMP15& bmp = _bmpPool[filename];
 
     u32 bmpDataOffset = 0;
     fseek(f, 0x0a, SEEK_SET);
@@ -165,14 +150,18 @@ cBMP15 createBMP15FromFile(const std::string& filename) {
 
     bmp.filename(filename);
 
-    // dbg_printf( "load bmp success, %08x\n", bmp.buffer() );
     return bmp;
 }
 
 void destroyBMP15() {
-    _bmpPool.remove_if([&](cBMP15& testItem) {
-        bool res = testItem.rawBuffer()->use_count() <= 1;
-        
-        return res;
-    });
+    for (std::unordered_map<std::string, cBMP15>::iterator it = _bmpPool.begin(); it != _bmpPool.end(); )
+    {
+        bool remove = it->second.rawBuffer()->use_count() <= 1;
+
+        if (remove) {
+            it = _bmpPool.erase(it);
+        } else {
+            it++;
+        }
+    }
 }
