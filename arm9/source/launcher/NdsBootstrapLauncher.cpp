@@ -108,16 +108,16 @@ bool NdsBootstrapLauncher::prepareIni(const std::string& mRomPath, const std::st
 
     if (hb) {
         ini.SetString("NDS-BOOTSTRAP", "DSI_MODE", "0");
-        ini.SetString("NDS-BOOTSTRAP", "QUIT_PATH", fsManager().resolveSystemPath("/_nds/akmenunext/launcher.nds"));
+        ini.SetString("NDS-BOOTSTRAP", "QUIT_PATH", fsManager().resolveSystemPath("_nds/akmenunext/launcher.nds"));
         ini.SaveIniFile("/_nds/nds-bootstrap.ini");
         return true;
     }
 
     ini.SetString("NDS-BOOTSTRAP", "SAV_PATH", mSavePath);
-    ini.SetString("NDS-BOOTSTRAP", "QUIT_PATH", fsManager().resolveSystemPath("/_nds/akmenunext/launcher.nds"));
+    ini.SetString("NDS-BOOTSTRAP", "QUIT_PATH", fsManager().resolveSystemPath("_nds/akmenunext/launcher.nds"));
     ini.SetString("NDS-BOOTSTRAP", "CONSOLE_MODEL", is3DS() ? "2" : "0");
 
-    std::string custIniPath = fsManager().resolveSystemPath("/_nds/akmenunext/ndsbs.ini");
+    std::string custIniPath = fsManager().resolveSystemPath("_nds/akmenunext/ndsbs.ini");
     if (access(custIniPath.c_str(), F_OK) != 0) {
         akui::cMessageBox::showModal(LANG("nds bootstrap", "inimissingtitle"), LANG("nds bootstrap", "inimissing"), MB_OK);
         return false;
@@ -242,7 +242,7 @@ bool launchHbStrap(std::string romPath){
     progressWnd().setPercent(100);
     progressWnd().hide();
 
-    std::string ndsHbBootstrapPath = fsManager().resolveSystemPath("/_nds/nds-bootstrap-hb-release.nds");
+    std::string ndsHbBootstrapPath = fsManager().resolveSystemPath("_nds/nds-bootstrap-hb-release.nds");
     std::vector<const char*> argv;
     argv.push_back(ndsHbBootstrapPath.c_str());
     eRunNdsRetCode rc = runNdsFile(argv[0], argv.size(), &argv[0]);
@@ -254,10 +254,10 @@ bool launchHbStrap(std::string romPath){
 }
 
 s16 NdsBootstrapLauncher::process(s16 iter) {
-    static const std::string ndsBootstrapCheck = fsManager().resolveSystemPath("/_nds/pagefile.sys");
-    static const std::string ndsBootstrapPath = fsManager().resolveSystemPath("/_nds/nds-bootstrap-release.nds");
-    static const std::string ndsBootstrapPathNightly = fsManager().resolveSystemPath("/_nds/nds-bootstrap-nightly.nds");
-    static const std::string ndsHbBootstrapPath = fsManager().resolveSystemPath("/_nds/nds-bootstrap-hb-release.nds");
+    static const std::string ndsBootstrapCheck = fsManager().resolveSystemPath("_nds/pagefile.sys");
+    static const std::string ndsBootstrapPath = fsManager().resolveSystemPath("_nds/nds-bootstrap-release.nds");
+    static const std::string ndsBootstrapPathNightly = fsManager().resolveSystemPath("_nds/nds-bootstrap-nightly.nds");
+    static const std::string ndsHbBootstrapPath = fsManager().resolveSystemPath("_nds/nds-bootstrap-hb-release.nds");
 
     bool isDsiWare = false;
 

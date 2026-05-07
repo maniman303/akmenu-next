@@ -2,6 +2,8 @@
 #include "language.h"
 #include "twin.h"
 #include "logger.h"
+#include "fsmngr.h"
+#include "gbaloader.h"
 #include "vfxmanager.h"
 #include "../romlauncher.h"
 #include "font/fontfactory.h"
@@ -16,6 +18,9 @@ cRomBootWnd::cRomBootWnd(const std::string& romPath, std::function<void()> onExi
     _romPath = romPath;
     _onExit = onExit;
     _romInfo.mayBeDSRom(romPath);
+    if (!_romInfo.isDSRom()) {
+        _romInfo.mayBeGbaRom(romPath);
+    }
 
     _pressAnimation.setDuration(36);
 
@@ -85,7 +90,7 @@ void cRomBootWnd::update() {
 void cRomBootWnd::onFocused() {
     gdi().setScreenTransparency(0, GE_SUB);
     gdi().setMainLayerTransparency(0, MEL_UP);
-    if (!_romInfo.isDSRom()) {
+    if (!_romInfo.isDSRom() && !(_romInfo.isGbaRom() && gbaLoader().validate())) {
         windowManager().removeWindow(this);
         if (_onExit) {
             _onExit();
@@ -106,7 +111,8 @@ void cRomBootWnd::onFocused() {
     _pressText.setTextColor(0x0 | BIT(15));
     _pressText.setCentered(true);
 
-    std::string romName = _romInfo.getDsLocTitle();
+    std::string fileName = replaceInString(fsManager().getFilename(_romPath, false), "; ", ": ");
+    std::string romName = (_romInfo.isDSRom() && gs().viewMode == cGlobalSettings::TViewMode::EViewInternal) ? _romInfo.getDsLocTitle() : font().BreakLine(fileName, 128);
     u16 romNameHeight = font().TextHeight(romName);
     u16 romNameY = (196 - romNameHeight) >> 1;
     _nameText.setText(romName);
@@ -120,7 +126,7 @@ void cRomBootWnd::draw() {
 }
 
 void cRomBootWnd::drawBackdrop() {
-    if (!_romInfo.isDSRom()) {
+    if (!_romInfo.isDSRom() && !_romInfo.isGbaRom()) {
         return;
     }
 
@@ -148,7 +154,14 @@ void cRomBootWnd::startRom() {
     disableInput();
     vfxManager().playEffect(VFX_EFFECT::SELECT);
     WorkIndicatorTask* task = new WorkIndicatorTask({&vfxManager()}, this, [this](){
-        if (launchRom(_romPath, _romInfo, false) != ELaunchRomOk) {
+        if (_romInfo.isDSRom()) {
+            if (launchRom(_romPath, _romInfo, false) != ELaunchRomOk) {
+                moveToMain();
+            }
+        } else if (_romInfo.isGbaRom()) {
+            gbaLoader().startRom(_romPath);
+            moveToMain();
+        } else {
             moveToMain();
         }
     });

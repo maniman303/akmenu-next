@@ -18,90 +18,110 @@ cFont::cFont() {}
 cFont::~cFont() {}
 
 std::string cFont::BreakLine(const std::string& text, u32 maxLineWidth) {
-    if (text.empty() || maxLineWidth == 0) return text;
+    if (text.empty() || maxLineWidth == 0) {
+        return text;
+    }
 
-    std::string ret;
-    ret.reserve(text.size() + text.size() / 20);
+    std::string out;
+    std::string line;
+
+    out.reserve(text.size() + text.size() / 16);
 
     const char* p = text.c_str();
-    const size_t len = text.size();
+    size_t len = text.size();
 
-    size_t lineStart = 0;
-    size_t i = 0;
+    u32 width = 0;
 
-    u32 lineWidth = 0;
+    size_t colonBreak = std::string::npos;
+    size_t spaceBreak = std::string::npos;
 
-    struct BreakPoint {
-        size_t posInText;
-        size_t posInRet;
-        u32 widthAfter;
-        int priority;
-        bool valid;
-    };
-    BreakPoint bp = { 0, 0, 0, 0, false };
-
-    auto flushUpTo = [&](size_t end) {
-        ret.append(p + lineStart, p + end);
-        lineStart = end;
-    };
-
-    while (i < len) {
+    for (size_t i = 0; i < len;) {
         u32 ww, add;
         Info(p + i, &ww, &add);
 
-        if (*(p + i) == '\n') {
-            flushUpTo(i + 1);
-            lineWidth = 0;
-            bp.valid = false;
+        char c = p[i];
+
+        if (c == '\n') {
+            out += line;
+            out += '\n';
+
+            line.clear();
+
+            width = 0;
+            colonBreak = std::string::npos;
+            spaceBreak = std::string::npos;
+
             i++;
             continue;
         }
 
-        if (ww == 0 || *(p + i) == '\r') {
+        if (ww == 0 || c == '\r') {
             i++;
             continue;
         }
 
-        lineWidth += ww;
+        line.append(p + i, add);
+        width += ww;
 
-        if (*(p + i) == ' ' && (!bp.valid || bp.priority <= 1)) {
-            bp = { i, ret.size() + (i - lineStart), lineWidth, 1, true };
-        } else if (*(p + i) == ':' && (!bp.valid || bp.priority <= 2)) {
-            bp = { i, ret.size() + (i - lineStart), lineWidth, 2, true };
+        if (c == ':') {
+            colonBreak = line.size() - add;
+        } else if (c == ' ') {
+            spaceBreak = line.size() - add;
         }
 
-        if (lineWidth > maxLineWidth) {
-            if (bp.valid) {
-                flushUpTo(bp.posInText);
+        if (width > maxLineWidth) {
+            size_t breakPos = std::string::npos;
 
-                if (bp.priority == 1) {
-                    ret.push_back('\n');
-                    lineStart = bp.posInText + 1;
-                } else {
-                    ret.append(p + lineStart, p + lineStart + add);
-                    ret.push_back('\n');
-                    lineStart = bp.posInText + add;
+            // ':' has priority
+            if (colonBreak != std::string::npos) {
+                breakPos = colonBreak + 1;
+            } else if (spaceBreak != std::string::npos) {
+                breakPos = spaceBreak;
+            }
+
+            if (breakPos != std::string::npos) {
+                out.append(line.data(), breakPos);
+                out += '\n';
+
+                size_t next = breakPos + 1;
+
+                while (next < line.size()) {
+                    char s = line[next];
+
+                    if (s != ' ' && s != '\t')
+                        break;
+
+                    next++;
                 }
 
-                lineWidth = lineWidth - bp.widthAfter;
-                bp.valid = false;
+                line.erase(0, next);
             } else {
-                flushUpTo(i);
-                ret.push_back('\n');
-                lineWidth = ww;
-                bp.valid = false;
+                out += line;
+                out += '\n';
+                line.clear();
             }
+
+            // Recalculate width
+            width = 0;
+
+            for (size_t k = 0; k < line.size();) {
+                u32 cw, ca;
+                Info(line.c_str() + k, &cw, &ca);
+
+                width += cw;
+                k += ca;
+            }
+
+            colonBreak = std::string::npos;
+            spaceBreak = std::string::npos;
         }
 
         i += add;
     }
 
-    flushUpTo(len);
+    out += line;
 
-    if (!ret.empty() && ret.back() == '\n')
-        ret.pop_back();
-
-    return ret;
+    return out;
 }
 
 u32 cFont::FontRAM(void) {

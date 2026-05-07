@@ -16,7 +16,7 @@ TaskWorker* Slot1Launcher::task() {
 }
 
 s16 Slot1Launcher::process(s16 iter) {
-    static const std::string slot1LoaderPath = fsManager().resolveSystemPath("/_nds/akmenunext/slot1launch.nds");
+    static const std::string slot1LoaderPath = fsManager().resolveSystemPath("_nds/akmenunext/slot1launch.nds");
 
     if (access(slot1LoaderPath.c_str(), F_OK) != 0) {
         showModalOk(LOADER_NOT_FOUND_TITLE, formatString(LOADER_NOT_FOUND_MESSAGE.c_str(), slot1LoaderPath.c_str()));

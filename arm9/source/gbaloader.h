@@ -17,9 +17,20 @@ class cGbaLoader {
     static void StartGBA(void);
     static u8 GetGbaHeader();
 
+    cGbaLoader();
+
+    void init();
+    bool validate();
+    bool startRom(const std::string& fileName);
+
   private:
     static void LoadBorder(void);
     static void BootGBA(void);
+
+    bool tryCopyBorder();
+
+    bool _isRunnerPresent;
+    bool _isBiosPresent;
 };
 
 typedef t_singleton<cGbaLoader> GbaLoader_s;

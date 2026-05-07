@@ -371,8 +371,7 @@ eRunNdsRetCode runNdsFile (const char* filename, int argc, const char** argv)  {
 	int pathLen;
 	const char* args[1];
 
-	
-	if (stat (filename, &st) < 0) {
+	if (stat(filename, &st) < 0) {
 		return RUN_NDS_STAT_FAILED;
 	}
 
@@ -393,9 +392,7 @@ eRunNdsRetCode runNdsFile (const char* filename, int argc, const char** argv)  {
 	
 	installBootStub(havedsiSD);
 
-	// logger().info("Cluster: " + std::to_string(st.st_ino));
-
-	return runNds (load_bin, load_bin_size, st.st_ino, true, true, argc, argv);
+	return runNds(load_bin, load_bin_size, st.st_ino, true, true, argc, argv);
 }
 
 /*

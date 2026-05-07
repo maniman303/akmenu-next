@@ -55,7 +55,7 @@ cHelpWnd::cHelpWnd(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std::strin
     }
     _helpText = formatString(_helpText.c_str(), 7, 1, 2, 4, 3, 5, 6, "START", "SELECT");
 
-    std::string ndsbsVer = fsManager().resolveSystemPath("/_nds/release-bootstrap.ver");
+    std::string ndsbsVer = fsManager().resolveSystemPath("_nds/release-bootstrap.ver");
     
     char ndsbsBuffer[256];
     _helpText += "https://github.com/maniman303\n";

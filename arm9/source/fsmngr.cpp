@@ -35,7 +35,7 @@ void cFSManager::init(int argc, char* argv[]) {
         chdir("fat:/");
 
         _isFlashcart = true;
-        _fsRoot = "fat:";
+        _fsRoot = "fat:/";
     }
 
     if (isSDInserted()) {
@@ -43,7 +43,7 @@ void cFSManager::init(int argc, char* argv[]) {
 
         if (!isFlashcart()) {
             chdir("sd:/");
-            _fsRoot = "sd:";
+            _fsRoot = "sd:/";
         }
     }
 }
@@ -70,12 +70,25 @@ bool cFSManager::fileExists(const std::string& filePath) const {
 }
 
 std::string cFSManager::getFilename(const std::string& path) const {
-    size_t pos = path.find_last_of("/\\");
-    if (pos == std::string::npos) {
-        return path;
+    return getFilename(path, true);
+}
+
+std::string cFSManager::getFilename(const std::string& path, bool extension) const {
+    std::string fileName = path;
+    
+    if (!extension) {
+        size_t lastDot = path.find_last_of('.');
+        if (lastDot != std::string::npos && lastDot != 0) {
+            fileName = path.substr(0, lastDot);
+        }
     }
 
-    return path.substr(pos + 1);
+    size_t pos = fileName.find_last_of("/\\");
+    if (pos == std::string::npos) {
+        return fileName;
+    }
+
+    return fileName.substr(pos + 1);
 }
 
 std::vector<std::string> cFSManager::getUiNames() const {
@@ -125,7 +138,7 @@ std::string cFSManager::resolveSystemPath(const char* path) const {
 }
 
 std::string cFSManager::getFSRoot() const {
-    return _fsRoot + "/";
+    return _fsRoot;
 }
 
 const std::string& cFSManager::getIconPath(const std::string& iconName) {

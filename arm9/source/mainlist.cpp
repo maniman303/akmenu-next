@@ -46,6 +46,7 @@ cMainList::cMainList(cWindow* parent, const std::string& text)
     _centerInternalColumn = false;
     _viewMode = VM_LIST;
     _busy = false;
+    _currentDir = "";
     _scheduledRom = "";
     _canRenderBackdrop = true;
     _scheduleBackdrop = true;
@@ -155,10 +156,8 @@ void cMainList::processDirIcon(DSRomInfo& romInfo, const std::string fileName) {
     
     if (extName == ".gba") {
         romInfo.mayBeGbaRom(fileName);
-        if (romInfo.isGbaRom()) {
-            // TODO: Try load bmp icon
-        } else {
-            romInfo.setBannerFromFile(fsManager().getIconPath("unknown_banner.bin"), unknown_banner_bin);
+        if (!romInfo.isGbaRom()) {
+            romInfo.setBannerFromFile(fsManager().getIconPath("unknown_banner.bin"), unknown_banner_bin); 
         }
 
         return;

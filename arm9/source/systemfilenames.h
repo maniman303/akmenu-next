@@ -77,3 +77,7 @@
 #define SFN_ICONS_DIRECTORY SFN_SYSTEM_DIR + "icons/"
 
 #define SFN_CHEATS SFN_SYSTEM_DIR + "cheats/usrcheat.dat"
+
+#define SFN_GBARUNNER_NDS fsManager().resolveSystemPath("GBARunner3.nds")
+#define SFN_GBARUNNER_BIOS fsManager().resolveSystemPath("_gba/bios.bin")
+#define SFN_GBARUNNER_FRAME fsManager().resolveSystemPath("_gba/border.bmp")

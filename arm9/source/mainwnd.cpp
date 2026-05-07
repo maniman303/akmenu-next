@@ -420,7 +420,7 @@ void cMainWnd::launchSelected() {
     }
 
     if (rominfo.isGbaRom()) {
-        // TODO: Run gbarunner3 here
+        gbaLoader().startRom(rominfo.fileName());
         return;
     }
 
@@ -696,7 +696,7 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
                 gs().saveSettings();
 
                 disableInput();
-                std::string launcherPath = fsManager().resolveSystemPath("/_nds/akmenunext/launcher.nds");
+                std::string launcherPath = fsManager().resolveSystemPath("_nds/akmenunext/launcher.nds");
                 HomebrewLauncher* launcher = new HomebrewLauncher();
                 launcher->setOnCompleted([this](){
                     enableInput();
@@ -713,7 +713,7 @@ void cMainWnd::saveSettings(cSettingWnd* settingWnd) {
                 gs().saveSettings();
 
                 disableInput();
-                std::string launcherPath = fsManager().resolveSystemPath("/_nds/akmenunext/launcher.nds");
+                std::string launcherPath = fsManager().resolveSystemPath("_nds/akmenunext/launcher.nds");
                 HomebrewLauncher* launcher = new HomebrewLauncher();
                 launcher->setOnCompleted([this](){
                     enableInput();

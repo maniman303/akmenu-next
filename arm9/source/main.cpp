@@ -40,6 +40,7 @@
 
 #include "vfxmanager.h"
 #include "ticksound.h"
+#include "gbaloader.h"
 
 #include "smalldate.h"
 #include "smallclock.h"
@@ -192,6 +193,8 @@ int main(int argc, char* argv[]) {
     gs().loadSettings();
 
     saveManager().loadLastInfo();
+
+    gbaLoader().init();
 
     vfxManager().init();
     

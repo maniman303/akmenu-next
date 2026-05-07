@@ -12,7 +12,87 @@
 #include "bmp15.h"
 #include "systemfilenames.h"
 #include "sram.h"
+#include "fsmngr.h"
+#include "logger.h"
+#include "savemngr.h"
+#include "launcher/nds_loader_arm9.h"
 #include "../../share/fifotool.h"
+
+cGbaLoader::cGbaLoader() {
+    _isRunnerPresent = false;
+    _isBiosPresent = false;
+}
+
+void cGbaLoader::init() {
+    _isRunnerPresent = fsManager().fileExists(SFN_GBARUNNER_NDS);
+    _isBiosPresent = fsManager().fileExists(SFN_GBARUNNER_BIOS);
+}
+
+bool cGbaLoader::validate() {
+    return _isRunnerPresent && _isBiosPresent;
+}
+
+bool cGbaLoader::startRom(const std::string& fileName) {
+    std::string gbaRunnerNds = SFN_GBARUNNER_NDS;
+
+    if (!_isRunnerPresent) {
+        logger().error("File '" + gbaRunnerNds + "' could not be found.");
+        return false;
+    }
+
+    if (!_isBiosPresent) {
+        logger().error("File '" + SFN_GBARUNNER_BIOS + "' could not be found.");
+        return false;
+    }
+
+    // TODO: Generate gbarunner3 settings
+
+    if (!tryCopyBorder()) {
+        logger().error("File '" + SFN_GBAFRAME + "' could not be copied.");
+    }
+
+    saveManager().saveLastInfo(fileName);
+
+    std::vector<const char*> argv;
+    argv.push_back(gbaRunnerNds.c_str());
+    argv.push_back(fileName.c_str());
+
+    eRunNdsRetCode res = runNdsFile(argv[0], argv.size(), &argv[0]);
+
+    return res == eRunNdsRetCode::RUN_NDS_OK;
+}
+
+bool cGbaLoader::tryCopyBorder() {
+    std::string themeBorder = SFN_GBAFRAME;
+    std::string runnerBorder = SFN_GBARUNNER_FRAME;
+
+    FILE* src = fopen(themeBorder.c_str(), "rb");
+    if (!src) {
+        return false;
+    }
+
+    FILE* dst = fopen(runnerBorder.c_str(), "wb");
+    if (!dst) {
+        fclose(src);
+        return false;
+    }
+
+    char buffer[4096];
+
+    size_t bytesRead;
+    while ((bytesRead = fread(buffer, 1, sizeof(buffer), src)) > 0) {
+        if (fwrite(buffer, 1, bytesRead, dst) != bytesRead) {
+            fclose(src);
+            fclose(dst);
+            return false;
+        }
+    }
+
+    fclose(src);
+    fclose(dst);
+
+    return true;
+}
 
 void cGbaLoader::StartGBA(void) {
     LoadBorder();
