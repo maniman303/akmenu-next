@@ -7,6 +7,7 @@ class cLogger {
   public:
     void init();
     void info(std::string message);
+    void warn(std::string message);
     void error(std::string message);
 
   private:

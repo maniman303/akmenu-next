@@ -15,6 +15,7 @@
 #include "fsmngr.h"
 #include "logger.h"
 #include "savemngr.h"
+#include "jsonfile.h"
 #include "launcher/nds_loader_arm9.h"
 #include "../../share/fifotool.h"
 
@@ -45,10 +46,13 @@ bool cGbaLoader::startRom(const std::string& fileName) {
         return false;
     }
 
-    // TODO: Generate gbarunner3 settings
+    if (!setupSettings()) {
+        logger().error("File '" + SFN_GBARUNNER_JSON + "' could not be saved.");
+        return false;
+    }
 
     if (!tryCopyBorder()) {
-        logger().error("File '" + SFN_GBAFRAME + "' could not be copied.");
+        logger().warn("File '" + SFN_GBAFRAME + "' could not be copied.");
     }
 
     saveManager().saveLastInfo(fileName);
@@ -92,6 +96,13 @@ bool cGbaLoader::tryCopyBorder() {
     fclose(dst);
 
     return true;
+}
+
+bool cGbaLoader::setupSettings() {
+    cJsonFile settings(SFN_GBARUNNER_JSON);
+    settings.setString({"displaySettings", "gbaScreen"}, "top");
+    settings.setBool({"runSettings", "skipBiosIntro"}, true);
+    return settings.save();
 }
 
 void cGbaLoader::StartGBA(void) {

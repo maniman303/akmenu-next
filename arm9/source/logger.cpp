@@ -17,6 +17,10 @@ void cLogger::info(std::string message) {
     write("info", message);
 }
 
+void cLogger::warn(std::string message) {
+    write("warning", message);
+}
+
 void cLogger::error(std::string message) {
     write("error", message);
 }

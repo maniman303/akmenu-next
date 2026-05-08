@@ -28,6 +28,7 @@ class cGbaLoader {
     static void BootGBA(void);
 
     bool tryCopyBorder();
+    bool setupSettings();
 
     bool _isRunnerPresent;
     bool _isBiosPresent;

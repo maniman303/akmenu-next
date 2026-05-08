@@ -81,3 +81,4 @@
 #define SFN_GBARUNNER_NDS fsManager().resolveSystemPath("GBARunner3.nds")
 #define SFN_GBARUNNER_BIOS fsManager().resolveSystemPath("_gba/bios.bin")
 #define SFN_GBARUNNER_FRAME fsManager().resolveSystemPath("_gba/border.bmp")
+#define SFN_GBARUNNER_JSON fsManager().resolveSystemPath("_gba/GBARunner3.json")
