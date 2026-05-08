@@ -275,6 +275,12 @@ bool DSRomInfo::loadGbaRomInfo(const std::string& filename) {
         if (header.is96h == 0x96) {
             _isGbaRom = ETrue;
             memcpy(_saveInfo.gameCode, header.gamecode, 4);
+            // std::string code;
+            // code += header.gamecode[0];
+            // code += header.gamecode[1];
+            // code += header.gamecode[2];
+            // code += header.gamecode[3];
+            // logger().info("GBA code: " + code + std::to_string(header.version));
             _romVersion = header.version;
             setBannerFromFile(fsManager().getIconPath("gbarom_banner.bin"), gbarom_banner_bin);
             return true;

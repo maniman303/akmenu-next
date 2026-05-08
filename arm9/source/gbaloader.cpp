@@ -16,6 +16,7 @@
 #include "logger.h"
 #include "savemngr.h"
 #include "jsonfile.h"
+#include "vfxmanager.h"
 #include "launcher/nds_loader_arm9.h"
 #include "../../share/fifotool.h"
 
@@ -57,13 +58,20 @@ bool cGbaLoader::startRom(const std::string& fileName) {
 
     saveManager().saveLastInfo(fileName);
 
+    vfxManager().disable();
+
     std::vector<const char*> argv;
     argv.push_back(gbaRunnerNds.c_str());
     argv.push_back(fileName.c_str());
 
     eRunNdsRetCode res = runNdsFile(argv[0], argv.size(), &argv[0]);
+    if (res == eRunNdsRetCode::RUN_NDS_OK) {
+        return true;
+    }
 
-    return res == eRunNdsRetCode::RUN_NDS_OK;
+    vfxManager().enable();
+
+    return false;
 }
 
 bool cGbaLoader::tryCopyBorder() {

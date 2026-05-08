@@ -30,7 +30,15 @@ void VfxManager::enable() {
 }
 
 void VfxManager::disable() {
-    _enabled = false;;
+    _enabled = false;
+
+    for (VfxManager::VfxEntry& entry : _entries) {
+        if (entry.effect == VFX_EFFECT::NONE) {
+            continue;
+        }
+
+        soundKill(entry.channel);
+    }
 }
 
 void VfxManager::update() {
