@@ -4,6 +4,7 @@ set -e
 #FLASHCART
 mkdir -p flashcart
 cp -r Autoboot flashcart
+cp -r _gba flashcart
 cp -r _nds flashcart
 cp -r _pico flashcart
 cp boot.nds flashcart/boot.nds
@@ -15,6 +16,7 @@ cd ..
 #PICO
 mkdir -p pico
 cp -r _pico pico
+cp -r _gba pico
 cp -r _nds pico
 cp boot.dsi pico/boot.nds
 cp boot.dsi pico/_picoboot.nds
@@ -25,6 +27,7 @@ cd ..
 
 #DSI
 mkdir -p dsi
+cp -r _gba dsi
 cp -r _nds dsi
 cp -r title dsi
 cp boot.dsi dsi/boot.nds

@@ -192,12 +192,22 @@ void cJsonFile::parseObject(
 
         if (t[i].type == JSMN_OBJECT) {
             parseObject(js, t, i, child);
-        } else {
+        }
+        else if (t[i].type == JSMN_STRING) {
             child.type = Node::STRING;
-            child.value = std::string(
-                js + t[i].start,
-                t[i].end - t[i].start
-            );
+            child.value = std::string(js + t[i].start, t[i].end - t[i].start);
+            i++;
+        }
+        else if (t[i].type == JSMN_PRIMITIVE) {
+            std::string v(js + t[i].start, t[i].end - t[i].start);
+
+            if (v == "true" || v == "false") {
+                child.type = Node::BOOL;
+            } else {
+                child.type = Node::NUMBER;
+            }
+
+            child.value = v;
             i++;
         }
     }

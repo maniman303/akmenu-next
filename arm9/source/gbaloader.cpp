@@ -100,8 +100,12 @@ bool cGbaLoader::tryCopyBorder() {
 
 bool cGbaLoader::setupSettings() {
     cJsonFile settings(SFN_GBARUNNER_JSON);
-    settings.setString({"displaySettings", "gbaScreen"}, "top");
     settings.setBool({"runSettings", "skipBiosIntro"}, true);
+    settings.setBool({"runSettings", "enableJit"}, true);
+    settings.setBool({"runSettings", "enableEwramDCache"}, true);
+    settings.setString({"displaySettings", "gbaScreen"}, "top");
+    settings.setBool({"displaySettings", "enableCenterAndMask"}, true);
+    settings.setString({"displaySettings", "borderImage"}, "default");
     return settings.save();
 }
 
