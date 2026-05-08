@@ -420,7 +420,11 @@ bool DirectoryLoadTask::setupGameScan() {
                 extName = llfn.substr(lastDotPos);
             }
 
-            if ((extName != ".nds" && extName != ".gba") || llfn == "boot.nds" || llfn == "gbarunner3.nds") {
+            if (extName != ".nds" && (extName != ".gba" || !gbaLoader().validate())) {
+                continue;
+            }
+
+            if (llfn == "boot.nds" || llfn == "gbarunner3.nds") {
                 continue;
             }
 
@@ -471,7 +475,7 @@ bool DirectoryLoadTask::setupPath() {
         _extNames.emplace(".nds");
         _extNames.emplace(".dsi");
         _extNames.emplace(".sri");
-        _extNames.emplace(".gba");
+        if (gbaLoader().validate()) _extNames.emplace(".gba");
         if (gs().fileListType > 0) _extNames.emplace(".sav");
     } 
 

@@ -88,8 +88,7 @@ cBMP15 createBMP15FromFile(const std::string& filename) {
     }
 
     FILE* f = fopen(filename.c_str(), "rb");
-    if (NULL == f) {
-        dbg_printf("(%s) file does not exist\n", filename.c_str());
+    if (f == NULL) {
         return cBMP15();
     }
 
@@ -105,7 +104,6 @@ cBMP15 createBMP15FromFile(const std::string& filename) {
     fseek(f, 0, SEEK_SET);
     fread(&bmMark, 1, 2, f);
     if (bmMark != 0x4d42) {  // 'B' 'M' header
-        dbg_printf("not a bmp file\n");
         fclose(f);
         return cBMP15();
     }
@@ -144,7 +142,6 @@ cBMP15 createBMP15FromFile(const std::string& filename) {
             pixelColor = ((pixelColor & 0x7C00) >> 10) | ((pixelColor & 0x03E0)) |
                          ((pixelColor & 0x1F) << 10);
             pbuffer[i * (bmp.pitch() >> 1) + j] = pixelColor | (pixelColor ? BIT(15) : 0);
-            // dbg_printf("%d               %d\n", j, i );
         }
     }
 

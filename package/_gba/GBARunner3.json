@@ -6,7 +6,7 @@
         "enableIWramDCache": false,
         "enableEwramDCache": true,
         "forceDSModeArm9Clock": false,
-        "skipBiosIntro": false
+        "skipBiosIntro": true
     },
     "displaySettings": {
         "gbaScreen": "top",

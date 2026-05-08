@@ -52,9 +52,9 @@ bool cGbaLoader::startRom(const std::string& fileName) {
         return false;
     }
 
-    if (!tryCopyBorder()) {
-        logger().warn("File '" + SFN_GBAFRAME + "' could not be copied.");
-    }
+    // if (!tryCopyBorder()) {
+    //     logger().warn("File '" + SFN_GBAFRAME + "' could not be copied.");
+    // }
 
     saveManager().saveLastInfo(fileName);
 
@@ -74,46 +74,41 @@ bool cGbaLoader::startRom(const std::string& fileName) {
     return false;
 }
 
-bool cGbaLoader::tryCopyBorder() {
-    std::string themeBorder = SFN_GBAFRAME;
-    std::string runnerBorder = SFN_GBARUNNER_FRAME;
+// bool cGbaLoader::tryCopyBorder() {
+//     std::string themeBorder = SFN_GBAFRAME;
+//     std::string runnerBorder = SFN_GBARUNNER_FRAME;
 
-    FILE* src = fopen(themeBorder.c_str(), "rb");
-    if (!src) {
-        return false;
-    }
+//     FILE* src = fopen(themeBorder.c_str(), "rb");
+//     if (!src) {
+//         return false;
+//     }
 
-    FILE* dst = fopen(runnerBorder.c_str(), "wb");
-    if (!dst) {
-        fclose(src);
-        return false;
-    }
+//     FILE* dst = fopen(runnerBorder.c_str(), "wb");
+//     if (!dst) {
+//         fclose(src);
+//         return false;
+//     }
 
-    char buffer[4096];
+//     char buffer[4096];
 
-    size_t bytesRead;
-    while ((bytesRead = fread(buffer, 1, sizeof(buffer), src)) > 0) {
-        if (fwrite(buffer, 1, bytesRead, dst) != bytesRead) {
-            fclose(src);
-            fclose(dst);
-            return false;
-        }
-    }
+//     size_t bytesRead;
+//     while ((bytesRead = fread(buffer, 1, sizeof(buffer), src)) > 0) {
+//         if (fwrite(buffer, 1, bytesRead, dst) != bytesRead) {
+//             fclose(src);
+//             fclose(dst);
+//             return false;
+//         }
+//     }
 
-    fclose(src);
-    fclose(dst);
+//     fclose(src);
+//     fclose(dst);
 
-    return true;
-}
+//     return true;
+// }
 
 bool cGbaLoader::setupSettings() {
     cJsonFile settings(SFN_GBARUNNER_JSON);
-    settings.setBool({"runSettings", "skipBiosIntro"}, true);
-    settings.setBool({"runSettings", "enableJit"}, true);
-    settings.setBool({"runSettings", "enableEwramDCache"}, true);
     settings.setString({"displaySettings", "gbaScreen"}, "top");
-    settings.setBool({"displaySettings", "enableCenterAndMask"}, true);
-    settings.setString({"displaySettings", "borderImage"}, "default");
     return settings.save();
 }
 

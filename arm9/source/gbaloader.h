@@ -27,7 +27,7 @@ class cGbaLoader {
     static void LoadBorder(void);
     static void BootGBA(void);
 
-    bool tryCopyBorder();
+    // bool tryCopyBorder();
     bool setupSettings();
 
     bool _isRunnerPresent;
