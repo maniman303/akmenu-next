@@ -4,6 +4,7 @@
 #include "batterymeter.h"
 #include "booticon.h"
 #include "fpscounter.h"
+#include "gbaicon.h"
 #include "smallclock.h"
 #include "smalldate.h"
 #include "userwnd.h"
@@ -32,6 +33,7 @@ class cTopBar : public cWindow {
     cBatteryMeter _batteryMeter;
     cBootIcon _bootIcon;
     cFpsCounter _fpsCounter;
+    cGbaIcon _gbaIcon;
     cSmallClock _smallClock;
     cSmallDate _smallDate;
     cUserWindow _userWnd;

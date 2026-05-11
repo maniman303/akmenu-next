@@ -61,6 +61,8 @@
 #define SFN_UI_PREFIXES_DIRECTORY SFN_UI_DIRECTORY + gs().uiName + "/prefixes"
 #define SFN_UI_BOOT_AUTO_ICON SFN_UI_ICONS_DIRECTORY + "/boot_auto.bmp"
 #define SFN_UI_BOOT_MANUAL_ICON SFN_UI_ICONS_DIRECTORY + "/boot_manual.bmp"
+#define SFN_UI_GBA_TOP_ICON SFN_UI_ICONS_DIRECTORY + "/gba_top.bmp"
+#define SFN_UI_GBA_BOTTOM_ICON SFN_UI_ICONS_DIRECTORY + "/gba_bottom.bmp"
 #define SFN_UI_FOCUS_TR SFN_UI_DIRECTORY + gs().uiName + "/focus_tr.bmp"
 #define SFN_UI_FOCUS_TL SFN_UI_DIRECTORY + gs().uiName + "/focus_tl.bmp"
 #define SFN_UI_FOCUS_BR SFN_UI_DIRECTORY + gs().uiName + "/focus_br.bmp"

@@ -13,6 +13,7 @@ cTopBar::cTopBar() : cWindow(NULL, "topbar") {
     _batteryMeter.setParent(this);
     _bootIcon.setParent(this);
     _fpsCounter.setParent(this);
+    _gbaIcon.setParent(this);
     _smallClock.setParent(this);
     _smallDate.setParent(this);
     _userWnd.setParent(this);
@@ -32,6 +33,7 @@ void cTopBar::init() {
     _batteryMeter.init();
     _bootIcon.init();
     _fpsCounter.init();
+    _gbaIcon.init();
     _smallClock.init();
     _smallDate.init();
 
@@ -78,6 +80,7 @@ void cTopBar::draw() {
     _batteryMeter.draw();
     _bootIcon.draw();
     _fpsCounter.draw();
+    _gbaIcon.draw();
     _smallClock.draw();
     _smallDate.draw();
     _userWnd.draw();
