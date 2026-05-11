@@ -20,25 +20,39 @@ This fork is a work in progress project aimed to rewrite the UI part of **akmenu
 - Added bmp coloring system with system theme color.
 - Added new default theme.
 - Added VFX sounds for navigation.
+- Added animations.
+- GBARunner3 support.
 - Many bug fixes.
 
 The end goal is to recreate (with proper theme that's not included yet) the aesthetic and feel of original Nintendo DS bios.
 
-Plans for near future:
-- Add support for gbarunner3.
-
 Plans for far future:
 - New info box.
+- New favorites management system.
 - Button bar used in settings, modal dialogs, help menu.
-- Top screen header used in settings, file manager, help menu.
 - Redesigned rom info menu, help menu, cheat window menu.
-- Animations.
-- Redesigned start menu inspired by bios settings.
+- Top screen header used in settings, file manager, help menu.
 - Optional vertical rom list, similar to DSi and 3ds menu.
 
 ## Installing
 
 Please check the [AKMenu-Next Docs](https://coderkei.github.io/akmenu-next-docs/) for setting up or updating AKMenu-Next.
+
+## GBARunner3 support
+
+- You will need `GBARunner3.nds` at the root of your MicroSD card (next to the boot.nds).
+- You will need GBA bios called `bios.bin` at `/_gba` folder.
+- If both `GBARunner3.nds` and `bios.bin` are present, then GBA roms will start showing up in the menu.
+- You can add custom icons for GBA roms by placing 32x32 pixels BMP (16 bit X1R5G5B5) files next to rom files, with the same name, but different extension.
+
+#### Custom GBA icon example
+
+```
+F:\Roms\The Legend of Zelda; The Minish Cap.gba
+F:\Roms\The Legend of Zelda; The Minish Cap.bmp
+```
+
+The `;` in filename will be replaced with `:` while displaying in menu.
 
 ## Building from source
 
