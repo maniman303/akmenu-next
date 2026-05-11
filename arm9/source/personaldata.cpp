@@ -21,3 +21,7 @@ u16 cPersonalData::color() {
 
     return res | BIT(15);
 }
+
+bool cPersonalData::gbaBottomScreen() {
+    return PersonalData->gbaScreen;
+}

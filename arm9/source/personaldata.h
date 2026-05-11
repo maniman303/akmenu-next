@@ -10,6 +10,7 @@ class cPersonalData {
     u8 alarmHour();
     u8 alarmMinute();
     u16 color();
+    bool gbaBottomScreen();
 };
 
 typedef t_singleton<cPersonalData> PersonalData_s;

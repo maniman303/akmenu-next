@@ -10,6 +10,7 @@
 #include "gbaloader.h"
 #include "exptools.h"
 #include "bmp15.h"
+#include "personaldata.h"
 #include "systemfilenames.h"
 #include "sram.h"
 #include "fsmngr.h"
@@ -108,7 +109,7 @@ bool cGbaLoader::startRom(const std::string& fileName) {
 
 bool cGbaLoader::setupSettings() {
     cJsonFile settings(SFN_GBARUNNER_JSON);
-    settings.setString({"displaySettings", "gbaScreen"}, "top");
+    settings.setString({"displaySettings", "gbaScreen"}, personalData().gbaBottomScreen() ? "bottom" : "top");
     return settings.save();
 }
 
@@ -147,10 +148,7 @@ void cGbaLoader::LoadBorder(void) {
 
 void cGbaLoader::BootGBA(void) {
     sysSetBusOwners(BUS_OWNER_ARM7, BUS_OWNER_ARM7);
-    if (PersonalData->gbaScreen)
-        REG_POWERCNT = 1;
-    else
-        REG_POWERCNT = (POWER_SWAP_LCDS | 1) & 0xffff;
+    REG_POWERCNT = personalData().gbaBottomScreen() ? 1 : (POWER_SWAP_LCDS | 1) & 0xffff;
     fifoSendValue32(FIFO_USER_01, MENU_MSG_GBA);
 }
 
