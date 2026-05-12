@@ -370,10 +370,6 @@ bool cMainList::processKeyMessage(cKeyMessage message) {
 }
 
 cRect cMainList::focusRectangle() const {
-    if (_rows.size() == 0) {
-        return cRect(position(), size(), false);
-    }
-
     u32 visibleRowId = _selectedRowId - _firstVisibleRowId;
     cPoint rowPos = position() + cPoint(0, (visibleRowId * _rowHeight) - 1);
     cSize rowSize = cSize(size().x, _rowHeight + 1);
