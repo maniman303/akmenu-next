@@ -3,6 +3,7 @@
 #include <cstdio>
 #include "systemdetails.h"
 #include "fifotool.h"
+#include "logger.h"
 
 #define FIFO_SOUND_READY 0x1234
 
@@ -50,7 +51,9 @@ void cSystemDetails::update() {
 	_chargingStatus = (level & 0x80) != 0;
 
 	if (_chargingStatus) {
-		_batteryStatus = 0;
+		_batteryStatus = 15;
+	} else {
+		_batteryStatus = level & 0xf;
 	}
 
 	if (_batteryStatus == 0 || _chargingStatus) {
@@ -64,6 +67,10 @@ bool cSystemDetails::fifoStatus() {
 	return _fifoReady;
 }
 
-int cSystemDetails::batteryStatus() {
-	return (_batteryStatus & 0x1) | (_chargingStatus ? 2 : 0);
+bool cSystemDetails::isBatteryLow() {
+	return _batteryStatus <= 3;
+}
+
+bool cSystemDetails::isBatteryCharging() {
+	return _chargingStatus;
 }

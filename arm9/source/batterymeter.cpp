@@ -30,17 +30,15 @@ void cBatteryMeter::flipIcon() {
 }
 
 int cBatteryMeter::getBatteryType() {
-    if (!sd().fifoStatus()) {
-        return -1;
-    }
-
-    int level = sd().batteryStatus();
-
-    if (level & 0x2) {
+    if (sd().isBatteryCharging()) {
         return 2;
     }
 
-    return level & 0x1;
+    if (sd().isBatteryLow()) {
+        return 1;
+    }
+
+    return 0;
 }
 
 void cBatteryMeter::draw() {

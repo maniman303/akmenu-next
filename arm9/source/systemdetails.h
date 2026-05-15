@@ -8,7 +8,8 @@ class cSystemDetails {
     void initArm7RegStatuses();
     void update();
     bool fifoStatus();
-    int batteryStatus();
+    bool isBatteryLow();
+    bool isBatteryCharging();
 
   protected:
     bool _fifoInit;
