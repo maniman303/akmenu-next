@@ -282,7 +282,6 @@ bool DSRomInfo::loadGbaRomInfo(const std::string& filename) {
             // code += header.gamecode[3];
             // logger().info("GBA code: " + code + std::to_string(header.version));
             _romVersion = header.version;
-            setBannerFromFile(fsManager().getIconPath("gbarom_banner.bin"), gbarom_banner_bin);
             return true;
         }
     }
@@ -369,11 +368,13 @@ bool DSRomInfo::tryLoadGbaIcon(bool size) {
     std::string iconFileName = _fileName;
     std::size_t dotPos = iconFileName.find_last_of('.');
     if (dotPos == std::string::npos) {
+        setBannerFromFile(fsManager().getIconPath("gbarom_banner.bin"), gbarom_banner_bin);
         return false;
     }
 
     std::size_t slashPos = iconFileName.find_last_of("/\\");
     if (slashPos != std::string::npos && dotPos < slashPos) {
+        setBannerFromFile(fsManager().getIconPath("gbarom_banner.bin"), gbarom_banner_bin);
         return false;
     }
 
