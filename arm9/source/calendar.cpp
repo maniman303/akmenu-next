@@ -8,6 +8,7 @@
 */
 
 #include "calendar.h"
+#include "divider.h"
 #include "globalsettings.h"
 #include "cachedinifile.h"
 #include "personaldata.h"
@@ -140,12 +141,14 @@ void cCalendar::drawNumber(const cPoint& position, u32 index, u32 value) {
 void cCalendar::drawText(const cPoint& position, u32 value, u32 factor) {
     u32 ii = 0;
     while (true) {
-        u8 number = value / factor;
-        value %= factor;
+        u8 number = hw::divide(value, factor);
+        value = hw::mod(value, factor);
         drawNumber(position, ii, number);
         factor /= 10;
         ii++;
-        if (0 == factor) break;
+        if (factor == 0) {
+            break;
+        }
     }
 }
 

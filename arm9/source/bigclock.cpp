@@ -16,7 +16,6 @@
 
 cBigClock::cBigClock() : cWindow(NULL, "big clock") {
     _engine = GE_SUB;
-    _show = false;
     _colonShow = true;
     _ampmShow = false;
     _ampmColor = RGB15(17, 12, 0);
@@ -26,10 +25,8 @@ cBigClock::cBigClock() : cWindow(NULL, "big clock") {
 
 void cBigClock::init() {
     CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
-    _show = ini.GetInt("big clock", "show", _show);
-
-    if (!_show) {
-        return;
+    if (!ini.GetInt("big clock", "show", 0)) {
+        hide();
     }
 
     int x = ini.GetInt("big clock", "x", 8);
@@ -70,7 +67,6 @@ void cBigClock::drawColon() {
 }
 
 void cBigClock::draw() {
-    if (!_show) return;
     u8 hours = datetime().hours();
     u8 minutes = datetime().minutes();
     const char* ampm = (hours < 12) ? "AM" : "PM";

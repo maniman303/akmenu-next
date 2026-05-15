@@ -14,6 +14,7 @@
 #include <queue>
 #include <algorithm>
 #include "dbgtool.h"
+#include "divider.h"
 #include "gbaloader.h"
 #include "folder_banner_bin.h"
 #include "gba_banner_bin.h"
@@ -78,7 +79,7 @@ int cMainList::init() {
 
     s32 w = ini.GetInt("main list", "w", 248);
     s32 h = ini.GetInt("main list", "h", 152);
-    h = (h / _tallRowHeight) * _tallRowHeight;
+    h = hw::divide(h, _tallRowHeight) * _tallRowHeight;
     setSize(cSize(w, h));
 
     _itemBg = new akui::cImage(this);
@@ -174,7 +175,7 @@ void cMainList::processDirIcons() {
     _romInfoList.resize(total);
 
     for (size_t i = 0; i < total; i++) {
-        DSRomInfo& romInfo = _romInfoList[(_firstVisibleRowId + i) % total];
+        DSRomInfo& romInfo = _romInfoList[hw::mod(_firstVisibleRowId + i, total)];
         std::string fileName = _rows[_firstVisibleRowId + i][REALNAME_COLUMN].text();
         
         processDirIcon(romInfo, fileName);
@@ -185,15 +186,16 @@ void cMainList::validateDirIcons() {
     u32 total = onScreenRowCount();
 
     for (size_t i = 0; i < total; i++) {
-        DSRomInfo& romInfo = _romInfoList[(_firstVisibleRowId + i) % total];
+        size_t romId = (size_t)hw::mod(_firstVisibleRowId + i, total);
+        DSRomInfo& romInfo = _romInfoList[romId];
         std::string fileName = _rows[_firstVisibleRowId + i][REALNAME_COLUMN].text();
         
         if (romInfo.fileName() == fileName) {
             continue;
         }
 
-        _romInfoList[(_firstVisibleRowId + i) % total] = DSRomInfo();
-        romInfo = _romInfoList[(_firstVisibleRowId + i) % total];
+        _romInfoList[romId] = DSRomInfo();
+        romInfo = _romInfoList[romId];
         processDirIcon(romInfo, fileName);
     }
 }
@@ -490,7 +492,7 @@ void cMainList::drawIcons() {
     int prefix = small ? 0 : _iconPrefix;
 
     for (size_t i = 0; i < total; i++) {
-        int romId = (_firstVisibleRowId + i) % total;
+        int romId = hw::mod(_firstVisibleRowId + i, total);
 
         s32 itemX = position().x + prefix;
         s32 itemY = position().y + i * _rowHeight + ((_rowHeight - iconHeight) >> 1) - 1;

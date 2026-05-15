@@ -30,7 +30,6 @@ class cSram {
 
   public:
     static void SaveSramToFile(const char* romName, u16 aStartPage);
-    static void LoadSramFromFile(const char* romName, u16 aStartPage);
     static void CreateDefaultFile(const char* romName, u32 size);
     static u8* SaveSramToMemory(u16 aStartPage, sSaveInfo& aSaveInfo, bool aShowProgress);
     static void ProcessRAW(FILE* aFile, sSaveInfo& anInfo);

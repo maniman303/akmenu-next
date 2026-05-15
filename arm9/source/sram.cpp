@@ -36,51 +36,6 @@ void cSram::BlankSram(u16 aStartPage) {
     cExpansion::CloseNorWrite();
 }
 
-void cSram::LoadSramFromFile(const char* romName, u16 aStartPage) {
-    char saveName[256];
-    if (!SaveFileName(romName, saveName)) return;
-
-    FILE* saveFile = fopen(saveName, "rb");
-    if (saveFile) {
-        sSaveInfo saveInfo;
-        ProcessRAW(saveFile, saveInfo);
-        u8* buf = (u8*)malloc(saveInfo.size);
-        if (buf) {
-            BlankSram(aStartPage);
-            progressWnd().setTipText(LANG("progress window", "gba save load"));
-            progressWnd().show();
-            progressWnd().setPercent(0);
-            memset(buf, 0, saveInfo.size);
-            size_t ret = fread(buf, saveInfo.size, 1, saveFile);
-            progressWnd().setPercent(10);
-            if (ret == 1 && !ferror(saveFile)) {
-                int page = saveInfo.offset / SRAM_PAGE_SIZE,
-                    offset = saveInfo.offset % SRAM_PAGE_SIZE, size = saveInfo.size, bufOffset = 0,
-                    ii = 0;
-                while (page < SRAM_SAVE_PAGES && size > 0) {
-                    expansion().SetRampage(page + aStartPage);
-                    int maxSize = SRAM_PAGE_SIZE - offset,
-                        bufSize = (size > maxSize) ? maxSize : size;
-                    cExpansion::WriteSram(0x0A000000, buf + bufOffset, bufSize);
-                    bufOffset += bufSize;
-                    size -= bufSize;
-                    offset = 0;
-                    page++;
-                    if (ii++ % 4 == 0)
-                        progressWnd().setPercent(10 + bufOffset * 90 / saveInfo.size);
-                }
-            }
-            progressWnd().setPercent(100);
-            progressWnd().hide();
-            free(buf);
-        }
-        fclose(saveFile);
-        expansion().SetRampage(0);
-    } else {
-        BlankSram(aStartPage);
-    }
-}
-
 void cSram::SaveSramToFile(const char* romName, u16 aStartPage) {
     char saveName[256];
     if (!SaveFileName(romName, saveName)) return;

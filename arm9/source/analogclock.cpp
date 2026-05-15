@@ -7,7 +7,6 @@
 
 cAnalogClock::cAnalogClock() {
     setEngine(GE_SUB);
-    _show = false;
     _lengthSeconds = 0;
     _lengthMinutes = 0;
     _lengthHours = 0;
@@ -21,7 +20,11 @@ cAnalogClock::~cAnalogClock() {}
 
 void cAnalogClock::init() {
     CIniFile ini = iniFiles().get(SFN_UI_SETTINGS);
-    _show = ini.GetInt("analog clock", "show", _show);
+    
+    if (!ini.GetInt("analog clock", "show", 0)) {
+        hide();
+    }
+
     int dx = ini.GetInt("analog clock", "x", 0);
     int dy = ini.GetInt("analog clock", "y", 0);
     setRelativePosition(cPoint(dx, dy));
@@ -58,15 +61,11 @@ void cAnalogClock::init() {
 }
 
 void cAnalogClock::draw() {
-    if (!_show) {
-        return;
-    }
-
     s16 degreesSeconds = datetime().seconds() * 6;
     s16 degreesMinutes = datetime().minutes() * 6;
     s16 degreesHours = (datetime().hours() % 12) * 30;
     s16 degreesAlarm = (personalData().alarmHour() % 12) * 30;
-    degreesAlarm += (personalData().alarmMinute() / 2);
+    degreesAlarm += (personalData().alarmMinute() >> 1);
 
     gdi().drawRadiusLine(position().x, position().y, 2, _lengthSeconds, degreesSeconds, _colorSeconds, selectedEngine());
     gdi().drawRadiusLine(position().x, position().y, 2, _lengthMinutes, degreesMinutes, _colorMinutes, selectedEngine());

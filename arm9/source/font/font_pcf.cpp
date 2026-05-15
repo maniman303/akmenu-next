@@ -12,7 +12,8 @@
 #include <unordered_map>
 #include "font_pcf.h"
 #include "font_pcf_internals.h"
-#include "language.h"
+#include "../divider.h"
+#include "../language.h"
 
 std::unordered_map<u16, s32> map;
 
@@ -165,10 +166,7 @@ bool cFontPcf::ParseEncodings(int aFont, u32 aSize, u32 aOffset) {
             u16* codes = (u16*)(buffer + sizeof(SPcfEncodingsHeader));
             for (u32 ii = 0; ii < nencoding; ii++) {
                 if (codes[ii] != 0xffff) {
-                    iGlyphs[codes[ii]].iCode =
-                            (((ii / (header.iLastCol - header.iFirstCol + 1)) + header.iFirstRow) *
-                             256) +
-                            ((ii % (header.iLastCol - header.iFirstCol + 1)) + header.iFirstCol);
+                    iGlyphs[codes[ii]].iCode = ((hw::divide(ii, (header.iLastCol - header.iFirstCol + 1)) + header.iFirstRow) * 256) + (hw::mod(ii, (header.iLastCol - header.iFirstCol + 1)) + header.iFirstCol);
                 }
             }
             res = true;

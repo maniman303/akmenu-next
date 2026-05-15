@@ -8,8 +8,9 @@
 */
 
 #include "formdesc.h"
-#include "fontfactory.h"
 #include "uisettings.h"
+#include "../divider.h"
+#include "../font/fontfactory.h"
 
 cFormDesc::cFormDesc() {
     _bodyColor = uiSettings().formBodyColor;    // RGB15(30,29,22);
@@ -29,7 +30,7 @@ void cFormDesc::draw(const cRect& area, GRAPHICS_ENGINE engine) const {
         u32 middleX = area.position().x + _topleft.width();
         u32 middleY = area.position().y;
         u32 middleWidth = area.size().x - _topleft.width() - _topright.width();
-        u32 repeats = (middleWidth / _middle.width()) + 1;
+        u32 repeats = hw::divide(middleWidth, _middle.width()) + 1;
 
         gdi().bitBlt(_middle.buffer(), middleX, middleY, _middle.width(), _middle.height(), (u16)repeats, engine);
     }

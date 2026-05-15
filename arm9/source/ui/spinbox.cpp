@@ -10,10 +10,11 @@
 #include <math.h>
 #include <string>
 #include "spinbox.h"
-#include "fontfactory.h"
-#include "logger.h"
 #include "uisettings.h"
+#include "../divider.h"
+#include "../logger.h"
 #include "../systemfilenames.h"
+#include "../font/fontfactory.h"
 
 //#include "windowmanager.h"
 
@@ -145,7 +146,7 @@ namespace akui {
             s32 middleWidth = _middleBg.size().x;
             if (middleWidth > 0) {
                 s32 titleWidth = _nextButton.position().x - x - _rightBg.size().x;
-                s32 repeats = (titleWidth / middleWidth) + 1;
+                s32 repeats = hw::divide(titleWidth, middleWidth) + 1;
                 _middleBg.draw(x, y, (u16)repeats);
             }
 

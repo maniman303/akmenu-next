@@ -8,6 +8,7 @@
 */
 
 #include "timer.h"
+#include "divider.h"
 #include "stringtool.h"
 
 cTimer::cTimer() {
@@ -40,7 +41,7 @@ u32 cTimer::updateFrames() {
     u32 diff = _ticks - _fpsCounter;
     _fpsCounter = _ticks;
 
-    _fps = 60 / diff;
+    _fps = hw::divide(60, diff);
 
     return _frames;
 }

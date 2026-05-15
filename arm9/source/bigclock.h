@@ -36,7 +36,6 @@ class cBigClock : public cWindow {
     cBMP15 _numbers;
     cBMP15 _colon;
 
-    bool _show;
     bool _colonShow;
     bool _ampmShow;
     cPoint _ampmPosition;

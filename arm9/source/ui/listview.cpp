@@ -12,6 +12,7 @@
 #include "timer.h"
 #include "logger.h"
 #include "uisettings.h"
+#include "../divider.h"
 #include "../stringtool.h"
 #include "../globalsettings.h"
 
@@ -118,7 +119,7 @@ namespace akui {
             return;
         }
 
-        _visibleRowCount = size().y / _rowHeight;
+        _visibleRowCount = hw::divide(size().y, _rowHeight);
     }
 
     void cListView::draw() {
@@ -263,7 +264,7 @@ namespace akui {
 
     s32 cListView::rowBelowPoint(const cPoint& pt) {
         if (windowRectangle().surrounds(pt)) {
-            s32 row = _firstVisibleRowId + (pt.y - position().y) / _rowHeight;
+            s32 row = _firstVisibleRowId + hw::divide(pt.y - position().y, _rowHeight);
             if (static_cast<size_t>(row) >= _rows.size()) row = -1;
             return row;
         }
@@ -303,7 +304,7 @@ namespace akui {
 
         u32 tickDiff = timer().getFrame() - gs().scrollTick;
         if (message.isKeyShift(KEY_DOWN)) {
-            if (!message.isKeyDown(KEY_DOWN) && (tickDiff <= gs().scrollWait || (tickDiff % gs().scrollSpeed) != 0)) {
+            if (!message.isKeyDown(KEY_DOWN) && (tickDiff <= gs().scrollWait || hw::mod(tickDiff, gs().scrollSpeed) != 0)) {
                 return true;
             }
 
@@ -313,7 +314,7 @@ namespace akui {
         }
 
         if (message.isKeyShift(KEY_UP)) {
-            if (!message.isKeyDown(KEY_UP) && (tickDiff <= gs().scrollWait || (tickDiff % gs().scrollSpeed) != 0)) {
+            if (!message.isKeyDown(KEY_UP) && (tickDiff <= gs().scrollWait || hw::mod(tickDiff, gs().scrollSpeed) != 0)) {
                 return true;
             }
 

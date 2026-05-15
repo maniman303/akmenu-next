@@ -1,5 +1,6 @@
 #include <algorithm>
 #include "animation.h"
+#include "../divider.h"
 #include "../timer.h"
 
 Animation::Animation() : Animation(0) {}
@@ -71,8 +72,9 @@ u16 Animation::value() {
     if (ticksSincStart >= _duration) {
         res = 100;
     } else if (ticksSincStart > 0) {
-        double incPerTick = 100.0 / static_cast<double>(_duration);
-        res = std::min((u16)100, static_cast<u16>(incPerTick * static_cast<double>(ticksSincStart)));
+        s32 incRestPerTick = 0;
+        s32 incPerTick = hw::divide(100, _duration, incRestPerTick);
+        res = std::min((u16)100, (u16)(ticksSincStart * incPerTick + hw::divide(ticksSincStart * incRestPerTick, _duration)));
     }
 
     return _isReversed ? 100 - res : res;

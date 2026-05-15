@@ -15,6 +15,7 @@
 #include "logger.h"
 #include "uisettings.h"
 #include "windowmanager.h"
+#include "../divider.h"
 #include "../globalsettings.h"
 
 namespace akui {
@@ -126,12 +127,12 @@ namespace akui {
         }
 
         u32 tickDiff = timer().getFrame() - gs().scrollTick;
-        if (message.isKeyDown(KEY_DOWN) || (message.isKeyHeld(KEY_DOWN) && tickDiff > gs().scrollWait && tickDiff % gs().scrollSpeed == 0)) {
+        if (message.isKeyDown(KEY_DOWN) || (message.isKeyHeld(KEY_DOWN) && tickDiff > gs().scrollWait && hw::mod(tickDiff, gs().scrollSpeed) == 0)) {
             selectItem(_selectedItemIndex + 1, false);
             return true;
         }
 
-        if (message.isKeyDown(KEY_UP) || (message.isKeyHeld(KEY_UP) && tickDiff > gs().scrollWait && tickDiff % gs().scrollSpeed == 0)) {
+        if (message.isKeyDown(KEY_UP) || (message.isKeyHeld(KEY_UP) && tickDiff > gs().scrollWait && hw::mod(tickDiff, gs().scrollSpeed) == 0)) {
             selectItem(_selectedItemIndex - 1, false);
             return true;
         }
@@ -220,7 +221,7 @@ namespace akui {
         cRect rect(menuPos, menuPos + menuSize);
 
         if (rect.surrounds(pt)) {
-            s32 item = (pt.y - menuPos.y) / _itemHeight;
+            s32 item = hw::divide(pt.y - menuPos.y, _itemHeight);
 
             s32 itemOffset = 0;
             for (int i = 0; i <= item; i++) {

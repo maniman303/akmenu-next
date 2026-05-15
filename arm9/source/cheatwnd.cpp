@@ -10,6 +10,7 @@
 #include <fat.h>
 #include <sys/stat.h>
 #include "cheatwnd.h"
+#include "divider.h"
 #include "gamecode.h"
 #include "language.h"
 #include "msgbox.h"
@@ -167,12 +168,12 @@ bool cCheatWnd::processKeyMessage(cKeyMessage message) {
     }
 
     u32 tickDiff = timer().getFrame() - gs().scrollTick;
-    if (message.isKeyDown(KEY_DOWN) || (message.isKeyHeld(KEY_DOWN) && tickDiff > gs().scrollWait && tickDiff % gs().scrollSpeed == 0)) {
+    if (message.isKeyDown(KEY_DOWN) || (message.isKeyHeld(KEY_DOWN) && tickDiff > gs().scrollWait && hw::mod(tickDiff, gs().scrollSpeed) == 0)) {
         _list.selectNext();
         return true;
     }
 
-    if (message.isKeyDown(KEY_UP) || (message.isKeyHeld(KEY_UP) && tickDiff > gs().scrollWait && tickDiff % gs().scrollSpeed == 0)) {
+    if (message.isKeyDown(KEY_UP) || (message.isKeyHeld(KEY_UP) && tickDiff > gs().scrollWait && hw::mod(tickDiff, gs().scrollSpeed) == 0)) {
         _list.selectPrev();
         return true;
     }

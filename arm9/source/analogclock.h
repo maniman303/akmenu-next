@@ -18,7 +18,6 @@ class cAnalogClock : public cWindow {
     void draw() override;
 
   protected:
-    bool _show;
     u16 _lengthSeconds;
     u16 _lengthMinutes;
     u16 _lengthHours;

@@ -13,6 +13,7 @@
 #include <string>
 #include <math.h>
 #include "dbgtool.h"
+#include "divider.h"
 #include "fontfactory.h"
 #include "globalsettings.h"
 #include "sprite.h"
@@ -285,7 +286,7 @@ void cGdi::drawLine(s16 x1, s16 y1, s16 x2, s16 y2, GRAPHICS_ENGINE engine) {
         } else {
             xv = -1;
         }
-        yv = ye / abs(xe);
+        yv = hw::divide(ye, abs(xe));
 
         while (px != xe) {
             putScreenPixel(buffer, x1 + px, y1 + (int)py, color);
@@ -301,7 +302,7 @@ void cGdi::drawLine(s16 x1, s16 y1, s16 x2, s16 y2, GRAPHICS_ENGINE engine) {
         float xv;
         int yv;
 
-        xv = xe / abs(ye);
+        xv = hw::divide(xe, abs(ye));
         if (0 < ye) {
             yv = 1;
         } else {
@@ -709,7 +710,9 @@ void ITCM_FUNC(cGdi::bitBlt)(const void* src, s16 srcW, s16 srcH, s16 destX, s16
         return;
     }
 
-    repeats = std::min(repeats, (u16)((SCREEN_WIDTH - destX) / destW));
+    if (repeats > 1) {
+        repeats = std::min(repeats, (u16)hw::divide(SCREEN_WIDTH - destX, destW));
+    }
 
     u16 pitchPixel = (destW + (destW & 1));
     u16 halfPitch = pitchPixel >> 1;

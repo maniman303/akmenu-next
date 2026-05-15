@@ -14,6 +14,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "datetime.h"
+#include "divider.h"
 #include "dbgtool.h"
 #include "dsrom.h"
 #include "inifile.h"
@@ -222,7 +223,7 @@ bool cSaveManager::initializeSaveFile(const std::string& romFilename, u8 slot, u
                     }
                     tail -= writtenSize;
                     ii++;
-                    if (0 == ii % 8) progressWnd().setPercent((lseek(f, 0, SEEK_END)) * 100 / size);
+                    if (0 == ii % 8) progressWnd().setPercent(hw::divide(lseek(f, 0, SEEK_END) * 100, size));
                 }
                 progressWnd().setPercent(100);
                 progressWnd().hide();
