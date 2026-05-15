@@ -47,6 +47,9 @@ void cSystemDetails::initArm7RegStatuses() {
 }
 
 void cSystemDetails::update() {
+	bool oldCharging = _chargingStatus;
+	int oldStatus = _batteryStatus;
+
 	u32 level = getBatteryLevel();
 	_chargingStatus = (level & 0x80) != 0;
 
@@ -56,7 +59,11 @@ void cSystemDetails::update() {
 		_batteryStatus = level & 0xf;
 	}
 
-	if (_batteryStatus == 0 || _chargingStatus) {
+	if (oldCharging == _chargingStatus && oldStatus == _batteryStatus) {
+		return;
+	}
+
+	if (_batteryStatus > 3 || _chargingStatus) {
 		ledBlink(PM_LED_ON);
 	} else {
 		ledBlink(PM_LED_BLINK);
