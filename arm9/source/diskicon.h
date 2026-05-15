@@ -30,7 +30,6 @@ class cDiskIcon : public cWindow {
   protected:
     bool _show;
     bool _blink;
-    float _lightTime;
     cBMP15 _icon;
 };
 

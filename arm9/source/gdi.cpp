@@ -275,11 +275,11 @@ void cGdi::drawLine(s16 x1, s16 y1, s16 x2, s16 y2, GRAPHICS_ENGINE engine) {
 
     if (abs(x2 - x1) > abs(y2 - y1)) {
         int px = 0;
-        float py = 0;
+        int py = 0;
         int xe = x2 - x1;
-        float ye = y2 - y1;
+        int ye = y2 - y1;
         int xv;
-        float yv;
+        int yv;
 
         if (0 < xe) {
             xv = 1;
@@ -295,11 +295,11 @@ void cGdi::drawLine(s16 x1, s16 y1, s16 x2, s16 y2, GRAPHICS_ENGINE engine) {
         }
         return;
     } else {
-        float px = 0;
+        int px = 0;
         int py = 0;
-        float xe = x2 - x1;
+        int xe = x2 - x1;
         int ye = y2 - y1;
-        float xv;
+        int xv;
         int yv;
 
         xv = hw::divide(xe, abs(ye));
@@ -314,6 +314,7 @@ void cGdi::drawLine(s16 x1, s16 y1, s16 x2, s16 y2, GRAPHICS_ENGINE engine) {
             px += xv;
             py += yv;
         }
+        
         return;
     }
 }
