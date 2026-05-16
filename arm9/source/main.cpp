@@ -244,6 +244,7 @@ int main(int argc, char* argv[]) {
 
     u16 ticks = 0;
     while (true) {
+        datetime().fillTimeParts();
         timer().updateFrames();
         tickSound().play();
 
@@ -258,8 +259,7 @@ int main(int argc, char* argv[]) {
 
         windowManager().update();
         subWindowManager().update();
-
-        datetime().purge();
+        
         destroyBMP15();
 
         swiWaitForVBlank();

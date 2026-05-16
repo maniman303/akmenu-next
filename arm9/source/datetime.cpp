@@ -9,6 +9,7 @@
 
 #include <string.h>
 #include "datetime.h"
+#include "blockds/ndstypes.h"
 
 inline bool isLeapYear(u16 year) {
     return (year % 400 == 0) || ((year % 4 == 0) && (year % 100 != 0));
@@ -17,76 +18,74 @@ inline bool isLeapYear(u16 year) {
 const char* cDateTime::weekdayStrings[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
 cDateTime::cDateTime() {
-    set = false;
+    fillTimeParts();
 }
 
-void cDateTime::FillTimeParts(void) {
-    if (set) {
-        return;
-    }
-
+ARM_CODE LIBNDS_NOINLINE
+void ITCM_FUNC(cDateTime::fillTimeParts)(void) {
     time_t epochTime;
     if (time(&epochTime) == (time_t)-1) {
         memset(&iTimeParts, 0, sizeof(iTimeParts));
     } else {
         localtime_r(&epochTime, &iTimeParts);
     }
-
-    set = true;
 }
 
-u16 cDateTime::year() {
-    FillTimeParts();
+ARM_CODE LIBNDS_NOINLINE
+u16 ITCM_FUNC(cDateTime::year)() {
     return iTimeParts.tm_year + 1900;
 }
 
-u8 cDateTime::month() {
-    FillTimeParts();
+ARM_CODE LIBNDS_NOINLINE
+u8 ITCM_FUNC(cDateTime::month)() {
     return iTimeParts.tm_mon + 1;
 }
 
-u8 cDateTime::day() {
-    FillTimeParts();
+ARM_CODE LIBNDS_NOINLINE
+u8 ITCM_FUNC(cDateTime::day)() {
     return iTimeParts.tm_mday;
 }
 
-u8 cDateTime::weekday() {
-    FillTimeParts();
+ARM_CODE LIBNDS_NOINLINE
+u8 ITCM_FUNC(cDateTime::weekday)() {
     return iTimeParts.tm_wday;
 }
 
-u32 cDateTime::now() {
+ARM_CODE LIBNDS_NOINLINE
+u32 ITCM_FUNC(cDateTime::now)() {
     u32 res = ((u32)year()) << 16;
     res = res | ((u16)month()) << 8;
     res = res | day();
     return res;
 }
 
-u8 cDateTime::hours() {
-    FillTimeParts();
+ARM_CODE LIBNDS_NOINLINE
+u8 ITCM_FUNC(cDateTime::hours)() {
     return iTimeParts.tm_hour;
 }
 
-u8 cDateTime::minutes() {
-    FillTimeParts();
+ARM_CODE LIBNDS_NOINLINE
+u8 ITCM_FUNC(cDateTime::minutes)() {
     return iTimeParts.tm_min;
 }
 
-u8 cDateTime::seconds() {
-    FillTimeParts();
+ARM_CODE LIBNDS_NOINLINE
+u8 ITCM_FUNC(cDateTime::seconds)() {
     return iTimeParts.tm_sec;
 }
 
-u8 cDateTime::daysOfMonth() {
+ARM_CODE LIBNDS_NOINLINE
+u8 ITCM_FUNC(cDateTime::daysOfMonth)() {
     return (28 | (((isLeapYear(year()) ? 62648028 : 62648012) >> (month() * 2)) & 3));
 }
 
-u8 cDateTime::weekDayOfMonthFirstDay() {
+ARM_CODE LIBNDS_NOINLINE
+u8 ITCM_FUNC(cDateTime::weekDayOfMonthFirstDay)() {
     return (weekday() + 7 - ((day() - 1) % 7)) % 7;
 }
 
-u64 cDateTime::secondsInDay(void) {
-    FillTimeParts();
+ARM_CODE LIBNDS_NOINLINE
+u64 ITCM_FUNC(cDateTime::secondsInDay)(void) {
     u8 hours = iTimeParts.tm_hour;
     u16 minutes = hours * 60 + iTimeParts.tm_min;
     u64 seconds = minutes * 60 + iTimeParts.tm_sec;
@@ -95,21 +94,13 @@ u64 cDateTime::secondsInDay(void) {
 }
 
 std::string cDateTime::getDateString() {
-    // FillTimeParts();
     return formatString("%d/%d%/%d %s\n", year(), month(), day(), weekdayStrings[weekday()]);
 }
 
 std::string cDateTime::getTimeString() {
-    // FillTimeParts();
     return formatString("%d:%d%:%d\n", hours(), minutes(), seconds());
 }
 
 std::string cDateTime::getTimeStampString() {
-    // FillTimeParts();
-    return formatString("%04d%02d%02d%02d%02d%02d", year(), month(), day(), hours(), minutes(),
-                        seconds());
-}
-
-void cDateTime::purge() {
-    set = false;
+    return formatString("%04d%02d%02d%02d%02d%02d", year(), month(), day(), hours(), minutes(), seconds());
 }

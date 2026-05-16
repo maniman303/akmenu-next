@@ -17,10 +17,6 @@
 class cDateTime {
   private:
     tm iTimeParts;
-    bool set;
-
-  private:
-    void FillTimeParts(void);
 
   public:
     cDateTime();
@@ -28,6 +24,7 @@ class cDateTime {
 
   public:
     static const char* weekdayStrings[];
+    void fillTimeParts(void);
     u16 year(void);
     u8 month(void);
     u8 day(void);
@@ -47,8 +44,6 @@ class cDateTime {
     std::string getDateString(void);
     std::string getTimeString(void);
     std::string getTimeStampString(void);
-
-    void purge();
 };
 
 typedef t_singleton<cDateTime> dateTime_s;
