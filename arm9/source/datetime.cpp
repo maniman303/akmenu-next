@@ -7,10 +7,12 @@
     SPDX-License-Identifier: GPL-3.0-or-later
 */
 
+#include <string.h>
 #include "datetime.h"
-#include <string.h>  //memset
 
-#define IS_LEAP(n) ((!(((n) + 1900) % 400) || (!(((n) + 1900) % 4) && (((n) + 1900) % 100))) != 0)
+inline bool isLeapYear(u16 year) {
+    return (year % 400 == 0) || ((year % 4 == 0) && (year % 100 != 0));
+}
 
 const char* cDateTime::weekdayStrings[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
@@ -76,7 +78,7 @@ u8 cDateTime::seconds() {
 }
 
 u8 cDateTime::daysOfMonth() {
-    return (28 | (((IS_LEAP(year()) ? 62648028 : 62648012) >> (month() * 2)) & 3));
+    return (28 | (((isLeapYear(year()) ? 62648028 : 62648012) >> (month() * 2)) & 3));
 }
 
 u8 cDateTime::weekDayOfMonthFirstDay() {

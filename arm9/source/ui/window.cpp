@@ -9,6 +9,7 @@
 
 #include "window.h"
 #include "windowmanager.h"
+#include "../blockds/ndstypes.h"
 
 cWindow::cWindow(cWindow* aParent, const std::string& aText)
     : _parent(aParent),
@@ -130,7 +131,8 @@ cWindow& cWindow::setSize(const cSize& aSize) {
     return *this;
 }
 
-cPoint cWindow::position() const {
+ARM_CODE LIBNDS_NOINLINE
+cPoint ITCM_FUNC(cWindow::position)() const {
     cPoint parentPosition = cPoint(0, 0);
     if (_parent != NULL) {
         parentPosition = _parent->position();
