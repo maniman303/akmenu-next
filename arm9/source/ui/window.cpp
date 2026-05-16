@@ -148,7 +148,13 @@ cWindow& cWindow::setRelativePosition(const cPoint& rPosition) {
 }
 
 cWindow& cWindow::setText(const std::string& aText) {
+    bool textChanged = _text != aText;
+
     _text = aText;
-    onTextChanged();
+    
+    if (textChanged) {
+        onTextChanged();
+    }
+
     return *this;
 }

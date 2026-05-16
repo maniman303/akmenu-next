@@ -14,6 +14,7 @@
 #include "font_pcf_internals.h"
 #include "../divider.h"
 #include "../language.h"
+#include "../logger.h"
 
 std::unordered_map<u16, s32> map;
 
@@ -52,8 +53,9 @@ u32 cFontPcf::TextWidth(const std::string& aString) const {
     u32 res = 0;
     u32 temp = 0;
     u32 len = 0;
+    size_t strLen = aString.length();
 
-    for (size_t i = 0; i < aString.length(); i++) {
+    for (size_t i = 0; i < strLen; i++) {
         if (aString[i] == '\n' || aString[i] == '\r') {
             if (temp > res) {
                 res = temp;
@@ -65,7 +67,15 @@ u32 cFontPcf::TextWidth(const std::string& aString) const {
 
         u32 code = utf8toucs2(reinterpret_cast<const u8*>(aString.c_str() + i), &len);
         s32 index = Search(code);
-        temp += (index >= 0) ? iGlyphs[index].iWidth : ((code > 0 && code < 8) ? 10 : 0);
+        if (index >= 0) {
+            temp += iGlyphs[index].iWidth;
+        } else {
+            temp += (code > 0 && code < 8) ? 10 : 0;
+        }
+
+        if (len > 1) {
+            i += len - 1;
+        }
     }
 
     if (res == 0) {

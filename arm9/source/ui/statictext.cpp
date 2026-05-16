@@ -23,6 +23,8 @@ cStaticText::cStaticText(s32 x, s32 y, u32 w, u32 h, cWindow* parent, const std:
     _textColor = uiSettings().formTextColor;  //(RGB15(31,31,31))
     _isFocusable = false;
 
+    fillLines();
+
     setRelativePosition(cPoint(x, y));
 }
 
@@ -41,14 +43,11 @@ void cStaticText::draw() {
         return;
     }
     
-    std::string content = textFont.BreakLine(text(), size().x);
-    std::vector<std::string> lines = splitLines(content);
-    for (size_t i = 0; i < lines.size(); i++) {
-        u32 textWidth = textFont.TextWidth(lines[i]);
+    for (size_t i = 0; i < _lines.size(); i++) {
         u32 textHeight = textFont.GetHeight() + textFont.GetDescend();
-        s16 posX = position().x + (size().x - textWidth) / 2;
+        s16 posX = position().x + (size().x - _lines[i].width) / 2;
         s16 posY = position().y + i * textHeight;
-        gdi().textOutRect(posX, posY, size().x, size().y, lines[i].c_str(), selectedEngine(), textFont);
+        gdi().textOutRect(posX, posY, size().x, size().y, _lines[i].text.c_str(), selectedEngine(), textFont);
     }
 }
 
@@ -58,8 +57,30 @@ void cStaticText::setTextColor(COLOR color) {
 
 void cStaticText::setFont(bool primary) {
     _primaryFont = primary;
+    fillLines();
 }
 
 void cStaticText::setCentered(bool centered) {
     _centered = centered;
+    fillLines();
+}
+
+void cStaticText::onTextChanged() {
+    fillLines();
+}
+
+void cStaticText::fillLines() {
+    _lines.clear();
+    
+    if (!_centered) {
+        return;
+    }
+
+    cFont& textFont = _primaryFont ? font() : fontSecondary();
+    std::string content = textFont.BreakLine(_text, size().x);
+    std::vector<std::string> lines = splitLines(content);
+
+    for (const std::string& line : lines) {
+        _lines.emplace_back(line, textFont.TextWidth(line));
+    }
 }

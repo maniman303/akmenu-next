@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <nds.h>
+#include <vector>
 #include "bmp15.h"
 #include "window.h"
 
@@ -24,7 +26,19 @@ class cStaticText : public cWindow {
     void setTextColor(COLOR color);
     void setFont(bool primary);
     void setCentered(bool centered);
+
   protected:
+    struct TextLine {
+      std::string text;
+      u16 width;
+
+      TextLine(const std::string& t, u16 w) : text(t), width(w) {}
+    };
+
+    void onTextChanged() override;
+    void fillLines();
+
+    std::vector<TextLine> _lines;
     bool _centered;
     bool _primaryFont;
     COLOR _textColor;
